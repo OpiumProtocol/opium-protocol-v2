@@ -8,9 +8,9 @@ contract WhitelistedWithGovernance is Whitelisted {
     event GovernorSet(address governor);
 
     // Emitted when new whitelist is proposed
-    event Proposed(address[] whitelist);
+    event ProposedWhitelistedWithGovernance(address[] whitelist);
     // Emitted when proposed whitelist is committed (set)
-    event Committed(address[] whitelist);
+    event CommittedWhitelistedWithGovernance(address[] whitelist);
 
     // Proposal life timelock interval
     uint256 public timeLockInterval;
@@ -48,13 +48,13 @@ contract WhitelistedWithGovernance is Whitelisted {
         // If whitelist has never been initialized, we set whitelist right away without proposal
         if (whitelist.length == 0) {
             whitelist = _whitelist;
-            emit Committed(_whitelist);
+            emit CommittedWhitelistedWithGovernance(_whitelist);
 
         // Otherwise save current time as timestamp of proposal, save proposed whitelist and emit event
         } else {
             proposalTime = now;
             proposedWhitelist = _whitelist;
-            emit Proposed(_whitelist);
+            emit CommittedWhitelistedWithGovernance(_whitelist);
         }
     }
 
@@ -68,7 +68,7 @@ contract WhitelistedWithGovernance is Whitelisted {
         
         // Set new whitelist and emit event
         whitelist = proposedWhitelist;
-        emit Committed(whitelist);
+        emit CommittedWhitelistedWithGovernance(whitelist);
 
         // Reset proposal time lock
         proposalTime = 0;
