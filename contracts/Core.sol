@@ -71,11 +71,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// [0] - buyer address
     /// [1] - seller address - if seller is set to `address(0)`, consider as pooled position
     function create(Derivative memory _derivative, uint256 _quantity, address[2] memory _addresses) public nonReentrant {
-        if (_addresses[1] == address(0)) {
-            _createPooled(_derivative, _quantity, _addresses[0]);
-        } else {
-            _create(_derivative, _quantity, _addresses);
-        }
+        _create(_derivative, _quantity, _addresses);
     }
 
     /// @notice Executes several positions of `msg.sender` with same `tokenId`
@@ -160,56 +156,6 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         IERC20 marginToken;
         TokenSpender tokenSpender;
         TokenMinter tokenMinter;
-    }
-
-    /// @notice This function creates pooled positions
-    /// @param _derivative Derivative Derivative definition
-    /// @param _quantity uint256 Quantity of positions to create
-    /// @param _address address Address of position receiver
-    function _createPooled(Derivative memory _derivative, uint256 _quantity, address _address) private {
-        // Local variables
-        CreatePooledLocalVars memory vars;
-
-        // Create instance of Opium.SyntheticAggregator
-        // Create instance of Opium.IDerivativeLogic
-        // Create instance of margin token
-        // Create instance of Opium.TokenSpender
-        // Create instance of Opium.TokenMinter
-        vars.syntheticAggregator = SyntheticAggregator(registry.getSyntheticAggregator());
-        vars.derivativeLogic = IDerivativeLogic(_derivative.syntheticId);
-        vars.marginToken = IERC20(_derivative.token);
-        vars.tokenSpender = TokenSpender(registry.getTokenSpender());
-        vars.tokenMinter = TokenMinter(registry.getMinter());
-
-        // Generate hash for derivative
-        bytes32 derivativeHash = getDerivativeHash(_derivative);
-
-        // Check with Opium.SyntheticAggregator if syntheticId is a pool
-        require(vars.syntheticAggregator.isPool(derivativeHash, _derivative), ERROR_CORE_NOT_POOL);
-
-        // Check if ticker was canceled
-        require(!cancelled[derivativeHash], ERROR_CORE_TICKER_WAS_CANCELLED);
-
-        // Validate input data against Derivative logic (`syntheticId`)
-        require(vars.derivativeLogic.validateInput(_derivative), ERROR_CORE_SYNTHETIC_VALIDATION_ERROR);
-
-        // Get cached margin required according to logic from Opium.SyntheticAggregator
-        (uint256 margin, ) = vars.syntheticAggregator.getMargin(derivativeHash, _derivative);
-
-        // Check ERC20 tokens allowance: margin * quantity
-        // `msg.sender` must provide margin for position creation
-        require(vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >= margin.mul(_quantity), ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE);
-
-    	// Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        vars.tokenSpender.claimTokens(vars.marginToken, msg.sender, address(this), margin.mul(_quantity));
-
-        // Since it's a pooled position, we add transferred margin to pool balance
-        poolVaults[_derivative.syntheticId][_derivative.token] = poolVaults[_derivative.syntheticId][_derivative.token].add(margin.mul(_quantity));
-
-        // Mint LONG position tokens
-        vars.tokenMinter.mint(_address, derivativeHash, _quantity);
-
-        emit Created(_address, address(0), derivativeHash, _quantity);
     }
 
     struct CreateLocalVars {
