@@ -7,11 +7,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { deployer } = await getNamedAccounts();
 
-  await deploy("LibPosition", {
+  await deploy("NewLibPosition", {
     from: deployer,
     log: true,
   });
 };
 
 export default func;
-func.tags = ["LibPosition"];
+func.tags = ["NewLibPosition"];

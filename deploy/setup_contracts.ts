@@ -8,8 +8,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deployments.fixture([
     "Registry",
-    "LibPosition",
-    "TokenMinter",
+    "NewLibPosition",
+    "OpiumProxyFactory",
     "Core",
     "TokenSpender",
     "OracleAggregator",
@@ -19,7 +19,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer, governor } = await getNamedAccounts();
 
   const registry = await get("Registry");
-  const tokenMinter = await get("TokenMinter");
+  const tokenMinter = await get("OpiumProxyFactory");
   const core = await get("Core");
   const oracleAggregator = await get("OracleAggregator");
   const syntheticAggregator = await get("SyntheticAggregator");

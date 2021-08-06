@@ -10,17 +10,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const registry = await get("Registry");
-  const libPosition = await get("LibPosition");
+  const libPosition = await get("NewLibPosition");
 
-  await deploy("TokenMinter", {
+  await deploy("OpiumProxyFactory", {
     from: deployer,
     args: [baseTokenURI, registry.address],
     libraries: {
-      LibPosition: libPosition.address,
+      NewLibPosition: libPosition.address,
     },
     log: true,
   });
 };
 
 export default func;
-func.tags = ["TokenMinter"];
+func.tags = ["OpiumProxyFactory"];
