@@ -1,7 +1,5 @@
 pragma solidity 0.5.16;
 
-import "hardhat/console.sol";
-
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 

@@ -5,8 +5,8 @@ import "./Errors/RegistryErrors.sol";
 /// @title Opium.Registry contract keeps addresses of deployed Opium contracts set to allow them route and communicate to each other
 contract Registry is RegistryErrors {
 
-    // Address of Opium.TokenMinter contract
-    address private minter;
+    // Address of Opium.OpiumProxyFactory contract
+    address private opiumProxyFactory;
 
     // Address of Opium.Core contract
     address private core;
@@ -39,15 +39,15 @@ contract Registry is RegistryErrors {
 
     // SETTERS
 
-    /// @notice Sets Opium.TokenMinter, Opium.Core, Opium.OracleAggregator, Opium.SyntheticAggregator, Opium.TokenSpender, Opium commission receiver addresses and allows to do it only once
-    /// @param _minter address Address of Opium.TokenMinter
+    /// @notice Sets Opium.OpiumProxyFactory, Opium.Core, Opium.OracleAggregator, Opium.SyntheticAggregator, Opium.TokenSpender, Opium commission receiver addresses and allows to do it only once
+    /// @param _opiumProxyFactory address Address of Opium.OpiumProxyFactory
     /// @param _core address Address of Opium.Core
     /// @param _oracleAggregator address Address of Opium.OracleAggregator
     /// @param _syntheticAggregator address Address of Opium.SyntheticAggregator
     /// @param _tokenSpender address Address of Opium.TokenSpender
     /// @param _opiumAddress address Address of Opium commission receiver
     function init(
-        address _minter,
+        address _opiumProxyFactory,
         address _core,
         address _oracleAggregator,
         address _syntheticAggregator,
@@ -55,7 +55,7 @@ contract Registry is RegistryErrors {
         address _opiumAddress
     ) external onlyInitializer {
         require(
-            minter == address(0) &&
+            opiumProxyFactory == address(0) &&
             core == address(0) &&
             oracleAggregator == address(0) &&
             syntheticAggregator == address(0) &&
@@ -65,7 +65,7 @@ contract Registry is RegistryErrors {
         );
 
         require(
-            _minter != address(0) &&
+            _opiumProxyFactory != address(0) &&
             _core != address(0) &&
             _oracleAggregator != address(0) &&
             _syntheticAggregator != address(0) &&
@@ -74,7 +74,7 @@ contract Registry is RegistryErrors {
             ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS
         );
 
-        minter = _minter;
+        opiumProxyFactory = _opiumProxyFactory;
         core = _core;
         oracleAggregator = _oracleAggregator;
         syntheticAggregator = _syntheticAggregator;
@@ -94,8 +94,8 @@ contract Registry is RegistryErrors {
 
     /// @notice Returns address of Opium.TokenMinter
     /// @param result address Address of Opium.TokenMinter
-    function getMinter() external view returns (address result) {
-        return minter;
+    function getOpiumProxyFactory() external view returns (address result) {
+        return opiumProxyFactory;
     }
 
     /// @notice Returns address of Opium.Core

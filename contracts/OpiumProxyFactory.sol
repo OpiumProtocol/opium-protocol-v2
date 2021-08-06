@@ -4,9 +4,8 @@ import "./Lib/UsingRegistry.sol";
 import "./OpiumPositionToken.sol";
 import "./Interface/IOpiumPositionToken.sol";
 
-import "hardhat/console.sol";
-
 contract OpiumProxyFactory {
+    event LogPositionTokenAddress(address _positionAddress);
 
     function _isContract(address _address) private view returns(bool) {
         uint size;
@@ -36,19 +35,23 @@ contract OpiumProxyFactory {
         return opiumPositionAddress;
     }
 
-     function createPositionsPair(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _quantity) external {
+    function mint(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _quantity) external {
         bytes memory shortPositionBytecode = _getCreationBytecode("SHORT", "SHORT", 18);
         bytes memory longPositionBytecode = _getCreationBytecode("LONG", "LONG", 18);
         bytes32 salt = keccak256(abi.encodePacked( _derivativeHash));
-        address longPositionAddress = _checkOrDeployPosition(salt, longPositionBytecode);
         address shortPositionAddress = _checkOrDeployPosition(salt, shortPositionBytecode);
+        address longPositionAddress = _checkOrDeployPosition(salt, longPositionBytecode);
 
-        IOpiumPositionToken(shortPositionAddress).mint(_buyer, _quantity);
-        IOpiumPositionToken(longPositionAddress).mint(_seller, _quantity);
+        emit LogPositionTokenAddress(shortPositionAddress);
+        emit LogPositionTokenAddress(longPositionAddress);
+
+        IOpiumPositionToken(shortPositionAddress).mint(_seller, _quantity);
+        IOpiumPositionToken(longPositionAddress).mint(_buyer, _quantity);
     }
+    
 
-    function burn(address _token, address _positionHolder,  uint256 _quantity) external {
-        IOpiumPositionToken(_token).burn(_positionHolder,  _quantity);   
+    function burn(address _tokenOwner, address _token, uint256 _quantity) external {
+        IOpiumPositionToken(_token).burn(_tokenOwner,  _quantity);   
     }
 
 }
