@@ -12,13 +12,13 @@ describe("Registry", () => {
 
   it("should revert for non initializer address", async () => {
     try {
-      const { registry, tokenMinter, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
+      const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
       const { deployer, notAllowed } = namedSigners
 
       await registry
         .connect(notAllowed)
         .init(
-          tokenMinter.address,
+          opiumProxyFactory.address,
           core.address,
           oracleAggregator.address,
           syntheticAggregator.address,
@@ -32,11 +32,11 @@ describe("Registry", () => {
 
   it("should revert on a second init call", async () => {
     try {
-      const { registry, tokenMinter, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
+      const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
       const {deployer} = namedSigners;
 
       await registry.init(
-        tokenMinter.address,
+        opiumProxyFactory.address,
         core.address,
         oracleAggregator.address,
         syntheticAggregator.address,
@@ -55,11 +55,11 @@ describe("Registry", () => {
     expect(result).to.be.equal(core.address);
   });
 
-  it("should correctly get token minter address", async () => {
-    const { registry, tokenMinter } = await setup();
+  it("should correctly get opium proxy factory address", async () => {
+    const { registry, opiumProxyFactory } = await setup();
 
-    const result = await registry.getMinter();
-    expect(result).to.be.equal(tokenMinter.address);
+    const result = await registry.getOpiumProxyFactory();
+    expect(result).to.be.equal(opiumProxyFactory.address);
   });
 
   it("should correctly get oracle aggregator address", async () => {
