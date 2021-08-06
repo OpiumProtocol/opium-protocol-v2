@@ -42,7 +42,8 @@
     "ts-generator": "^0.1.1",
     "ts-node": "^10.0.0",
     "typechain": "^5.1.1",
-    "typescript": "~4.2.4"
+    "typescript": "~4.2.4",
+    "hardhat-deploy-ethers": "^0.3.0-beta.10"
   },
   "files": [
     "/contracts"
@@ -69,8 +70,6 @@
     "prettier:check": "prettier --check --config ./.prettierrc \"**/*.{js,json,md,sol,ts}\""
   },
   "dependencies": {
-    "erc721o": "git+https://github.com/OpiumProtocol/erc721o.git#97a3c1d",
-    "hardhat-deploy-ethers": "^0.3.0-beta.10",
     "openzeppelin-solidity": "2.4.0"
   },
   "engines": {
