@@ -3,8 +3,6 @@ pragma solidity 0.5.16;
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
-import "erc721o/contracts/Interfaces/IERC721O.sol";
-
 import "./Lib/WhitelistedWithGovernanceAndChangableTimelock.sol";
 
 /// @title Opium.TokenSpender contract holds users ERC20 approvals and allows whitelisted contracts to use tokens
@@ -28,12 +26,11 @@ contract TokenSpender is WhitelistedWithGovernanceAndChangableTimelock {
     }
 
     /// @notice Using this function whitelisted contracts could call ERC721O transfers
-    /// @param token IERC721O Instance of token
+    /// @param token IERC20 Instance of token
     /// @param from address Address from which tokens are transferred
     /// @param to address Address of tokens receiver
-    /// @param tokenId uint256 Token ID to be transferred
     /// @param amount uint256 Amount of tokens to be transferred
-    function claimPositions(IERC721O token, address from, address to, uint256 tokenId, uint256 amount) external onlyWhitelisted {
-        token.safeTransferFrom(from, to, tokenId, amount);
+    function claimPositions(IERC20 token, address from, address to, uint256 tokenId, uint256 amount) external onlyWhitelisted {
+        token.safeTransferFrom(from, to, amount);
     }
 }

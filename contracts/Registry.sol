@@ -92,8 +92,8 @@ contract Registry is RegistryErrors {
 
     // GETTERS
 
-    /// @notice Returns address of Opium.TokenMinter
-    /// @param result address Address of Opium.TokenMinter
+    /// @notice Returns address of Opium.OpiumProxyFactory
+    /// @param result address Address of Opium.OpiumProxyFactory
     function getOpiumProxyFactory() external view returns (address result) {
         return opiumProxyFactory;
     }
