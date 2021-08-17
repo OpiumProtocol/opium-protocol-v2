@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 contract RegistryErrors {
     string constant internal ERROR_REGISTRY_ONLY_INITIALIZER = "REGISTRY:ONLY_INITIALIZER";

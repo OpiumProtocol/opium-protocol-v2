@@ -126,7 +126,7 @@ const config: HardhatUserConfig = {
     tests: "./test",
   },
   solidity: {
-    version: "0.5.16",
+    version: "0.8.5",
     settings: {
       optimizer: {
         enabled: true,
@@ -176,15 +176,6 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: ETHERSCAN_KEY,
   },
-  // dependencyCompiler: {
-  //   paths: [
-  //     "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol",
-  //     "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol",
-  //     "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol",
-  //     "erc721o/contracts/Libs/LibPosition.sol",
-  //     "erc721o/contracts/Interfaces/IERC721O.sol",
-  //   ],
-  // },
 };
 
 export default config;

@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 import "../Registry.sol";
 
@@ -19,7 +19,7 @@ contract UsingRegistry is UsingRegistryErrors {
     }
 
     /// @notice Defines registry instance and emits appropriate event
-    constructor(address _registry) public {
+    constructor(address _registry) {
         registry = Registry(_registry);
         emit RegistrySet(_registry);
     }

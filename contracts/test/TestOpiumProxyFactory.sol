@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 import "../Lib/UsingRegistry.sol";
 import "../OpiumPositionToken.sol";
@@ -15,7 +15,7 @@ contract TestOpiumProxyFactory {
     }
 
     function _computeDeploymentAddress(bytes32 _salt, bytes memory _bytecode) public view returns(address) {
-        return address(uint(keccak256(abi.encodePacked(hex'ff', address(this), _salt, keccak256(_bytecode)))));
+        return address(uint160(uint256(keccak256(abi.encodePacked(hex'ff', address(this), _salt, keccak256(_bytecode))))));
     }
 
     function _getCreationBytecode(string memory name, string memory symbol, uint8 decimals) public pure returns(bytes memory) {

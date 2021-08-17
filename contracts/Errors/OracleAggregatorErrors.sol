@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 contract OracleAggregatorErrors {
     string constant internal ERROR_ORACLE_AGGREGATOR_NOT_ENOUGH_ETHER = "ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER";

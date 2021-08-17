@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 import "./WhitelistedWithGovernance.sol";
 
@@ -14,10 +14,13 @@ contract WhitelistedWithGovernanceAndChangableTimelock is WhitelistedWithGoverna
     // Proposed timelock
     uint256 public proposedTimeLock;
 
+    constructor(uint256 _timeLockInterval, address _governor) WhitelistedWithGovernance(_timeLockInterval, _governor) {}
+
+
     /// @notice Calling this function governor could propose new timelock
     /// @param _timelock uint256 New timelock value
     function proposeTimelock(uint256 _timelock) public onlyGovernor {
-        timeLockProposalTime = now;
+        timeLockProposalTime = block.timestamp;
         proposedTimeLock = _timelock;
         emit ProposedWhitelistedWithGovernanceAndChangableTimelock(_timelock);
     }
@@ -27,7 +30,7 @@ contract WhitelistedWithGovernanceAndChangableTimelock is WhitelistedWithGoverna
         // Check if proposal was made
         require(timeLockProposalTime != 0, "Didn't proposed yet");
         // Check if timelock interval was passed
-        require((timeLockProposalTime + timeLockInterval) < now, "Can't commit yet");
+        require((timeLockProposalTime + timeLockInterval) < block.timestamp, "Can't commit yet");
         
         // Set new timelock and emit event
         timeLockInterval = proposedTimeLock;

@@ -30,6 +30,7 @@
     "hardhat": "^2.4.1",
     "hardhat-dependency-compiler": "^1.1.1",
     "hardhat-deploy": "^0.8.9",
+    "hardhat-deploy-ethers": "^0.3.0-beta.10",
     "hardhat-gas-reporter": "^1.0.4",
     "lint-staged": "^11.0.0",
     "mocha": "^9.0.1",
@@ -42,8 +43,7 @@
     "ts-generator": "^0.1.1",
     "ts-node": "^10.0.0",
     "typechain": "^5.1.1",
-    "typescript": "~4.2.4",
-    "hardhat-deploy-ethers": "^0.3.0-beta.10"
+    "typescript": "~4.2.4"
   },
   "files": [
     "/contracts"
@@ -70,7 +70,7 @@
     "prettier:check": "prettier --check --config ./.prettierrc \"**/*.{js,json,md,sol,ts}\""
   },
   "dependencies": {
-    "openzeppelin-solidity": "2.4.0"
+    "openzeppelin-solidity": "^4.2.0"
   },
   "engines": {
     "node": "^14.5"

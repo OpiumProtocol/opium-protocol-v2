@@ -1,8 +1,8 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract BalanceHelper {
     using SafeERC20 for IERC20;

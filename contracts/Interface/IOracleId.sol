@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 /// @title Opium.Interface.IOracleId contract is an interface that every oracleId should implement
 interface IOracleId {

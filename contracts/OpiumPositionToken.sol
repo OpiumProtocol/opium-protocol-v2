@@ -1,11 +1,10 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 
-contract OpiumPositionToken is ERC20Detailed, ERC20 {
+contract OpiumPositionToken is ERC20 {
     address public factory;
-    constructor(string memory name, string memory symbol, uint8 decimals) public ERC20Detailed(name, symbol, decimals) {
+    constructor(string memory name, string memory symbol, uint8 decimals) ERC20(name, symbol) {
         factory = msg.sender;
     }
 

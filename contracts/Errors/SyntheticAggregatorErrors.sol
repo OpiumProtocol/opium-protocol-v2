@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 contract SyntheticAggregatorErrors {
     string constant internal ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH = "SYNTHETIC_AGGREGATOR:DERIVATIVE_HASH_NOT_MATCH";

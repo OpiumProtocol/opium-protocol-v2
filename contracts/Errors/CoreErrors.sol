@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 contract CoreErrors {
     string constant internal ERROR_CORE_NOT_POOL = "CORE:NOT_POOL";

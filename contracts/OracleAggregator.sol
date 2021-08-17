@@ -1,7 +1,7 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/security/ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 
 import "./Errors/OracleAggregatorErrors.sol";
 
@@ -47,7 +47,7 @@ contract OracleAggregator is OracleAggregatorErrors, ReentrancyGuard {
         _registerQuery(oracleId, timestamp);
 
         // Call the `oracleId` contract and transfer ETH
-        IOracleId(oracleId).fetchData.value(msg.value)(timestamp);
+        IOracleId(oracleId).fetchData{value: msg.value}(timestamp);
     }
 
     /// @notice Requests data from `oracleId` multiple times
@@ -62,7 +62,7 @@ contract OracleAggregator is OracleAggregatorErrors, ReentrancyGuard {
         }
 
         // Call the `oracleId` contract and transfer ETH
-        IOracleId(oracleId).recursivelyFetchData.value(msg.value)(timestamp, period, times);
+        IOracleId(oracleId).recursivelyFetchData{value: msg.value}(timestamp, period, times);
     }
 
     /// @notice Receives and caches data from `msg.sender`

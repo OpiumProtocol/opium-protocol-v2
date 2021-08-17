@@ -2,10 +2,9 @@ import { ethers } from "hardhat";
 import { utils } from "ethers";
 import { expect } from "chai";
 import { derivativeFactory } from "../utils/derivatives";
-import { calculateLongTokenId, calculateShortTokenId } from "../utils/positions";
 import setup from "../utils/setup";
 import { TNamedSigners } from "../hardhat.config";
-import { ERC20, OpiumPositionToken, OpiumProxyFactory } from "../typechain";
+import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { decodeLogs } from "../utils/events";
 
 const SECONDS_40_MINS = 60 * 40;

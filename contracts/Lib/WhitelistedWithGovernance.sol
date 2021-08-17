@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 import "./Whitelisted.sol";
 
@@ -33,7 +33,7 @@ contract WhitelistedWithGovernance is Whitelisted {
     /// @notice Contract constructor
     /// @param _timeLockInterval uint256 Initial value for timelock interval
     /// @param _governor address Initial value for governor
-    constructor(uint256 _timeLockInterval, address _governor) public {
+    constructor(uint256 _timeLockInterval, address _governor) {
         timeLockInterval = _timeLockInterval;
         governor = _governor;
         emit GovernorSet(governor);
@@ -52,7 +52,7 @@ contract WhitelistedWithGovernance is Whitelisted {
 
         // Otherwise save current time as timestamp of proposal, save proposed whitelist and emit event
         } else {
-            proposalTime = now;
+            proposalTime = block.timestamp;
             proposedWhitelist = _whitelist;
             emit CommittedWhitelistedWithGovernance(_whitelist);
         }
@@ -64,7 +64,7 @@ contract WhitelistedWithGovernance is Whitelisted {
         require(proposalTime != 0, "Didn't proposed yet");
 
         // Check if timelock interval was passed
-        require((proposalTime + timeLockInterval) < now, "Can't commit yet");
+        require((proposalTime + timeLockInterval) < block.timestamp, "Can't commit yet");
         
         // Set new whitelist and emit event
         whitelist = proposedWhitelist;

@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 
 import "./Errors/RegistryErrors.sol";
 
@@ -33,7 +33,7 @@ contract Registry is RegistryErrors {
     }
 
     /// @notice Sets initializer
-    constructor() public {
+    constructor() {
         initializer = msg.sender;
     }
 

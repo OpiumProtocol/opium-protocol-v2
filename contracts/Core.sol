@@ -1,10 +1,10 @@
-pragma solidity 0.5.16;
+pragma solidity 0.8.5;
 pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
+import "openzeppelin-solidity/contracts/security/ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 
 import "./Interface/IDerivativeLogic.sol";
 
@@ -52,7 +52,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     mapping (bytes32 => bool) public cancelled;
 
     /// @notice Calls Core.Lib.UsingRegistry constructor
-    constructor(address _registry) public UsingRegistry(_registry) {}
+    constructor(address _registry) UsingRegistry(_registry) {}
 
     // PUBLIC FUNCTIONS
 
@@ -246,7 +246,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
         for (uint256 i; i < _positionAddresses.length; i++) {
             // Check if execution is performed after endTime
-            require(now > _derivatives[i].endTime, ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED);
+            require(block.timestamp > _derivatives[i].endTime, ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED);
 
             // Checking whether execution is performed by `_tokenOwner` or `_tokenOwner` allowed third party executions on it's behalf
             require(
@@ -294,7 +294,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
             // Check if cancellation is called after `NO_DATA_CANCELLATION_PERIOD` and `oracleId` didn't provided data
             require(
-                _derivatives[i].endTime + NO_DATA_CANCELLATION_PERIOD <= now &&
+                _derivatives[i].endTime + NO_DATA_CANCELLATION_PERIOD <= block.timestamp &&
                 !vars.oracleAggregator.hasData(_derivatives[i].oracleId, _derivatives[i].endTime),
                 ERROR_CORE_CANCELLATION_IS_NOT_ALLOWED
             );
