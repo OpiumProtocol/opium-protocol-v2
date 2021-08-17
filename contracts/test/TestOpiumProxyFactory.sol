@@ -1,10 +1,29 @@
 pragma solidity 0.8.5;
 
+import "openzeppelin-solidity/contracts/proxy/Clones.sol";
+
 import "../Lib/UsingRegistry.sol";
 import "../OpiumPositionToken.sol";
 import "../Interface/IOpiumPositionToken.sol";
 
+
 contract TestOpiumProxyFactory {
+    event LogPositionTokenAddress(address _positionAddress);
+
+    address immutable opiumPositionTokenImplementation;
+
+    constructor() {
+        opiumPositionTokenImplementation = address(new OpiumPositionToken());
+    }
+
+    modifier implementationAddressExists() {
+        require(opiumPositionTokenImplementation != address(0), "IMPLEMENTATION_IS_NULL");
+        _;
+    }
+
+    function getImplementationAddress() view external returns(address) {
+        return opiumPositionTokenImplementation;
+    }
 
     function _isContract(address _address) public view returns(bool) {
         uint size;
@@ -14,43 +33,38 @@ contract TestOpiumProxyFactory {
         return size > 0;
     }
 
-    function _computeDeploymentAddress(bytes32 _salt, bytes memory _bytecode) public view returns(address) {
-        return address(uint160(uint256(keccak256(abi.encodePacked(hex'ff', address(this), _salt, keccak256(_bytecode))))));
+    function _computeDeploymentAddress(bytes32 _salt) public view returns(address) {
+        return Clones.predictDeterministicAddress(opiumPositionTokenImplementation, _salt, address(this));
     }
 
-    function _getCreationBytecode(string memory name, string memory symbol, uint8 decimals) public pure returns(bytes memory) {
-        bytes memory bytecode = type(OpiumPositionToken).creationCode;
-        return abi.encodePacked(bytecode, abi.encode(name, symbol, decimals));
-    }
-
-    function _checkOrDeployPosition(bytes32 _salt, bytes memory _bytecode) public returns(address) {
+    function _checkOrDeployPosition(bool _isLong, bytes32 _salt) public implementationAddressExists() returns(address) {
         address opiumPositionAddress;
-        opiumPositionAddress = _computeDeploymentAddress(_salt, _bytecode);
-
-        bool response = _isContract(opiumPositionAddress);
-
-        if(!response) {
-            assembly {
-                opiumPositionAddress := create2(0, add(_bytecode, 32), mload(_bytecode), _salt)
-            }
+        opiumPositionAddress = _computeDeploymentAddress(_salt);
+        if(!_isContract(opiumPositionAddress)) {
+            opiumPositionAddress = Clones.cloneDeterministic(opiumPositionTokenImplementation, _salt);
+            _isLong ?  IOpiumPositionToken(opiumPositionAddress).initialize("LONG", "LONG") : IOpiumPositionToken(opiumPositionAddress).initialize("SHORT", "SHORT");
         }
         return opiumPositionAddress;
     }
 
-     function createPositionsPair(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _quantity) external returns(address, address) {
-        bytes memory shortPositionBytecode = _getCreationBytecode("SHORT", "SHORT", 18);
-        bytes memory longPositionBytecode = _getCreationBytecode("LONG", "LONG", 18);
-        bytes32 salt = keccak256(abi.encodePacked( _derivativeHash));
-        address longPositionAddress = _checkOrDeployPosition(salt, longPositionBytecode);
-        address shortPositionAddress = _checkOrDeployPosition(salt, shortPositionBytecode);
+    function mint(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _quantity) external implementationAddressExists() returns(address, address) {
+        bytes32 shortSalt = keccak256(abi.encodePacked( _derivativeHash, "SHORT"));
+        bytes32 longSalt = keccak256(abi.encodePacked( _derivativeHash, "LONG"));
 
-        IOpiumPositionToken(shortPositionAddress).mint(_buyer, _quantity);
-        IOpiumPositionToken(longPositionAddress).mint(_seller, _quantity);
+        address shortPositionAddress = _checkOrDeployPosition(false, shortSalt);
+        address longPositionAddress = _checkOrDeployPosition(true, longSalt);
+
+        emit LogPositionTokenAddress(shortPositionAddress);
+        emit LogPositionTokenAddress(longPositionAddress);
+
+        IOpiumPositionToken(shortPositionAddress).mint(_seller, _quantity);
+        IOpiumPositionToken(longPositionAddress).mint(_buyer, _quantity);
 
         return(longPositionAddress, shortPositionAddress);
+
     }
 
-    function burn(address _token, address _positionHolder,  uint256 _quantity) external {
-        IOpiumPositionToken(_token).burn(_positionHolder,  _quantity);   
+    function burn(address _tokenOwner, address _token, uint256 _quantity) external implementationAddressExists() {
+        IOpiumPositionToken(_token).burn(_tokenOwner,  _quantity);   
     }
 }

@@ -1,14 +1,18 @@
 pragma solidity 0.8.5;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "hardhat/console.sol";
 
-contract OpiumPositionToken is ERC20 {
+contract OpiumPositionToken is ERC20Upgradeable {
     address public factory;
-    constructor(string memory name, string memory symbol, uint8 decimals) ERC20(name, symbol) {
+
+    function initialize(string memory name, string memory symbol) public initializer {
         factory = msg.sender;
+        __ERC20_init(name, symbol);
     }
 
     modifier isFactory() {
+        require(factory != address(0), "FACTORY_IS_NULL");
         require(msg.sender == factory, "NOT_FACTORY");
         _;
     }
