@@ -151,4 +151,27 @@ describe("TokenSpender", () => {
         expect(whitelist[0]).to.be.equal(newCore.address)
     })
 
+    it('should successfully propose a new timelock', async () => {
+        const {libPosition, registry } = await setup()
+        const { governor } = namedSigners;
+
+        const Core = await ethers.getContractFactory("Core", {
+            libraries: {
+                NewLibPosition: libPosition.address,
+            },
+        });
+        const newCore = await Core.deploy(registry.address);
+        await newCore.deployed();
+        const beforeTimelockInterval = await tokenSpender.connect(governor).timeLockInterval()
+        const newTimelockInterval = 3000
+        const tx = await tokenSpender.connect(governor).proposeTimelock(newTimelockInterval)
+        await tx.wait()
+        await timeTravel(4000)
+        const tx2 = await tokenSpender.connect(governor).commitTimelock()
+        await tx2.wait()
+
+        const afterTimelockInterval = await tokenSpender.connect(governor).timeLockInterval()
+        expect(afterTimelockInterval).to.be.eq(newTimelockInterval)
+        expect(afterTimelockInterval).to.not.be.eq(beforeTimelockInterval)
+    })
 })
