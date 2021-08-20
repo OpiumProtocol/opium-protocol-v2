@@ -46,7 +46,7 @@ contract OpiumProxyFactory {
         return opiumPositionAddress;
     }
 
-    function mint(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _quantity) external implementationAddressExists() {
+    function mint(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _amount) external implementationAddressExists() {
         bytes32 shortSalt = keccak256(abi.encodePacked( _derivativeHash, "SHORT"));
         bytes32 longSalt = keccak256(abi.encodePacked( _derivativeHash, "LONG"));
 
@@ -56,11 +56,11 @@ contract OpiumProxyFactory {
         emit LogPositionTokenAddress(shortPositionAddress);
         emit LogPositionTokenAddress(longPositionAddress);
 
-        IOpiumPositionToken(shortPositionAddress).mint(_seller, _quantity);
-        IOpiumPositionToken(longPositionAddress).mint(_buyer, _quantity);
+        IOpiumPositionToken(shortPositionAddress).mint(_seller, _amount);
+        IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);
     }
 
-    function burn(address _tokenOwner, address _token, uint256 _quantity) external implementationAddressExists() {
-        IOpiumPositionToken(_token).burn(_tokenOwner,  _quantity);   
+    function burn(address _tokenOwner, address _token, uint256 _amount) external implementationAddressExists() {
+        IOpiumPositionToken(_token).burn(_tokenOwner,  _amount);   
     }
 }

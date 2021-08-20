@@ -17,11 +17,11 @@ contract OpiumPositionToken is ERC20Upgradeable {
         _;
     }
 
-    function mint(address _positionHolder, uint256 _quantity) external isFactory {
-        _mint(_positionHolder, _quantity);
+    function mint(address _positionHolder, uint256 _amount) external isFactory {
+        _mint(_positionHolder, _amount);
     }
 
-    function burn(address _positionHolder, uint256 _quantity) external isFactory {
-        _burn(_positionHolder, _quantity);
+    function burn(address _positionHolder, uint256 _amount) external isFactory {
+        _burn(_positionHolder, _amount);
     }
 }

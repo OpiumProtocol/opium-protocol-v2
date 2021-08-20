@@ -50,14 +50,14 @@ describe("TestOpiumProxyFactory", () => {
 
     it("expects to mint the correct number of erc20 long/short positions", async () => {
         const { buyer, seller } = namedSigners;
-        const quantity = 1
+        const amount = 1
 
         const hash = getDerivativeHash(derivative)
         const tx = await opiumProxyFactory.mint(buyer.address, seller.address, hash, 1)
 
         await tx.wait()
 
-        const result = await opiumProxyFactory.callStatic.mint(buyer.address, seller.address, hash, quantity)
+        const result = await opiumProxyFactory.callStatic.mint(buyer.address, seller.address, hash, amount)
 
         const longOpiumPositionToken = await <OpiumPositionToken> await ethers.getContractAt('OpiumPositionToken', result[0])
         const shortOpiumPositionToken = await <OpiumPositionToken> await ethers.getContractAt('OpiumPositionToken', result[1])
@@ -68,22 +68,22 @@ describe("TestOpiumProxyFactory", () => {
         const longOpiumPositionTokenSellerBalance = await longOpiumPositionToken.balanceOf(seller.address)
         const longOpiumPositionTokenBuyerBalance = await longOpiumPositionToken.balanceOf(buyer.address)
 
-        expect(shortOpiumPositionTokenSellerBalance).to.equal(quantity)
+        expect(shortOpiumPositionTokenSellerBalance).to.equal(amount)
         expect(shortOpiumPositionTokenBuyerBalance).to.equal(0)
         expect(longOpiumPositionTokenSellerBalance).to.equal(0)
-        expect(longOpiumPositionTokenBuyerBalance).to.equal(quantity)
+        expect(longOpiumPositionTokenBuyerBalance).to.equal(amount)
     });
 
-    it("expects to burn the correct number of erc20 long/short positions with quantity set to 2", async () => {
+    it("expects to burn the correct number of erc20 long/short positions with amount set to 2", async () => {
         const { buyer, seller } = namedSigners;
-        const quantity = 2
+        const amount = 2
 
         const hash = getDerivativeHash(secondDerivative)
-        const tx = await opiumProxyFactory.mint(buyer.address, seller.address, hash, quantity)
+        const tx = await opiumProxyFactory.mint(buyer.address, seller.address, hash, amount)
 
         await tx.wait()
 
-        const result = await opiumProxyFactory.callStatic.mint(buyer.address, seller.address, hash, quantity)
+        const result = await opiumProxyFactory.callStatic.mint(buyer.address, seller.address, hash, amount)
         
         const longOpiumPositionToken = <OpiumPositionToken> await ethers.getContractAt('OpiumPositionToken', result[0])
         const shortOpiumPositionToken = <OpiumPositionToken> await ethers.getContractAt('OpiumPositionToken', result[1])
@@ -94,12 +94,12 @@ describe("TestOpiumProxyFactory", () => {
         const beforeLongOpiumPositionTokenSellerBalance = await longOpiumPositionToken.balanceOf(seller.address)
         const beforeLongOpiumPositionTokenBuyerBalance = await longOpiumPositionToken.balanceOf(buyer.address)
 
-        expect(beforeShortOpiumPositionTokenSellerBalance).to.equal(quantity)
+        expect(beforeShortOpiumPositionTokenSellerBalance).to.equal(amount)
         expect(beforeShortOpiumPositionTokenBuyerBalance).to.equal(0)
         expect(beforeLongOpiumPositionTokenSellerBalance).to.equal(0)
-        expect(beforeLongOpiumPositionTokenBuyerBalance).to.equal(quantity)
+        expect(beforeLongOpiumPositionTokenBuyerBalance).to.equal(amount)
 
-        const tx2 = await opiumProxyFactory.burn(seller.address, shortOpiumPositionToken.address, quantity)
+        const tx2 = await opiumProxyFactory.burn(seller.address, shortOpiumPositionToken.address, amount)
         await tx2.wait()
 
         const afterShortOpiumPositionTokenSellerBalance = await shortOpiumPositionToken.balanceOf(seller.address)
@@ -110,7 +110,7 @@ describe("TestOpiumProxyFactory", () => {
         expect(afterShortOpiumPositionTokenSellerBalance).to.equal(0)
         expect(afterShortOpiumPositionTokenBuyerBalance).to.equal(0)
         expect(afterLongOpiumPositionTokenSellerBalance).to.equal(0)
-        expect(afterLongOpiumPositionTokenBuyerBalance).to.equal(quantity)
+        expect(afterLongOpiumPositionTokenBuyerBalance).to.equal(amount)
     })
 
 });

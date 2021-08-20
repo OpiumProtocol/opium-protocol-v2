@@ -88,7 +88,7 @@ describe("CoreExecution", () => {
     const noDataOptionDerivativeHash = await core.getDerivativeHash(noDataOptionDerivative);
     noDataOption = {
       derivative: noDataOptionDerivative,
-      quantity: 3,
+      amount: 3,
       price: 230, // full margin profit
       hash: noDataOptionDerivativeHash,
     };
@@ -107,7 +107,7 @@ describe("CoreExecution", () => {
     const fullMarginOptionDerivativeHash = await core.getDerivativeHash(fullMarginOptionDerivative);
     fullMarginOption = {
       derivative: fullMarginOptionDerivative,
-      quantity: 3,
+      amount: 3,
       price: 230, // full margin profit
       hash: fullMarginOptionDerivativeHash,
     };
@@ -128,7 +128,7 @@ describe("CoreExecution", () => {
     const overMarginOptionDerivativeHash = await core.getDerivativeHash(overMarginOptionDerivative);
     overMarginOption = {
       derivative: overMarginOptionDerivative,
-      quantity: 3,
+      amount: 3,
       price: 300, // over margin profit
       hash: overMarginOptionDerivativeHash,
     };
@@ -149,7 +149,7 @@ describe("CoreExecution", () => {
     const underMarginOptionDerivativeHash = await core.getDerivativeHash(underMarginOptionDerivative);
     underMarginOption = {
       derivative: underMarginOptionDerivative,
-      quantity: 3,
+      amount: 3,
       price: 220, // under margin profit
       hash: underMarginOptionDerivativeHash,
     };
@@ -170,7 +170,7 @@ describe("CoreExecution", () => {
     const nonProfitOptionDerivativeHash = await core.getDerivativeHash(nonProfitOptionDerivative);
     nonProfitOption = {
       derivative: nonProfitOptionDerivative,
-      quantity: 3,
+      amount: 3,
       price: 190, // non profit
       hash: nonProfitOptionDerivativeHash,
     };
@@ -178,8 +178,8 @@ describe("CoreExecution", () => {
     await oracleAggregator.connect(oracle).__callback(nonProfitOption.derivative.endTime, nonProfitOption.price); // Current price
 
     // Create options
-    await testToken.approve(tokenSpender.address, noDataOption.derivative.margin * noDataOption.quantity);
-    const tx = await core.create(noDataOption.derivative, noDataOption.quantity, [buyer.address, seller.address]);
+    await testToken.approve(tokenSpender.address, noDataOption.derivative.margin * noDataOption.amount);
+    const tx = await core.create(noDataOption.derivative, noDataOption.amount, [buyer.address, seller.address]);
     const receipt2 = await tx.wait()
     const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt2)
     noDataOption = {
@@ -188,8 +188,8 @@ describe("CoreExecution", () => {
       longPositionAddress: formatAddress(log[1].data)
     }
 
-    await testToken.approve(tokenSpender.address, fullMarginOption.derivative.margin * fullMarginOption.quantity);
-    const tx2 = await core.create(fullMarginOption.derivative, fullMarginOption.quantity, [buyer.address, seller.address]);
+    await testToken.approve(tokenSpender.address, fullMarginOption.derivative.margin * fullMarginOption.amount);
+    const tx2 = await core.create(fullMarginOption.derivative, fullMarginOption.amount, [buyer.address, seller.address]);
     const receipt2 = await tx2.wait()
     const log2 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt2)
     fullMarginOption = {
@@ -198,8 +198,8 @@ describe("CoreExecution", () => {
       longPositionAddress: formatAddress(log2[1].data)
     }
 
-    await testToken.approve(tokenSpender.address, overMarginOption.derivative.margin * overMarginOption.quantity);
-    const tx3 = await core.create(overMarginOption.derivative, overMarginOption.quantity, [buyer.address, seller.address]);
+    await testToken.approve(tokenSpender.address, overMarginOption.derivative.margin * overMarginOption.amount);
+    const tx3 = await core.create(overMarginOption.derivative, overMarginOption.amount, [buyer.address, seller.address]);
     const receipt3 = await tx3.wait()
     const log3 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt3)
     overMarginOption = {
@@ -208,8 +208,8 @@ describe("CoreExecution", () => {
       longPositionAddress: formatAddress(log3[1].data)
     }
 
-    await testToken.approve(tokenSpender.address, underMarginOption.derivative.margin * underMarginOption.quantity);
-    const tx4 = await core.create(underMarginOption.derivative, underMarginOption.quantity, [buyer.address, seller.address]);
+    await testToken.approve(tokenSpender.address, underMarginOption.derivative.margin * underMarginOption.amount);
+    const tx4 = await core.create(underMarginOption.derivative, underMarginOption.amount, [buyer.address, seller.address]);
     const receipt4 = await tx4.wait()
     const log4 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt4)
     underMarginOption = {
@@ -218,8 +218,8 @@ describe("CoreExecution", () => {
       longPositionAddress: formatAddress(log4[1].data)
     }
 
-    await testToken.approve(tokenSpender.address, nonProfitOption.derivative.margin * nonProfitOption.quantity);
-    const tx5 = await core.create(nonProfitOption.derivative, nonProfitOption.quantity, [buyer.address, seller.address]);
+    await testToken.approve(tokenSpender.address, nonProfitOption.derivative.margin * nonProfitOption.amount);
+    const tx5 = await core.create(nonProfitOption.derivative, nonProfitOption.amount, [buyer.address, seller.address]);
     const receipt4 = await tx5.wait()
     const log5 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt4)
     nonProfitOption = {
@@ -229,7 +229,7 @@ describe("CoreExecution", () => {
     }
   });
 
-  it("should revert execution with CORE:TOKEN_IDS_AND_QUANTITIES_LENGTH_DOES_NOT_MATCH", async () => {
+  it("should revert execution with CORE:ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH", async () => {
     try {
       const { seller } = namedSigners
 
@@ -242,11 +242,11 @@ describe("CoreExecution", () => {
           [fullMarginOption.derivative, fullMarginOption.derivative],
         );
     } catch (error) {
-      expect(error.message).to.include("CORE:TOKEN_IDS_AND_QUANTITIES_LENGTH_DOES_NOT_MATCH");
+      expect(error.message).to.include("CORE:ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH");
     }
   });
 
-  it("should revert execution with CORE:TOKEN_IDS_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH", async () => {
+  it("should revert execution with CORE:ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH", async () => {
     try {
       const { seller } = namedSigners
 
@@ -259,7 +259,7 @@ describe("CoreExecution", () => {
           [fullMarginOption.derivative],
         );
     } catch (error) {
-      expect(error.message).to.include("CORE:TOKEN_IDS_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH");
+      expect(error.message).to.include("CORE:ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH");
     }
   });
 
@@ -334,12 +334,12 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.feesVaults(deployer.address, testToken.address);
     const authorFeesBefore = await core.feesVaults(author.address, testToken.address);
-    const quantity = fullMarginOption.quantity - 1;
-    await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, quantity, fullMarginOption.derivative);
-    await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, quantity, fullMarginOption.derivative);
+    const amount = fullMarginOption.amount - 1;
+    await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, amount, fullMarginOption.derivative);
+    await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, amount, fullMarginOption.derivative);
       
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
-    const buyerPayout = (fullMarginOption.derivative.margin - calculatePayoutFee(fullMarginOption.derivative.margin)) * quantity;        
+    const buyerPayout = (fullMarginOption.derivative.margin - calculatePayoutFee(fullMarginOption.derivative.margin)) * amount;        
     expect(buyerBalanceAfter).to.be.equal(buyerBalanceBefore.toNumber() +buyerPayout);
       
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
@@ -348,10 +348,10 @@ describe("CoreExecution", () => {
     const { opiumFee, authorFee } = calculateFees(fullMarginOption.derivative.margin);
   
     const opiumFeesAfter = await core.feesVaults(deployer.address, testToken.address);
-    expect(opiumFeesAfter).to.be.equal(opiumFeesBefore + opiumFee * quantity);
+    expect(opiumFeesAfter).to.be.equal(opiumFeesBefore + opiumFee * amount);
   
     const authorFeesAfter = await core.feesVaults(author.address, testToken.address);
-    expect(authorFeesAfter).to.be.equal(authorFeesBefore.toNumber() + authorFee * quantity);   
+    expect(authorFeesAfter).to.be.equal(authorFeesBefore.toNumber() + authorFee * amount);   
   });
 
   it("should revert execution before endTime with CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED", async () => {
@@ -422,16 +422,16 @@ describe("CoreExecution", () => {
 
     await core
       .connect(buyer)
-      [executeOne](overMarginOption.longPositionAddress, overMarginOption.quantity, overMarginOption.derivative);
+      [executeOne](overMarginOption.longPositionAddress, overMarginOption.amount, overMarginOption.derivative);
 
     await core
       .connect(seller)
-      [executeOne](overMarginOption.shortPositionAddress, overMarginOption.quantity, overMarginOption.derivative);
+      [executeOne](overMarginOption.shortPositionAddress, overMarginOption.amount, overMarginOption.derivative);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     const buyerPayout =
       (overMarginOption.derivative.margin - calculatePayoutFee(overMarginOption.derivative.margin)) *
-      overMarginOption.quantity;
+      overMarginOption.amount;
     expect(buyerBalanceAfter).to.be.equal(+buyerBalanceBefore + +buyerPayout);
 
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
@@ -440,7 +440,7 @@ describe("CoreExecution", () => {
     const opiumFeesAfter = await core.feesVaults(deployer.address, testToken.address);
 
     const { opiumFee } = calculateFees(overMarginOption.derivative.margin);
-    expect(opiumFeesAfter).to.be.equal(+opiumFeesBefore + opiumFee * overMarginOption.quantity);
+    expect(opiumFeesAfter).to.be.equal(+opiumFeesBefore + opiumFee * overMarginOption.amount);
   });
 
   it("should execute under margin option", async () => {
@@ -452,26 +452,26 @@ describe("CoreExecution", () => {
 
     await core
       .connect(buyer)
-      [executeOne](underMarginOption.longPositionAddress, underMarginOption.quantity, underMarginOption.derivative);
+      [executeOne](underMarginOption.longPositionAddress, underMarginOption.amount, underMarginOption.derivative);
 
     await core
       .connect(seller)
-      [executeOne](underMarginOption.shortPositionAddress, underMarginOption.quantity, underMarginOption.derivative);
+      [executeOne](underMarginOption.shortPositionAddress, underMarginOption.amount, underMarginOption.derivative);
 
     const profit = underMarginOption.price - underMarginOption.derivative.params[0];
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
-    const buyerPayout = (profit - calculatePayoutFee(profit)) * underMarginOption.quantity;
+    const buyerPayout = (profit - calculatePayoutFee(profit)) * underMarginOption.amount;
     expect(buyerBalanceAfter).to.be.equal(+buyerBalanceBefore + buyerPayout);
 
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     expect(sellerBalanceAfter).to.be.equal(
-      +sellerBalanceBefore + (underMarginOption.derivative.margin - profit) * underMarginOption.quantity,
+      +sellerBalanceBefore + (underMarginOption.derivative.margin - profit) * underMarginOption.amount,
     );
 
     const opiumFeesAfter = await core.feesVaults(deployer.address, testToken.address);
     const { opiumFee } = calculateFees(profit);
-    expect(opiumFeesAfter).to.be.equal(+opiumFeesBefore + opiumFee * underMarginOption.quantity);
+    expect(opiumFeesAfter).to.be.equal(+opiumFeesBefore + opiumFee * underMarginOption.amount);
   });
 
   it("should execute non profit option", async () => {
@@ -483,17 +483,17 @@ describe("CoreExecution", () => {
 
     await core
       .connect(buyer)
-      [executeOne](nonProfitOption.longPositionAddress, nonProfitOption.quantity, nonProfitOption.derivative);
+      [executeOne](nonProfitOption.longPositionAddress, nonProfitOption.amount, nonProfitOption.derivative);
     await core
       .connect(seller)
-      [executeOne](nonProfitOption.shortPositionAddress, nonProfitOption.quantity, nonProfitOption.derivative);
+      [executeOne](nonProfitOption.shortPositionAddress, nonProfitOption.amount, nonProfitOption.derivative);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     expect(buyerBalanceAfter).to.be.equal(buyerBalanceBefore);
 
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     expect(sellerBalanceAfter).to.be.equal(
-      +sellerBalanceBefore + nonProfitOption.derivative.margin * nonProfitOption.quantity,
+      +sellerBalanceBefore + nonProfitOption.derivative.margin * nonProfitOption.amount,
     );
 
     const opiumFeesAfter = await core.feesVaults(deployer.address, testToken.address);
@@ -504,7 +504,7 @@ describe("CoreExecution", () => {
     const { buyer } = namedSigners;
 
     try {
-      await core.connect(buyer)[cancelOne](noDataOption.longPositionAddress, noDataOption.quantity, noDataOption.derivative);
+      await core.connect(buyer)[cancelOne](noDataOption.longPositionAddress, noDataOption.amount, noDataOption.derivative);
     } catch (error) {
       expect(error.message).to.include("CORE:CANCELLATION_IS_NOT_ALLOWED");
     }
@@ -514,7 +514,7 @@ describe("CoreExecution", () => {
     try {
       const { buyer } = namedSigners;
       await timeTravel(SECONDS_3_WEEKS);
-      await core.connect(buyer)[executeOne](noDataOption.longPositionAddress, noDataOption.quantity, noDataOption.derivative);
+      await core.connect(buyer)[executeOne](noDataOption.longPositionAddress, noDataOption.amount, noDataOption.derivative);
     } catch (error) {
       expect(error.message).to.include("ORACLE_AGGREGATOR:DATA_DOESNT_EXIST");
     }
@@ -526,16 +526,16 @@ describe("CoreExecution", () => {
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
 
-    const quantity = noDataOption.quantity - 1;
+    const amount = noDataOption.amount - 1;
 
-    await core.connect(buyer)[cancelOne](noDataOption.longPositionAddress, quantity, noDataOption.derivative);
-    await core.connect(seller)[cancelOne](noDataOption.shortPositionAddress, quantity, noDataOption.derivative);
+    await core.connect(buyer)[cancelOne](noDataOption.longPositionAddress, amount, noDataOption.derivative);
+    await core.connect(seller)[cancelOne](noDataOption.shortPositionAddress, amount, noDataOption.derivative);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     expect(buyerBalanceAfter).to.be.equal(buyerBalanceBefore);
 
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
-    expect(sellerBalanceAfter).to.be.equal(+sellerBalanceBefore + noDataOption.derivative.margin * quantity);
+    expect(sellerBalanceAfter).to.be.equal(+sellerBalanceBefore + noDataOption.derivative.margin * amount);
   });
 
   it("should revert execution with CORE:TICKER_WAS_CANCELLED", async () => {

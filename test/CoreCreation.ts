@@ -55,9 +55,9 @@ describe("CoreCreation", () => {
         token: testToken.address,
         syntheticId: optionCallMock.address,
       });
-      const quantity = 3;
-      await testToken.approve(tokenSpender.address, optionCall.margin * quantity, { from: deployer.address });
-      await core.create(optionCall, quantity, [buyer.address, seller.address], { from: deployer.address });
+      const amount = 3;
+      await testToken.approve(tokenSpender.address, optionCall.margin * amount, { from: deployer.address });
+      await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
     } catch (error) {
       expect(error.message).to.include("SYNTHETIC_AGGREGATOR:WRONG_MARGIN");
     }
@@ -77,9 +77,9 @@ describe("CoreCreation", () => {
         token: testToken.address,
         syntheticId: optionCallMock.address,
       });
-      const quantity = 3;
-      await testToken.approve(tokenSpender.address, optionCall.margin * quantity, { from: deployer.address });
-      await core.create(optionCall, quantity, [buyer.address, seller.address], { from: deployer.address });
+      const amount = 3;
+      await testToken.approve(tokenSpender.address, optionCall.margin * amount, { from: deployer.address });
+      await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
     } catch (error) {
       expect(error.message).to.include("CORE:SYNTHETIC_VALIDATION_ERROR");
     }
@@ -99,8 +99,8 @@ describe("CoreCreation", () => {
         token: testToken.address,
         syntheticId: optionCallMock.address,
       });
-      const quantity = 3;
-      await core.create(optionCall, quantity, [buyer.address, seller.address], { from: deployer.address });
+      const amount = 3;
+      await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
     } catch (error) {
       expect(error.message).to.include("CORE:NOT_ENOUGH_TOKEN_ALLOWANCE");
     }
@@ -110,7 +110,7 @@ describe("CoreCreation", () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
     const { deployer, buyer, seller } = namedSigners;
 
-    const quantity = 3;
+    const amount = 3;
     const optionCall = derivativeFactory({
       margin: 30,
       endTime,
@@ -124,8 +124,8 @@ describe("CoreCreation", () => {
 
     const balance = await testToken.balanceOf(deployer.address, { from: deployer.address });
 
-    await testToken.approve(tokenSpender.address, optionCall.margin * quantity, { from: deployer.address });
-    const tx = await core.create(optionCall, quantity, [buyer.address, seller.address], { from: deployer.address });
+    await testToken.approve(tokenSpender.address, optionCall.margin * amount, { from: deployer.address });
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
     const receipt = await tx.wait()
     const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
     const shortPositionAddress = formatAddress(log[0].data)
@@ -139,7 +139,7 @@ describe("CoreCreation", () => {
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address)
 
     // expect(buyerPositionsBalance).to.equal(1);
-    expect(buyerPositionsLongBalance).to.equal(quantity);
+    expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
     // const sellerPositionsBalance = await tokenMinter["balanceOf(address)"](seller.address);
@@ -148,14 +148,14 @@ describe("CoreCreation", () => {
 
     // expect(sellerPositionsBalance).to.equal(1);
     expect(sellerPositionsLongBalance).to.equal(0);
-    expect(sellerPositionsShortBalance).to.equal(quantity);
+    expect(sellerPositionsShortBalance).to.equal(amount);
   });
 
   it("should create second exactly the same OptionCall derivative", async () => {
     const { buyer, seller } = namedSigners;
 
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
-    const quantity = 3;
+    const amount = 3;
     const optionCall = derivativeFactory({
       margin: 30,
       endTime,
@@ -166,14 +166,14 @@ describe("CoreCreation", () => {
       syntheticId: optionCallMock.address,
     });
 
-    await testToken.approve(tokenSpender.address, optionCall.margin * quantity);
+    await testToken.approve(tokenSpender.address, optionCall.margin * amount);
 
     hash = await core.getDerivativeHash(optionCall);
 
     const oldCoreTokenBalance = await testToken.balanceOf(core.address);
 
     // Create derivative
-    const tx = await core.create(optionCall, quantity, [buyer.address, seller.address]);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait()
     const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
     const shortPositionAddress = formatAddress(log[0].data)
@@ -184,14 +184,14 @@ describe("CoreCreation", () => {
 
     const newCoreTokenBalance = await testToken.balanceOf(core.address);
 
-    expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.toNumber() + optionCall.margin * quantity);
+    expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.toNumber() + optionCall.margin * amount);
 
     // const buyerPositionsBalance = await tokenMinter["balanceOf(address)"](buyer.address);
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address)
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address)
 
     // expect(buyerPositionsBalance).to.equal(1);
-    expect(buyerPositionsLongBalance).to.equal(quantity);
+    expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
     // const sellerPositionsBalance = await tokenMinter["balanceOf(address)"](seller.address);
@@ -200,6 +200,6 @@ describe("CoreCreation", () => {
 
     // expect(sellerPositionsBalance).to.equal(1);
     expect(sellerPositionsLongBalance).to.equal(0);
-    expect(sellerPositionsShortBalance).to.equal(quantity);
+    expect(sellerPositionsShortBalance).to.equal(amount);
   });
 });

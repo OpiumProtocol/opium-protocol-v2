@@ -29,9 +29,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     using SafeERC20 for IERC20;
 
     // Emitted when Core creates new position
-    event Created(address buyer, address seller, bytes32 derivativeHash, uint256 quantity);
+    event Created(address buyer, address seller, bytes32 derivativeHash, uint256 amount);
     // Emitted when Core executes positions
-    event Executed(address tokenOwner, address positionAddress, uint256 quantity);
+    event Executed(address tokenOwner, address positionAddress, uint256 amount);
     // Emitted when Core cancels ticker for the first time
     event Canceled(bytes32 derivativeHash);
 
@@ -66,87 +66,87 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
     /// @notice Creates derivative contracts (positions)
     /// @param _derivative Derivative Derivative definition
-    /// @param _quantity uint256 Quantity of derivatives to be created
+    /// @param _amount uint256 Amount of derivatives to be created
     /// @param _addresses address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address - if seller is set to `address(0)`, consider as pooled position
-    function create(Derivative memory _derivative, uint256 _quantity, address[2] memory _addresses) public nonReentrant {
-        _create(_derivative, _quantity, _addresses);
+    function create(Derivative memory _derivative, uint256 _amount, address[2] memory _addresses) public nonReentrant {
+        _create(_derivative, _amount, _addresses);
     }
 
     /// @notice Executes several positions of `msg.sender` with same `tokenId`
     /// @param _positionAddress uint256 `tokenId` of positions that needs to be executed
-    /// @param _quantity uint256 Quantity of positions to execute
+    /// @param _amount uint256 Amount of positions to execute
     /// @param _derivative Derivative Derivative definition
-    function execute(address _positionAddress, uint256 _quantity, Derivative memory _derivative) public nonReentrant {
+    function execute(address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
         address[] memory positionAddresses = new address[](1);
-        uint256[] memory quantities = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
 
         positionAddresses[0] = _positionAddress;
-        quantities[0] = _quantity;
+        amounts[0] = _amount;
         derivatives[0] = _derivative;
 
-        _execute(msg.sender, positionAddresses, quantities, derivatives);
+        _execute(msg.sender, positionAddresses, amounts, derivatives);
     }
 
     /// @notice Executes several positions of `_tokenOwner` with same `tokenId`
     /// @param _tokenOwner address Address of the owner of positions
     /// @param _positionAddress uint256 `tokenId` of positions that needs to be executed
-    /// @param _quantity uint256 Quantity of positions to execute
+    /// @param _amount uint256 Amount of positions to execute
     /// @param _derivative Derivative Derivative definition
-    function execute(address _tokenOwner, address _positionAddress, uint256 _quantity, Derivative memory _derivative) public nonReentrant {
+    function execute(address _tokenOwner, address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
         address[] memory positionAddresses = new address[](1);
-        uint256[] memory quantities = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
 
         positionAddresses[0] = _positionAddress;
-        quantities[0] = _quantity;
+        amounts[0] = _amount;
         derivatives[0] = _derivative;
 
-        _execute(_tokenOwner, positionAddresses, quantities, derivatives);
+        _execute(_tokenOwner, positionAddresses, amounts, derivatives);
     }
 
     /// @notice Executes several positions of `msg.sender` with different `tokenId`s
     /// @param _positionAddresses uint256[] `tokenId`s of positions that needs to be executed
-    /// @param _quantities uint256[] Quantity of positions to execute for each `tokenId`
+    /// @param _amounts uint256[] Amount of positions to execute for each `tokenId`
     /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
-    function execute(address[] memory _positionAddresses, uint256[] memory _quantities, Derivative[] memory _derivatives) public nonReentrant {
-        _execute(msg.sender, _positionAddresses, _quantities, _derivatives);
+    function execute(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
+        _execute(msg.sender, _positionAddresses, _amounts, _derivatives);
     }
 
     /// @notice Executes several positions of `_tokenOwner` with different `tokenId`s
     /// @param _tokenOwner address Address of the owner of positions
     /// @param _positionAddresses uint256[] `tokenId`s of positions that needs to be executed
-    /// @param _quantities uint256[] Quantity of positions to execute for each `tokenId`
+    /// @param _amounts uint256[] Amount of positions to execute for each `tokenId`
     /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
     /// execute many addresses
-    function execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _quantities, Derivative[] memory _derivatives) public nonReentrant {
-        _execute(_tokenOwner, _positionAddresses, _quantities, _derivatives);
+    function execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
+        _execute(_tokenOwner, _positionAddresses, _amounts, _derivatives);
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddress uint256 `tokenId` of positions that needs to be canceled
-    /// @param _quantity uint256 Quantity of positions to cancel
+    /// @param _amount uint256 Amount of positions to cancel
     /// @param _derivative Derivative Derivative definition
-    function cancel(address _positionAddress, uint256 _quantity, Derivative memory _derivative) public nonReentrant {
+    function cancel(address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
         address[] memory positionAddresses = new address[](1);
-        uint256[] memory quantities = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
 
         positionAddresses[0] = _positionAddress;
-        quantities[0] = _quantity;
+        amounts[0] = _amount;
         derivatives[0] = _derivative;
 
-        _cancel(positionAddresses, quantities, derivatives);
+        _cancel(positionAddresses, amounts, derivatives);
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddresses uint256[] `tokenId` of positions that needs to be canceled
-    /// @param _quantities uint256[] Quantity of positions to cancel for each `tokenId`
+    /// @param _amounts uint256[] Amount of positions to cancel for each `tokenId`
     /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
-    function cancel(address[] memory _positionAddresses, uint256[] memory _quantities, Derivative[] memory _derivatives) public nonReentrant {
-        _cancel(_positionAddresses, _quantities, _derivatives);
+    function cancel(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
+        _cancel(_positionAddresses, _amounts, _derivatives);
     }
 
     // PRIVATE FUNCTIONS
@@ -169,11 +169,11 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
     /// @notice This function creates p2p positions
     /// @param _derivative Derivative Derivative definition
-    /// @param _quantity uint256 Quantity of positions to create
+    /// @param _amount uint256 Amount of positions to create
     /// @param _addresses address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
-    function _create(Derivative memory _derivative, uint256 _quantity, address[2] memory _addresses) private {
+    function _create(Derivative memory _derivative, uint256 _amount, address[2] memory _addresses) private {
         // Local variables
         CreateLocalVars memory vars;
 
@@ -206,17 +206,17 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         // margins[1] - sellerMargin
         (margins[0], margins[1]) = vars.syntheticAggregator.getMargin(derivativeHash, _derivative);
 
-        // Check ERC20 tokens allowance: (margins[0] + margins[1]) * quantity
+        // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
         // `msg.sender` must provide margin for position creation
-        require(vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >= margins[0].add(margins[1]).mul(_quantity), ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE);
+        require(vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >= margins[0].add(margins[1]).mul(_amount), ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE);
 
     	// Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        vars.tokenSpender.claimTokens(vars.marginToken, msg.sender, address(this), margins[0].add(margins[1]).mul(_quantity));
+        vars.tokenSpender.claimTokens(vars.marginToken, msg.sender, address(this), margins[0].add(margins[1]).mul(_amount));
 
         // Mint LONG and SHORT positions tokens
-        vars.opiumProxyFactory.mint(_addresses[0], _addresses[1], derivativeHash, _quantity);
+        vars.opiumProxyFactory.mint(_addresses[0], _addresses[1], derivativeHash, _amount);
 
-        emit Created(_addresses[0], _addresses[1], derivativeHash, _quantity);
+        emit Created(_addresses[0], _addresses[1], derivativeHash, _amount);
     }
 
     struct ExecuteAndCancelLocalVars {
@@ -228,11 +228,11 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// @notice Executes several positions of `_tokenOwner` with different `tokenId`s
     /// @param _tokenOwner address Address of the owner of positions
     /// @param _positionAddresses uint256[] `tokenId`s of positions that needs to be executed
-    /// @param _quantities uint256[] Quantity of positions to execute for each `tokenId`
+    /// @param _amounts uint256[] Amount of positions to execute for each `tokenId`
     /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
-    function _execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _quantities, Derivative[] memory _derivatives) private {
-        require(_positionAddresses.length == _quantities.length, ERROR_CORE_TOKEN_IDS_AND_QUANTITIES_LENGTH_DOES_NOT_MATCH);
-        require(_positionAddresses.length == _derivatives.length, ERROR_CORE_TOKEN_IDS_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
+    function _execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) private {
+        require(_positionAddresses.length == _amounts.length, ERROR_CORE_ADDRESSES_AND_AMOUNTS_LENGTH_DO_NOT_MATCH);
+        require(_positionAddresses.length == _derivatives.length, ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
 
         // Local variables
         ExecuteAndCancelLocalVars memory vars;
@@ -256,7 +256,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
             );
 
             // Returns payout for all positions
-            uint256 payout = _getPayout(_derivatives[i], _positionAddresses[i], _quantities[i], vars);
+            uint256 payout = _getPayout(_derivatives[i], _positionAddresses[i], _amounts[i], vars);
 
             // Transfer payout
             if (payout > 0) {
@@ -264,19 +264,19 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
             }
 
             // Burn executed position tokens
-            vars.opiumProxyFactory.burn(_tokenOwner, _positionAddresses[i], _quantities[i]);
+            vars.opiumProxyFactory.burn(_tokenOwner, _positionAddresses[i], _amounts[i]);
 
-            emit Executed(_tokenOwner, _positionAddresses[i], _quantities[i]);
+            emit Executed(_tokenOwner, _positionAddresses[i], _amounts[i]);
         }
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddresses uint256[] `tokenId` of positions that needs to be canceled
-    /// @param _quantities uint256[] Quantity of positions to cancel for each `tokenId`
+    /// @param _amounts uint256[] Amount of positions to cancel for each `tokenId`
     /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
-    function _cancel(address[] memory _positionAddresses, uint256[] memory _quantities, Derivative[] memory _derivatives) private {
-        require(_positionAddresses.length == _quantities.length, ERROR_CORE_TOKEN_IDS_AND_QUANTITIES_LENGTH_DOES_NOT_MATCH);
-        require(_positionAddresses.length == _derivatives.length, ERROR_CORE_TOKEN_IDS_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
+    function _cancel(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) private {
+        require(_positionAddresses.length == _amounts.length, ERROR_CORE_ADDRESSES_AND_AMOUNTS_LENGTH_DO_NOT_MATCH);
+        require(_positionAddresses.length == _derivatives.length, ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
 
         // Local variables
         ExecuteAndCancelLocalVars memory vars;
@@ -329,23 +329,23 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
                 revert(ERROR_CORE_UNKNOWN_POSITION_TYPE);
             }
             
-            // Transfer payout * _quantities[i]
+            // Transfer payout * _amounts[i]
             if (payout > 0) {
-                IERC20(_derivatives[i].token).safeTransfer(msg.sender, payout.mul(_quantities[i]));
+                IERC20(_derivatives[i].token).safeTransfer(msg.sender, payout.mul(_amounts[i]));
             }
 
             // Burn canceled position tokens
-            vars.opiumProxyFactory.burn(msg.sender, _positionAddresses[i], _quantities[i]);
+            vars.opiumProxyFactory.burn(msg.sender, _positionAddresses[i], _amounts[i]);
         }
     }
 
     /// @notice Calculates payout for position and gets fees
     /// @param _derivative Derivative Derivative definition
     /// @param _positionAddress uint256 `tokenId` of positions
-    /// @param _quantity uint256 Quantity of positions
+    /// @param _amount uint256 Amount of positions
     /// @param _vars ExecuteAndCancelLocalVars Helping local variables
     /// @return payout uint256 Payout for all tokens
-    function _getPayout(Derivative memory _derivative, address _positionAddress, uint256 _quantity, ExecuteAndCancelLocalVars memory _vars) private returns (uint256 payout) {
+    function _getPayout(Derivative memory _derivative, address _positionAddress, uint256 _amount, ExecuteAndCancelLocalVars memory _vars) private returns (uint256 payout) {
         // Trying to getData from Opium.OracleAggregator, could be reverted
         // Opium allows to use "dummy" oracleIds, in this case data is set to `0`
         uint256 data;
@@ -387,8 +387,8 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
                 // Pooled position payoutRatio is considered as full payout, not as payoutRatio
                 payout = payoutRatio[0];
 
-                // Multiply payout by quantity
-                payout = payout.mul(_quantity);
+                // Multiply payout by amount
+                payout = payout.mul(_amount);
 
                 // Check sufficiency of syntheticId balance in poolVaults
                 require(
@@ -403,15 +403,15 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
                 // Set payout to buyerPayout
                 payout = payouts[0];
 
-                // Multiply payout by quantity
-                payout = payout.mul(_quantity);
+                // Multiply payout by amount
+                payout = payout.mul(_amount);
             }
 
             // Take fees only from profit makers
-            // Check: payout > buyerMargin * quantity
-            if (payout > margins[0].mul(_quantity)) {
+            // Check: payout > buyerMargin * amount
+            if (payout > margins[0].mul(_amount)) {
                 // Get Opium and `syntheticId` author fees and subtract it from payout
-                payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[0].mul(_quantity)));
+                payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[0].mul(_amount)));
             }
 
         // Check if `_positionAddresses` is an ID of SHORT position
@@ -419,14 +419,14 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
             // Set payout to sellerPayout
             payout = payouts[1];
 
-            // Multiply payout by quantity
-            payout = payout.mul(_quantity);
+            // Multiply payout by amount
+            payout = payout.mul(_amount);
 
             // Take fees only from profit makers
-            // Check: payout > sellerMargin * quantity
-            if (payout > margins[1].mul(_quantity)) {
+            // Check: payout > sellerMargin * amount
+            if (payout > margins[1].mul(_amount)) {
                 // Get Opium fees and subtract it from payout
-                payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[1].mul(_quantity)));
+                payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[1].mul(_amount)));
             }
         } else {
             // Either portfolioId, hack or bug
