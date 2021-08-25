@@ -316,12 +316,12 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
             uint256 payout;
             // Check if `_positionAddresses` is an ID of LONG position
-            if (derivativeHash.computeLongPositionAddress(registry.getOpiumProxyFactory()) == _positionAddresses[i]) {
+            if (derivativeHash.computeLongPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[i]) {
                 // Set payout to buyerPayout
                 payout = margins[0];
 
             // Check if `_tokenId` is an ID of SHORT position
-            } else if (derivativeHash.computeShortPositionAddress(registry.getOpiumProxyFactory()) == _positionAddresses[i]) {
+            } else if (derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[i]) {
                 // Set payout to sellerPayout
                 payout = margins[1];
             } else {
@@ -380,8 +380,10 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         payouts[0] = margins[0].add(margins[1]).mul(payoutRatio[0]).div(payoutRatio[0].add(payoutRatio[1]));
         payouts[1] = margins[0].add(margins[1]).mul(payoutRatio[1]).div(payoutRatio[0].add(payoutRatio[1]));
 
+        address opiumProxyFactory = registry.getOpiumProxyFactory();
+
         // Check if `_positionAddresses` is an ID of LONG position
-        if (derivativeHash.computeLongPositionAddress(registry.getOpiumProxyFactory()) == _positionAddress) {
+        if (derivativeHash.computeLongPositionAddress(address(_vars.opiumProxyFactory)) == _positionAddress) {
             // Check if it's a pooled position
             if (_vars.syntheticAggregator.isPool(derivativeHash, _derivative)) {
                 // Pooled position payoutRatio is considered as full payout, not as payoutRatio
@@ -415,7 +417,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
             }
 
         // Check if `_positionAddresses` is an ID of SHORT position
-        } else if (derivativeHash.computeShortPositionAddress(registry.getOpiumProxyFactory()) == _positionAddress) {
+        } else if (derivativeHash.computeShortPositionAddress(address(_vars.opiumProxyFactory)) == _positionAddress) {
             // Set payout to sellerPayout
             payout = payouts[1];
 
