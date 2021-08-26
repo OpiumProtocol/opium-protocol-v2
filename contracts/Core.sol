@@ -125,6 +125,43 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         _execute(_tokenOwner, _positionAddresses, _amounts, _derivatives);
     }
 
+    function burnMarketNeutral(address[2][] memory _positionsAddresses, Derivative[] memory _derivatives) external nonReentrant {
+        require(_positionsAddresses.length == _derivatives.length, "POSITIONS_DERIVATIVES_MISMATCH");
+        for(uint24 i=0; i < _positionsAddresses.length; i++) {
+            if(IERC20(_positionsAddresses[i][0]).balanceOf(msg.sender) == IERC20(_positionsAddresses[i][1]).balanceOf(msg.sender)) {
+                _burnMarketNeutral(msg.sender, _positionsAddresses[i], _derivatives[i]);
+            }
+        }
+    }
+
+    function burnMarketNeutral(
+        address[2] memory _positionAddresses,
+        Derivative memory _derivative
+    ) external nonReentrant {
+        _burnMarketNeutral(msg.sender, _positionAddresses, _derivative);
+    }
+
+    function _burnMarketNeutral(
+        address positionsOwner,
+        address[2] memory _positionAddresses,
+        Derivative memory _derivative
+    ) private {
+        uint256 shortBalance = IERC20(_positionAddresses[0]).balanceOf(positionsOwner);
+        uint256 longBalance = IERC20(_positionAddresses[1]).balanceOf(positionsOwner);
+        bytes32 derivativeHash = getDerivativeHash(_derivative);
+        ExecuteAndCancelLocalVars memory vars;
+
+        vars.opiumProxyFactory = OpiumProxyFactory(registry.getOpiumProxyFactory());
+        require(derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[0], "WRONG_SHORT");
+        require(derivativeHash.computeLongPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[1], "WRONG_LONG");
+        require(longBalance == shortBalance, "NOT_MARKET_NEUTRAL");
+
+        vars.opiumProxyFactory.burn(positionsOwner, _positionAddresses[0], IERC20(_positionAddresses[0]).balanceOf(positionsOwner));
+        vars.opiumProxyFactory.burn(positionsOwner, _positionAddresses[1], IERC20(_positionAddresses[1]).balanceOf(positionsOwner));
+        uint256 totalMargin = shortBalance.add(longBalance);
+        IERC20(_derivative.token).safeTransfer(positionsOwner, _derivative.margin.mul(shortBalance));
+    }
+
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddress uint256 `tokenId` of positions that needs to be canceled
     /// @param _amount uint256 Amount of positions to cancel
