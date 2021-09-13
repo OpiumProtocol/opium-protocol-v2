@@ -74,8 +74,8 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         _create(_derivative, _amount, _addresses);
     }
 
-    /// @notice Executes several positions of `msg.sender` with same `tokenId`
-    /// @param _positionAddress uint256 `tokenId` of positions that needs to be executed
+    /// @notice Executes several positions of `msg.sender` with specified `positionAddress`
+    /// @param _positionAddress address `positionAddress` of position that needs to be executed
     /// @param _amount uint256 Amount of positions to execute
     /// @param _derivative Derivative Derivative definition
     function execute(address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
@@ -90,9 +90,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         _execute(msg.sender, positionAddresses, amounts, derivatives);
     }
 
-    /// @notice Executes several positions of `_tokenOwner` with same `tokenId`
+    /// @notice Executes several positions of `_tokenOwner` with specified `positionAddress`
     /// @param _tokenOwner address Address of the owner of positions
-    /// @param _positionAddress uint256 `tokenId` of positions that needs to be executed
+    /// @param _positionAddress address `positionAddress` of positions that needs to be executed
     /// @param _amount uint256 Amount of positions to execute
     /// @param _derivative Derivative Derivative definition
     function execute(address _tokenOwner, address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
@@ -107,24 +107,27 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         _execute(_tokenOwner, positionAddresses, amounts, derivatives);
     }
 
-    /// @notice Executes several positions of `msg.sender` with different `tokenId`s
-    /// @param _positionAddresses uint256[] `tokenId`s of positions that needs to be executed
-    /// @param _amounts uint256[] Amount of positions to execute for each `tokenId`
-    /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
+    /// @notice Executes several positions of `msg.sender` with different `positionAddresses`
+    /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be executed
+    /// @param _amounts uint256[] Amount of positions to execute for each `positionAddress`
+    /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
     function execute(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
         _execute(msg.sender, _positionAddresses, _amounts, _derivatives);
     }
 
-    /// @notice Executes several positions of `_tokenOwner` with different `tokenId`s
+    /// @notice Executes several positions of `_tokenOwner` with different `positionAddresses`
     /// @param _tokenOwner address Address of the owner of positions
-    /// @param _positionAddresses uint256[] `tokenId`s of positions that needs to be executed
-    /// @param _amounts uint256[] Amount of positions to execute for each `tokenId`
-    /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
+    /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be executed
+    /// @param _amounts uint256[] Amount of positions to execute for each `positionAddresses`
+    /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
     /// execute many addresses
     function execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
         _execute(_tokenOwner, _positionAddresses, _amounts, _derivatives);
     }
 
+    /// @notice Burns market neutral position for a list of `_positionsAddresses` pairs
+    /// @param _positionsAddresses address[2][] `_positionsAddresses` of the positions that need to be burnt
+    /// @param _derivatives Derivative[] derivative definitions for each `positionAddresses` pair
     function burnMarketNeutral(address[2][] memory _positionsAddresses, Derivative[] memory _derivatives) external nonReentrant {
         require(_positionsAddresses.length == _derivatives.length, "POSITIONS_DERIVATIVES_MISMATCH");
         for(uint24 i=0; i < _positionsAddresses.length; i++) {
@@ -134,6 +137,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         }
     }
 
+    /// @notice Burns market neutral position for a `_positionsAddresses` pair
+    /// @param _positionAddresses address[2] `_positionAddresses` of the position that needs to be burnt
+    /// @param _derivative Derivative derivative definition for the `positionAddresses` pair
     function burnMarketNeutral(
         address[2] memory _positionAddresses,
         Derivative memory _derivative
@@ -141,6 +147,10 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         _burnMarketNeutral(msg.sender, _positionAddresses, _derivative);
     }
 
+    /// @notice Burns market neutral position for a `_positionAddresses` pair
+    /// @param positionsOwner address `positionsOwner` owner of the `positionAddresses` pair
+    /// @param _positionAddresses address[2] `positionAddresses` of the position that needs to be burnt
+    /// @param _derivative Derivative derivative definition for the `positionAddresses` pair
     function _burnMarketNeutral(
         address positionsOwner,
         address[2] memory _positionAddresses,
@@ -163,7 +173,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
-    /// @param _positionAddress uint256 `tokenId` of positions that needs to be canceled
+    /// @param _positionAddress address `positionAddress` of positions that needs to be canceled
     /// @param _amount uint256 Amount of positions to cancel
     /// @param _derivative Derivative Derivative definition
     function cancel(address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
@@ -179,9 +189,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
-    /// @param _positionAddresses uint256[] `tokenId` of positions that needs to be canceled
-    /// @param _amounts uint256[] Amount of positions to cancel for each `tokenId`
-    /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
+    /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be canceled
+    /// @param _amounts uint256[] Amount of positions to cancel for each `positionAddress`
+    /// @param _derivatives Derivative[] Derivative definitions for each `_positionAddress`
     function cancel(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
         _cancel(_positionAddresses, _amounts, _derivatives);
     }
@@ -262,11 +272,11 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         SyntheticAggregator syntheticAggregator;
     }
 
-    /// @notice Executes several positions of `_tokenOwner` with different `tokenId`s
+    /// @notice Executes several positions of `_tokenOwner` with different `positionAddresses`
     /// @param _tokenOwner address Address of the owner of positions
-    /// @param _positionAddresses uint256[] `tokenId`s of positions that needs to be executed
-    /// @param _amounts uint256[] Amount of positions to execute for each `tokenId`
-    /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
+    /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be executed
+    /// @param _amounts uint256[] Amount of positions to execute for each `positionAddress`
+    /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
     function _execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) private {
         require(_positionAddresses.length == _amounts.length, ERROR_CORE_ADDRESSES_AND_AMOUNTS_LENGTH_DO_NOT_MATCH);
         require(_positionAddresses.length == _derivatives.length, ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
@@ -308,9 +318,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
-    /// @param _positionAddresses uint256[] `tokenId` of positions that needs to be canceled
-    /// @param _amounts uint256[] Amount of positions to cancel for each `tokenId`
-    /// @param _derivatives Derivative[] Derivative definitions for each `tokenId`
+    /// @param _positionAddresses address[] `positionAddress` of positions that needs to be canceled
+    /// @param _amounts uint256[] Amount of positions to cancel for each `positionAddress`
+    /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
     function _cancel(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) private {
         require(_positionAddresses.length == _amounts.length, ERROR_CORE_ADDRESSES_AND_AMOUNTS_LENGTH_DO_NOT_MATCH);
         require(_positionAddresses.length == _derivatives.length, ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
@@ -352,12 +362,12 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
             (margins[0], margins[1]) = vars.syntheticAggregator.getMargin(derivativeHash, _derivatives[i]);
 
             uint256 payout;
-            // Check if `_positionAddresses` is an ID of LONG position
+            // Check if `_positionAddresses` is a LONG position
             if (derivativeHash.computeLongPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[i]) {
                 // Set payout to buyerPayout
                 payout = margins[0];
 
-            // Check if `_tokenId` is an ID of SHORT position
+            // Check if `positionAddress` is a SHORT position
             } else if (derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[i]) {
                 // Set payout to sellerPayout
                 payout = margins[1];
@@ -378,7 +388,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
     /// @notice Calculates payout for position and gets fees
     /// @param _derivative Derivative Derivative definition
-    /// @param _positionAddress uint256 `tokenId` of positions
+    /// @param _positionAddress address `positionAddress` of positions
     /// @param _amount uint256 Amount of positions
     /// @param _vars ExecuteAndCancelLocalVars Helping local variables
     /// @return payout uint256 Payout for all tokens
@@ -419,7 +429,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
         address opiumProxyFactory = registry.getOpiumProxyFactory();
 
-        // Check if `_positionAddresses` is an ID of LONG position
+        // Check if `_positionAddress` is LONG position
         if (derivativeHash.computeLongPositionAddress(address(_vars.opiumProxyFactory)) == _positionAddress) {
             // Check if it's a pooled position
             if (_vars.syntheticAggregator.isPool(derivativeHash, _derivative)) {
@@ -453,7 +463,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
                 payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[0].mul(_amount)));
             }
 
-        // Check if `_positionAddresses` is an ID of SHORT position
+        // Check if `_positionAddress` is a SHORT position
         } else if (derivativeHash.computeShortPositionAddress(address(_vars.opiumProxyFactory)) == _positionAddress) {
             // Set payout to sellerPayout
             payout = payouts[1];
