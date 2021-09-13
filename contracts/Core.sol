@@ -13,7 +13,7 @@ import "./Errors/CoreErrors.sol";
 import "./Lib/UsingRegistry.sol";
 import "./Lib/LibDerivative.sol";
 import "./Lib/LibCommission.sol";
-import "./Lib/NewLibPosition.sol";
+import "./Lib/LibPosition.sol";
 
 import "./Registry.sol";
 import "./OpiumProxyFactory.sol";
@@ -25,7 +25,7 @@ import "./TokenSpender.sol";
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
 contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, ReentrancyGuard {
     using SafeMath for uint256;
-    using NewLibPosition for bytes32;
+    using LibPosition for bytes32;
     using SafeERC20 for IERC20;
 
     // Emitted when Core creates new position

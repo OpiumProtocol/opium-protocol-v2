@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/proxy/Clones.sol";
 import "../OpiumPositionToken.sol";
 import "../Interface/IOpiumProxyFactory.sol";
 
-library NewLibPosition {
+library LibPosition {
   function computeLongPositionAddress(bytes32 _derivativeHash, address _factoryAddress) external view returns(address) {
     bytes32 salt = keccak256(abi.encodePacked( _derivativeHash, "LONG"));
     return Clones.predictDeterministicAddress(IOpiumProxyFactory(_factoryAddress).getImplementationAddress(), salt, _factoryAddress);

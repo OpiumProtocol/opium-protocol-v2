@@ -104,7 +104,7 @@ describe("TokenSpender", () => {
         
         const Core = await ethers.getContractFactory("Core", {
             libraries: {
-                NewLibPosition: libPosition.address,
+                LibPosition: libPosition.address,
             },
         });
         const newCore = await Core.deploy(registry.address);
@@ -142,7 +142,7 @@ describe("TokenSpender", () => {
         
         const Core = await ethers.getContractFactory("Core", {
             libraries: {
-                NewLibPosition: libPosition.address,
+                LibPosition: libPosition.address,
             },
         });
         const newCore = await Core.deploy(registry.address);
@@ -163,7 +163,7 @@ describe("TokenSpender", () => {
 
         const Core = await ethers.getContractFactory("Core", {
             libraries: {
-                NewLibPosition: libPosition.address,
+                LibPosition: libPosition.address,
             },
         });
         const newCore = await Core.deploy(registry.address);

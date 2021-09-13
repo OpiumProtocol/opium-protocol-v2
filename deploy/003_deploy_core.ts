@@ -8,13 +8,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const registry = await get("Registry");
-  const libPosition = await get("NewLibPosition");
+  const libPosition = await get("LibPosition");
 
   await deploy("Core", {
     from: deployer,
     args: [registry.address],
     libraries: {
-      NewLibPosition: libPosition.address,
+      LibPosition: libPosition.address,
     },
     log: true,
   });

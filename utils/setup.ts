@@ -35,12 +35,12 @@ const setup = async (): Promise<TContracts> => {
   const TestToken = await ethers.getContractFactory("TestToken");
   const OracleAggregator = await ethers.getContractFactory("OracleAggregator");
   const SyntheticAggregator = await ethers.getContractFactory("SyntheticAggregator");
-  const LibPosition = await ethers.getContractFactory("NewLibPosition");
+  const LibPosition = await ethers.getContractFactory("LibPosition");
   const OracleIdMock = await ethers.getContractFactory("OracleIdMock");
   const libPosition = await LibPosition.deploy();
   const Core = await ethers.getContractFactory("Core", {
     libraries: {
-      NewLibPosition: libPosition.address,
+      LibPosition: libPosition.address,
     },
   });
   const OpiumProxyFactory = await ethers.getContractFactory("OpiumProxyFactory");

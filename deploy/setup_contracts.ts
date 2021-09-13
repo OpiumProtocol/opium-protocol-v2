@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deployments.fixture([
     "Registry",
-    "NewLibPosition",
+    "LibPosition",
     "OpiumProxyFactory",
     "Core",
     "TokenSpender",
