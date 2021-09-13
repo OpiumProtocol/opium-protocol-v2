@@ -5,12 +5,14 @@ import setup from "../utils/setup";
 import { TNamedSigners } from "../hardhat.config";
 import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { decodeLogs } from "../utils/events";
+import { cast } from "../utils/bn";
 
 const SECONDS_40_MINS = 60 * 40;
 
 const formatAddress = (address: string): string => {
   return '0x'.concat(address.split('0x000000000000000000000000')[1])
 }
+
 describe("Core: burn market neutral positions", () => {
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
   let namedSigners: TNamedSigners
@@ -26,7 +28,7 @@ describe("Core: burn market neutral positions", () => {
 
     const amount = 3;
     const optionCall = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime,
       params: [
         20000, // Strike Price 200.00$
@@ -38,7 +40,7 @@ describe("Core: burn market neutral positions", () => {
     const initialTokenBalance = await testToken.balanceOf(marketNeutralParty.address);
     console.log(`initialTokenBalance: ${initialTokenBalance.toString()}`)
 
-    await testToken.approve(tokenSpender.address, optionCall.margin * amount);
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait()
     const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
@@ -84,7 +86,7 @@ describe("Core: burn market neutral positions", () => {
 
     const amount = 12;
     const optionCall = derivativeFactory({
-      margin: 400000,
+      margin: cast(400000),
       endTime,
       params: [
         20000, // Strike Price 200.00$
@@ -94,7 +96,7 @@ describe("Core: burn market neutral positions", () => {
     });
 
 
-    await testToken.approve(tokenSpender.address, optionCall.margin * amount);
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait()
     const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
@@ -106,7 +108,7 @@ describe("Core: burn market neutral positions", () => {
 
     const secondAmount = 7
     const secondOptionCall = derivativeFactory({
-      margin: 1231900100,
+      margin: cast(1231900100),
       endTime,
       params: [
         20000, // Strike Price 200.00$
@@ -115,7 +117,7 @@ describe("Core: burn market neutral positions", () => {
       syntheticId: optionCallMock.address,
     });
 
-    await testToken.approve(tokenSpender.address, secondOptionCall.margin * secondAmount);
+    await testToken.approve(tokenSpender.address, secondOptionCall.margin.mul(secondAmount));
     const tx2 = await core.create(secondOptionCall, secondAmount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt2 = await tx2.wait()
     const log2 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt2)

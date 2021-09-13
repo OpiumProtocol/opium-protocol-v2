@@ -6,14 +6,15 @@ import setup from "../utils/setup";
 import { TNamedSigners } from "../hardhat.config";
 import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { decodeLogs } from "../utils/events";
+import { cast, toBN } from "../utils/bn";
 
 const SECONDS_40_MINS = 60 * 40;
 
 const formatAddress = (address: string): string => {
   return '0x'.concat(address.split('0x000000000000000000000000')[1])
 }
+
 describe("CoreCreation", () => {
-  let hash;
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
   let namedSigners: TNamedSigners
 
@@ -23,7 +24,7 @@ describe("CoreCreation", () => {
   it(`should return the correct getDerivativeHash`, async () => {
     const { core, testToken, optionCallMock } = await setup();
     const optionCall = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime,
       params: [
         20000, // Strike Price 200.00$
@@ -43,11 +44,11 @@ describe("CoreCreation", () => {
 
   it(`should revert create OptionCall derivative with SYNTHETIC_AGGREGATOR:WRONG_MARGIN`, async () => {
     try {
-      const { deployer, buyer, seller } = namedSigners;
+      const { buyer, seller } = namedSigners;
       const { core, testToken, optionCallMock, tokenSpender } = await setup();
 
       const optionCall = derivativeFactory({
-        margin: 0,
+        margin: cast(0),
         endTime,
         params: [
           20000, // Strike Price 200.00$
@@ -56,20 +57,21 @@ describe("CoreCreation", () => {
         syntheticId: optionCallMock.address,
       });
       const amount = 3;
-      await testToken.approve(tokenSpender.address, optionCall.margin * amount, { from: deployer.address });
-      await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
+      await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
+      await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
-      expect(error.message).to.include("SYNTHETIC_AGGREGATOR:WRONG_MARGIN");
+      const { message } = error as Error
+      expect(message).to.include("SYNTHETIC_AGGREGATOR:WRONG_MARGIN");
     }
   });
 
   it(`should revert create OptionCall derivative with CORE:SYNTHETIC_VALIDATION_ERROR`, async () => {
     try {
-      const { deployer, buyer, seller } = namedSigners;  
+      const { buyer, seller } = namedSigners;  
       const { core, testToken, optionCallMock, tokenSpender } = await setup();
 
       const optionCall = derivativeFactory({
-        margin: 30,
+        margin: cast(30),
         endTime: 0,
         params: [
           20000, // Strike Price 200.00$
@@ -78,20 +80,21 @@ describe("CoreCreation", () => {
         syntheticId: optionCallMock.address,
       });
       const amount = 3;
-      await testToken.approve(tokenSpender.address, optionCall.margin * amount, { from: deployer.address });
-      await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
+      await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
+      await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
-      expect(error.message).to.include("CORE:SYNTHETIC_VALIDATION_ERROR");
+      const { message } = error as Error
+      expect(message).to.include("CORE:SYNTHETIC_VALIDATION_ERROR");
     }
   });
 
   it(`should revert create OptionCall derivative with 'CORE:NOT_ENOUGH_TOKEN_ALLOWANCE`, async () => {
     try {
       const { core, testToken, optionCallMock } = await setup();
-      const { deployer, buyer, seller } = namedSigners;  
+      const { buyer, seller } = namedSigners;  
 
       const optionCall = derivativeFactory({
-        margin: 3,
+        margin: cast(3),
         endTime,
         params: [
           20000, // Strike Price 200.00$
@@ -100,9 +103,10 @@ describe("CoreCreation", () => {
         syntheticId: optionCallMock.address,
       });
       const amount = 3;
-      await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
+      await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
-      expect(error.message).to.include("CORE:NOT_ENOUGH_TOKEN_ALLOWANCE");
+      const { message } = error as Error
+      expect(message).to.include("CORE:NOT_ENOUGH_TOKEN_ALLOWANCE");
     }
   });
 
@@ -112,7 +116,7 @@ describe("CoreCreation", () => {
 
     const amount = 3;
     const optionCall = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime,
       params: [
         20000, // Strike Price 200.00$
@@ -120,12 +124,12 @@ describe("CoreCreation", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    hash = await core.getDerivativeHash(optionCall);
+    const hash = await core.getDerivativeHash(optionCall);
 
-    const balance = await testToken.balanceOf(deployer.address, { from: deployer.address });
+    const balance = await testToken.balanceOf(deployer.address);
 
-    await testToken.approve(tokenSpender.address, optionCall.margin * amount, { from: deployer.address });
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], { from: deployer.address });
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait()
     const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
     const shortPositionAddress = formatAddress(log[0].data)
@@ -157,7 +161,7 @@ describe("CoreCreation", () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
     const amount = 3;
     const optionCall = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime,
       params: [
         20000, // Strike Price 200.00$
@@ -166,9 +170,9 @@ describe("CoreCreation", () => {
       syntheticId: optionCallMock.address,
     });
 
-    await testToken.approve(tokenSpender.address, optionCall.margin * amount);
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
 
-    hash = await core.getDerivativeHash(optionCall);
+    const hash = await core.getDerivativeHash(optionCall);
 
     const oldCoreTokenBalance = await testToken.balanceOf(core.address);
 
@@ -184,7 +188,7 @@ describe("CoreCreation", () => {
 
     const newCoreTokenBalance = await testToken.balanceOf(core.address);
 
-    expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.toNumber() + optionCall.margin * amount);
+    expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.add(optionCall.margin.mul(amount)));
 
     // const buyerPositionsBalance = await tokenMinter["balanceOf(address)"](buyer.address);
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address)

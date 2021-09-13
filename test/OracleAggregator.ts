@@ -51,7 +51,8 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(oracle).__callback(timestamp, data);
     } catch (error) {
-      expect(error.message).to.include("ORACLE_AGGREGATOR:DATA_ALREADY_EXIST");
+      const { message } = error as Error
+      expect(message).to.include("ORACLE_AGGREGATOR:DATA_ALREADY_EXIST");
     }
   });
 
@@ -78,7 +79,8 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp);
     } catch (error) {
-      expect(error.message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
+      const { message } = error as Error
+      expect(message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
     }
   });
 
@@ -92,7 +94,8 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp);
     } catch (error) {
-      expect(error.message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
+      const { message } = error as Error
+      expect(message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
     }
   });
 
@@ -103,7 +106,8 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp, { value: lessMoney });
     } catch (error) {
-      expect(error.message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
+      const { message } = error as Error
+      expect(message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
     }
   });
 
@@ -129,7 +133,8 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp, { value: moreMoney });
     } catch (error) {
-      expect(error.message).to.include("ORACLE_AGGREGATOR:QUERY_WAS_ALREADY_MADE");
+      const { message } = error as Error
+      expect(message).to.include("ORACLE_AGGREGATOR:QUERY_WAS_ALREADY_MADE");
     }
   });
 
@@ -145,7 +150,8 @@ describe("OracleAggregator", () => {
         .connect(author)
         .recursivelyFetchData(oracleIdMock.address, timestampMinusOne, period, times, { value: moreMoney });
     } catch (error) {
-      expect(error.message).to.include("ORACLE_AGGREGATOR:QUERY_WAS_ALREADY_MADE");
+      const { message } = error as Error
+      expect(message).to.include("ORACLE_AGGREGATOR:QUERY_WAS_ALREADY_MADE");
     }
   });
 

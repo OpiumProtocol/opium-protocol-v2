@@ -26,7 +26,8 @@ describe("Registry", () => {
           deployer.address,
         );
     } catch (error) {
-      expect(error.message).to.include("REGISTRY:ONLY_INITIALIZER");
+      const { message } = error as Error
+      expect(message).to.include("REGISTRY:ONLY_INITIALIZER");
     }
   });
 
@@ -44,7 +45,8 @@ describe("Registry", () => {
         deployer.address,
       );
     } catch (error) {
-      expect(error.message).to.include("REGISTRY:ALREADY_SET");
+      const { message } = error as Error
+      expect(message).to.include("REGISTRY:ALREADY_SET");
     }
   });
 

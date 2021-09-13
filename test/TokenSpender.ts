@@ -32,7 +32,8 @@ describe("TokenSpender", () => {
         try {
             await tokenSpender.connect(notAllowed).proposeWhitelist([ core.address ])
         } catch (error) {
-            expect(error.message).to.include('Only governor allowed')
+            const { message } = error as Error
+            expect(message).to.include('Only governor allowed')
         }
     })
 
@@ -51,7 +52,8 @@ describe("TokenSpender", () => {
 
             await tokenSpender.claimTokens(dai.address, deployer.address, hacker.address, toBN('0.01'))
         } catch (error) {
-            expect(error.message).to.include('Only whitelisted allowed')
+            const { message } = error as Error
+            expect(message).to.include('Only whitelisted allowed')
         }
     })
 
@@ -79,7 +81,8 @@ describe("TokenSpender", () => {
 
             await tokenSpender.connect(governor).commitWhitelist()
         } catch (error) {
-            expect(error.message).to.include(`Didn't proposed yet`)
+            const { message } = error as Error
+            expect(message).to.include(`Didn't proposed yet`)
         }
     })
 
@@ -88,7 +91,8 @@ describe("TokenSpender", () => {
             const { governor } = namedSigners;
             await tokenSpender.connect(governor).proposeWhitelist([])
         } catch (error) {
-            expect(error.message).to.include(`Can't be empty'`)
+            const { message } = error as Error
+            expect(message).to.include(`Can't be empty'`)
         }
     })
 
@@ -117,7 +121,8 @@ describe("TokenSpender", () => {
             const { notAllowed } = namedSigners;
             await tokenSpender.connect(notAllowed).commitWhitelist()
         } catch (error) {
-            expect(error.message).to.include('Only governor allowed')
+            const { message } = error as Error
+            expect(message).to.include('Only governor allowed')
         }
     })
 
@@ -126,7 +131,8 @@ describe("TokenSpender", () => {
             const { governor } = namedSigners;
             await tokenSpender.connect(governor).commitWhitelist()
         } catch (error) {
-            expect(error.message).to.include(`Can't commit yet`)
+            const { message } = error as Error
+            expect(message).to.include(`Can't commit yet`)
         }
     })
 

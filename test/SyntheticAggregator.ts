@@ -3,6 +3,7 @@ import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import { expect } from "chai";
 import setup from "../utils/setup";
 import { TNamedSigners } from "../hardhat.config";
+import { cast } from "../utils/bn";
 
 describe("SyntheticAggregator", () => {
   let namedSigners: TNamedSigners
@@ -14,7 +15,7 @@ describe("SyntheticAggregator", () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 
     const derivative = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
       params: [200],
       syntheticId: optionCallMock.address,
@@ -30,7 +31,7 @@ describe("SyntheticAggregator", () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 
     const derivative = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
       params: [200],
       syntheticId: optionCallMock.address,
@@ -49,7 +50,7 @@ describe("SyntheticAggregator", () => {
     const { deployer } = namedSigners;
 
     const derivative = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
       params: [200],
       syntheticId: optionCallMock.address,
@@ -65,7 +66,7 @@ describe("SyntheticAggregator", () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 
     const derivative = derivativeFactory({
-      margin: 30,
+      margin: cast(30),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
       params: [200],
       syntheticId: optionCallMock.address,

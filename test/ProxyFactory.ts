@@ -5,6 +5,7 @@ import { TNamedSigners } from "../hardhat.config";
 import { OpiumPositionToken } from "../typechain";
 import { TestOpiumProxyFactory } from "../typechain/TestOpiumProxyFactory";
 import { derivativeFactory, getDerivativeHash, TDerivative } from "../utils/derivatives";
+import { cast } from "../utils/bn";
 
 describe("TestOpiumProxyFactory", () => {
   let namedSigners: TNamedSigners
@@ -17,14 +18,14 @@ describe("TestOpiumProxyFactory", () => {
     const { optionCallMock } = await setup();
     
     derivative = derivativeFactory({
-        margin: 30,
+        margin: cast(30),
         endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
         params: [200],
         syntheticId: optionCallMock.address,
     });
 
     secondDerivative = derivativeFactory({
-        margin: 31,
+        margin: cast(31),
         endTime: ~~(Date.now() / 1000) + 3601, // now + 1 hour
         params: [200],
         syntheticId: optionCallMock.address,
