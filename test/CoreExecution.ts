@@ -8,15 +8,17 @@ import { TNamedSigners } from "../hardhat.config";
 import { decodeLogs } from "../utils/events";
 import { cast, mul } from "../utils/bn";
 import { BigNumber } from "ethers";
-
-const AUTHOR_COMMISSION = 0.0025; // 0.25%
-const OPIUM_COMMISSION = 0.1; // 10% of author commission
-const SECONDS_10_MINS = 60 * 10;
-const SECONDS_20_MINS = 60 * 20;
-const SECONDS_30_MINS = 60 * 30;
-const SECONDS_40_MINS = 60 * 40;
-const SECONDS_50_MINS = 60 * 50;
-const SECONDS_3_WEEKS = 60 * 60 * 24 * 7 * 3;
+import { formatAddress } from "../utils/addresses";
+import { 
+  AUTHOR_COMMISSION,
+  OPIUM_COMMISSION,
+  SECONDS_10_MINS,
+  SECONDS_20_MINS,
+  SECONDS_30_MINS,
+  SECONDS_40_MINS,
+  SECONDS_50_MINS,
+  SECONDS_3_WEEKS,
+ } from "../utils/constants";
 
 const calculateFees = (payout: BigNumber) => {
   const opiumOverallFee = Math.floor(payout.toNumber() * AUTHOR_COMMISSION);
@@ -53,10 +55,6 @@ const executeManyWithAddress =
 
 const cancelOne = "cancel(address,uint256,(uint256,uint256,uint256[],address,address,address))";
 const cancelMany = "cancel(address[],uint256[],(uint256,uint256,uint256[],address,address,address)[])";
-
-const formatAddress = (address: string): string => {
-  return '0x'.concat(address.split('0x000000000000000000000000')[1])
-}
 
 describe("CoreExecution", () => {
   let fullMarginOption: ICreatedDerivativeOrder,

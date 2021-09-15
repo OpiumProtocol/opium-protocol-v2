@@ -1,4 +1,4 @@
-import zeroAddress from "./addresses";
+import {zeroAddress} from "./addresses";
 import { BigNumber, utils } from "ethers";
 import { cast } from "./bn";
 

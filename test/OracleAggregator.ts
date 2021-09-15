@@ -73,7 +73,6 @@ describe("OracleAggregator", () => {
       const { oracleAggregator } = await setup();
       const { deployer, author } = namedSigners;
 
-
       const oracleIdMock = await deployMockContract(deployer, (await artifacts.readArtifact("OracleIdMock")).abi);
       await oracleIdMock.mock.calculateFetchPrice.returns(fetchPrice);
 

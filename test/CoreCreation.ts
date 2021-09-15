@@ -6,13 +6,9 @@ import setup from "../utils/setup";
 import { TNamedSigners } from "../hardhat.config";
 import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { decodeLogs } from "../utils/events";
-import { cast, toBN } from "../utils/bn";
-
-const SECONDS_40_MINS = 60 * 40;
-
-const formatAddress = (address: string): string => {
-  return '0x'.concat(address.split('0x000000000000000000000000')[1])
-}
+import { cast } from "../utils/bn";
+import { formatAddress } from "../utils/addresses";
+import { SECONDS_40_MINS } from "../utils/constants";
 
 describe("CoreCreation", () => {
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins

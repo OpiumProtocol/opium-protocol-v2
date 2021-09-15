@@ -37,7 +37,7 @@ describe("TestOpiumProxyFactory", () => {
 
     })
     
-    it("expects _isContract to return false if the argument is an     external account", async () => {
+    it("expects _isContract to return false if the argument is an external account", async () => {
         const { buyer } = namedSigners;
         const result  = await opiumProxyFactory._isContract(buyer.address)
         expect(result).to.not.be.true
@@ -113,5 +113,4 @@ describe("TestOpiumProxyFactory", () => {
         expect(afterLongOpiumPositionTokenSellerBalance).to.equal(0)
         expect(afterLongOpiumPositionTokenBuyerBalance).to.equal(amount)
     })
-
 });
