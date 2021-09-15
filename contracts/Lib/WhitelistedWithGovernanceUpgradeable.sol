@@ -1,9 +1,10 @@
 pragma solidity 0.8.5;
 
-import "./Whitelisted.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./WhitelistedUpgradeable.sol";
 
 /// @title Opium.Lib.WhitelistedWithGovernance contract implements Opium.Lib.Whitelisted and adds governance for whitelist controlling
-contract WhitelistedWithGovernance is Whitelisted {
+contract WhitelistedWithGovernanceUpgradeable is Initializable, WhitelistedUpgradeable {
     // Emitted when new governor is set
     event GovernorSet(address governor);
 
@@ -33,7 +34,7 @@ contract WhitelistedWithGovernance is Whitelisted {
     /// @notice Contract constructor
     /// @param _timeLockInterval uint256 Initial value for timelock interval
     /// @param _governor address Initial value for governor
-    constructor(uint256 _timeLockInterval, address _governor) {
+    function __WhitelistedWithGovernance__init(uint256 _timeLockInterval, address _governor) internal initializer {
         timeLockInterval = _timeLockInterval;
         governor = _governor;
         emit GovernorSet(governor);

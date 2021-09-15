@@ -2,10 +2,11 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./Errors/RegistryErrors.sol";
+
+import "../Errors/RegistryErrors.sol";
 
 /// @title Opium.Registry contract keeps addresses of deployed Opium contracts set to allow them route and communicate to each other
-contract Registry is Initializable, OwnableUpgradeable, RegistryErrors {
+contract TestRegistryUpgrade is Initializable, OwnableUpgradeable, RegistryErrors {
 
     // Address of Opium.OpiumProxyFactory contract
     address private opiumProxyFactory;
@@ -24,6 +25,8 @@ contract Registry is Initializable, OwnableUpgradeable, RegistryErrors {
 
     // Address of Opium commission receiver
     address private opiumAddress;
+
+    uint256 public favNumber;
 
     /// @notice Sets initializer
     function initialize() public initializer {
@@ -117,5 +120,9 @@ contract Registry is Initializable, OwnableUpgradeable, RegistryErrors {
     /// @param result address Address of Opium commission receiver
     function getOpiumAddress() external view returns (address result) {
         return opiumAddress;
+    }
+
+    function getOpiumAddresses() external view returns(address, address, address, address, address) {
+        return (opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender);
     }
 }

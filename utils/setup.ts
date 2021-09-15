@@ -1,3 +1,5 @@
+import { ethers, upgrades } from "hardhat";
+import { Contract } from "ethers";
 import {
   Core,
   OpiumProxyFactory,
@@ -9,9 +11,7 @@ import {
   TestToken,
   TokenSpender,
 } from "../typechain";
-import { ethers } from "hardhat";
 import { toBN } from "./bn";
-import { Contract } from "ethers";
 
 export type TContracts = {
   libPosition: Contract,
@@ -27,7 +27,7 @@ export type TContracts = {
 };
 
 const setup = async (): Promise<TContracts> => {
-  const {deployer} = await ethers.getNamedSigners();
+  const {deployer, governor} = await ethers.getNamedSigners();
 
   const Registry = await ethers.getContractFactory("Registry");
   const TokenSpender = await ethers.getContractFactory("TokenSpender");
@@ -44,10 +44,9 @@ const setup = async (): Promise<TContracts> => {
     },
   });
   const OpiumProxyFactory = await ethers.getContractFactory("OpiumProxyFactory");
-
-  const registry = <Registry>await Registry.deploy();
+  const registry = <Registry>await upgrades.deployProxy(Registry, {initializer: 'initialize'});
   const opiumProxyFactory = <OpiumProxyFactory>await OpiumProxyFactory.deploy();
-  const tokenSpender = <TokenSpender>await TokenSpender.deploy(deployer.address);
+  const tokenSpender = <TokenSpender>await upgrades.deployProxy(TokenSpender, [governor.address], {initializer: 'initialize'});
   const core = <Core>await Core.deploy(registry.address);
   const oracleAggregator = <OracleAggregator>await OracleAggregator.deploy();
   const syntheticAggregator = <SyntheticAggregator>await SyntheticAggregator.deploy();
@@ -57,7 +56,7 @@ const setup = async (): Promise<TContracts> => {
 
   const whitelist = [core.address];
 
-  await tokenSpender.proposeWhitelist(whitelist, { from: deployer.address });
+  await tokenSpender.connect(governor).proposeWhitelist(whitelist);
 
   await registry.deployed();
   await tokenSpender.deployed();
@@ -76,7 +75,6 @@ const setup = async (): Promise<TContracts> => {
     syntheticAggregator.address,
     tokenSpender.address,
     deployer.address,
-    { from: deployer.address },
   );
 
   return {

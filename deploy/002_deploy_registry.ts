@@ -10,6 +10,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("Registry", {
     from: deployer,
     log: true,
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+      execute: {
+        init: {
+          methodName: 'initialize',
+          args: []
+        }
+      }
+    }
   });
 };
 

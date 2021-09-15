@@ -2,6 +2,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-deploy";
+import'@openzeppelin/hardhat-upgrades';
 // import "hardhat-deploy-ethers";
 import "hardhat-dependency-compiler";
 import "hardhat-gas-reporter";

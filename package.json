@@ -71,6 +71,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "^4.3.0",
+    "@openzeppelin/hardhat-upgrades": "^1.10.0",
     "openzeppelin-solidity": "^4.2.0"
   },
   "engines": {

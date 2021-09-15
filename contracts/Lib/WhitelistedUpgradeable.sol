@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
 /// @title Opium.Lib.Whitelisted contract implements whitelist with modifier to restrict access to only whitelisted addresses
-contract Whitelisted {
+contract WhitelistedUpgradeable {
     // Whitelist array
     address[] internal whitelist;
 

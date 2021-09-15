@@ -9,8 +9,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy("TokenSpender", {
     from: deployer,
-    args: [governor],
+    args: [],
     log: true,
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+      execute: {
+        init: {
+          methodName: 'initialize',
+          args: [governor]
+        }
+      }
+    }
   });
 };
 

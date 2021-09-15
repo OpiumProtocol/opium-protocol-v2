@@ -34,7 +34,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     syntheticAggregator.address,
     tokenSpender.address,
     governor,
-    { from: deployer },
   );
 };
 

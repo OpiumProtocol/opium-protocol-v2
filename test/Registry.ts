@@ -27,7 +27,7 @@ describe("Registry", () => {
         );
     } catch (error) {
       const { message } = error as Error
-      expect(message).to.include("REGISTRY:ONLY_INITIALIZER");
+      expect(message).to.include("Ownable: caller is not the owner");
     }
   });
 

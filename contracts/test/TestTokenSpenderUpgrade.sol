@@ -4,10 +4,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "./Lib/WhitelistedWithGovernanceAndChangableTimelockUpgradeable.sol";
+import "../Lib/WhitelistedWithGovernanceAndChangableTimelockUpgradeable.sol";
 
 /// @title Opium.TokenSpender contract holds users ERC20 approvals and allows whitelisted contracts to use tokens
-contract TokenSpender is Initializable, WhitelistedWithGovernanceAndChangableTimelockUpgradeable {
+contract TestTokenSpenderUpgrade is Initializable, WhitelistedWithGovernanceAndChangableTimelockUpgradeable {
     using SafeERC20 for IERC20;
 
     // Initial timelock period
@@ -35,5 +35,9 @@ contract TokenSpender is Initializable, WhitelistedWithGovernanceAndChangableTim
     /// @param amount uint256 Amount of tokens to be transferred
     function claimPositions(IERC20 token, address from, address to, uint256 amount) external onlyWhitelisted {
         token.safeTransferFrom(from, to, amount);
+    }
+
+    function getAggregatedGovernance() view external returns(uint256, address, uint256) {
+        return (timeLockInterval, governor, proposalTime);
     }
 }

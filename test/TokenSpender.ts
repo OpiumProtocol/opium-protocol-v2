@@ -17,7 +17,6 @@ describe("TokenSpender", () => {
         ( namedSigners = await ethers.getNamedSigners() as TNamedSigners);
         const { deployer } = namedSigners
 
-
         await deployments.fixture(['TokenSpender'])
         const tokenSpenderDeployment = await deployments.get('TokenSpender')
         tokenSpender = <TokenSpender>await ethers.getContractAt("TokenSpender", tokenSpenderDeployment.address)
