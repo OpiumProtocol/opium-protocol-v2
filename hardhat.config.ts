@@ -2,7 +2,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-deploy";
-import'@openzeppelin/hardhat-upgrades';
+import "@openzeppelin/hardhat-upgrades";
 // import "hardhat-deploy-ethers";
 import "hardhat-dependency-compiler";
 import "hardhat-gas-reporter";
@@ -53,8 +53,7 @@ const chainIds = {
   bscMainnet: 56,
 };
 
-const mnemonic =
-  process.env.MNEMONIC;
+const mnemonic = process.env.MNEMONIC;
 if (!mnemonic) {
   throw new Error("Please set your MNEMONIC in a .env file");
 }
@@ -82,18 +81,18 @@ const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): N
 };
 
 export type TNamedSigners = {
-  deployer: SignerWithAddress
-  governor: SignerWithAddress
-  buyer: SignerWithAddress
-  seller: SignerWithAddress
-  oracle: SignerWithAddress
-  author: SignerWithAddress
-  thirdParty: SignerWithAddress
-  notAllowed: SignerWithAddress
-  hacker: SignerWithAddress
-  goodGuy: SignerWithAddress
-  authorized: SignerWithAddress
-}
+  deployer: SignerWithAddress;
+  governor: SignerWithAddress;
+  buyer: SignerWithAddress;
+  seller: SignerWithAddress;
+  oracle: SignerWithAddress;
+  author: SignerWithAddress;
+  thirdParty: SignerWithAddress;
+  notAllowed: SignerWithAddress;
+  hacker: SignerWithAddress;
+  goodGuy: SignerWithAddress;
+  authorized: SignerWithAddress;
+};
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -164,11 +163,11 @@ const config: HardhatUserConfig = {
       default: 8,
     },
     goodGuy: {
-      default: 9
+      default: 9,
     },
     authorized: {
-      default: 10
-    }
+      default: 10,
+    },
   },
   typechain: {
     outDir: "typechain",

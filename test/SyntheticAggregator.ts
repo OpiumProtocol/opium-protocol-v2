@@ -6,11 +6,11 @@ import { TNamedSigners } from "../hardhat.config";
 import { cast } from "../utils/bn";
 
 describe("SyntheticAggregator", () => {
-  let namedSigners: TNamedSigners
+  let namedSigners: TNamedSigners;
 
-  before(async() => {
-    namedSigners = await ethers.getNamedSigners() as TNamedSigners;
-  })
+  before(async () => {
+    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
+  });
   it(`should successfully return isPool`, async () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 

@@ -25,11 +25,11 @@ describe("OracleAggregator", () => {
   const period = 60; // 2 minutes
   const times = 3;
 
-  let namedSigners: TNamedSigners
+  let namedSigners: TNamedSigners;
 
-  before(async() => {
-    namedSigners = await ethers.getNamedSigners() as TNamedSigners;
-  })
+  before(async () => {
+    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
+  });
 
   it("should accept data from oracle", async () => {
     const { oracle } = namedSigners;
@@ -51,7 +51,7 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(oracle).__callback(timestamp, data);
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:DATA_ALREADY_EXIST");
     }
   });
@@ -78,7 +78,7 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp);
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
     }
   });
@@ -93,7 +93,7 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp);
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
     }
   });
@@ -105,7 +105,7 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp, { value: lessMoney });
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:NOT_ENOUGH_ETHER");
     }
   });
@@ -132,7 +132,7 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.connect(author).fetchData(oracleIdMock.address, timestamp, { value: moreMoney });
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:QUERY_WAS_ALREADY_MADE");
     }
   });
@@ -149,7 +149,7 @@ describe("OracleAggregator", () => {
         .connect(author)
         .recursivelyFetchData(oracleIdMock.address, timestampMinusOne, period, times, { value: moreMoney });
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:QUERY_WAS_ALREADY_MADE");
     }
   });

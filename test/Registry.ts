@@ -4,16 +4,16 @@ import setup from "../utils/setup";
 import { TNamedSigners } from "../hardhat.config";
 
 describe("Registry", () => {
-  let namedSigners: TNamedSigners
+  let namedSigners: TNamedSigners;
 
-  before(async() => {
-    namedSigners = await ethers.getNamedSigners() as TNamedSigners;
-  })
+  before(async () => {
+    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
+  });
 
   it("should revert for non initializer address", async () => {
     try {
       const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-      const { deployer, notAllowed } = namedSigners
+      const { deployer, notAllowed } = namedSigners;
 
       await registry
         .connect(notAllowed)
@@ -26,7 +26,7 @@ describe("Registry", () => {
           deployer.address,
         );
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("Ownable: caller is not the owner");
     }
   });
@@ -34,7 +34,7 @@ describe("Registry", () => {
   it("should revert on a second init call", async () => {
     try {
       const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-      const {deployer} = namedSigners;
+      const { deployer } = namedSigners;
 
       await registry.init(
         opiumProxyFactory.address,
@@ -45,7 +45,7 @@ describe("Registry", () => {
         deployer.address,
       );
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("REGISTRY:ALREADY_SET");
     }
   });

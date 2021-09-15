@@ -1,4 +1,4 @@
-import {zeroAddress} from "./addresses";
+import { zeroAddress } from "./addresses";
 import { BigNumber, utils } from "ethers";
 import { cast } from "./bn";
 
@@ -12,15 +12,15 @@ export type TDerivative = {
 };
 
 export type TDerivativeOrder = {
-  derivative: TDerivative
-  amount: number
-  price: BigNumber
-  hash: string
-}
+  derivative: TDerivative;
+  amount: number;
+  price: BigNumber;
+  hash: string;
+};
 
 export interface ICreatedDerivativeOrder extends TDerivativeOrder {
-  shortPositionAddress: string
-  longPositionAddress: string
+  shortPositionAddress: string;
+  longPositionAddress: string;
 }
 
 export const derivativeFactory = (derivative: Partial<TDerivative>): TDerivative => {

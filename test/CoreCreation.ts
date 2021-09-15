@@ -12,11 +12,11 @@ import { SECONDS_40_MINS } from "../utils/constants";
 
 describe("CoreCreation", () => {
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
-  let namedSigners: TNamedSigners
+  let namedSigners: TNamedSigners;
 
-  before(async() => {
-    namedSigners = await ethers.getNamedSigners() as TNamedSigners;
-  })
+  before(async () => {
+    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
+  });
   it(`should return the correct getDerivativeHash`, async () => {
     const { core, testToken, optionCallMock } = await setup();
     const optionCall = derivativeFactory({
@@ -56,14 +56,14 @@ describe("CoreCreation", () => {
       await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
       await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("SYNTHETIC_AGGREGATOR:WRONG_MARGIN");
     }
   });
 
   it(`should revert create OptionCall derivative with CORE:SYNTHETIC_VALIDATION_ERROR`, async () => {
     try {
-      const { buyer, seller } = namedSigners;  
+      const { buyer, seller } = namedSigners;
       const { core, testToken, optionCallMock, tokenSpender } = await setup();
 
       const optionCall = derivativeFactory({
@@ -79,7 +79,7 @@ describe("CoreCreation", () => {
       await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
       await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("CORE:SYNTHETIC_VALIDATION_ERROR");
     }
   });
@@ -87,7 +87,7 @@ describe("CoreCreation", () => {
   it(`should revert create OptionCall derivative with 'CORE:NOT_ENOUGH_TOKEN_ALLOWANCE`, async () => {
     try {
       const { core, testToken, optionCallMock } = await setup();
-      const { buyer, seller } = namedSigners;  
+      const { buyer, seller } = namedSigners;
 
       const optionCall = derivativeFactory({
         margin: cast(3),
@@ -101,7 +101,7 @@ describe("CoreCreation", () => {
       const amount = 3;
       await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
-      const { message } = error as Error
+      const { message } = error as Error;
       expect(message).to.include("CORE:NOT_ENOUGH_TOKEN_ALLOWANCE");
     }
   });
@@ -126,25 +126,27 @@ describe("CoreCreation", () => {
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
-    const receipt = await tx.wait()
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
-    const shortPositionAddress = formatAddress(log[0].data)
-    const longPositionAddress = formatAddress(log[1].data)
+    const receipt = await tx.wait();
+    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
+    const shortPositionAddress = formatAddress(log[0].data);
+    const longPositionAddress = formatAddress(log[1].data);
 
-    const shortPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
-    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress)
+    const shortPositionERC20 = <OpiumPositionToken>(
+      await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
+    );
+    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
 
     // const buyerPositionsBalance = await tokenMinter["balanceOf(address)"](buyer.address);
-    const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address)
-    const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address)
+    const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
+    const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
 
     // expect(buyerPositionsBalance).to.equal(1);
     expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
     // const sellerPositionsBalance = await tokenMinter["balanceOf(address)"](seller.address);
-    const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address)
-    const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address)
+    const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
+    const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address);
 
     // expect(sellerPositionsBalance).to.equal(1);
     expect(sellerPositionsLongBalance).to.equal(0);
@@ -174,29 +176,31 @@ describe("CoreCreation", () => {
 
     // Create derivative
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
-    const receipt = await tx.wait()
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, 'LogPositionTokenAddress', receipt)
-    const shortPositionAddress = formatAddress(log[0].data)
-    const longPositionAddress = formatAddress(log[1].data)
+    const receipt = await tx.wait();
+    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
+    const shortPositionAddress = formatAddress(log[0].data);
+    const longPositionAddress = formatAddress(log[1].data);
 
-    const shortPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
-    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress)
+    const shortPositionERC20 = <OpiumPositionToken>(
+      await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
+    );
+    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
 
     const newCoreTokenBalance = await testToken.balanceOf(core.address);
 
     expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.add(optionCall.margin.mul(amount)));
 
     // const buyerPositionsBalance = await tokenMinter["balanceOf(address)"](buyer.address);
-    const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address)
-    const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address)
+    const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
+    const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
 
     // expect(buyerPositionsBalance).to.equal(1);
     expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
     // const sellerPositionsBalance = await tokenMinter["balanceOf(address)"](seller.address);
-    const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address)
-    const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address)
+    const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
+    const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address);
 
     // expect(sellerPositionsBalance).to.equal(1);
     expect(sellerPositionsLongBalance).to.equal(0);

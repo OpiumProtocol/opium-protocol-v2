@@ -14,20 +14,20 @@ import {
 import { toBN } from "./bn";
 
 export type TContracts = {
-  libPosition: Contract,
-  registry: Registry,
-  opiumProxyFactory: OpiumProxyFactory,
-  tokenSpender: TokenSpender,
-  core: Core,
-  testToken: TestToken,
-  optionCallMock: OptionCallSyntheticIdMock,
-  oracleAggregator: OracleAggregator,
-  syntheticAggregator: SyntheticAggregator,
-  oracleIdMock: OracleIdMock,
+  libPosition: Contract;
+  registry: Registry;
+  opiumProxyFactory: OpiumProxyFactory;
+  tokenSpender: TokenSpender;
+  core: Core;
+  testToken: TestToken;
+  optionCallMock: OptionCallSyntheticIdMock;
+  oracleAggregator: OracleAggregator;
+  syntheticAggregator: SyntheticAggregator;
+  oracleIdMock: OracleIdMock;
 };
 
 const setup = async (): Promise<TContracts> => {
-  const {deployer, governor} = await ethers.getNamedSigners();
+  const { deployer, governor } = await ethers.getNamedSigners();
 
   const Registry = await ethers.getContractFactory("Registry");
   const TokenSpender = await ethers.getContractFactory("TokenSpender");
@@ -44,9 +44,11 @@ const setup = async (): Promise<TContracts> => {
     },
   });
   const OpiumProxyFactory = await ethers.getContractFactory("OpiumProxyFactory");
-  const registry = <Registry>await upgrades.deployProxy(Registry, {initializer: 'initialize'});
+  const registry = <Registry>await upgrades.deployProxy(Registry, { initializer: "initialize" });
   const opiumProxyFactory = <OpiumProxyFactory>await OpiumProxyFactory.deploy();
-  const tokenSpender = <TokenSpender>await upgrades.deployProxy(TokenSpender, [governor.address], {initializer: 'initialize'});
+  const tokenSpender = <TokenSpender>(
+    await upgrades.deployProxy(TokenSpender, [governor.address], { initializer: "initialize" })
+  );
   const core = <Core>await Core.deploy(registry.address);
   const oracleAggregator = <OracleAggregator>await OracleAggregator.deploy();
   const syntheticAggregator = <SyntheticAggregator>await SyntheticAggregator.deploy();
