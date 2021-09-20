@@ -121,7 +121,7 @@ describe("Upgradeability", () => {
     const derivative = derivativeFactory({
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [200],
+      params: [cast(200)],
       syntheticId: optionCallMock.address,
     });
 
@@ -194,7 +194,7 @@ describe("Upgradeability", () => {
       margin: cast(30),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,

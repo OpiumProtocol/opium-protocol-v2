@@ -5,7 +5,7 @@ import { cast } from "./bn";
 export type TDerivative = {
   margin: BigNumber;
   endTime: number;
-  params: number[];
+  params: BigNumber[];
   oracleId: string;
   token: string;
   syntheticId: string;

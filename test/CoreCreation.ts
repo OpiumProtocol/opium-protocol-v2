@@ -23,7 +23,7 @@ describe("CoreCreation", () => {
       margin: cast(30),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -47,7 +47,7 @@ describe("CoreCreation", () => {
         margin: cast(0),
         endTime,
         params: [
-          20000, // Strike Price 200.00$
+          cast(20000), // Strike Price 200.00$
         ],
         token: testToken.address,
         syntheticId: optionCallMock.address,
@@ -70,7 +70,7 @@ describe("CoreCreation", () => {
         margin: cast(30),
         endTime: 0,
         params: [
-          20000, // Strike Price 200.00$
+          cast(20000), // Strike Price 200.00$
         ],
         token: testToken.address,
         syntheticId: optionCallMock.address,
@@ -93,7 +93,7 @@ describe("CoreCreation", () => {
         margin: cast(3),
         endTime,
         params: [
-          20000, // Strike Price 200.00$
+          cast(20000), // Strike Price 200.00$
         ],
         token: testToken.address,
         syntheticId: optionCallMock.address,
@@ -115,7 +115,7 @@ describe("CoreCreation", () => {
       margin: cast(30),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -136,19 +136,15 @@ describe("CoreCreation", () => {
     );
     const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
 
-    // const buyerPositionsBalance = await tokenMinter["balanceOf(address)"](buyer.address);
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
 
-    // expect(buyerPositionsBalance).to.equal(1);
     expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
-    // const sellerPositionsBalance = await tokenMinter["balanceOf(address)"](seller.address);
     const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
     const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address);
 
-    // expect(sellerPositionsBalance).to.equal(1);
     expect(sellerPositionsLongBalance).to.equal(0);
     expect(sellerPositionsShortBalance).to.equal(amount);
   });
@@ -162,7 +158,7 @@ describe("CoreCreation", () => {
       margin: cast(30),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -190,19 +186,15 @@ describe("CoreCreation", () => {
 
     expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.add(optionCall.margin.mul(amount)));
 
-    // const buyerPositionsBalance = await tokenMinter["balanceOf(address)"](buyer.address);
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
 
-    // expect(buyerPositionsBalance).to.equal(1);
     expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
-    // const sellerPositionsBalance = await tokenMinter["balanceOf(address)"](seller.address);
     const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
     const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address);
 
-    // expect(sellerPositionsBalance).to.equal(1);
     expect(sellerPositionsLongBalance).to.equal(0);
     expect(sellerPositionsShortBalance).to.equal(amount);
   });

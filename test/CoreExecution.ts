@@ -4,6 +4,7 @@ import { derivativeFactory, ICreatedDerivativeOrder, TDerivativeOrder } from "..
 import setup from "../utils/setup";
 import {
   Core,
+  OpiumPositionToken,
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
   OracleAggregator,
@@ -99,7 +100,7 @@ describe("CoreExecution", () => {
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + SECONDS_50_MINS, // Now + 40 mins
       params: [
-        200, // Strike Price 200.00$
+        cast(200), // Strike Price 200.00$
       ],
       oracleId: oracle.address,
       token: testToken.address,
@@ -118,7 +119,7 @@ describe("CoreExecution", () => {
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + SECONDS_40_MINS, // Now + 40 mins
       params: [
-        200, // Strike Price 200.00$
+        cast(200), // Strike Price 200.00$
       ],
       oracleId: oracle.address,
       token: testToken.address,
@@ -141,7 +142,7 @@ describe("CoreExecution", () => {
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + SECONDS_20_MINS, // Now + 20 mins
       params: [
-        200, // Strike Price 200.00$
+        cast(200), // Strike Price 200.00$
       ],
       oracleId: oracle.address,
       token: testToken.address,
@@ -164,7 +165,7 @@ describe("CoreExecution", () => {
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + SECONDS_30_MINS, // Now + 30 mins
       params: [
-        200, // Strike Price 200.00$
+        cast(200), // Strike Price 200.00$
       ],
       oracleId: oracle.address,
       token: testToken.address,
@@ -187,7 +188,7 @@ describe("CoreExecution", () => {
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + SECONDS_10_MINS, // Now + 10 mins
       params: [
-        200, // Strike Price 200.00$
+        cast(200), // Strike Price 200.00$
       ],
       oracleId: oracle.address,
       token: testToken.address,

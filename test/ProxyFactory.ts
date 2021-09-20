@@ -20,14 +20,14 @@ describe("TestOpiumProxyFactory", () => {
     derivative = derivativeFactory({
       margin: cast(30),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [200],
+      params: [cast(200)],
       syntheticId: optionCallMock.address,
     });
 
     secondDerivative = derivativeFactory({
       margin: cast(31),
       endTime: ~~(Date.now() / 1000) + 3601, // now + 1 hour
-      params: [200],
+      params: [cast(200)],
       syntheticId: optionCallMock.address,
     });
 

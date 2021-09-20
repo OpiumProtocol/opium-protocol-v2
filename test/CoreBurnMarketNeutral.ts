@@ -27,7 +27,7 @@ describe("Core: burn market neutral positions", () => {
       margin: cast(30),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+       cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -90,7 +90,7 @@ describe("Core: burn market neutral positions", () => {
       margin: cast(400000),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+       cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -110,7 +110,7 @@ describe("Core: burn market neutral positions", () => {
       margin: cast(1231900100),
       endTime,
       params: [
-        20000, // Strike Price 200.00$
+       cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
