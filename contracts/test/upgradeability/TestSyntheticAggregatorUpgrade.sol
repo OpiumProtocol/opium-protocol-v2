@@ -3,16 +3,16 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibCommission.sol";
+import "../../Lib/LibDerivative.sol";
+import "../../Lib/LibCommission.sol";
 
-import "./Errors/SyntheticAggregatorErrors.sol";
+import "../../Errors/SyntheticAggregatorErrors.sol";
 
-import "./Interface/IOracleId.sol";
-import "./Interface/IDerivativeLogic.sol";
+import "../../Interface/IOracleId.sol";
+import "../../Interface/IDerivativeLogic.sol";
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
-contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, LibCommission, ReentrancyGuardUpgradeable {
+contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivative, LibCommission, ReentrancyGuardUpgradeable {
     // Emitted when new ticker is initialized
     event Create(Derivative derivative, bytes32 derivativeHash);
 
@@ -148,5 +148,9 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, LibCom
 
         // If we are here, this basically means this ticker was not used before, so we emit an event for Dapps developers about new ticker (derivative) and it's hash
         emit Create(_derivative, derivativeHash);
+    }
+
+    function placeholder() pure external returns(string memory) {
+        return "upgraded";
     }
 }

@@ -10,6 +10,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("SyntheticAggregator", {
     from: deployer,
     log: true,
+    proxy: {
+      proxyContract: "OpenZeppelinTransparentProxy",
+    }
   });
 };
 

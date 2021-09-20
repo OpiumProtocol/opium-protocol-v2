@@ -38,20 +38,16 @@ const setup = async (): Promise<TContracts> => {
   const LibPosition = await ethers.getContractFactory("LibPosition");
   const OracleIdMock = await ethers.getContractFactory("OracleIdMock");
   const libPosition = await LibPosition.deploy();
-  const Core = await ethers.getContractFactory("Core", {
-    libraries: {
-      LibPosition: libPosition.address,
-    },
-  });
+  const Core = await ethers.getContractFactory("Core");
   const OpiumProxyFactory = await ethers.getContractFactory("OpiumProxyFactory");
   const registry = <Registry>await upgrades.deployProxy(Registry, { initializer: "initialize" });
   const opiumProxyFactory = <OpiumProxyFactory>await OpiumProxyFactory.deploy();
   const tokenSpender = <TokenSpender>(
     await upgrades.deployProxy(TokenSpender, [governor.address], { initializer: "initialize" })
   );
-  const core = <Core>await Core.deploy(registry.address);
-  const oracleAggregator = <OracleAggregator>await OracleAggregator.deploy();
-  const syntheticAggregator = <SyntheticAggregator>await SyntheticAggregator.deploy();
+  const core = <Core>await upgrades.deployProxy(Core, [registry.address], { initializer: 'initialize' });
+  const oracleAggregator = <OracleAggregator>await upgrades.deployProxy(OracleAggregator);
+  const syntheticAggregator = <SyntheticAggregator>await upgrades.deployProxy(SyntheticAggregator);
   const testToken = <TestToken>await TestToken.deploy("test", "test", 18);
   const optionCallMock = <OptionCallSyntheticIdMock>await OptionCallSyntheticIdMock.deploy();
   const oracleIdMock = <OracleIdMock>await OracleIdMock.deploy(toBN("0.1"), registry.address);

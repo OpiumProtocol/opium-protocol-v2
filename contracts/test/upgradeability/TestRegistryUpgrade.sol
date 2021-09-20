@@ -3,7 +3,7 @@ pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "../Errors/RegistryErrors.sol";
+import "../../Errors/RegistryErrors.sol";
 
 /// @title Opium.Registry contract keeps addresses of deployed Opium contracts set to allow them route and communicate to each other
 contract TestRegistryUpgrade is Initializable, OwnableUpgradeable, RegistryErrors {

@@ -6,12 +6,12 @@ import "../OpiumPositionToken.sol";
 import "../Interface/IOpiumProxyFactory.sol";
 
 library LibPosition {
-  function computeLongPositionAddress(bytes32 _derivativeHash, address _factoryAddress) external view returns(address) {
+  function computeLongPositionAddress(bytes32 _derivativeHash, address _factoryAddress) internal view returns(address) {
     bytes32 salt = keccak256(abi.encodePacked( _derivativeHash, "LONG"));
     return Clones.predictDeterministicAddress(IOpiumProxyFactory(_factoryAddress).getImplementationAddress(), salt, _factoryAddress);
   }
 
-  function computeShortPositionAddress(bytes32 _derivativeHash, address _factoryAddress) external view returns(address) {
+  function computeShortPositionAddress(bytes32 _derivativeHash, address _factoryAddress) internal view returns(address) {
     bytes32 salt = keccak256(abi.encodePacked( _derivativeHash, "SHORT"));
 
     return Clones.predictDeterministicAddress(IOpiumProxyFactory(_factoryAddress).getImplementationAddress(), salt, _factoryAddress);

@@ -98,20 +98,11 @@ describe("TokenSpender", () => {
   });
 
   it("should be successfully propose new addresses by governor address, but keep old till time lock", async () => {
-    const { libPosition, registry } = await setup();
-    const { governor } = namedSigners;
+    const { governor, authorized } = namedSigners;
 
     const oldWhitelist = await tokenSpender.getWhitelist();
 
-    const Core = await ethers.getContractFactory("Core", {
-      libraries: {
-        LibPosition: libPosition.address,
-      },
-    });
-    const newCore = await Core.deploy(registry.address);
-    await newCore.deployed();
-
-    await tokenSpender.connect(governor).proposeWhitelist([newCore.address]);
+    await tokenSpender.connect(governor).proposeWhitelist([authorized.address]);
 
     const newWhitelist = await tokenSpender.getWhitelist();
     expect(newWhitelist[0]).to.be.equal(oldWhitelist[0]);
@@ -138,37 +129,20 @@ describe("TokenSpender", () => {
   });
 
   it("should successfully commit new whitelist after time lock", async () => {
-    const { libPosition, registry } = await setup();
-    const { governor } = namedSigners;
+    const { governor, authorized } = namedSigners;
 
-    const Core = await ethers.getContractFactory("Core", {
-      libraries: {
-        LibPosition: libPosition.address,
-      },
-    });
-    const newCore = await Core.deploy(registry.address);
-    await newCore.deployed();
-
-    await tokenSpender.connect(governor).proposeWhitelist([newCore.address]);
+    await tokenSpender.connect(governor).proposeWhitelist([authorized.address]);
 
     await timeTravel(15 * 24 * 60 * 60); // Travel 15 days forward
     await tokenSpender.connect(governor).commitWhitelist();
 
     const whitelist = await tokenSpender.getWhitelist();
-    expect(whitelist[0]).to.be.equal(newCore.address);
+    expect(whitelist[0]).to.be.equal(authorized.address);
   });
 
   it("should successfully propose a new timelock", async () => {
-    const { libPosition, registry } = await setup();
     const { governor } = namedSigners;
 
-    const Core = await ethers.getContractFactory("Core", {
-      libraries: {
-        LibPosition: libPosition.address,
-      },
-    });
-    const newCore = await Core.deploy(registry.address);
-    await newCore.deployed();
     const beforeTimelockInterval = await tokenSpender.connect(governor).timeLockInterval();
     const newTimelockInterval = 3000;
     const tx = await tokenSpender.connect(governor).proposeTimelock(newTimelockInterval);

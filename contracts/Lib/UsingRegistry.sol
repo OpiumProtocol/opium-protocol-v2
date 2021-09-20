@@ -1,11 +1,13 @@
 pragma solidity 0.8.5;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import "../Registry.sol";
 
 import "../Errors/UsingRegistryErrors.sol";
 
 /// @title Opium.Lib.UsingRegistry contract should be inherited by contracts, that are going to use Opium.Registry
-contract UsingRegistry is UsingRegistryErrors {
+contract UsingRegistry is Initializable, UsingRegistryErrors {
     // Emitted when registry instance is set
     event RegistrySet(address registry);
 
@@ -19,7 +21,7 @@ contract UsingRegistry is UsingRegistryErrors {
     }
 
     /// @notice Defines registry instance and emits appropriate event
-    constructor(address _registry) {
+    function usingRegistry__init__(address _registry) initializer public {
         registry = Registry(_registry);
         emit RegistrySet(_registry);
     }

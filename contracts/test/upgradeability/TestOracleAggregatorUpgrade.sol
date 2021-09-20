@@ -3,12 +3,12 @@ pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 
-import "./Errors/OracleAggregatorErrors.sol";
+import "../../Errors/OracleAggregatorErrors.sol";
 
-import "./Interface/IOracleId.sol";
+import "../../Interface/IOracleId.sol";
 
 /// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution
-contract OracleAggregator is OracleAggregatorErrors, ReentrancyGuardUpgradeable {
+contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
 
     // Storage for the `oracleId` results
@@ -119,5 +119,9 @@ contract OracleAggregator is OracleAggregatorErrors, ReentrancyGuardUpgradeable 
     /// @param result bool Returns whether data were provided already
     function hasData(address oracleId, uint256 timestamp) public view returns(bool result) {
         return dataExist[oracleId][timestamp];
+    }
+
+    function placeholder() pure external returns(string memory) {
+        return "upgraded";
     }
 }

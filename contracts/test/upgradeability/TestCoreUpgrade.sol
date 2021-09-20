@@ -7,24 +7,24 @@ import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./Interface/IDerivativeLogic.sol";
+import "../../Interface/IDerivativeLogic.sol";
 
-import "./Errors/CoreErrors.sol";
+import "../../Errors/CoreErrors.sol";
 
-import "./Lib/UsingRegistry.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibCommission.sol";
-import "./Lib/LibPosition.sol";
+import "../../Lib/UsingRegistry.sol";
+import "../../Lib/LibDerivative.sol";
+import "../../Lib/LibCommission.sol";
+import "../../Lib/LibPosition.sol";
 
-import "./Registry.sol";
-import "./OpiumProxyFactory.sol";
+import "../../Registry.sol";
+import "../../OpiumProxyFactory.sol";
 
-import "./OracleAggregator.sol";
-import "./SyntheticAggregator.sol";
-import "./TokenSpender.sol";
+import "../../OracleAggregator.sol";
+import "../../SyntheticAggregator.sol";
+import "../../TokenSpender.sol";
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
-contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, ReentrancyGuardUpgradeable {
+contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErrors, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
     using LibPosition for bytes32;
     using SafeERC20 for IERC20;
@@ -525,5 +525,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         // Update feeVault for `syntheticId` author
         // feeVault[author][token] += authorFee
         feesVaults[authorAddress][_derivative.token] = feesVaults[authorAddress][_derivative.token].add(authorFee);
+    }
+
+    function placeholder() pure external returns(string memory) {
+        return "upgraded";
     }
 }

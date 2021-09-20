@@ -4,7 +4,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "../Lib/WhitelistedWithGovernanceAndChangableTimelockUpgradeable.sol";
+import "../../Lib/WhitelistedWithGovernanceAndChangableTimelockUpgradeable.sol";
 
 /// @title Opium.TokenSpender contract holds users ERC20 approvals and allows whitelisted contracts to use tokens
 contract TestTokenSpenderUpgrade is Initializable, WhitelistedWithGovernanceAndChangableTimelockUpgradeable {
