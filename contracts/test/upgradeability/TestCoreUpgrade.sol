@@ -1,8 +1,8 @@
 pragma solidity 0.8.5;
 pragma experimental ABIEncoderV2;
 
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -27,7 +27,7 @@ import "../../TokenSpender.sol";
 contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErrors, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
     using LibPosition for bytes32;
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     // Emitted when Core creates new position
     event Created(address buyer, address seller, bytes32 derivativeHash, uint256 amount);
@@ -42,18 +42,18 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     // Vaults for pools
     // This mapping holds balances of pooled positions
     // poolVaults[syntheticAddress][tokenAddress] => availableBalance
-    mapping (address => mapping(address => uint256)) public poolVaults;
+    mapping(address => mapping(address => uint256)) public poolVaults;
 
     // Vaults for fees
     // This mapping holds balances of fee recipients
     // feesVaults[feeRecipientAddress][tokenAddress] => availableBalance
-    mapping (address => mapping(address => uint256)) public feesVaults;
+    mapping(address => mapping(address => uint256)) public feesVaults;
 
     // Hashes of cancelled tickers
-    mapping (bytes32 => bool) public cancelled;
+    mapping(bytes32 => bool) public cancelled;
 
     /// @notice Calls Core.Lib.UsingRegistry constructor
-    function initialize(address _registry) initializer public {
+    function initialize(address _registry) public initializer {
         usingRegistry__init__(_registry);
     }
 
@@ -64,7 +64,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     function withdrawFee(address _tokenAddress) public nonReentrant {
         uint256 balance = feesVaults[msg.sender][_tokenAddress];
         feesVaults[msg.sender][_tokenAddress] = 0;
-        IERC20(_tokenAddress).safeTransfer(msg.sender, balance);
+        IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
     }
 
     /// @notice Creates derivative contracts (positions)
@@ -73,7 +73,11 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _addresses address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address - if seller is set to `address(0)`, consider as pooled position
-    function create(Derivative memory _derivative, uint256 _amount, address[2] memory _addresses) public nonReentrant {
+    function create(
+        Derivative memory _derivative,
+        uint256 _amount,
+        address[2] memory _addresses
+    ) public nonReentrant {
         _create(_derivative, _amount, _addresses);
     }
 
@@ -81,7 +85,11 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _positionAddress address `positionAddress` of position that needs to be executed
     /// @param _amount uint256 Amount of positions to execute
     /// @param _derivative Derivative Derivative definition
-    function execute(address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
+    function execute(
+        address _positionAddress,
+        uint256 _amount,
+        Derivative memory _derivative
+    ) public nonReentrant {
         address[] memory positionAddresses = new address[](1);
         uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
@@ -98,7 +106,12 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _positionAddress address `positionAddress` of positions that needs to be executed
     /// @param _amount uint256 Amount of positions to execute
     /// @param _derivative Derivative Derivative definition
-    function execute(address _tokenOwner, address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
+    function execute(
+        address _tokenOwner,
+        address _positionAddress,
+        uint256 _amount,
+        Derivative memory _derivative
+    ) public nonReentrant {
         address[] memory positionAddresses = new address[](1);
         uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
@@ -114,7 +127,11 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be executed
     /// @param _amounts uint256[] Amount of positions to execute for each `positionAddress`
     /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
-    function execute(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
+    function execute(
+        address[] memory _positionAddresses,
+        uint256[] memory _amounts,
+        Derivative[] memory _derivatives
+    ) public nonReentrant {
         _execute(msg.sender, _positionAddresses, _amounts, _derivatives);
     }
 
@@ -124,17 +141,28 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _amounts uint256[] Amount of positions to execute for each `positionAddresses`
     /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
     /// execute many addresses
-    function execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
+    function execute(
+        address _tokenOwner,
+        address[] memory _positionAddresses,
+        uint256[] memory _amounts,
+        Derivative[] memory _derivatives
+    ) public nonReentrant {
         _execute(_tokenOwner, _positionAddresses, _amounts, _derivatives);
     }
 
     /// @notice Burns market neutral position for a list of `_positionsAddresses` pairs
     /// @param _positionsAddresses address[2][] `_positionsAddresses` of the positions that need to be burnt
     /// @param _derivatives Derivative[] derivative definitions for each `positionAddresses` pair
-    function burnMarketNeutral(address[2][] memory _positionsAddresses, Derivative[] memory _derivatives) external nonReentrant {
+    function burnMarketNeutral(address[2][] memory _positionsAddresses, Derivative[] memory _derivatives)
+        external
+        nonReentrant
+    {
         require(_positionsAddresses.length == _derivatives.length, "POSITIONS_DERIVATIVES_MISMATCH");
-        for(uint24 i=0; i < _positionsAddresses.length; i++) {
-            if(IERC20(_positionsAddresses[i][0]).balanceOf(msg.sender) == IERC20(_positionsAddresses[i][1]).balanceOf(msg.sender)) {
+        for (uint24 i = 0; i < _positionsAddresses.length; i++) {
+            if (
+                IERC20Upgradeable(_positionsAddresses[i][0]).balanceOf(msg.sender) ==
+                IERC20Upgradeable(_positionsAddresses[i][1]).balanceOf(msg.sender)
+            ) {
                 _burnMarketNeutral(msg.sender, _positionsAddresses[i], _derivatives[i]);
             }
         }
@@ -143,10 +171,10 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @notice Burns market neutral position for a `_positionsAddresses` pair
     /// @param _positionAddresses address[2] `_positionAddresses` of the position that needs to be burnt
     /// @param _derivative Derivative derivative definition for the `positionAddresses` pair
-    function burnMarketNeutral(
-        address[2] memory _positionAddresses,
-        Derivative memory _derivative
-    ) external nonReentrant {
+    function burnMarketNeutral(address[2] memory _positionAddresses, Derivative memory _derivative)
+        external
+        nonReentrant
+    {
         _burnMarketNeutral(msg.sender, _positionAddresses, _derivative);
     }
 
@@ -159,27 +187,45 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
         address[2] memory _positionAddresses,
         Derivative memory _derivative
     ) private {
-        uint256 shortBalance = IERC20(_positionAddresses[0]).balanceOf(positionsOwner);
-        uint256 longBalance = IERC20(_positionAddresses[1]).balanceOf(positionsOwner);
+        uint256 shortBalance = IERC20Upgradeable(_positionAddresses[0]).balanceOf(positionsOwner);
+        uint256 longBalance = IERC20Upgradeable(_positionAddresses[1]).balanceOf(positionsOwner);
         bytes32 derivativeHash = getDerivativeHash(_derivative);
         ExecuteAndCancelLocalVars memory vars;
 
         vars.opiumProxyFactory = OpiumProxyFactory(registry.getOpiumProxyFactory());
-        require(derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[0], "WRONG_SHORT");
-        require(derivativeHash.computeLongPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[1], "WRONG_LONG");
+        require(
+            derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[0],
+            "WRONG_SHORT"
+        );
+        require(
+            derivativeHash.computeLongPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[1],
+            "WRONG_LONG"
+        );
         require(longBalance == shortBalance, "NOT_MARKET_NEUTRAL");
 
-        vars.opiumProxyFactory.burn(positionsOwner, _positionAddresses[0], IERC20(_positionAddresses[0]).balanceOf(positionsOwner));
-        vars.opiumProxyFactory.burn(positionsOwner, _positionAddresses[1], IERC20(_positionAddresses[1]).balanceOf(positionsOwner));
+        vars.opiumProxyFactory.burn(
+            positionsOwner,
+            _positionAddresses[0],
+            IERC20Upgradeable(_positionAddresses[0]).balanceOf(positionsOwner)
+        );
+        vars.opiumProxyFactory.burn(
+            positionsOwner,
+            _positionAddresses[1],
+            IERC20Upgradeable(_positionAddresses[1]).balanceOf(positionsOwner)
+        );
         uint256 totalMargin = shortBalance.add(longBalance);
-        IERC20(_derivative.token).safeTransfer(positionsOwner, _derivative.margin.mul(shortBalance));
+        IERC20Upgradeable(_derivative.token).safeTransfer(positionsOwner, _derivative.margin.mul(shortBalance));
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddress address `positionAddress` of positions that needs to be canceled
     /// @param _amount uint256 Amount of positions to cancel
     /// @param _derivative Derivative Derivative definition
-    function cancel(address _positionAddress, uint256 _amount, Derivative memory _derivative) public nonReentrant {
+    function cancel(
+        address _positionAddress,
+        uint256 _amount,
+        Derivative memory _derivative
+    ) public nonReentrant {
         address[] memory positionAddresses = new address[](1);
         uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
@@ -195,7 +241,11 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be canceled
     /// @param _amounts uint256[] Amount of positions to cancel for each `positionAddress`
     /// @param _derivatives Derivative[] Derivative definitions for each `_positionAddress`
-    function cancel(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) public nonReentrant {
+    function cancel(
+        address[] memory _positionAddresses,
+        uint256[] memory _amounts,
+        Derivative[] memory _derivatives
+    ) public nonReentrant {
         _cancel(_positionAddresses, _amounts, _derivatives);
     }
 
@@ -204,7 +254,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     struct CreatePooledLocalVars {
         SyntheticAggregator syntheticAggregator;
         IDerivativeLogic derivativeLogic;
-        IERC20 marginToken;
+        IERC20Upgradeable marginToken;
         TokenSpender tokenSpender;
         OpiumProxyFactory opiumProxyFactory;
     }
@@ -212,7 +262,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     struct CreateLocalVars {
         SyntheticAggregator syntheticAggregator;
         IDerivativeLogic derivativeLogic;
-        IERC20 marginToken;
+        IERC20Upgradeable marginToken;
         TokenSpender tokenSpender;
         OpiumProxyFactory opiumProxyFactory;
     }
@@ -223,7 +273,11 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _addresses address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
-    function _create(Derivative memory _derivative, uint256 _amount, address[2] memory _addresses) private {
+    function _create(
+        Derivative memory _derivative,
+        uint256 _amount,
+        address[2] memory _addresses
+    ) private {
         // Local variables
         CreateLocalVars memory vars;
 
@@ -234,7 +288,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
         // Create instance of Opium.OpiumProxyFactory
         vars.syntheticAggregator = SyntheticAggregator(registry.getSyntheticAggregator());
         vars.derivativeLogic = IDerivativeLogic(_derivative.syntheticId);
-        vars.marginToken = IERC20(_derivative.token);
+        vars.marginToken = IERC20Upgradeable(_derivative.token);
         vars.tokenSpender = TokenSpender(registry.getTokenSpender());
         vars.opiumProxyFactory = OpiumProxyFactory(registry.getOpiumProxyFactory());
 
@@ -258,10 +312,19 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
 
         // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
         // `msg.sender` must provide margin for position creation
-        require(vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >= margins[0].add(margins[1]).mul(_amount), ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE);
+        require(
+            vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >=
+                margins[0].add(margins[1]).mul(_amount),
+            ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE
+        );
 
-    	// Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        vars.tokenSpender.claimTokens(vars.marginToken, msg.sender, address(this), margins[0].add(margins[1]).mul(_amount));
+        // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
+        vars.tokenSpender.claimTokens(
+            vars.marginToken,
+            msg.sender,
+            address(this),
+            margins[0].add(margins[1]).mul(_amount)
+        );
 
         // Mint LONG and SHORT positions tokens
         vars.opiumProxyFactory.mint(_addresses[0], _addresses[1], derivativeHash, _amount);
@@ -280,9 +343,17 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _positionAddresses address[] `positionAddresses` of positions that needs to be executed
     /// @param _amounts uint256[] Amount of positions to execute for each `positionAddress`
     /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
-    function _execute(address _tokenOwner, address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) private {
+    function _execute(
+        address _tokenOwner,
+        address[] memory _positionAddresses,
+        uint256[] memory _amounts,
+        Derivative[] memory _derivatives
+    ) private {
         require(_positionAddresses.length == _amounts.length, ERROR_CORE_ADDRESSES_AND_AMOUNTS_LENGTH_DO_NOT_MATCH);
-        require(_positionAddresses.length == _derivatives.length, ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
+        require(
+            _positionAddresses.length == _derivatives.length,
+            ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH
+        );
 
         // Local variables
         ExecuteAndCancelLocalVars memory vars;
@@ -301,7 +372,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
             // Checking whether execution is performed by `_tokenOwner` or `_tokenOwner` allowed third party executions on it's behalf
             require(
                 _tokenOwner == msg.sender ||
-                IDerivativeLogic(_derivatives[i].syntheticId).thirdpartyExecutionAllowed(_tokenOwner),
+                    IDerivativeLogic(_derivatives[i].syntheticId).thirdpartyExecutionAllowed(_tokenOwner),
                 ERROR_CORE_SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED
             );
 
@@ -310,7 +381,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
 
             // Transfer payout
             if (payout > 0) {
-                IERC20(_derivatives[i].token).safeTransfer(_tokenOwner, payout);
+                IERC20Upgradeable(_derivatives[i].token).safeTransfer(_tokenOwner, payout);
             }
 
             // Burn executed position tokens
@@ -324,9 +395,16 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _positionAddresses address[] `positionAddress` of positions that needs to be canceled
     /// @param _amounts uint256[] Amount of positions to cancel for each `positionAddress`
     /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
-    function _cancel(address[] memory _positionAddresses, uint256[] memory _amounts, Derivative[] memory _derivatives) private {
+    function _cancel(
+        address[] memory _positionAddresses,
+        uint256[] memory _amounts,
+        Derivative[] memory _derivatives
+    ) private {
         require(_positionAddresses.length == _amounts.length, ERROR_CORE_ADDRESSES_AND_AMOUNTS_LENGTH_DO_NOT_MATCH);
-        require(_positionAddresses.length == _derivatives.length, ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH);
+        require(
+            _positionAddresses.length == _derivatives.length,
+            ERROR_CORE_ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH
+        );
 
         // Local variables
         ExecuteAndCancelLocalVars memory vars;
@@ -345,7 +423,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
             // Check if cancellation is called after `NO_DATA_CANCELLATION_PERIOD` and `oracleId` didn't provided data
             require(
                 _derivatives[i].endTime + NO_DATA_CANCELLATION_PERIOD <= block.timestamp &&
-                !vars.oracleAggregator.hasData(_derivatives[i].oracleId, _derivatives[i].endTime),
+                    !vars.oracleAggregator.hasData(_derivatives[i].oracleId, _derivatives[i].endTime),
                 ERROR_CORE_CANCELLATION_IS_NOT_ALLOWED
             );
 
@@ -370,18 +448,20 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
                 // Set payout to buyerPayout
                 payout = margins[0];
 
-            // Check if `positionAddress` is a SHORT position
-            } else if (derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[i]) {
+                // Check if `positionAddress` is a SHORT position
+            } else if (
+                derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[i]
+            ) {
                 // Set payout to sellerPayout
                 payout = margins[1];
             } else {
                 // Either portfolioId, hack or bug
                 revert(ERROR_CORE_UNKNOWN_POSITION_TYPE);
             }
-            
+
             // Transfer payout * _amounts[i]
             if (payout > 0) {
-                IERC20(_derivatives[i].token).safeTransfer(msg.sender, payout.mul(_amounts[i]));
+                IERC20Upgradeable(_derivatives[i].token).safeTransfer(msg.sender, payout.mul(_amounts[i]));
             }
 
             // Burn canceled position tokens
@@ -395,7 +475,12 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _amount uint256 Amount of positions
     /// @param _vars ExecuteAndCancelLocalVars Helping local variables
     /// @return payout uint256 Payout for all tokens
-    function _getPayout(Derivative memory _derivative, address _positionAddress, uint256 _amount, ExecuteAndCancelLocalVars memory _vars) private returns (uint256 payout) {
+    function _getPayout(
+        Derivative memory _derivative,
+        address _positionAddress,
+        uint256 _amount,
+        ExecuteAndCancelLocalVars memory _vars
+    ) private returns (uint256 payout) {
         // Trying to getData from Opium.OracleAggregator, could be reverted
         // Opium allows to use "dummy" oracleIds, in this case data is set to `0`
         uint256 data;
@@ -409,7 +494,10 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
         // Get payout ratio from Derivative logic
         // payoutRatio[0] - buyerPayout
         // payoutRatio[1] - sellerPayout
-        (payoutRatio[0], payoutRatio[1]) = IDerivativeLogic(_derivative.syntheticId).getExecutionPayout(_derivative, data);
+        (payoutRatio[0], payoutRatio[1]) = IDerivativeLogic(_derivative.syntheticId).getExecutionPayout(
+            _derivative,
+            data
+        );
 
         // Generate hash for derivative
         bytes32 derivativeHash = getDerivativeHash(_derivative);
@@ -444,13 +532,14 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
 
                 // Check sufficiency of syntheticId balance in poolVaults
                 require(
-                    poolVaults[_derivative.syntheticId][_derivative.token] >= payout
-                    ,
+                    poolVaults[_derivative.syntheticId][_derivative.token] >= payout,
                     ERROR_CORE_INSUFFICIENT_POOL_BALANCE
                 );
 
                 // Subtract paid out margin from poolVault
-                poolVaults[_derivative.syntheticId][_derivative.token] = poolVaults[_derivative.syntheticId][_derivative.token].sub(payout);
+                poolVaults[_derivative.syntheticId][_derivative.token] = poolVaults[_derivative.syntheticId][
+                    _derivative.token
+                ].sub(payout);
             } else {
                 // Set payout to buyerPayout
                 payout = payouts[0];
@@ -463,10 +552,12 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
             // Check: payout > buyerMargin * amount
             if (payout > margins[0].mul(_amount)) {
                 // Get Opium and `syntheticId` author fees and subtract it from payout
-                payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[0].mul(_amount)));
+                payout = payout.sub(
+                    _getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[0].mul(_amount))
+                );
             }
 
-        // Check if `_positionAddress` is a SHORT position
+            // Check if `_positionAddress` is a SHORT position
         } else if (derivativeHash.computeShortPositionAddress(address(_vars.opiumProxyFactory)) == _positionAddress) {
             // Set payout to sellerPayout
             payout = payouts[1];
@@ -478,7 +569,9 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
             // Check: payout > sellerMargin * amount
             if (payout > margins[1].mul(_amount)) {
                 // Get Opium fees and subtract it from payout
-                payout = payout.sub(_getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[1].mul(_amount)));
+                payout = payout.sub(
+                    _getFees(_vars.syntheticAggregator, derivativeHash, _derivative, payout - margins[1].mul(_amount))
+                );
             }
         } else {
             // Either portfolioId, hack or bug
@@ -492,7 +585,12 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
     /// @param _derivative Derivative Derivative definition
     /// @param _profit uint256 payout of one position
     /// @return fee uint256 Opium and `syntheticId` author fee
-    function _getFees(SyntheticAggregator _syntheticAggregator, bytes32 _derivativeHash, Derivative memory _derivative, uint256 _profit) private returns (uint256 fee) {
+    function _getFees(
+        SyntheticAggregator _syntheticAggregator,
+        bytes32 _derivativeHash,
+        Derivative memory _derivative,
+        uint256 _profit
+    ) private returns (uint256 fee) {
         // Get cached `syntheticId` author address from Opium.SyntheticAggregator
         address authorAddress = _syntheticAggregator.getAuthorAddress(_derivativeHash, _derivative);
         // Get cached `syntheticId` fee percentage from Opium.SyntheticAggregator
@@ -527,7 +625,7 @@ contract TestCoreUpgrade is LibDerivative, LibCommission, UsingRegistry, CoreErr
         feesVaults[authorAddress][_derivative.token] = feesVaults[authorAddress][_derivative.token].add(authorFee);
     }
 
-    function placeholder() pure external returns(string memory) {
+    function placeholder() external pure returns (string memory) {
         return "upgraded";
     }
 }
