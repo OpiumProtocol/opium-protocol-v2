@@ -3,7 +3,6 @@ import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-deploy";
 import "@openzeppelin/hardhat-upgrades";
-// import "hardhat-deploy-ethers";
 import "hardhat-dependency-compiler";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
@@ -16,7 +15,6 @@ import { resolve } from "path";
 
 import "./tasks/accounts";
 import "./tasks/clean";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
@@ -78,20 +76,6 @@ const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): N
     chainId: chainIds[network],
     url: nodeUrl,
   };
-};
-
-export type TNamedSigners = {
-  deployer: SignerWithAddress;
-  governor: SignerWithAddress;
-  buyer: SignerWithAddress;
-  seller: SignerWithAddress;
-  oracle: SignerWithAddress;
-  author: SignerWithAddress;
-  thirdParty: SignerWithAddress;
-  notAllowed: SignerWithAddress;
-  hacker: SignerWithAddress;
-  goodGuy: SignerWithAddress;
-  authorized: SignerWithAddress;
 };
 
 const config: HardhatUserConfig = {

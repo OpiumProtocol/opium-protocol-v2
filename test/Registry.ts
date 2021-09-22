@@ -1,7 +1,10 @@
+// theirs
 import { ethers } from "hardhat";
 import { expect } from "chai";
+// utils
 import setup from "../utils/setup";
-import { TNamedSigners } from "../hardhat.config";
+// types
+import { TNamedSigners } from "../types";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;

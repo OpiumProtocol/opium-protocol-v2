@@ -1,14 +1,24 @@
+// theirs
 import { ethers, upgrades } from "hardhat";
 import { expect } from "chai";
+// utils
 import setup from "../utils/setup";
-import { TNamedSigners } from "../hardhat.config";
-import { OpiumPositionToken, OpiumProxyFactory, TestOracleAggregatorUpgrade, TestRegistryUpgrade, TestSyntheticAggregatorUpgrade, TestTokenSpenderUpgrade } from "../typechain";
-import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
-import { cast } from "../utils/bn";
-import { TestCoreUpgrade } from "../typechain/TestCoreUpgrade";
 import { SECONDS_40_MINS } from "../utils/constants";
 import { decodeLogs } from "../utils/events";
 import { formatAddress } from "../utils/addresses";
+import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
+import { cast } from "../utils/bn";
+// types and constants
+import { TNamedSigners } from "../types";
+import {
+  OpiumPositionToken,
+  OpiumProxyFactory,
+  TestOracleAggregatorUpgrade,
+  TestRegistryUpgrade,
+  TestSyntheticAggregatorUpgrade,
+  TestTokenSpenderUpgrade,
+  TestCoreUpgrade,
+} from "../typechain";
 
 describe("Upgradeability", () => {
   let namedSigners: TNamedSigners;
@@ -100,15 +110,21 @@ describe("Upgradeability", () => {
     expect(registryOpiumAddressesBefore).to.be.deep.eq(registryOpiumAddressesAfter);
   });
 
-  it("should upgrade SyntheticAggregator", async() => {
+  it("should upgrade SyntheticAggregator", async () => {
     const { syntheticAggregator, optionCallMock, registry } = await setup();
 
     const syntheticAggregatorAddressBefore = await registry.getSyntheticAggregator();
-    const syntheticAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(syntheticAggregator.address);
+    const syntheticAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
+      syntheticAggregator.address,
+    );
 
     const SyntheticAggregatorUpgrade = await ethers.getContractFactory("TestSyntheticAggregatorUpgrade");
-    const upgraded = <TestSyntheticAggregatorUpgrade>await upgrades.upgradeProxy(syntheticAggregator.address, SyntheticAggregatorUpgrade);
-    const syntheticAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(syntheticAggregator.address);
+    const upgraded = <TestSyntheticAggregatorUpgrade>(
+      await upgrades.upgradeProxy(syntheticAggregator.address, SyntheticAggregatorUpgrade)
+    );
+    const syntheticAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
+      syntheticAggregator.address,
+    );
     const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
 
     const syntheticAggregatorAddressAfter = await registry.getSyntheticAggregator();
@@ -131,18 +147,24 @@ describe("Upgradeability", () => {
 
     expect(margin.buyerMargin).to.be.equal(0);
     expect(margin.sellerMargin).to.be.equal(derivative.margin);
-  })
+  });
 
-  it("should upgrade OracleAggregator", async() => {
+  it("should upgrade OracleAggregator", async () => {
     const { oracleAggregator, registry } = await setup();
     const { oracle } = namedSigners;
 
     const oracleAggregatorAddressBefore = await registry.getOracleAggregator();
-    const oracleAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(oracleAggregator.address);
+    const oracleAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
+      oracleAggregator.address,
+    );
 
     const OracleAggregatorUpgrade = await ethers.getContractFactory("TestOracleAggregatorUpgrade");
-    const upgraded = <TestOracleAggregatorUpgrade>await upgrades.upgradeProxy(oracleAggregator.address, OracleAggregatorUpgrade);
-    const oracleAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(oracleAggregator.address);
+    const upgraded = <TestOracleAggregatorUpgrade>(
+      await upgrades.upgradeProxy(oracleAggregator.address, OracleAggregatorUpgrade)
+    );
+    const oracleAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
+      oracleAggregator.address,
+    );
     const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
     const oracleAggregatorAddressAfter = await registry.getOracleAggregator();
 
@@ -156,15 +178,15 @@ describe("Upgradeability", () => {
      * TODO:
      * remove code duplication and set up test suites to keep it DRY
      */
-     const timestamp = Math.floor(Date.now() / 1000);
-     const data = 123456789;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const data = 123456789;
     await upgraded.connect(oracle).__callback(timestamp, data);
     const result = await upgraded.getData(oracle.address, timestamp);
 
     expect(result).to.be.equal(data);
-  })
+  });
 
-  it("should upgrade Core", async() => {
+  it("should upgrade Core", async () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry } = await setup();
     const { buyer, seller } = namedSigners;
     const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
@@ -223,5 +245,5 @@ describe("Upgradeability", () => {
 
     expect(sellerPositionsLongBalance).to.equal(0);
     expect(sellerPositionsShortBalance).to.equal(amount);
-  })
+  });
 });

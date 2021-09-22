@@ -1,3 +1,5 @@
+export const zeroAddress = "0x0000000000000000000000000000000000000000";
+
 export const AUTHOR_COMMISSION = 0.0025; // 0.25%
 export const OPIUM_COMMISSION = 0.1; // 10% of author commission
 export const SECONDS_10_MINS = 60 * 10;

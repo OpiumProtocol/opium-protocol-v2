@@ -1,6 +1,11 @@
+// theirs
 import { ethers } from "hardhat";
 import { expect } from "chai";
-import { derivativeFactory, ICreatedDerivativeOrder, TDerivativeOrder } from "../utils/derivatives";
+import { BigNumber } from "ethers";
+// utils
+import { derivativeFactory } from "../utils/derivatives";
+import { cast, mul } from "../utils/bn";
+import { TDerivativeOrder } from "../types";
 import setup from "../utils/setup";
 import {
   Core,
@@ -12,10 +17,9 @@ import {
   TokenSpender,
 } from "../typechain";
 import timeTravel from "../utils/timeTravel";
-import { TNamedSigners } from "../hardhat.config";
+import { TNamedSigners, ICreatedDerivativeOrder } from "../types";
 import { decodeLogs } from "../utils/events";
-import { cast, mul } from "../utils/bn";
-import { BigNumber } from "ethers";
+// types and constants
 import { formatAddress } from "../utils/addresses";
 import {
   AUTHOR_COMMISSION,
@@ -343,9 +347,9 @@ describe("CoreExecution", () => {
 
     try {
       await core
-      .connect(buyer)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+        .connect(buyer)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         [executeMany]([fullMarginOption.longPositionAddress], [1], [fullMarginOption.derivative]);
     } catch (error) {
       const { message } = error as Error;

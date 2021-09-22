@@ -1,27 +1,7 @@
-import { zeroAddress } from "./addresses";
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
+import { zeroAddress } from "./constants";
 import { cast } from "./bn";
-
-export type TDerivative = {
-  margin: BigNumber;
-  endTime: number;
-  params: BigNumber[];
-  oracleId: string;
-  token: string;
-  syntheticId: string;
-};
-
-export type TDerivativeOrder = {
-  derivative: TDerivative;
-  amount: number;
-  price: BigNumber;
-  hash: string;
-};
-
-export interface ICreatedDerivativeOrder extends TDerivativeOrder {
-  shortPositionAddress: string;
-  longPositionAddress: string;
-}
+import { TDerivative } from "../types";
 
 export const derivativeFactory = (derivative: Partial<TDerivative>): TDerivative => {
   const def = {

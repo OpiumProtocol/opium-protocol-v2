@@ -1,9 +1,12 @@
+// theirs
 import { ethers } from "hardhat";
-import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import { expect } from "chai";
+// utils
+import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import setup from "../utils/setup";
-import { TNamedSigners } from "../hardhat.config";
 import { cast } from "../utils/bn";
+// types and constants
+import { TNamedSigners } from "../types";
 
 describe("SyntheticAggregator", () => {
   let namedSigners: TNamedSigners;

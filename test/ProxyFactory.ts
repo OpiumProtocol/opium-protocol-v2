@@ -1,11 +1,15 @@
+// theirs
 import { ethers } from "hardhat";
 import { expect } from "chai";
+// utils
+import { cast } from "../utils/bn";
+import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import setup from "../utils/setup";
-import { TNamedSigners } from "../hardhat.config";
+// types and constants
+import { TNamedSigners } from "../types";
 import { OpiumPositionToken } from "../typechain";
 import { TestOpiumProxyFactory } from "../typechain/TestOpiumProxyFactory";
-import { derivativeFactory, getDerivativeHash, TDerivative } from "../utils/derivatives";
-import { cast } from "../utils/bn";
+import { TDerivative } from "../types";
 
 describe("TestOpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;

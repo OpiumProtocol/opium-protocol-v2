@@ -1,12 +1,15 @@
+// theirs
 import { ethers } from "hardhat";
 import { expect } from "chai";
+// utils
 import { derivativeFactory } from "../utils/derivatives";
 import setup from "../utils/setup";
-import { TNamedSigners } from "../hardhat.config";
-import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { decodeLogs } from "../utils/events";
 import { cast } from "../utils/bn";
 import { formatAddress } from "../utils/addresses";
+// types and constants
+import { TNamedSigners } from "../types";
+import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { SECONDS_40_MINS } from "../utils/constants";
 
 describe("Core: burn market neutral positions", () => {
@@ -27,7 +30,7 @@ describe("Core: burn market neutral positions", () => {
       margin: cast(30),
       endTime,
       params: [
-       cast(20000), // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -90,7 +93,7 @@ describe("Core: burn market neutral positions", () => {
       margin: cast(400000),
       endTime,
       params: [
-       cast(20000), // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -110,7 +113,7 @@ describe("Core: burn market neutral positions", () => {
       margin: cast(1231900100),
       endTime,
       params: [
-       cast(20000), // Strike Price 200.00$
+        cast(20000), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,

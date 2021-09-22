@@ -1,13 +1,16 @@
+// theirs
 import { ethers } from "hardhat";
 import { utils } from "ethers";
 import { expect } from "chai";
-import { derivativeFactory } from "../utils/derivatives";
-import setup from "../utils/setup";
-import { TNamedSigners } from "../hardhat.config";
-import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
+// utils
 import { decodeLogs } from "../utils/events";
 import { cast } from "../utils/bn";
 import { formatAddress } from "../utils/addresses";
+import { derivativeFactory } from "../utils/derivatives";
+import setup from "../utils/setup";
+// types
+import { TNamedSigners } from "../types";
+import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
 import { SECONDS_40_MINS } from "../utils/constants";
 
 describe("CoreCreation", () => {

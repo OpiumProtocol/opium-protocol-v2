@@ -1,11 +1,14 @@
+// theirs
 import { artifacts, deployments, ethers } from "hardhat";
 import { expect } from "chai";
-import setup from "../utils/setup";
 import { deployMockContract, MockContract } from "ethereum-waffle";
+// utils
+import setup from "../utils/setup";
 import { toBN } from "../utils/bn";
-import { TokenSpender } from "../typechain";
 import timeTravel from "../utils/timeTravel";
-import { TNamedSigners } from "../hardhat.config";
+// types
+import { TokenSpender } from "../typechain";
+import { TNamedSigners } from "../types";
 
 describe("TokenSpender", () => {
   let tokenSpender: TokenSpender;

@@ -3,7 +3,7 @@ import { expect } from "chai";
 import setup from "../utils/setup";
 import { deployMockContract } from "ethereum-waffle";
 import { toBN } from "../utils/bn";
-import { TNamedSigners } from "../hardhat.config";
+import { TNamedSigners } from "../types";
 
 describe("OracleAggregator", () => {
   const timestamp = Math.floor(Date.now() / 1000);

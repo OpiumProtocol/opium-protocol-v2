@@ -45,7 +45,7 @@ const setup = async (): Promise<TContracts> => {
   const tokenSpender = <TokenSpender>(
     await upgrades.deployProxy(TokenSpender, [governor.address], { initializer: "initialize" })
   );
-  const core = <Core>await upgrades.deployProxy(Core, [registry.address], { initializer: 'initialize' });
+  const core = <Core>await upgrades.deployProxy(Core, [registry.address], { initializer: "initialize" });
   const oracleAggregator = <OracleAggregator>await upgrades.deployProxy(OracleAggregator);
   const syntheticAggregator = <SyntheticAggregator>await upgrades.deployProxy(SyntheticAggregator);
   const testToken = <TestToken>await TestToken.deploy("test", "test", 18);
