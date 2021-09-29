@@ -12,7 +12,12 @@ import "../../Interface/IOracleId.sol";
 import "../../Interface/IDerivativeLogic.sol";
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
-contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivative, LibCommission, ReentrancyGuardUpgradeable {
+contract TestSyntheticAggregatorUpgrade is
+    SyntheticAggregatorErrors,
+    LibDerivative,
+    LibCommission,
+    ReentrancyGuardUpgradeable
+{
     // Emitted when new ticker is initialized
     event Create(Derivative derivative, bytes32 derivativeHash);
 
@@ -20,27 +25,31 @@ contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivat
     // Invalid - syntheticId is not initialized yet
     // NotPool - syntheticId with p2p logic
     // Pool - syntheticId with pooled logic
-    enum SyntheticTypes { Invalid, NotPool, Pool }
+    enum SyntheticTypes {
+        Invalid,
+        NotPool,
+        Pool
+    }
 
     // Cache of buyer margin by ticker
     // buyerMarginByHash[derivativeHash] = buyerMargin
-    mapping (bytes32 => uint256) public buyerMarginByHash;
+    mapping(bytes32 => uint256) public buyerMarginByHash;
 
     // Cache of seller margin by ticker
     // sellerMarginByHash[derivativeHash] = sellerMargin
-    mapping (bytes32 => uint256) public sellerMarginByHash;
+    mapping(bytes32 => uint256) public sellerMarginByHash;
 
     // Cache of type by ticker
     // typeByHash[derivativeHash] = type
-    mapping (bytes32 => SyntheticTypes) public typeByHash;
+    mapping(bytes32 => SyntheticTypes) public typeByHash;
 
     // Cache of commission by ticker
     // commissionByHash[derivativeHash] = commission
-    mapping (bytes32 => uint256) public commissionByHash;
+    mapping(bytes32 => uint256) public commissionByHash;
 
     // Cache of author addresses by ticker
     // authorAddressByHash[derivativeHash] = authorAddress
-    mapping (bytes32 => address) public authorAddressByHash;
+    mapping(bytes32 => address) public authorAddressByHash;
 
     // PUBLIC FUNCTIONS
 
@@ -48,7 +57,11 @@ contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivat
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return commission uint256 Synthetic author commission
-    function getAuthorCommission(bytes32 _derivativeHash, Derivative memory _derivative) public nonReentrant returns (uint256 commission) {
+    function getAuthorCommission(bytes32 _derivativeHash, Derivative memory _derivative)
+        public
+        nonReentrant
+        returns (uint256 commission)
+    {
         // Initialize derivative if wasn't initialized before
         _initDerivative(_derivativeHash, _derivative);
         commission = commissionByHash[_derivativeHash];
@@ -58,7 +71,11 @@ contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivat
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return authorAddress address Synthetic author address
-    function getAuthorAddress(bytes32 _derivativeHash, Derivative memory _derivative) public nonReentrant returns (address authorAddress) {
+    function getAuthorAddress(bytes32 _derivativeHash, Derivative memory _derivative)
+        public
+        nonReentrant
+        returns (address authorAddress)
+    {
         // Initialize derivative if wasn't initialized before
         _initDerivative(_derivativeHash, _derivative);
         authorAddress = authorAddressByHash[_derivativeHash];
@@ -69,10 +86,14 @@ contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivat
     /// @param _derivative Derivative Derivative itself
     /// @return buyerMargin uint256 Margin of buyer
     /// @return sellerMargin uint256 Margin of seller
-    function getMargin(bytes32 _derivativeHash, Derivative memory _derivative) public nonReentrant returns (uint256 buyerMargin, uint256 sellerMargin) {
+    function getMargin(bytes32 _derivativeHash, Derivative memory _derivative)
+        public
+        nonReentrant
+        returns (uint256 buyerMargin, uint256 sellerMargin)
+    {
         // If it's a pool, just return margin from syntheticId contract
         if (_isPool(_derivativeHash, _derivative)) {
-            return IDerivativeLogic(_derivative.syntheticId).getMargin(_derivative); 
+            return IDerivativeLogic(_derivative.syntheticId).getMargin(_derivative);
         }
 
         // Initialize derivative if wasn't initialized before
@@ -150,7 +171,7 @@ contract TestSyntheticAggregatorUpgrade is SyntheticAggregatorErrors, LibDerivat
         emit Create(_derivative, derivativeHash);
     }
 
-    function placeholder() pure external returns(string memory) {
+    function placeholder() external pure returns (string memory) {
         return "upgraded";
     }
 }

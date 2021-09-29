@@ -14,14 +14,22 @@ abstract contract IDerivativeLogic is LibDerivative {
     /// @param _derivative Derivative Instance of derivative
     /// @return buyerMargin uint256 Margin needed from buyer (LONG position)
     /// @return sellerMargin uint256 Margin needed from seller (SHORT position)
-    function getMargin(Derivative memory _derivative) public view virtual returns (uint256 buyerMargin, uint256 sellerMargin);
+    function getMargin(Derivative memory _derivative)
+        public
+        view
+        virtual
+        returns (uint256 buyerMargin, uint256 sellerMargin);
 
     /// @notice Calculates payout for derivative execution
     /// @param _derivative Derivative Instance of derivative
     /// @param _result uint256 Data retrieved from oracleId on the maturity
     /// @return buyerPayout uint256 Payout in ratio for buyer (LONG position holder)
     /// @return sellerPayout uint256 Payout in ratio for seller (SHORT position holder)
-    function getExecutionPayout(Derivative memory _derivative, uint256 _result)	public view virtual returns (uint256 buyerPayout, uint256 sellerPayout);
+    function getExecutionPayout(Derivative memory _derivative, uint256 _result)
+        public
+        view
+        virtual
+        returns (uint256 buyerPayout, uint256 sellerPayout);
 
     /// @notice Returns syntheticId author address for Opium commissions
     /// @return authorAddress address The address of syntheticId address

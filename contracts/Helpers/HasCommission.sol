@@ -5,7 +5,7 @@ contract HasCommission {
     // Address of syntheticId author
     address internal author;
     // Commission is in Opium.Lib.LibCommission.COMMISSION_BASE base
-    uint256 constant internal AUTHOR_COMMISSION = 25; // 0.25% of profit
+    uint256 internal constant AUTHOR_COMMISSION = 25; // 0.25% of profit
 
     /// @notice Sets `msg.sender` as syntheticId author
     constructor() {

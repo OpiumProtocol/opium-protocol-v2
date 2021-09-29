@@ -21,7 +21,7 @@ contract UsingRegistry is Initializable, UsingRegistryErrors {
     }
 
     /// @notice Defines registry instance and emits appropriate event
-    function usingRegistry__init__(address _registry) initializer public {
+    function __UsingRegistry__init__(address _registry) initializer public {
         registry = Registry(_registry);
         emit RegistrySet(_registry);
     }

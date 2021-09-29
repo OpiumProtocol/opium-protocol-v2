@@ -7,7 +7,6 @@ import "../../Errors/RegistryErrors.sol";
 
 /// @title Opium.Registry contract keeps addresses of deployed Opium contracts set to allow them route and communicate to each other
 contract TestRegistryUpgrade is Initializable, OwnableUpgradeable, RegistryErrors {
-
     // Address of Opium.OpiumProxyFactory contract
     address private opiumProxyFactory;
 
@@ -50,21 +49,21 @@ contract TestRegistryUpgrade is Initializable, OwnableUpgradeable, RegistryError
     ) external onlyOwner {
         require(
             opiumProxyFactory == address(0) &&
-            core == address(0) &&
-            oracleAggregator == address(0) &&
-            syntheticAggregator == address(0) &&
-            tokenSpender == address(0) &&
-            opiumAddress == address(0),
+                core == address(0) &&
+                oracleAggregator == address(0) &&
+                syntheticAggregator == address(0) &&
+                tokenSpender == address(0) &&
+                opiumAddress == address(0),
             ERROR_REGISTRY_ALREADY_SET
         );
 
         require(
             _opiumProxyFactory != address(0) &&
-            _core != address(0) &&
-            _oracleAggregator != address(0) &&
-            _syntheticAggregator != address(0) &&
-            _tokenSpender != address(0) &&
-            _opiumAddress != address(0),
+                _core != address(0) &&
+                _oracleAggregator != address(0) &&
+                _syntheticAggregator != address(0) &&
+                _tokenSpender != address(0) &&
+                _opiumAddress != address(0),
             ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS
         );
 
@@ -122,7 +121,17 @@ contract TestRegistryUpgrade is Initializable, OwnableUpgradeable, RegistryError
         return opiumAddress;
     }
 
-    function getOpiumAddresses() external view returns(address, address, address, address, address) {
+    function getOpiumAddresses()
+        external
+        view
+        returns (
+            address,
+            address,
+            address,
+            address,
+            address
+        )
+    {
         return (opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender);
     }
 }

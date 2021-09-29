@@ -13,15 +13,15 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
 
     // Storage for the `oracleId` results
     // dataCache[oracleId][timestamp] => data
-    mapping (address => mapping(uint256 => uint256)) public dataCache;
+    mapping(address => mapping(uint256 => uint256)) public dataCache;
 
     // Flags whether data were provided
     // dataExist[oracleId][timestamp] => bool
-    mapping (address => mapping(uint256 => bool)) public dataExist;
+    mapping(address => mapping(uint256 => bool)) public dataExist;
 
     // Flags whether data were requested
     // dataRequested[oracleId][timestamp] => bool
-    mapping (address => mapping(uint256 => bool)) public dataRequested;
+    mapping(address => mapping(uint256 => bool)) public dataRequested;
 
     // MODIFIERS
 
@@ -42,12 +42,17 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
     /// @notice Requests data from `oracleId` one time
     /// @param oracleId address Address of the `oracleId` smart contract
     /// @param timestamp uint256 Timestamp at which data are needed
-    function fetchData(address oracleId, uint256 timestamp) public payable nonReentrant enoughEtherProvided(oracleId, 1) {
+    function fetchData(address oracleId, uint256 timestamp)
+        public
+        payable
+        nonReentrant
+        enoughEtherProvided(oracleId, 1)
+    {
         // Check if was not requested before and mark as requested
         _registerQuery(oracleId, timestamp);
 
         // Call the `oracleId` contract and transfer ETH
-        IOracleId(oracleId).fetchData{value: msg.value}(timestamp);
+        IOracleId(oracleId).fetchData{ value: msg.value }(timestamp);
     }
 
     /// @notice Requests data from `oracleId` multiple times
@@ -55,14 +60,19 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
     /// @param timestamp uint256 Timestamp at which data are needed for the first time
     /// @param period uint256 Period in seconds between multiple timestamps
     /// @param times uint256 How many timestamps are requested
-    function recursivelyFetchData(address oracleId, uint256 timestamp, uint256 period, uint256 times) public payable nonReentrant enoughEtherProvided(oracleId, times) {
+    function recursivelyFetchData(
+        address oracleId,
+        uint256 timestamp,
+        uint256 period,
+        uint256 times
+    ) public payable nonReentrant enoughEtherProvided(oracleId, times) {
         // Check if was not requested before and mark as requested in loop for each timestamp
-        for (uint256 i = 0; i < times; i++) {	
+        for (uint256 i = 0; i < times; i++) {
             _registerQuery(oracleId, timestamp + period * i);
         }
 
         // Call the `oracleId` contract and transfer ETH
-        IOracleId(oracleId).recursivelyFetchData{value: msg.value}(timestamp, period, times);
+        IOracleId(oracleId).recursivelyFetchData{ value: msg.value }(timestamp, period, times);
     }
 
     /// @notice Receives and caches data from `msg.sender`
@@ -82,7 +92,7 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
     /// @notice Requests and returns price in ETH for one request. This function could be called as `view` function. Oraclize API for price calculations restricts making this function as view.
     /// @param oracleId address Address of the `oracleId` smart contract
     /// @return fetchPrice uint256 Price of one data request in ETH
-    function calculateFetchPrice(address oracleId) public returns(uint256 fetchPrice) {
+    function calculateFetchPrice(address oracleId) public returns (uint256 fetchPrice) {
         fetchPrice = IOracleId(oracleId).calculateFetchPrice();
     }
 
@@ -93,10 +103,13 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
     /// @param timestamp uint256 Timestamp at which data are requested
     function _registerQuery(address oracleId, uint256 timestamp) private {
         // Check if data was not requested and provided yet
-        require(!dataRequested[oracleId][timestamp] && !dataExist[oracleId][timestamp], ERROR_ORACLE_AGGREGATOR_QUERY_WAS_ALREADY_MADE);
+        require(
+            !dataRequested[oracleId][timestamp] && !dataExist[oracleId][timestamp],
+            ERROR_ORACLE_AGGREGATOR_QUERY_WAS_ALREADY_MADE
+        );
 
         // Mark as requested
-        dataRequested[oracleId][timestamp] = true;	
+        dataRequested[oracleId][timestamp] = true;
     }
 
     // VIEW FUNCTIONS
@@ -105,7 +118,7 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
     /// @param oracleId address Address of the `oracleId` smart contract
     /// @param timestamp uint256 Timestamp at which data were requested
     /// @return dataResult uint256 Cached data provided by `oracleId`
-    function getData(address oracleId, uint256 timestamp) public view returns(uint256 dataResult) {
+    function getData(address oracleId, uint256 timestamp) public view returns (uint256 dataResult) {
         // Check if Opium.OracleAggregator has data
         require(hasData(oracleId, timestamp), ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST);
 
@@ -117,11 +130,11 @@ contract TestOracleAggregatorUpgrade is OracleAggregatorErrors, ReentrancyGuardU
     /// @param oracleId address Address of the `oracleId` smart contract
     /// @param timestamp uint256 Timestamp at which data were requested
     /// @param result bool Returns whether data were provided already
-    function hasData(address oracleId, uint256 timestamp) public view returns(bool result) {
+    function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {
         return dataExist[oracleId][timestamp];
     }
 
-    function placeholder() pure external returns(string memory) {
+    function placeholder() external pure returns (string memory) {
         return "upgraded";
     }
 }

@@ -9,7 +9,8 @@ import "../Helpers/ExecutableByThirdParty.sol";
 import "../Helpers/HasCommission.sol";
 
 contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {
-    using SafeMath for uint256;    
+    using SafeMath for uint256;
+
     constructor() {
         /*
         {
@@ -19,7 +20,9 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
             "description": "Dummy synthetic for testing purposes"
         }
         */
-        emit MetadataSet("{\"author\":\"opium.team\",\"type\":\"synthetic\",\"subtype\":\"none\",\"description\":\"Dummy synthetic for testing purposes\"}");
+        emit MetadataSet(
+            '{"author":"opium.team","type":"synthetic","subtype":"none","description":"Dummy synthetic for testing purposes"}'
+        );
     }
 
     /// @notice Getter for syntheticId author address
@@ -39,12 +42,22 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         return true;
     }
 
-    function getMargin(Derivative memory _derivative) public view override returns (uint256 buyerMargin, uint256 sellerMargin) {
+    function getMargin(Derivative memory _derivative)
+        public
+        view
+        override
+        returns (uint256 buyerMargin, uint256 sellerMargin)
+    {
         buyerMargin = _derivative.margin;
         sellerMargin = _derivative.margin;
     }
 
-    function getExecutionPayout(Derivative memory _derivative, uint256 _result)	public view override returns (uint256 buyerPayout, uint256 sellerPayout) {
+    function getExecutionPayout(Derivative memory _derivative, uint256 _result)
+        public
+        view
+        override
+        returns (uint256 buyerPayout, uint256 sellerPayout)
+    {
         buyerPayout = _derivative.margin;
         sellerPayout = _derivative.margin;
         _result;
@@ -58,7 +71,13 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         ExecutableByThirdParty.allowThirdpartyExecution(allow);
     }
 
-    function thirdpartyExecutionAllowed(address derivativeOwner) public view virtual override(IDerivativeLogic, ExecutableByThirdParty) returns (bool) {
+    function thirdpartyExecutionAllowed(address derivativeOwner)
+        public
+        view
+        virtual
+        override(IDerivativeLogic, ExecutableByThirdParty)
+        returns (bool)
+    {
         return ExecutableByThirdParty.thirdpartyExecutionAllowed(derivativeOwner);
     }
 }

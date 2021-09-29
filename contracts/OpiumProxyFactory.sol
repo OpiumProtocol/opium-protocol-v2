@@ -5,11 +5,10 @@ import "openzeppelin-solidity/contracts/proxy/Clones.sol";
 import "./OpiumPositionToken.sol";
 import "./Interface/IOpiumPositionToken.sol";
 
-
 contract OpiumProxyFactory {
     event LogPositionTokenAddress(address _positionAddress);
 
-    address immutable opiumPositionTokenImplementation;
+    address private immutable opiumPositionTokenImplementation;
 
     constructor() {
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
@@ -20,35 +19,42 @@ contract OpiumProxyFactory {
         _;
     }
 
-    function getImplementationAddress() view external returns(address) {
+    function getImplementationAddress() external view returns (address) {
         return opiumPositionTokenImplementation;
     }
 
-    function _isContract(address _address) private view returns(bool) {
-        uint size;
+    function _isContract(address _address) private view returns (bool) {
+        uint256 size;
         assembly {
             size := extcodesize(_address)
         }
         return size > 0;
     }
 
-    function _computeDeploymentAddress(bytes32 _salt) private view returns(address) {
+    function _computeDeploymentAddress(bytes32 _salt) private view returns (address) {
         return Clones.predictDeterministicAddress(opiumPositionTokenImplementation, _salt, address(this));
     }
 
-    function _checkOrDeployPosition(bool _isLong, bytes32 _salt) private implementationAddressExists() returns(address) {
+    function _checkOrDeployPosition(bool _isLong, bytes32 _salt) private implementationAddressExists returns (address) {
         address opiumPositionAddress;
         opiumPositionAddress = _computeDeploymentAddress(_salt);
-        if(!_isContract(opiumPositionAddress)) {
+        if (!_isContract(opiumPositionAddress)) {
             opiumPositionAddress = Clones.cloneDeterministic(opiumPositionTokenImplementation, _salt);
-            _isLong ?  IOpiumPositionToken(opiumPositionAddress).initialize("LONG", "LONG") : IOpiumPositionToken(opiumPositionAddress).initialize("SHORT", "SHORT");
+            _isLong
+                ? IOpiumPositionToken(opiumPositionAddress).initialize("LONG", "LONG")
+                : IOpiumPositionToken(opiumPositionAddress).initialize("SHORT", "SHORT");
         }
         return opiumPositionAddress;
     }
 
-    function mint(address _buyer, address _seller, bytes32 _derivativeHash, uint256 _amount) external implementationAddressExists() {
-        bytes32 shortSalt = keccak256(abi.encodePacked( _derivativeHash, "SHORT"));
-        bytes32 longSalt = keccak256(abi.encodePacked( _derivativeHash, "LONG"));
+    function mint(
+        address _buyer,
+        address _seller,
+        bytes32 _derivativeHash,
+        uint256 _amount
+    ) external implementationAddressExists {
+        bytes32 shortSalt = keccak256(abi.encodePacked(_derivativeHash, "SHORT"));
+        bytes32 longSalt = keccak256(abi.encodePacked(_derivativeHash, "LONG"));
 
         address shortPositionAddress = _checkOrDeployPosition(false, shortSalt);
         address longPositionAddress = _checkOrDeployPosition(true, longSalt);
@@ -60,7 +66,11 @@ contract OpiumProxyFactory {
         IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);
     }
 
-    function burn(address _tokenOwner, address _token, uint256 _amount) external implementationAddressExists() {
-        IOpiumPositionToken(_token).burn(_tokenOwner,  _amount);   
+    function burn(
+        address _tokenOwner,
+        address _token,
+        uint256 _amount
+    ) external implementationAddressExists {
+        IOpiumPositionToken(_token).burn(_tokenOwner, _amount);
     }
 }

@@ -10,7 +10,11 @@ interface IOracleId {
     /// @param timestamp uint256 Timestamp at which data are needed for the first time
     /// @param period uint256 Period in seconds between multiple timestamps
     /// @param times uint256 How many timestamps are requested
-    function recursivelyFetchData(uint256 timestamp, uint256 period, uint256 times) external payable;
+    function recursivelyFetchData(
+        uint256 timestamp,
+        uint256 period,
+        uint256 times
+    ) external payable;
 
     /// @notice Requests and returns price in ETH for one request. This function could be called as `view` function. Oraclize API for price calculations restricts making this function as view.
     /// @return fetchPrice uint256 Price of one data request in ETH

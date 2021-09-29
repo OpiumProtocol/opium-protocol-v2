@@ -3,7 +3,12 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract TestToken is ERC20 {
     address public owner;
-    constructor(string memory _name, string memory _symbol, uint8 _decimals) ERC20(_name, _symbol) {
+
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        uint8 _decimals
+    ) ERC20(_name, _symbol) {
         owner = msg.sender;
         _mint(msg.sender, 1000000 * 10**18);
     }

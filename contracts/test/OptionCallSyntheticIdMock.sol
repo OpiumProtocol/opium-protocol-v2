@@ -12,7 +12,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
     using SafeMath for uint256;
 
     uint256 constant BASE_PPT = 1 ether;
-    
+
     constructor() {
         /*
         {
@@ -22,7 +22,9 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
             "description": "Option Call logic contract"
         }
         */
-        emit MetadataSet("{\"author\":\"DIB.ONE\",\"type\":\"option\",\"subtype\":\"call\",\"description\":\"Option Call logic contract\"}");
+        emit MetadataSet(
+            '{"author":"DIB.ONE","type":"option","subtype":"call","description":"Option Call logic contract"}'
+        );
     }
 
     /// @notice Getter for syntheticId author address
@@ -51,20 +53,25 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         }
 
         uint256 strikePrice = _derivative.params[0];
-        return (
-            _derivative.margin > 0 &&
-            _derivative.endTime > block.timestamp &&
-            strikePrice > 0 &&
-            ppt > 0
-        );
+        return (_derivative.margin > 0 && _derivative.endTime > block.timestamp && strikePrice > 0 && ppt > 0);
     }
 
-    function getMargin(Derivative memory _derivative) public view override returns (uint256 buyerMargin, uint256 sellerMargin) {
+    function getMargin(Derivative memory _derivative)
+        public
+        view
+        override
+        returns (uint256 buyerMargin, uint256 sellerMargin)
+    {
         buyerMargin = 0;
         sellerMargin = _derivative.margin;
     }
 
-    function getExecutionPayout(Derivative memory _derivative, uint256 _result)	public view override returns (uint256 buyerPayout, uint256 sellerPayout) {
+    function getExecutionPayout(Derivative memory _derivative, uint256 _result)
+        public
+        view
+        override
+        returns (uint256 buyerPayout, uint256 sellerPayout)
+    {
         uint256 ppt;
 
         uint256 strikePrice = _derivative.params[0];
@@ -100,7 +107,13 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         ExecutableByThirdParty.allowThirdpartyExecution(allow);
     }
 
-    function thirdpartyExecutionAllowed(address derivativeOwner) public view virtual override(IDerivativeLogic, ExecutableByThirdParty) returns (bool) {
+    function thirdpartyExecutionAllowed(address derivativeOwner)
+        public
+        view
+        virtual
+        override(IDerivativeLogic, ExecutableByThirdParty)
+        returns (bool)
+    {
         return ExecutableByThirdParty.thirdpartyExecutionAllowed(derivativeOwner);
-    } 
+    }
 }
