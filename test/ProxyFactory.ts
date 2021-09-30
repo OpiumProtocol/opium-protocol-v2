@@ -2,54 +2,63 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 // utils
-import { cast } from "../utils/bn";
+import { toBN } from "../utils/bn";
 import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import setup from "../utils/setup";
 // types and constants
 import { TNamedSigners } from "../types";
-import { OpiumPositionToken } from "../typechain";
-import { TestOpiumProxyFactory } from "../typechain/TestOpiumProxyFactory";
+import { Core, OpiumPositionToken, OpiumProxyFactory, OptionCallSyntheticIdMock } from "../typechain";
 import { TDerivative } from "../types";
+import { retrievePositionTokensAddresses } from "../utils/events";
+import { impersonateAccount, setBalance } from "../utils/timeTravel";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 
-describe("TestOpiumProxyFactory", () => {
+describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;
-  let opiumProxyFactory: TestOpiumProxyFactory;
+  let coreImpersonator: SignerWithAddress;
+  let opiumProxyFactory: OpiumProxyFactory;
+  let optionCallMock: OptionCallSyntheticIdMock;
+  let core: Core;
   let derivative: TDerivative;
   let secondDerivative: TDerivative;
 
   before(async () => {
     namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-    const { optionCallMock } = await setup();
+    ({ optionCallMock, opiumProxyFactory, core } = await setup());
 
     derivative = derivativeFactory({
-      margin: cast(30),
-      endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [cast(200)],
+      margin: toBN("30"),
+      endTime: 1632915687, //Tue Sep 29 2026 09:41:17 GMT+0000
+      params: [toBN("200")],
       syntheticId: optionCallMock.address,
     });
 
     secondDerivative = derivativeFactory({
-      margin: cast(31),
+      margin: toBN("31"),
       endTime: ~~(Date.now() / 1000) + 3601, // now + 1 hour
-      params: [cast(200)],
+      params: [toBN("200")],
       syntheticId: optionCallMock.address,
     });
 
-    const OpiumProxyFactory = await ethers.getContractFactory("TestOpiumProxyFactory");
-    opiumProxyFactory = <TestOpiumProxyFactory>await OpiumProxyFactory.deploy();
-    await opiumProxyFactory.deployed();
+    /**
+     * impersonating core with hardhat evm methods
+     */
+    coreImpersonator = await impersonateAccount(core.address);
+    await setBalance(coreImpersonator.address, toBN("2"));
   });
 
-  it("expects _isContract to return false if the argument is an external account", async () => {
-    const { buyer } = namedSigners;
-    const result = await opiumProxyFactory._isContract(buyer.address);
-    expect(result).to.not.be.true;
-  });
+  it("expects to revert if caller is not core", async () => {
+    try {
+      const { buyer, seller } = namedSigners;
+      await impersonateAccount(core.address);
+      const amount = 1;
 
-  it("expects _isContract to return true if the argument is a smart contract's address", async () => {
-    const { core } = await setup();
-    const result = await opiumProxyFactory._isContract(core.address);
-    expect(result).to.be.true;
+      const hash = getDerivativeHash(derivative);
+      await opiumProxyFactory.mint(buyer.address, seller.address, hash, amount);
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include("USING_REGISTRY:ONLY_CORE_ALLOWED");
+    }
   });
 
   it("expects to mint the correct number of erc20 long/short positions", async () => {
@@ -57,17 +66,19 @@ describe("TestOpiumProxyFactory", () => {
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
-    const tx = await opiumProxyFactory.mint(buyer.address, seller.address, hash, 1);
+    const tx = await opiumProxyFactory.connect(coreImpersonator).mint(buyer.address, seller.address, hash, amount);
+    const receipt = await tx.wait();
 
-    await tx.wait();
-
-    const result = await opiumProxyFactory.callStatic.mint(buyer.address, seller.address, hash, amount);
+    const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
+      opiumProxyFactory,
+      receipt,
+    );
 
     const longOpiumPositionToken = await (<OpiumPositionToken>(
-      await ethers.getContractAt("OpiumPositionToken", result[0])
+      await ethers.getContractAt("OpiumPositionToken", longOpiumPositionTokenAddress)
     ));
     const shortOpiumPositionToken = await (<OpiumPositionToken>(
-      await ethers.getContractAt("OpiumPositionToken", result[1])
+      await ethers.getContractAt("OpiumPositionToken", shortOpiumPositionTokenAddress)
     ));
 
     const shortOpiumPositionTokenSellerBalance = await shortOpiumPositionToken.balanceOf(seller.address);
@@ -80,6 +91,20 @@ describe("TestOpiumProxyFactory", () => {
     expect(shortOpiumPositionTokenBuyerBalance).to.equal(0);
     expect(longOpiumPositionTokenSellerBalance).to.equal(0);
     expect(longOpiumPositionTokenBuyerBalance).to.equal(amount);
+
+    const longTokenSupply = await longOpiumPositionToken.totalSupply();
+    const shortTokenSupply = await shortOpiumPositionToken.totalSupply();
+    const longTokenName = await longOpiumPositionToken.name();
+    const shortTokenName = await shortOpiumPositionToken.name();
+    const longTokenSymbol = await longOpiumPositionToken.symbol();
+    const shortTokenSymbol = await shortOpiumPositionToken.symbol();
+    console.log("shortTokenSymbol ", shortTokenSymbol);
+    expect(longTokenName).to.be.eq("OPIUM LONG TOKEN");
+    expect(shortTokenName).to.be.eq("OPIUM SHORT TOKEN");
+    expect(longTokenSymbol).to.be.eq("OPLN");
+    expect(shortTokenSymbol).to.be.eq("OPSH");
+    expect(longTokenSupply).to.be.eq(amount);
+    expect(shortTokenSupply).to.be.eq(amount);
   });
 
   it("expects to burn the correct number of erc20 long/short positions with amount set to 2", async () => {
@@ -87,14 +112,20 @@ describe("TestOpiumProxyFactory", () => {
     const amount = 2;
 
     const hash = getDerivativeHash(secondDerivative);
-    const tx = await opiumProxyFactory.mint(buyer.address, seller.address, hash, amount);
+    const tx = await opiumProxyFactory.connect(coreImpersonator).mint(buyer.address, seller.address, hash, amount);
+    const receipt = await tx.wait();
 
-    await tx.wait();
+    const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
+      opiumProxyFactory,
+      receipt,
+    );
 
-    const result = await opiumProxyFactory.callStatic.mint(buyer.address, seller.address, hash, amount);
-
-    const longOpiumPositionToken = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", result[0]);
-    const shortOpiumPositionToken = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", result[1]);
+    const longOpiumPositionToken = await (<OpiumPositionToken>(
+      await ethers.getContractAt("OpiumPositionToken", longOpiumPositionTokenAddress)
+    ));
+    const shortOpiumPositionToken = await (<OpiumPositionToken>(
+      await ethers.getContractAt("OpiumPositionToken", shortOpiumPositionTokenAddress)
+    ));
 
     const beforeShortOpiumPositionTokenSellerBalance = await shortOpiumPositionToken.balanceOf(seller.address);
     const beforeShortOpiumPositionTokenBuyerBalance = await shortOpiumPositionToken.balanceOf(buyer.address);
@@ -106,7 +137,9 @@ describe("TestOpiumProxyFactory", () => {
     expect(beforeLongOpiumPositionTokenSellerBalance).to.equal(0);
     expect(beforeLongOpiumPositionTokenBuyerBalance).to.equal(amount);
 
-    const tx2 = await opiumProxyFactory.burn(seller.address, shortOpiumPositionToken.address, amount);
+    const tx2 = await opiumProxyFactory
+      .connect(coreImpersonator)
+      .burn(seller.address, shortOpiumPositionToken.address, amount);
     await tx2.wait();
 
     const afterShortOpiumPositionTokenSellerBalance = await shortOpiumPositionToken.balanceOf(seller.address);
