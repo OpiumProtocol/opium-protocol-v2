@@ -17,6 +17,7 @@ export type TNamedSigners = {
   hacker: SignerWithAddress;
   goodGuy: SignerWithAddress;
   authorized: SignerWithAddress;
+  impersonator: SignerWithAddress;
 };
 
 export type TDerivative = {

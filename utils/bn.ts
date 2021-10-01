@@ -25,6 +25,6 @@ export const pow = (x: number, y: number): BigNumber => {
   return cast(x).pow(cast(y));
 };
 
-export const frac = (x: number, n: number, d: number): BigNumber => {
-  return cast(x).mul(cast(n)).div(cast(d));
+export const frac = (x: BigNumber, n: string, d: string): BigNumber => {
+  return x.mul(toBN(n)).div(toBN(d));
 };

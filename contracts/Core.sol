@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
 import "./Interface/IDerivativeLogic.sol";
 
 import "./Errors/CoreErrors.sol";
@@ -40,6 +39,8 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     event Executed(address tokenOwner, address positionAddress, uint256 amount);
     // Emitted when Core cancels ticker for the first time
     event Canceled(bytes32 derivativeHash);
+    // Emitted when Core redeems an amount of market neutral positions
+    event LogRedeem(uint256 amount, bytes32 derivativeHash);
 
     // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
     uint256 public constant NO_DATA_CANCELLATION_PERIOD = 2 weeks;
@@ -59,7 +60,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
     /// @notice Calls Core.Lib.UsingRegistry constructor
     function initialize(address _registry) public initializer {
-        usingRegistry__init__(_registry);
+        __UsingRegistry__init__(_registry);
     }
 
     // PUBLIC FUNCTIONS
@@ -148,56 +149,58 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// execute many addresses
     function execute(
         address _tokenOwner,
-        PositionType[] memory _positionTypes,
-        uint256[] memory _amounts,
-        Derivative[] memory _derivatives
-    ) public nonReentrant {
+        PositionType[] calldata _positionTypes,
+        uint256[] calldata _amounts,
+        Derivative[] calldata _derivatives
+    ) external nonReentrant {
         _execute(_tokenOwner, _positionTypes, _amounts, _derivatives);
     }
 
     /// @notice Burns market neutral position for a list of `_positionsAddresses` pairs
     /// @param _positionsAddresses address[2][] `_positionsAddresses` of the positions that need to be burnt
     /// @param _derivatives Derivative[] derivative definitions for each `positionAddresses` pair
-    function burnMarketNeutral(address[2][] memory _positionsAddresses, Derivative[] memory _derivatives)
-        external
-        nonReentrant
-    {
+    function redeem(
+        address[2][] calldata _positionsAddresses,
+        Derivative[] calldata _derivatives,
+        uint256[] calldata _amount
+    ) external nonReentrant {
         require(_positionsAddresses.length == _derivatives.length, "POSITIONS_DERIVATIVES_MISMATCH");
         for (uint24 i = 0; i < _positionsAddresses.length; i++) {
-            if (
-                IERC20Upgradeable(_positionsAddresses[i][0]).balanceOf(msg.sender) ==
-                IERC20Upgradeable(_positionsAddresses[i][1]).balanceOf(msg.sender)
-            ) {
-                _burnMarketNeutral(msg.sender, _positionsAddresses[i], _derivatives[i]);
-            }
+            _redeem(msg.sender, _positionsAddresses[i], _derivatives[i], _amount[i]);
         }
     }
 
     /// @notice Burns market neutral position for a `_positionsAddresses` pair
     /// @param _positionAddresses address[2] `_positionAddresses` of the position that needs to be burnt
     /// @param _derivative Derivative derivative definition for the `positionAddresses` pair
-    function burnMarketNeutral(address[2] memory _positionAddresses, Derivative memory _derivative)
-        external
-        nonReentrant
-    {
-        _burnMarketNeutral(msg.sender, _positionAddresses, _derivative);
+    function redeem(
+        address[2] calldata _positionAddresses,
+        Derivative calldata _derivative,
+        uint256 _amount
+    ) external nonReentrant {
+        _redeem(msg.sender, _positionAddresses, _derivative, _amount);
     }
 
     /// @notice Burns market neutral position for a `_positionAddresses` pair
-    /// @param positionsOwner address `positionsOwner` owner of the `positionAddresses` pair
+    /// @param _positionsOwner address `positionsOwner` owner of the `positionAddresses` pair
     /// @param _positionAddresses address[2] `positionAddresses` of the position that needs to be burnt
     /// @param _derivative Derivative derivative definition for the `positionAddresses` pair
-    function _burnMarketNeutral(
-        address positionsOwner,
+    function _redeem(
+        address _positionsOwner,
         address[2] memory _positionAddresses,
-        Derivative memory _derivative
+        Derivative memory _derivative,
+        uint256 _amount
     ) private {
-        uint256 shortBalance = IERC20Upgradeable(_positionAddresses[0]).balanceOf(positionsOwner);
-        uint256 longBalance = IERC20Upgradeable(_positionAddresses[1]).balanceOf(positionsOwner);
+        uint256 shortBalance = IERC20Upgradeable(_positionAddresses[0]).balanceOf(_positionsOwner);
+        uint256 longBalance = IERC20Upgradeable(_positionAddresses[1]).balanceOf(_positionsOwner);
+        require(shortBalance >= _amount, "NOT_ENOUGH_SHORT_POSITIONS");
+        require(longBalance >= _amount, "NOT_ENOUGH_LONG_POSITIONS");
+
         bytes32 derivativeHash = getDerivativeHash(_derivative);
         ExecuteAndCancelLocalVars memory vars;
-
         vars.opiumProxyFactory = OpiumProxyFactory(registry.getOpiumProxyFactory());
+        vars.syntheticAggregator = SyntheticAggregator(registry.getSyntheticAggregator());
+
         require(
             derivativeHash.computeShortPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[0],
             "WRONG_SHORT"
@@ -206,20 +209,17 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
             derivativeHash.computeLongPositionAddress(address(vars.opiumProxyFactory)) == _positionAddresses[1],
             "WRONG_LONG"
         );
-        require(longBalance == shortBalance, "NOT_MARKET_NEUTRAL");
 
-        vars.opiumProxyFactory.burn(
-            positionsOwner,
-            _positionAddresses[0],
-            IERC20Upgradeable(_positionAddresses[0]).balanceOf(positionsOwner)
-        );
-        vars.opiumProxyFactory.burn(
-            positionsOwner,
-            _positionAddresses[1],
-            IERC20Upgradeable(_positionAddresses[1]).balanceOf(positionsOwner)
-        );
-        uint256 totalMargin = shortBalance.add(longBalance);
-        IERC20Upgradeable(_derivative.token).safeTransfer(positionsOwner, _derivative.margin.mul(shortBalance));
+        vars.opiumProxyFactory.burn(_positionsOwner, _positionAddresses[0], _amount);
+        vars.opiumProxyFactory.burn(_positionsOwner, _positionAddresses[1], _amount);
+
+        uint256[2] memory margins;
+        (margins[0], margins[1]) = vars.syntheticAggregator.getMargin(derivativeHash, _derivative);
+        uint256 totalMargin = margins[0].add(margins[1]).mul(_amount);
+        uint256 fees = _getFees(vars.syntheticAggregator, derivativeHash, _derivative, totalMargin);
+
+        IERC20Upgradeable(_derivative.token).safeTransfer(_positionsOwner, totalMargin.sub(fees));
+        emit LogRedeem(_amount, derivativeHash);
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`

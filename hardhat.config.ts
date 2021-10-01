@@ -152,6 +152,9 @@ const config: HardhatUserConfig = {
     authorized: {
       default: 10,
     },
+    impersonator: {
+      default: 11,
+    },
   },
   typechain: {
     outDir: "typechain",

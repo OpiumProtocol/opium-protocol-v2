@@ -1,7 +1,7 @@
-import { utils } from "ethers";
-import { zeroAddress } from "./constants";
+import { utils, BigNumber } from "ethers";
+import { AUTHOR_COMMISSION, OPIUM_COMMISSION, zeroAddress } from "./constants";
 import { cast } from "./bn";
-import { TDerivative } from "../types";
+import { ICreatedDerivativeOrder, TDerivative, TDerivativeOrder } from "../types";
 
 export const derivativeFactory = (derivative: Partial<TDerivative>): TDerivative => {
   const def = {
@@ -31,4 +31,38 @@ export const getDerivativeHash = (derivative: TDerivative): string => {
       derivative.syntheticId,
     ],
   );
+};
+
+export const calculateFees = (payout: BigNumber) => {
+  const opiumOverallFee = Math.floor(payout.toNumber() * AUTHOR_COMMISSION);
+
+  const opiumFee = Math.floor(opiumOverallFee * OPIUM_COMMISSION);
+  const authorFee = opiumOverallFee - opiumFee;
+
+  return {
+    opiumOverallFee,
+    authorFee,
+    opiumFee,
+  };
+};
+
+export const calculatePayoutFee = (payout: BigNumber): BigNumber => {
+  const { opiumOverallFee } = calculateFees(payout);
+  return BigNumber.from(opiumOverallFee);
+};
+
+export const addPositionTokens = (
+  derivativeOrder: TDerivativeOrder,
+  shortPositionAddress: string,
+  longPositionAddress: string,
+): ICreatedDerivativeOrder => {
+  return {
+    ...derivativeOrder,
+    shortPositionAddress,
+    longPositionAddress,
+  };
+};
+
+export const computeDerivativeMargin = (margin: BigNumber, amount: number): BigNumber => {
+  return margin.mul(amount);
 };

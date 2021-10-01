@@ -2,15 +2,17 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 // utils
-import { derivativeFactory } from "../utils/derivatives";
+import { computeDerivativeMargin, derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import setup from "../utils/setup";
-import { decodeLogs } from "../utils/events";
-import { cast } from "../utils/bn";
-import { formatAddress } from "../utils/addresses";
+import { decodeEvents, retrievePositionTokensAddresses } from "../utils/events";
+import { frac, toBN } from "../utils/bn";
 // types and constants
 import { TNamedSigners } from "../types";
-import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
+import { Core, OpiumPositionToken } from "../typechain";
 import { SECONDS_40_MINS } from "../utils/constants";
+
+const redeemOne = "redeem(address[2],(uint256,uint256,uint256[],address,address,address),uint256)";
+const redeemMany = "redeem(address[2][],(uint256,uint256,uint256[],address,address,address)[],uint256[])";
 
 describe("Core: burn market neutral positions", () => {
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
@@ -20,34 +22,31 @@ describe("Core: burn market neutral positions", () => {
     namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
   });
 
-  it(`should burn a single market neutral position and return the initial margin`, async () => {
+  it(`should redeem an entire market neutral position and return the entire initial margin`, async () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
     const { deployer } = namedSigners;
     const marketNeutralParty = deployer;
 
     const amount = 3;
+    const redeemAmount = amount;
     const optionCall = derivativeFactory({
-      margin: cast(30),
+      margin: toBN("20"),
       endTime,
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN("20000"), // Strike Price
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
 
-    const initialTokenBalance = await testToken.balanceOf(marketNeutralParty.address);
-    console.log(`initialTokenBalance: ${initialTokenBalance.toString()}`);
+    const marketNeutralPartyInitialBalance = await testToken.balanceOf(marketNeutralParty.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait();
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
-    const shortPositionAddress = formatAddress(log[0].data);
-    const longPositionAddress = formatAddress(log[1].data);
+    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
-    const tokenBalanceAfterCreation = await testToken.balanceOf(marketNeutralParty.address);
-    console.log(`tokenBalanceAfterCreation: ${tokenBalanceAfterCreation.toString()}`);
+    const marketNeutralBalanceAfterCreation = await testToken.balanceOf(marketNeutralParty.address);
 
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
@@ -60,40 +59,44 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartysShortBalance).to.equal(amount);
 
-    const tx2 = await core["burnMarketNeutral(address[2],(uint256,uint256,uint256[],address,address,address))"](
-      [shortPositionAddress, longPositionAddress],
-      optionCall,
-    );
-    await tx2.wait();
+    const tx2 = await core[redeemOne]([shortPositionAddress, longPositionAddress], optionCall, redeemAmount);
+    const receipt2 = await tx2.wait();
+
+    const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
+    /**
+     * checks the emitted event arguments
+     */
+    expect(log.amount, "wrong amount event argument").to.be.eq(redeemAmount);
+    expect(log.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
 
     const marketNeutralPartyLongBalanceAfter = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
 
-    const tokenBalanceAfterBurn = await testToken.balanceOf(marketNeutralParty.address);
-    console.log(`tokenBalanceAfterBurn: ${tokenBalanceAfterBurn.toString()}`);
+    const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
+    
+    // author fee (includes opium fee)
+    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100");    
 
-    expect(tokenBalanceAfterBurn).to.equal(initialTokenBalance);
-    expect(marketNeutralPartyLongBalanceAfter).to.equal(0);
-    expect(marketNeutralPartysShortBalanceAfter).to.equal(0);
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(
+      marketNeutralBalanceAfterCreation.add(computeDerivativeMargin(optionCall.margin, redeemAmount).sub(derivativeAuthorFee)),
+    );
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(marketNeutralPartyInitialBalance.sub(derivativeAuthorFee));
+    expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.equal(amount - redeemAmount);
+    expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.equal(amount - redeemAmount);
   });
 
-  it(`should burn all the market neutral positions of the caller and return all their margins`, async () => {
+  it(`should redeem a third of the initial position's margin and burn the corresponding SHORT/LONG tokens`, async () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
     const { deployer } = namedSigners;
-
     const marketNeutralParty = deployer;
 
-    // creation of the first market neutral position
-
-    const initialTokenBalance = await testToken.balanceOf(marketNeutralParty.address);
-    console.log(`initial token balance: ${initialTokenBalance.toString()}`);
-
-    const amount = 12;
+    const amount = 9;
+    const redeemAmount = 4;
     const optionCall = derivativeFactory({
-      margin: cast(400000),
+      margin: toBN("30"),
       endTime,
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN("20000"), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -102,18 +105,77 @@ describe("Core: burn market neutral positions", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait();
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
-    const shortPositionAddress = formatAddress(log[0].data);
-    const longPositionAddress = formatAddress(log[1].data);
+    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+
+    const marketNeutralBalanceAfterCreation = await testToken.balanceOf(marketNeutralParty.address);
+
+    const shortPositionERC20 = <OpiumPositionToken>(
+      await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
+    );
+    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
+
+    const marketNeutralPartyLongBalance = await longPositionERC20.balanceOf(marketNeutralParty.address);
+    const marketNeutralPartysShortBalance = await shortPositionERC20.balanceOf(marketNeutralParty.address);
+
+    expect(marketNeutralPartyLongBalance).to.equal(amount);
+    expect(marketNeutralPartysShortBalance).to.equal(amount);
+
+    const tx2 = await core[redeemOne]([shortPositionAddress, longPositionAddress], optionCall, redeemAmount);
+    const receipt2 = await tx2.wait();
+    const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
+    /**
+     * checks the emitted event arguments
+     */
+    expect(log.amount, "wrong amount event argument").to.be.eq(redeemAmount);
+    expect(log.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
+
+    const marketNeutralPartyLongBalanceAfter = await longPositionERC20.balanceOf(marketNeutralParty.address);
+    const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
+    const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
+
+    // author fee (includes opium fee)
+    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100"); 
+
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(
+      marketNeutralBalanceAfterCreation.add(computeDerivativeMargin(optionCall.margin, redeemAmount).sub(derivativeAuthorFee)),
+    );
+    expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.equal(amount - redeemAmount);
+    expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.equal(amount - redeemAmount);
+  });
+
+  it(`should redeem many market neutral positions at once`, async () => {
+    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
+    const { deployer } = namedSigners;
+
+    const marketNeutralParty = deployer;
+
+    // creation of the first market neutral position
+    const amount = 12;
+    const redeemAmount = amount;
+    const optionCall = derivativeFactory({
+      margin: toBN("90"),
+      endTime,
+      params: [
+        toBN("30000"), // Strike Price
+      ],
+      token: testToken.address,
+      syntheticId: optionCallMock.address,
+    });
+
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
+    const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
+    const receipt = await tx.wait();
+    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
     // creation of the second market neutral position
 
     const secondAmount = 7;
+    const secondRedeemAmount = 3;
     const secondOptionCall = derivativeFactory({
-      margin: cast(1231900100),
+      margin: toBN("123"),
       endTime,
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN("10000"), // Strike Price
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -125,12 +187,12 @@ describe("Core: burn market neutral positions", () => {
       marketNeutralParty.address,
     ]);
     const receipt2 = await tx2.wait();
-    const log2 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt2);
-    const secondShortPositionAddress = formatAddress(log2[0].data);
-    const secondLongPositionAddress = formatAddress(log2[1].data);
+    const [secondShortPositionAddress, secondLongPositionAddress] = retrievePositionTokensAddresses(
+      opiumProxyFactory,
+      receipt2,
+    );
 
-    const tokenBalanceAfterSecondCreation = await testToken.balanceOf(marketNeutralParty.address);
-    console.log(`token balance after second derivative creation: ${tokenBalanceAfterSecondCreation.toString()}`);
+    const marketNeutralPartyBalanceAfterSecondCreation = await testToken.balanceOf(marketNeutralParty.address);
 
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
@@ -148,20 +210,32 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartySecondLongBalance = await secondLongPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartySecondShortBalance = await secondShortPositionERC20.balanceOf(marketNeutralParty.address);
 
+    /**
+     * expects the amount of minted LONG/SHORT after creation positions is as expected
+     */
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartyShortBalance).to.equal(amount);
     expect(marketNeutralPartySecondLongBalance).to.equal(secondAmount);
     expect(marketNeutralPartySecondShortBalance).to.equal(secondAmount);
 
     //@ts-ignore
-    const tx3 = await core["burnMarketNeutral(address[2][],(uint256,uint256,uint256[],address,address,address)[])"](
+    const tx3 = await core[redeemMany](
       [
         [shortPositionAddress, longPositionAddress],
         [secondShortPositionAddress, secondLongPositionAddress],
       ],
       [optionCall, secondOptionCall],
+      [redeemAmount, secondRedeemAmount],
     );
-    await tx3.wait();
+    const receipt3 = await tx3.wait();
+    const [log1, log2] = await decodeEvents<Core>(core, "LogRedeem", receipt3.events);
+    /**
+     * checks the emitted event arguments
+     */
+    expect(log1.amount, "wrong amount event argument").to.be.eq(redeemAmount);
+    expect(log1.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
+    expect(log2.amount, "wrong amount event argument").to.be.eq(secondRedeemAmount);
+    expect(log2.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(secondOptionCall));
 
     const marketNeutralPartyLongBalanceAfter = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
@@ -171,16 +245,31 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartySecondShortBalanceAfter = await secondShortPositionERC20.balanceOf(
       marketNeutralParty.address,
     );
+    const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
-    const tokenBalanceAfterBurn = await testToken.balanceOf(marketNeutralParty.address);
-    console.log(
-      `token balance after all market neutral positions have been burnt: ${tokenBalanceAfterBurn.toString()}`,
+    // author fee (includes opium fee)
+    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100");
+    const secondDerivativeAuthorFee = frac(secondOptionCall.margin.mul(secondRedeemAmount), "0.25", "100");
+
+    /**
+     * expects the account's ERC20 balance after redeem is equal to the
+     * ERC20 balance after creating the last redeemed position + all the redeemed collateral
+     */
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong token balance").to.equal(
+      marketNeutralPartyBalanceAfterSecondCreation
+        .add(computeDerivativeMargin(optionCall.margin, redeemAmount))
+        .add(computeDerivativeMargin(secondOptionCall.margin, secondRedeemAmount)).sub(derivativeAuthorFee).sub(secondDerivativeAuthorFee),
     );
-
-    expect(tokenBalanceAfterBurn).to.equal(initialTokenBalance);
-    expect(marketNeutralPartyLongBalanceAfter).to.equal(0);
-    expect(marketNeutralPartysShortBalanceAfter).to.equal(0);
-    expect(marketNeutralPartySecondLongBalanceAfter).to.equal(0);
-    expect(marketNeutralPartySecondShortBalanceAfter).to.equal(0);
+    /**
+     * expects the amount of LONG/SHORT positions to be equal to the created amount - redeemed amount
+     */
+    expect(marketNeutralPartyLongBalanceAfter, "wrong first long position balance").to.equal(amount - redeemAmount);
+    expect(marketNeutralPartysShortBalanceAfter, "wrong first short position balance").to.equal(amount - redeemAmount);
+    expect(marketNeutralPartySecondLongBalanceAfter, "wrong second long position balance").to.equal(
+      secondAmount - secondRedeemAmount,
+    );
+    expect(marketNeutralPartySecondShortBalanceAfter, "wrong second long position balance").to.equal(
+      secondAmount - secondRedeemAmount,
+    );
   });
 });
