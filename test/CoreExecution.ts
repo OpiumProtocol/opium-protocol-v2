@@ -1,11 +1,9 @@
 // theirs
 import { ethers } from "hardhat";
 import { expect } from "chai";
-import { BigNumber } from "ethers";
 // utils
-import { derivativeFactory } from "../utils/derivatives";
+import { calculateFees, calculatePayoutFee, derivativeFactory, addPositionTokens } from "../utils/derivatives";
 import { cast, mul } from "../utils/bn";
-import { TDerivativeOrder } from "../types";
 import setup from "../utils/setup";
 import {
   Core,
@@ -18,12 +16,7 @@ import {
 } from "../typechain";
 import timeTravel from "../utils/timeTravel";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../types";
-import { decodeLogs } from "../utils/events";
-// types and constants
-import { formatAddress } from "../utils/addresses";
 import {
-  AUTHOR_COMMISSION,
-  OPIUM_COMMISSION,
   SECONDS_10_MINS,
   SECONDS_20_MINS,
   SECONDS_30_MINS,
@@ -31,36 +24,7 @@ import {
   SECONDS_50_MINS,
   SECONDS_3_WEEKS,
 } from "../utils/constants";
-
-const calculateFees = (payout: BigNumber) => {
-  const opiumOverallFee = Math.floor(payout.toNumber() * AUTHOR_COMMISSION);
-
-  const opiumFee = Math.floor(opiumOverallFee * OPIUM_COMMISSION);
-  const authorFee = opiumOverallFee - opiumFee;
-
-  return {
-    opiumOverallFee,
-    authorFee,
-    opiumFee,
-  };
-};
-
-const calculatePayoutFee = (payout: BigNumber): BigNumber => {
-  const { opiumOverallFee } = calculateFees(payout);
-  return BigNumber.from(opiumOverallFee);
-};
-
-const addPositionTokens = (
-  derivativeOrder: TDerivativeOrder,
-  shortPositionAddress: string,
-  longPositionAddress: string,
-): ICreatedDerivativeOrder => {
-  return {
-    ...derivativeOrder,
-    shortPositionAddress,
-    longPositionAddress,
-  };
-};
+import { retrievePositionTokensAddresses } from "../utils/events";
 
 const executeOne = "execute(uint8,uint256,(uint256,uint256,uint256[],address,address,address))";
 const executeOneWithAddress = "execute(address,uint8,uint256,(uint256,uint256,uint256[],address,address,address))";
@@ -220,8 +184,11 @@ describe("CoreExecution", () => {
       seller.address,
     ]);
     const receipt = await tx.wait();
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
-    noDataOption = addPositionTokens(noDataOptionPayload, formatAddress(log[0].data), formatAddress(log[1].data));
+
+    noDataOption = addPositionTokens(
+      noDataOptionPayload,
+      ...retrievePositionTokensAddresses(opiumProxyFactory, receipt),
+    );
     await testToken.approve(
       tokenSpender.address,
       fullMarginOptionPayload.derivative.margin.mul(fullMarginOptionPayload.amount),
@@ -231,12 +198,10 @@ describe("CoreExecution", () => {
       seller.address,
     ]);
     const receipt2 = await tx2.wait();
-    const log2 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt2);
 
     fullMarginOption = addPositionTokens(
       fullMarginOptionPayload,
-      formatAddress(log2[0].data),
-      formatAddress(log2[1].data),
+      ...retrievePositionTokensAddresses(opiumProxyFactory, receipt2),
     );
 
     await testToken.approve(
@@ -248,11 +213,9 @@ describe("CoreExecution", () => {
       seller.address,
     ]);
     const receipt3 = await tx3.wait();
-    const log3 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt3);
     overMarginOption = addPositionTokens(
       overMarginOptionPayload,
-      formatAddress(log3[0].data),
-      formatAddress(log3[1].data),
+      ...retrievePositionTokensAddresses(opiumProxyFactory, receipt3),
     );
 
     await testToken.approve(
@@ -264,11 +227,9 @@ describe("CoreExecution", () => {
       seller.address,
     ]);
     const receipt4 = await tx4.wait();
-    const log4 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt4);
     underMarginOption = addPositionTokens(
       underMarginOptionPayload,
-      formatAddress(log4[0].data),
-      formatAddress(log4[1].data),
+      ...retrievePositionTokensAddresses(opiumProxyFactory, receipt4),
     );
 
     await testToken.approve(
@@ -280,11 +241,9 @@ describe("CoreExecution", () => {
       seller.address,
     ]);
     const receipt5 = await tx5.wait();
-    const log5 = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt5);
     nonProfitOption = addPositionTokens(
       nonProfitOptionPayload,
-      formatAddress(log5[0].data),
-      formatAddress(log5[1].data),
+      ...retrievePositionTokensAddresses(opiumProxyFactory, receipt5),
     );
   });
 

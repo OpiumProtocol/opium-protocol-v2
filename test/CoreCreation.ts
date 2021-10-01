@@ -3,14 +3,13 @@ import { ethers } from "hardhat";
 import { utils } from "ethers";
 import { expect } from "chai";
 // utils
-import { decodeLogs } from "../utils/events";
+import { retrievePositionTokensAddresses } from "../utils/events";
 import { cast } from "../utils/bn";
-import { formatAddress } from "../utils/addresses";
 import { derivativeFactory } from "../utils/derivatives";
 import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
-import { OpiumPositionToken, OpiumProxyFactory } from "../typechain";
+import { OpiumPositionToken } from "../typechain";
 import { SECONDS_40_MINS } from "../utils/constants";
 
 describe("CoreCreation", () => {
@@ -130,9 +129,8 @@ describe("CoreCreation", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
-    const shortPositionAddress = formatAddress(log[0].data);
-    const longPositionAddress = formatAddress(log[1].data);
+
+    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
@@ -176,9 +174,7 @@ describe("CoreCreation", () => {
     // Create derivative
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
-    const shortPositionAddress = formatAddress(log[0].data);
-    const longPositionAddress = formatAddress(log[1].data);
+    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
