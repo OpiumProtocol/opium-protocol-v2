@@ -67,7 +67,7 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
 
     /// @notice This function allows fee recipients to withdraw their fees
     /// @param _tokenAddress address Address of an ERC20 token to withdraw
-    function withdrawFee(address _tokenAddress) public nonReentrant {
+    function withdrawFee(address _tokenAddress) external nonReentrant {
         uint256 balance = feesVaults[msg.sender][_tokenAddress];
         feesVaults[msg.sender][_tokenAddress] = 0;
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
@@ -80,10 +80,10 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// [0] - buyer address
     /// [1] - seller address - if seller is set to `address(0)`, consider as pooled position
     function create(
-        Derivative memory _derivative,
+        Derivative calldata _derivative,
         uint256 _amount,
-        address[2] memory _addresses
-    ) public nonReentrant {
+        address[2] calldata _addresses
+    ) external nonReentrant {
         _create(_derivative, _amount, _addresses);
     }
 
@@ -94,8 +94,8 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     function execute(
         PositionType _positionType,
         uint256 _amount,
-        Derivative memory _derivative
-    ) public nonReentrant {
+        Derivative calldata _derivative
+    ) external nonReentrant {
         PositionType[] memory positionTypes = new PositionType[](1);
         uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
@@ -116,8 +116,8 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
         address _tokenOwner,
         PositionType _positionType,
         uint256 _amount,
-        Derivative memory _derivative
-    ) public nonReentrant {
+        Derivative calldata _derivative
+    ) external nonReentrant {
         PositionType[] memory positionTypes = new PositionType[](1);
         uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
@@ -134,10 +134,10 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// @param _amounts uint256[] Amount of positions to execute for each `positionAddress`
     /// @param _derivatives Derivative[] Derivative definitions for each `positionAddress`
     function execute(
-        PositionType[] memory _positionTypes,
-        uint256[] memory _amounts,
-        Derivative[] memory _derivatives
-    ) public nonReentrant {
+        PositionType[] calldata _positionTypes,
+        uint256[] calldata _amounts,
+        Derivative[] calldata _derivatives
+    ) external nonReentrant {
         _execute(msg.sender, _positionTypes, _amounts, _derivatives);
     }
 
@@ -229,8 +229,8 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     function cancel(
         PositionType _positionType,
         uint256 _amount,
-        Derivative memory _derivative
-    ) public nonReentrant {
+        Derivative calldata _derivative
+    ) external nonReentrant {
         PositionType[] memory positionTypes = new PositionType[](1);
         uint256[] memory amounts = new uint256[](1);
         Derivative[] memory derivatives = new Derivative[](1);
@@ -247,10 +247,10 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// @param _amounts uint256[] Amount of positions to cancel for each `positionAddress`
     /// @param _derivatives Derivative[] Derivative definitions for each `_positionAddress`
     function cancel(
-        PositionType[] memory _positionTypes,
-        uint256[] memory _amounts,
-        Derivative[] memory _derivatives
-    ) public nonReentrant {
+        PositionType[] calldata _positionTypes,
+        uint256[] calldata _amounts,
+        Derivative[] calldata _derivatives
+    ) external nonReentrant {
         _cancel(_positionTypes, _amounts, _derivatives);
     }
 
@@ -279,9 +279,9 @@ contract Core is LibDerivative, LibCommission, UsingRegistry, CoreErrors, Reentr
     /// [0] - buyer address
     /// [1] - seller address
     function _create(
-        Derivative memory _derivative,
+        Derivative calldata _derivative,
         uint256 _amount,
-        address[2] memory _addresses
+        address[2] calldata _addresses
     ) private {
         // Local variables
         CreateLocalVars memory vars;
