@@ -2,15 +2,15 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "./Lib/LibDerivative.sol";
-import "./Lib/UsingRegistry.sol";
-
-import "./Errors/SyntheticAggregatorErrors.sol";
-
 import "./Interface/IOracleId.sol";
 import "./Interface/IDerivativeLogic.sol";
 import "./Interface/IRegistry.sol";
-import "./Lib/Registry/RegistryEntities.sol";
+
+import "./Lib/LibDerivative.sol";
+import "./Registry/RegistryEntities.sol";
+
+import "./Errors/SyntheticAggregatorErrors.sol";
+
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
 contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, ReentrancyGuardUpgradeable {

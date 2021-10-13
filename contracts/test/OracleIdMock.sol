@@ -1,7 +1,6 @@
 pragma solidity 0.8.5;
 
 import "../Interface/IOracleId.sol";
-// import "../Lib/UsingRegistry.sol";
 import "../Interface/IRegistry.sol";
 import "../OracleAggregator.sol";
 

@@ -12,6 +12,7 @@ export type TNamedSigners = {
   shortExecutorOne: SignerWithAddress;
   longExecutorTwo: SignerWithAddress;
   shortExecutorTwo: SignerWithAddress;
+  guardian: SignerWithAddress;
   buyer: SignerWithAddress;
   seller: SignerWithAddress;
   oracle: SignerWithAddress;

@@ -3,16 +3,16 @@ pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "./Lib/UsingRegistry.sol";
+import "./Lib/UsingRegistryACL.sol";
 
 /// @title Opium.TokenSpender contract holds users ERC20 approvals and allows whitelisted contracts to use tokens
-contract TokenSpender is UsingRegistry {
+contract TokenSpender is UsingRegistryACL {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice Calls constructors of super-contracts
     /// @param _registry address Address of governor, who is allowed to adjust whitelist
-    function initialize(address _registry) public {
-        __UsingRegistry__init__(_registry);
+    function initialize(address _registry) external initializer {
+        __UsingRegistryACL__init(_registry);
     }
 
     /// @notice Using this function whitelisted contracts could call ERC20 transfers
@@ -25,7 +25,7 @@ contract TokenSpender is UsingRegistry {
         address from,
         address to,
         uint256 amount
-    ) external onlyWhitelisted {
+    ) external onlyWhitelisted whenNotPaused {
         token.safeTransferFrom(from, to, amount);
     }
 }

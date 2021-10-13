@@ -3,12 +3,12 @@ pragma solidity 0.8.5;
 import "openzeppelin-solidity/contracts/proxy/Clones.sol";
 
 import "./Lib/LibDerivative.sol";
-import "./Lib/UsingRegistry.sol";
+import "./Lib/UsingRegistryACL.sol";
 import "./Lib/LibPosition.sol";
 import "./OpiumPositionToken.sol";
 import "./Interface/IOpiumPositionToken.sol";
 
-contract OpiumProxyFactory is UsingRegistry, LibDerivative {
+contract OpiumProxyFactory is UsingRegistryACL, LibDerivative {
     using LibPosition for bytes32;
     event LogShortPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
     event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
@@ -21,7 +21,7 @@ contract OpiumProxyFactory is UsingRegistry, LibDerivative {
 
     constructor(address _registry) {
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
-        __UsingRegistry__init__(_registry);
+        __UsingRegistryACL__init(_registry);
     }
 
     modifier implementationAddressExists() {
@@ -80,7 +80,7 @@ contract OpiumProxyFactory is UsingRegistry, LibDerivative {
         bytes32 _derivativeHash,
         Derivative calldata _derivative,
         uint256 _amount
-    ) external onlyCore implementationAddressExists {
+    ) external onlyCore implementationAddressExists whenNotPaused {
         bytes32 shortSalt = keccak256(abi.encodePacked(_derivativeHash, "SHORT"));
         bytes32 longSalt = keccak256(abi.encodePacked(_derivativeHash, "LONG"));
 
@@ -95,7 +95,7 @@ contract OpiumProxyFactory is UsingRegistry, LibDerivative {
         address _tokenOwner,
         address _token,
         uint256 _amount
-    ) external onlyCore implementationAddressExists {
+    ) external onlyCore implementationAddressExists whenNotPaused {
         IOpiumPositionToken(_token).burn(_tokenOwner, _amount);
     }
 }

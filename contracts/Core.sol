@@ -4,24 +4,23 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "./Interface/IDerivativeLogic.sol";
-
-import "./Errors/CoreErrors.sol";
-
-import "./Lib/UsingRegistry.sol";
-import "./Lib/Registry/RegistryEntities.sol";
-
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
 
 import "./OpiumProxyFactory.sol";
-
 import "./OracleAggregator.sol";
 import "./SyntheticAggregator.sol";
 import "./TokenSpender.sol";
 
+import "./Interface/IDerivativeLogic.sol";
+
+import "./Errors/CoreErrors.sol";
+import "./Registry/RegistryEntities.sol";
+
+import "./Lib/LibDerivative.sol";
+import "./Lib/LibPosition.sol";
+import "./Lib/UsingRegistryACL.sol";
+
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
-contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgradeable {
+contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
     using LibPosition for bytes32;
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -48,16 +47,16 @@ contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgrad
     // Hashes of cancelled tickers
     mapping(bytes32 => bool) public cancelled;
 
-    /// @notice Calls Core.Lib.UsingRegistry constructor
-    function initialize(address _registry) public initializer {
-        __UsingRegistry__init__(_registry);
+    /// @notice Calls Core.Lib.__UsingRegistryACL__init constructor
+    function initialize(address _registry) external initializer {
+        __UsingRegistryACL__init(_registry);
     }
 
     // PUBLIC FUNCTIONS
 
     /// @notice This function allows fee recipients to withdraw their fees
     /// @param _tokenAddress address Address of an ERC20 token to withdraw
-    function withdrawFee(address _tokenAddress) external nonReentrant {
+    function withdrawFee(address _tokenAddress) external nonReentrant whenNotPaused {
         uint256 balance = feesVaults[msg.sender][_tokenAddress];
         feesVaults[msg.sender][_tokenAddress] = 0;
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
@@ -145,7 +144,7 @@ contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgrad
         address _positionsOwner,
         address[2] memory _positionAddresses,
         uint256 _amount
-    ) private {
+    ) private whenNotPaused {
         uint256 shortBalance = IERC20Upgradeable(_positionAddresses[0]).balanceOf(_positionsOwner);
         uint256 longBalance = IERC20Upgradeable(_positionAddresses[1]).balanceOf(_positionsOwner);
         bytes32 derivativeHash = IOpiumPositionToken(_positionAddresses[0]).getDerivativeHash();
@@ -180,7 +179,7 @@ contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgrad
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddress PositionType of positions to be canceled
     /// @param _amount uint256 Amount of positions to cancel
-    function cancel(address _positionAddress, uint256 _amount) external nonReentrant {
+    function cancel(address _positionAddress, uint256 _amount) external nonReentrant whenNotPaused {
         _cancel(_positionAddress, _amount);
     }
 
@@ -222,7 +221,7 @@ contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgrad
         Derivative calldata _derivative,
         uint256 _amount,
         address[2] calldata _addresses
-    ) private {
+    ) private whenNotPaused {
         // Local variables
         CreateLocalVars memory vars;
         RegistryEntities.ExecuteAndCancelLocalVars memory protocolAddresses = registry.getExecuteAndCancelLocalVars();
@@ -286,7 +285,7 @@ contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgrad
         address _positionOwner,
         address _positionAddress,
         uint256 _amount
-    ) private onlyOpiumFactoryTokens(_positionAddress) {
+    ) private onlyOpiumFactoryTokens(_positionAddress) whenNotPaused {
         // Local variables
         RegistryEntities.ExecuteAndCancelLocalVars memory vars = registry.getExecuteAndCancelLocalVars();
 
@@ -321,7 +320,7 @@ contract Core is LibDerivative, UsingRegistry, CoreErrors, ReentrancyGuardUpgrad
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddress PositionTypes of positions to be canceled
     /// @param _amount uint256[] Amount of positions to cancel for each `positionAddress`
-    function _cancel(address _positionAddress, uint256 _amount) private onlyOpiumFactoryTokens(_positionAddress) {
+    function _cancel(address _positionAddress, uint256 _amount) private onlyOpiumFactoryTokens(_positionAddress) whenNotPaused {
         // Local variables
         RegistryEntities.ExecuteAndCancelLocalVars memory vars = registry.getExecuteAndCancelLocalVars();
 

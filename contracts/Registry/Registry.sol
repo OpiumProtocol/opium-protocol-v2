@@ -1,6 +1,7 @@
 pragma solidity 0.8.5;
 
 import "./RegistryStorageUpgradeable.sol";
+import "../Lib/LibRoles.sol";
 
 contract RegistryUpgradeable is RegistryStorageUpgradeable {
     //add events
@@ -12,14 +13,36 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     function initialize(
         address _governor,
+        address _guardian,
         address[] memory _longExecutors, 
         address[] memory _shortExecutors
     ) external initializer {
         __RegistryStorage__init(
         _governor,
+        _guardian,
         _longExecutors, 
         _shortExecutors
         );
+    }
+
+    modifier onlyGovernor() {
+        require(isRole(DEFAULT_ADMIN_ROLE, msg.sender), NOT_GOVERNOR);
+        _;
+    }
+
+    modifier onlyLongExecutor() {
+        require(isRole(LibRoles.LONG_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), NOT_LONG_EXECUTOR);
+        _;
+    }
+
+    modifier onlyShortExecutor() {
+        require(isRole(LibRoles.SHORT_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), NOT_SHORT_EXECUTOR);
+        _;
+    }
+
+    modifier onlyGuardian() {
+        require(isRole(LibRoles.GUARDIAN, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), "NOT_GUARDIAN");
+        _;
     }
 
     function registerProtocol(
@@ -50,6 +73,16 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         });
     }
 
+    function pause() external onlyGuardian {
+        require(paused == false, "already paused");
+        paused = true;
+    }
+
+    function unpause() external onlyGuardian {
+        require(paused == true, "not paused");
+        paused = false;
+    }
+
     function addToWhitelist(address _whitelisted) external onlyLongExecutor {
         whitelist[_whitelisted] = true;
     }
@@ -63,6 +96,10 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     // GETTERS
+    function isPaused() external view returns(bool) {
+        return paused;
+    }
+
     function getExecuteAndCancelLocalVars() external view returns(RegistryEntities.ExecuteAndCancelLocalVars memory) {
         return RegistryEntities.ExecuteAndCancelLocalVars({
             opiumProxyFactory: protocolAddressesArgs.opiumProxyFactory,

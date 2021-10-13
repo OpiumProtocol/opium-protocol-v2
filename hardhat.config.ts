@@ -136,35 +136,38 @@ const config: HardhatUserConfig = {
     shortExecutorTwo: {
       default: 5,
     },
-    buyer: {
+    guardian: {
       default: 6,
     },
-    seller: {
+    buyer: {
       default: 7,
     },
-    oracle: {
+    seller: {
       default: 8,
     },
-    author: {
+    oracle: {
       default: 9,
     },
-    thirdParty: {
+    author: {
       default: 10,
     },
-    notAllowed: {
+    thirdParty: {
       default: 11,
     },
-    hacker: {
+    notAllowed: {
       default: 12,
     },
-    goodGuy: {
+    hacker: {
       default: 13,
     },
-    authorized: {
+    goodGuy: {
       default: 14,
     },
-    impersonator: {
+    authorized: {
       default: 15,
+    },
+    impersonator: {
+      default: 16,
     },
   },
   typechain: {

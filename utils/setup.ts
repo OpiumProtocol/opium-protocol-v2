@@ -27,7 +27,7 @@ export type TContracts = {
 };
 
 const setup = async (): Promise<TContracts> => {
-  const { deployer, governor, longExecutorOne, longExecutorTwo, shortExecutorOne, shortExecutorTwo } =
+  const { deployer, governor, guardian, longExecutorOne, longExecutorTwo, shortExecutorOne, shortExecutorTwo } =
     await ethers.getNamedSigners();
 
   const Registry = await ethers.getContractFactory("RegistryUpgradeable");
@@ -46,6 +46,7 @@ const setup = async (): Promise<TContracts> => {
       Registry,
       [
         governor.address,
+        guardian.address,
         [longExecutorOne.address, longExecutorTwo.address],
         [shortExecutorOne.address, shortExecutorTwo.address],
       ],

@@ -57,7 +57,7 @@ describe("OpiumProxyFactory", () => {
       await opiumProxyFactory.mint(buyer.address, seller.address, hash, derivative, amount);
     } catch (error) {
       const { message } = error as Error;
-      expect(message).to.include("USING_REGISTRY:ONLY_CORE_ALLOWED");
+      expect(message).to.include("only core");
     }
   });
 
