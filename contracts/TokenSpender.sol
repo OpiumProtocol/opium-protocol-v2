@@ -3,20 +3,16 @@ pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-
-import "./Lib/WhitelistedWithGovernanceAndChangableTimelockUpgradeable.sol";
+import "./Lib/UsingRegistry.sol";
 
 /// @title Opium.TokenSpender contract holds users ERC20 approvals and allows whitelisted contracts to use tokens
-contract TokenSpender is Initializable, WhitelistedWithGovernanceAndChangableTimelockUpgradeable {
+contract TokenSpender is UsingRegistry {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    // Initial timelock period
-    uint256 public constant WHITELIST_TIMELOCK = 1 hours;
-
     /// @notice Calls constructors of super-contracts
-    /// @param _governor address Address of governor, who is allowed to adjust whitelist
-    function initialize(address _governor) public {
-        __WhitelistedWithGovernanceAndChangableTimelock__init(WHITELIST_TIMELOCK, _governor);
+    /// @param _registry address Address of governor, who is allowed to adjust whitelist
+    function initialize(address _registry) public {
+        __UsingRegistry__init__(_registry);
     }
 
     /// @notice Using this function whitelisted contracts could call ERC20 transfers

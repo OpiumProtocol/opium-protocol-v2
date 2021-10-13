@@ -4,7 +4,7 @@ import { expect } from "chai";
 // utils
 import setup from "../utils/setup";
 import { SECONDS_40_MINS } from "../utils/constants";
-import { decodeLogs } from "../utils/events";
+import { decodeLogs, retrievePositionTokensAddresses } from "../utils/events";
 import { formatAddress } from "../utils/addresses";
 import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import { cast } from "../utils/bn";
@@ -36,10 +36,6 @@ describe("Upgradeability", () => {
       tokenSpender.address,
     );
 
-    const timelockBefore = await tokenSpender.timeLockInterval();
-    const governorAddressBefore = await tokenSpender.governor();
-    const proposalTimeBefore = await tokenSpender.proposalTime();
-
     const TestTokenSpenderUpgrade = await ethers.getContractFactory("TestTokenSpenderUpgrade");
     const upgraded = <TestTokenSpenderUpgrade>(
       await upgrades.upgradeProxy(tokenSpender.address, TestTokenSpenderUpgrade)
@@ -54,27 +50,15 @@ describe("Upgradeability", () => {
     expect(tokenSpenderImplementationAddressBefore).to.not.be.eq(tokenSpenderImplementationAddressAfter);
     expect(tokenSpenderImplementationAddressAfter).to.be.eq(upgradeImplementationAddress);
     expect(tokenSpenderRegistryAddressBefore).to.be.eq(tokenSpenderRegistryAddresAfter);
-
-    const [timelockAfter, governorAddressAfter, proposalTimeAfter] = await upgraded.getAggregatedGovernance();
-    expect(timelockBefore).to.be.eq(timelockAfter);
-    expect(governorAddressBefore).to.be.eq(governorAddressAfter);
-    expect(proposalTimeBefore).to.be.eq(proposalTimeAfter);
-
-    await tokenSpender.connect(governor).proposeWhitelist([core.address]);
-    const whitelist = await upgraded.callStatic.getWhitelist();
-    expect(whitelist[0]).to.equal(core.address);
   });
 
   it("should upgrade Registry", async () => {
     const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
     const { deployer } = namedSigners;
 
-    const registryOpiumAddressesBefore = await Promise.all([
-      registry.getOpiumProxyFactory(),
-      registry.getCore(),
-      registry.getOracleAggregator(),
-      registry.getSyntheticAggregator(),
-      registry.getTokenSpender(),
+    const [protocolAddressesBefore, protocolCommissionsBefore] = await Promise.all([
+      registry.getProtocolAddresses(),
+      registry.getProtocolCommissionParams(),
     ]);
     const coreRegistryAddressBefore = await core.getRegistry();
     const registryImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(registry.address);
@@ -84,20 +68,6 @@ describe("Upgradeability", () => {
     const registryImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(registry.address);
     const upgradedImplementationAddress = await upgrades.erc1967.getImplementationAddress(upgraded.address);
 
-    try {
-      await upgraded.init(
-        opiumProxyFactory.address,
-        core.address,
-        oracleAggregator.address,
-        syntheticAggregator.address,
-        tokenSpender.address,
-        deployer.address,
-      );
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("REGISTRY:ALREADY_SET");
-    }
-
     const coreRegistryAddressAfter = await core.getRegistry();
 
     expect(upgraded.address).to.be.eq(registry.address);
@@ -105,15 +75,14 @@ describe("Upgradeability", () => {
     expect(registryImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
     expect(coreRegistryAddressBefore).to.be.eq(coreRegistryAddressAfter);
 
-    const registryOpiumAddressesAfter = await upgraded.getOpiumAddresses();
-
-    expect(registryOpiumAddressesBefore).to.be.deep.eq(registryOpiumAddressesAfter);
+    expect(protocolAddressesBefore).to.be.deep.eq(await upgraded.getProtocolAddresses());
+    expect(protocolCommissionsBefore).to.be.deep.eq(await upgraded.getProtocolCommissionParams());
   });
 
   it("should upgrade SyntheticAggregator", async () => {
     const { syntheticAggregator, optionCallMock, registry } = await setup();
 
-    const syntheticAggregatorAddressBefore = await registry.getSyntheticAggregator();
+    const { syntheticAggregator: syntheticAggregatorAddress } = await registry.getProtocolAddresses();
     const syntheticAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
       syntheticAggregator.address,
     );
@@ -127,11 +96,11 @@ describe("Upgradeability", () => {
     );
     const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
 
-    const syntheticAggregatorAddressAfter = await registry.getSyntheticAggregator();
+    const { syntheticAggregator: syntheticAggregatorAddressAfter } = await registry.getProtocolAddresses();
 
     expect(upgraded.address).to.be.eq(syntheticAggregator.address);
     expect(syntheticAggregatorImplementationAddressBefore).to.not.be.eq(syntheticAggregatorImplementationAddressAfter);
-    expect(syntheticAggregatorAddressBefore).to.be.eq(syntheticAggregatorAddressAfter);
+    expect(syntheticAggregatorAddress).to.be.eq(syntheticAggregatorAddressAfter);
     expect(syntheticAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
     const derivative = derivativeFactory({
@@ -225,10 +194,11 @@ describe("Upgradeability", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await upgraded.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
-    const log = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogPositionTokenAddress", receipt);
-    const shortPositionAddress = formatAddress(log[0].data);
-    const longPositionAddress = formatAddress(log[1].data);
-
+    const [shortPositionAddress, longPositionAddress] = await retrievePositionTokensAddresses(
+      opiumProxyFactory,
+      receipt,
+    );
+    console.log("longPositionAddress ", longPositionAddress);
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
     );

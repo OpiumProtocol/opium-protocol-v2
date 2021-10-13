@@ -54,7 +54,7 @@ describe("OpiumProxyFactory", () => {
       const amount = 1;
 
       const hash = getDerivativeHash(derivative);
-      await opiumProxyFactory.mint(buyer.address, seller.address, hash, amount);
+      await opiumProxyFactory.mint(buyer.address, seller.address, hash, derivative, amount);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("USING_REGISTRY:ONLY_CORE_ALLOWED");
@@ -66,7 +66,9 @@ describe("OpiumProxyFactory", () => {
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
-    const tx = await opiumProxyFactory.connect(coreImpersonator).mint(buyer.address, seller.address, hash, amount);
+    const tx = await opiumProxyFactory
+      .connect(coreImpersonator)
+      .mint(buyer.address, seller.address, hash, derivative, amount);
     const receipt = await tx.wait();
 
     const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
@@ -98,7 +100,7 @@ describe("OpiumProxyFactory", () => {
     const shortTokenName = await shortOpiumPositionToken.name();
     const longTokenSymbol = await longOpiumPositionToken.symbol();
     const shortTokenSymbol = await shortOpiumPositionToken.symbol();
-    console.log("shortTokenSymbol ", shortTokenSymbol);
+
     expect(longTokenName).to.be.eq("OPIUM LONG TOKEN");
     expect(shortTokenName).to.be.eq("OPIUM SHORT TOKEN");
     expect(longTokenSymbol).to.be.eq("OPLN");
@@ -112,7 +114,9 @@ describe("OpiumProxyFactory", () => {
     const amount = 2;
 
     const hash = getDerivativeHash(secondDerivative);
-    const tx = await opiumProxyFactory.connect(coreImpersonator).mint(buyer.address, seller.address, hash, amount);
+    const tx = await opiumProxyFactory
+      .connect(coreImpersonator)
+      .mint(buyer.address, seller.address, hash, secondDerivative, amount);
     const receipt = await tx.wait();
 
     const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(

@@ -2,16 +2,16 @@ pragma solidity 0.8.5;
 
 import "../Interface/IOracleId.sol";
 // import "../Lib/UsingRegistry.sol";
-import "../Registry.sol";
+import "../Interface/IRegistry.sol";
 import "../OracleAggregator.sol";
 
 contract OracleIdMock is IOracleId {
     uint256 fetchPrice;
-    Registry registry;
+    IRegistry registry;
 
     constructor(uint256 _fetchPrice, address _registry) {
         fetchPrice = _fetchPrice;
-        registry = Registry(_registry);
+        registry = IRegistry(_registry);
     }
 
     function triggerCallback(uint256 timestamp, uint256 returnData) external {

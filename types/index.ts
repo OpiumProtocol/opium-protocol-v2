@@ -8,6 +8,10 @@ export interface Signers {
 export type TNamedSigners = {
   deployer: SignerWithAddress;
   governor: SignerWithAddress;
+  longExecutorOne: SignerWithAddress;
+  shortExecutorOne: SignerWithAddress;
+  longExecutorTwo: SignerWithAddress;
+  shortExecutorTwo: SignerWithAddress;
   buyer: SignerWithAddress;
   seller: SignerWithAddress;
   oracle: SignerWithAddress;

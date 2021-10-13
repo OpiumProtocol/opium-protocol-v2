@@ -13,7 +13,6 @@ import { NetworkUserConfig } from "hardhat/types";
 
 import { resolve } from "path";
 
-import "./tasks/accounts";
 import "./tasks/clean";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
@@ -125,35 +124,47 @@ const config: HardhatUserConfig = {
     governor: {
       default: 1,
     },
-    buyer: {
+    longExecutorOne: {
       default: 2,
     },
-    seller: {
+    shortExecutorOne: {
       default: 3,
     },
-    oracle: {
+    longExecutorTwo: {
       default: 4,
     },
-    author: {
+    shortExecutorTwo: {
       default: 5,
     },
-    thirdParty: {
+    buyer: {
       default: 6,
     },
-    notAllowed: {
+    seller: {
       default: 7,
     },
-    hacker: {
+    oracle: {
       default: 8,
     },
-    goodGuy: {
+    author: {
       default: 9,
     },
-    authorized: {
+    thirdParty: {
       default: 10,
     },
-    impersonator: {
+    notAllowed: {
       default: 11,
+    },
+    hacker: {
+      default: 12,
+    },
+    goodGuy: {
+      default: 13,
+    },
+    authorized: {
+      default: 14,
+    },
+    impersonator: {
+      default: 15,
     },
   },
   typechain: {

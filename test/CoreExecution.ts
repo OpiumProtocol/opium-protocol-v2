@@ -26,13 +26,12 @@ import {
 } from "../utils/constants";
 import { retrievePositionTokensAddresses } from "../utils/events";
 
-const executeOne = "execute(uint8,uint256,(uint256,uint256,uint256[],address,address,address))";
-const executeOneWithAddress = "execute(address,uint8,uint256,(uint256,uint256,uint256[],address,address,address))";
-const executeMany = "execute(uint8[],uint256[],(uint256,uint256,uint256[],address,address,address)[])";
-const executeManyWithAddress =
-  "execute(address,uint8[],uint256[],(uint256,uint256,uint256[],address,address,address)[])";
+const executeOne = "execute(address,uint256)";
+const executeOneWithAddress = "execute(address,address,uint256)";
+const executeMany = "execute(address[],uint256[])";
+const executeManyWithAddress = "execute(address,address[],uint256[])";
 
-const cancelOne = "cancel(uint8,uint256,(uint256,uint256,uint256[],address,address,address))";
+const cancelOne = "cancel(address,uint256)";
 const cancelMany = "cancel(uint8[],uint256[],(uint256,uint256,uint256[],address,address,address)[])";
 
 describe("CoreExecution", () => {
@@ -256,9 +255,8 @@ describe("CoreExecution", () => {
         .connect(seller)
         [executeManyWithAddress](
           seller.address,
-          [1, 0],
+          [fullMarginOption.longPositionAddress, fullMarginOption.shortPositionAddress],
           [1],
-          [fullMarginOption.derivative, fullMarginOption.derivative],
         );
     } catch (error) {
       const { message } = error as Error;
@@ -266,30 +264,17 @@ describe("CoreExecution", () => {
     }
   });
 
-  it("should revert execution with CORE:ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH", async () => {
-    try {
-      const { seller } = namedSigners;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await core.connect(seller)[executeManyWithAddress](seller.address, [1, 0], [1, 1], [fullMarginOption.derivative]);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:ADDRESSES_AND_DERIVATIVES_LENGTH_DOES_NOT_MATCH");
-    }
-  });
-
-  it("11should revert execution before endTime with CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED", async () => {
+  it("should revert execution before endTime with CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED", async () => {
     const { buyer, seller } = namedSigners;
-
     try {
-      await core.connect(buyer)[executeOne](1, 1, fullMarginOption.derivative);
+      await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
     }
 
     try {
-      await core.connect(buyer)[executeOneWithAddress](buyer.address, 1, 1, fullMarginOption.derivative);
+      await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
@@ -300,16 +285,14 @@ describe("CoreExecution", () => {
         .connect(buyer)
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        [executeMany]([1], [1], [fullMarginOption.derivative]);
+        [executeMany]([fullMarginOption.longPositionAddress], [1]);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await core.connect(buyer)[executeManyWithAddress](buyer.address, [1], [1], [fullMarginOption.derivative]);
+      await core.connect(buyer)[executeManyWithAddress](buyer.address, [fullMarginOption.longPositionAddress], [1]);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
@@ -317,36 +300,28 @@ describe("CoreExecution", () => {
 
     // Seller
     try {
-      await core.connect(seller)[executeOne](1, 1, fullMarginOption.derivative);
+      await core.connect(seller)[executeOne](fullMarginOption.longPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
     }
 
     try {
-      await core.connect(seller)[executeOneWithAddress](seller.address, 0, 1, fullMarginOption.derivative);
+      await core.connect(seller)[executeOneWithAddress](seller.address, fullMarginOption.shortPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await core
-        .connect(seller)
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        [executeMany]([0], [1], [fullMarginOption.derivative]);
+      await core.connect(seller)[executeMany]([fullMarginOption.shortPositionAddress], [1]);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await core.connect(seller)[executeManyWithAddress](seller.address, [1], [1], [fullMarginOption.derivative]);
+      await core.connect(seller)[executeManyWithAddress](seller.address, [fullMarginOption.longPositionAddress], [1]);
       throw null;
     } catch (error) {
       const { message } = error as Error;
@@ -364,8 +339,8 @@ describe("CoreExecution", () => {
     const opiumFeesBefore = await core.feesVaults(deployer.address, testToken.address);
     const authorFeesBefore = await core.feesVaults(author.address, testToken.address);
     const amount = fullMarginOption.amount - 1;
-    await core.connect(buyer)[executeOne](1, amount, fullMarginOption.derivative);
-    await core.connect(seller)[executeOne](0, amount, fullMarginOption.derivative);
+    await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, amount);
+    await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, amount);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
 
@@ -390,14 +365,14 @@ describe("CoreExecution", () => {
     const { buyer, seller, thirdParty } = namedSigners;
 
     try {
-      await core.connect(thirdParty)[executeOneWithAddress](buyer.address, 1, 1, fullMarginOption.derivative);
+      await core.connect(thirdParty)[executeOneWithAddress](buyer.address, fullMarginOption.longPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED");
     }
 
     try {
-      await core.connect(thirdParty)[executeOneWithAddress](seller.address, 1, 1, fullMarginOption.derivative);
+      await core.connect(thirdParty)[executeOneWithAddress](seller.address, fullMarginOption.longPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED");
@@ -413,7 +388,7 @@ describe("CoreExecution", () => {
     const opiumFeesBefore = await core.feesVaults(deployer.address, testToken.address);
     const authorFeesBefore = await core.feesVaults(author.address, testToken.address);
 
-    await core.connect(thirdParty)[executeOneWithAddress](buyer.address, 1, 1, fullMarginOption.derivative);
+    await core.connect(thirdParty)[executeOneWithAddress](buyer.address, fullMarginOption.longPositionAddress, 1);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     const buyerPayout = fullMarginOption.derivative.margin.sub(calculatePayoutFee(fullMarginOption.derivative.margin));
@@ -429,17 +404,19 @@ describe("CoreExecution", () => {
     expect(authorFeesAfter).to.equal(authorFeesBefore.add(authorFee));
   });
 
-  it("should revert execution of invalid tokenId with Transaction reverted: function was called with incorrect parameters", async () => {
-    // TODO: error does not exist, needs to be changed
-    const { buyer } = namedSigners;
-    try {
-      // wrong enum value
-      await core.connect(buyer)[executeOne](2, 1, fullMarginOption.derivative);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("Transaction reverted: function was called with incorrect parameters");
-    }
-  });
+  // it("should revert execution of invalid tokenId with Transaction reverted: function was called with incorrect parameters", async () => {
+  //   // TODO: error does not exist, needs to be changed
+  //   const { buyer } = namedSigners;
+  // USE UNKNOWN ADDRESS!
+  // CHECK THAT IT IS AN ADDRESS FROM OPIUM PROXY FACTORY !
+  //   try {
+  //     // wrong enum value
+  //     await core.connect(buyer)[executeOne](2, 1, fullMarginOption.derivative);
+  //   } catch (error) {
+  //     const { message } = error as Error;
+  //     expect(message).to.include("Transaction reverted: function was called with incorrect parameters");
+  //   }
+  // });
 
   it("should execute over margin option", async () => {
     const { deployer, buyer, seller } = namedSigners;
@@ -455,9 +432,9 @@ describe("CoreExecution", () => {
       await ethers.getContractAt("OpiumPositionToken", overMarginOption.shortPositionAddress)
     );
 
-    await core.connect(buyer)[executeOne](1, overMarginOption.amount, overMarginOption.derivative);
+    await core.connect(buyer)[executeOne](overMarginOption.longPositionAddress, overMarginOption.amount);
 
-    await core.connect(seller)[executeOne](0, overMarginOption.amount, overMarginOption.derivative);
+    await core.connect(seller)[executeOne](overMarginOption.shortPositionAddress, overMarginOption.amount);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     const buyerPayout = overMarginOption.derivative.margin
@@ -481,9 +458,9 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.feesVaults(deployer.address, testToken.address);
 
-    await core.connect(buyer)[executeOne](1, underMarginOption.amount, underMarginOption.derivative);
+    await core.connect(buyer)[executeOne](underMarginOption.longPositionAddress, underMarginOption.amount);
 
-    await core.connect(seller)[executeOne](0, underMarginOption.amount, underMarginOption.derivative);
+    await core.connect(seller)[executeOne](underMarginOption.shortPositionAddress, underMarginOption.amount);
 
     const profit = underMarginOption.price.sub(underMarginOption.derivative.params[0]);
 
@@ -508,8 +485,8 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.feesVaults(deployer.address, testToken.address);
 
-    await core.connect(buyer)[executeOne](1, nonProfitOption.amount, nonProfitOption.derivative);
-    await core.connect(seller)[executeOne](0, nonProfitOption.amount, nonProfitOption.derivative);
+    await core.connect(buyer)[executeOne](nonProfitOption.longPositionAddress, nonProfitOption.amount);
+    await core.connect(seller)[executeOne](nonProfitOption.shortPositionAddress, nonProfitOption.amount);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     expect(buyerBalanceAfter).to.be.equal(buyerBalanceBefore);
@@ -523,22 +500,22 @@ describe("CoreExecution", () => {
     expect(opiumFeesAfter).to.be.equal(opiumFeesBefore);
   });
 
-  it("should revert cancellation with CORE:CANCELLATION_IS_NOT_ALLOWED", async () => {
-    const { buyer } = namedSigners;
+  // it("should revert cancellation with CORE:CANCELLATION_IS_NOT_ALLOWED", async () => {
+  //   const { buyer } = namedSigners;
 
-    try {
-      await core.connect(buyer)[cancelOne](1, noDataOption.amount, noDataOption.derivative);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:CANCELLATION_IS_NOT_ALLOWED");
-    }
-  });
+  //   try {
+  //     await core.connect(buyer)[cancelOne](1, noDataOption.amount, noDataOption.derivative);
+  //   } catch (error) {
+  //     const { message } = error as Error;
+  //     expect(message).to.include("CORE:CANCELLATION_IS_NOT_ALLOWED");
+  //   }
+  // });
 
   it("should revert execution with ORACLE_AGGREGATOR:DATA_DOESNT_EXIST", async () => {
     try {
       const { buyer } = namedSigners;
       await timeTravel(SECONDS_3_WEEKS);
-      await core.connect(buyer)[executeOne](1, noDataOption.amount, noDataOption.derivative);
+      await core.connect(buyer)[executeOne](noDataOption.longPositionAddress, noDataOption.amount);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:DATA_DOESNT_EXIST");
@@ -553,8 +530,8 @@ describe("CoreExecution", () => {
 
     const amount = noDataOption.amount - 1;
 
-    await core.connect(buyer)[cancelOne](1, amount, noDataOption.derivative);
-    await core.connect(seller)[cancelOne](0, amount, noDataOption.derivative);
+    await core.connect(buyer)[cancelOne](noDataOption.longPositionAddress, amount);
+    await core.connect(seller)[cancelOne](noDataOption.shortPositionAddress, amount);
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     expect(buyerBalanceAfter).to.be.equal(buyerBalanceBefore);
@@ -570,7 +547,7 @@ describe("CoreExecution", () => {
     await oracleAggregator.connect(oracle).__callback(noDataOption.derivative.endTime, noDataOption.price);
 
     try {
-      await core.connect(buyer)[executeOne](1, 1, noDataOption.derivative);
+      await core.connect(buyer)[executeOne](noDataOption.longPositionAddress, 1);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("CORE:TICKER_WAS_CANCELLED");

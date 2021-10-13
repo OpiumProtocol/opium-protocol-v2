@@ -1,15 +1,18 @@
 pragma solidity 0.8.5;
 
 import "openzeppelin-solidity/contracts/proxy/Clones.sol";
+import "./Lib/LibDerivative.sol";
 
 import "./OpiumPositionToken.sol";
 import "./Interface/IOpiumPositionToken.sol";
 import "./Lib/UsingRegistry.sol";
+import "./Lib/LibPosition.sol";
 import "hardhat/console.sol";
 
-contract OpiumProxyFactory is UsingRegistry {
-    event LogShortPositionTokenAddress(address _positionAddress);
-    event LogLongPositionTokenAddress(address _positionAddress);
+contract OpiumProxyFactory is UsingRegistry, LibDerivative {
+    using LibPosition for bytes32;
+    event LogShortPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
+    event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
 
     address private immutable opiumPositionTokenImplementation;
     string private constant longTokenName = "OPIUM LONG TOKEN";
@@ -43,17 +46,34 @@ contract OpiumProxyFactory is UsingRegistry {
         return Clones.predictDeterministicAddress(opiumPositionTokenImplementation, _salt, address(this));
     }
 
-    function _checkOrDeployPosition(bool _isLong, bytes32 _salt) private implementationAddressExists returns (address) {
+    function _checkOrDeployPosition(
+        bool _isLong,
+        bytes32 _salt,
+        bytes32 _derivativeHash,
+        Derivative memory _derivative
+    ) private implementationAddressExists returns (address) {
         address opiumPositionAddress;
         opiumPositionAddress = _computeDeploymentAddress(_salt);
         if (!_isContract(opiumPositionAddress)) {
             opiumPositionAddress = Clones.cloneDeterministic(opiumPositionTokenImplementation, _salt);
             if (_isLong) {
-                IOpiumPositionToken(opiumPositionAddress).initialize(longTokenName, longTokenSymbol);
-                emit LogLongPositionTokenAddress(opiumPositionAddress);
+                IOpiumPositionToken(opiumPositionAddress).initialize(
+                    longTokenName,
+                    longTokenSymbol,
+                    _derivative,
+                    _derivativeHash,
+                    PositionType.LONG
+                );
+                emit LogLongPositionTokenAddress(_derivativeHash, opiumPositionAddress);
             } else {
-                IOpiumPositionToken(opiumPositionAddress).initialize(shortTokenName, shortTokenSymbol);
-                emit LogShortPositionTokenAddress(opiumPositionAddress);
+                IOpiumPositionToken(opiumPositionAddress).initialize(
+                    shortTokenName,
+                    shortTokenSymbol,
+                    _derivative,
+                    _derivativeHash,
+                    PositionType.SHORT
+                );
+                emit LogShortPositionTokenAddress(_derivativeHash, opiumPositionAddress);
             }
         }
         return opiumPositionAddress;
@@ -63,13 +83,14 @@ contract OpiumProxyFactory is UsingRegistry {
         address _buyer,
         address _seller,
         bytes32 _derivativeHash,
+        Derivative calldata _derivative,
         uint256 _amount
     ) external onlyCore implementationAddressExists {
         bytes32 shortSalt = keccak256(abi.encodePacked(_derivativeHash, "SHORT"));
         bytes32 longSalt = keccak256(abi.encodePacked(_derivativeHash, "LONG"));
 
-        address shortPositionAddress = _checkOrDeployPosition(false, shortSalt);
-        address longPositionAddress = _checkOrDeployPosition(true, longSalt);
+        address shortPositionAddress = _checkOrDeployPosition(false, shortSalt, _derivativeHash, _derivative);
+        address longPositionAddress = _checkOrDeployPosition(true, longSalt, _derivativeHash, _derivative);
 
         IOpiumPositionToken(shortPositionAddress).mint(_seller, _amount);
         IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);

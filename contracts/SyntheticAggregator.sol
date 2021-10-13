@@ -4,17 +4,21 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./Lib/LibDerivative.sol";
-import "./Lib/LibCommission.sol";
+import "./Lib/UsingRegistry.sol";
 
 import "./Errors/SyntheticAggregatorErrors.sol";
 
 import "./Interface/IOracleId.sol";
 import "./Interface/IDerivativeLogic.sol";
+import "./Interface/IRegistry.sol";
+import "./Lib/Registry/RegistryEntities.sol";
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
-contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, LibCommission, ReentrancyGuardUpgradeable {
+contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, ReentrancyGuardUpgradeable {
     // Emitted when new ticker is initialized
     event Create(Derivative derivative, bytes32 derivativeHash);
+
+    IRegistry registry;
 
     // Enum for types of syntheticId
     // Invalid - syntheticId is not initialized yet
@@ -47,6 +51,10 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, LibCom
     mapping(bytes32 => address) public authorAddressByHash;
 
     // PUBLIC FUNCTIONS
+
+    function initialize(address _registry) public initializer {
+        registry = IRegistry(_registry);
+    }
 
     /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author commission from cache
     /// @param _derivativeHash bytes32 Hash of derivative
@@ -158,7 +166,11 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, LibCom
         // Get commission from syntheticId
         uint256 commission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         // Check if commission is not set > 100%
-        require(commission <= COMMISSION_BASE, ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG);
+        RegistryEntities.ProtocolCommissionArgs memory protocolCommissionArgs = registry.getProtocolCommissionParams();
+        require(
+            commission <= protocolCommissionArgs.derivativeAuthorCommissionBase,
+            ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG
+        );
         // Cache commission
         commissionByHash[derivativeHash] = commission;
 

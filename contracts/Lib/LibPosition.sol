@@ -1,8 +1,6 @@
 pragma solidity ^0.8.5;
 
 import "openzeppelin-solidity/contracts/proxy/Clones.sol";
-
-import "../OpiumPositionToken.sol";
 import "../Interface/IOpiumProxyFactory.sol";
 
 library LibPosition {

@@ -11,8 +11,8 @@ import { TNamedSigners } from "../types";
 import { Core, OpiumPositionToken } from "../typechain";
 import { SECONDS_40_MINS } from "../utils/constants";
 
-const redeemOne = "redeem(address[2],(uint256,uint256,uint256[],address,address,address),uint256)";
-const redeemMany = "redeem(address[2][],(uint256,uint256,uint256[],address,address,address)[],uint256[])";
+const redeemOne = "redeem(address[2],uint256)";
+const redeemMany = "redeem(address[2][],uint256[])";
 
 describe("Core: burn market neutral positions", () => {
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
@@ -59,7 +59,7 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartysShortBalance).to.equal(amount);
 
-    const tx2 = await core[redeemOne]([shortPositionAddress, longPositionAddress], optionCall, redeemAmount);
+    const tx2 = await core["redeem(address[2],uint256)"]([shortPositionAddress, longPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
 
     const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
@@ -73,14 +73,18 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
 
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
-    
+
     // author fee (includes opium fee)
-    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100");    
+    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100");
 
     expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(
-      marketNeutralBalanceAfterCreation.add(computeDerivativeMargin(optionCall.margin, redeemAmount).sub(derivativeAuthorFee)),
+      marketNeutralBalanceAfterCreation.add(
+        computeDerivativeMargin(optionCall.margin, redeemAmount).sub(derivativeAuthorFee),
+      ),
     );
-    expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(marketNeutralPartyInitialBalance.sub(derivativeAuthorFee));
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(
+      marketNeutralPartyInitialBalance.sub(derivativeAuthorFee),
+    );
     expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.equal(amount - redeemAmount);
     expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.equal(amount - redeemAmount);
   });
@@ -120,7 +124,7 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartysShortBalance).to.equal(amount);
 
-    const tx2 = await core[redeemOne]([shortPositionAddress, longPositionAddress], optionCall, redeemAmount);
+    const tx2 = await core[redeemOne]([shortPositionAddress, longPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
     const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
     /**
@@ -134,10 +138,12 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
     // author fee (includes opium fee)
-    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100"); 
+    const derivativeAuthorFee = frac(optionCall.margin.mul(redeemAmount), "0.25", "100");
 
     expect(marketNeutralPartyBalanceAfterRedeem, "wrong balance").to.equal(
-      marketNeutralBalanceAfterCreation.add(computeDerivativeMargin(optionCall.margin, redeemAmount).sub(derivativeAuthorFee)),
+      marketNeutralBalanceAfterCreation.add(
+        computeDerivativeMargin(optionCall.margin, redeemAmount).sub(derivativeAuthorFee),
+      ),
     );
     expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.equal(amount - redeemAmount);
     expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.equal(amount - redeemAmount);
@@ -218,13 +224,11 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartySecondLongBalance).to.equal(secondAmount);
     expect(marketNeutralPartySecondShortBalance).to.equal(secondAmount);
 
-    //@ts-ignore
     const tx3 = await core[redeemMany](
       [
         [shortPositionAddress, longPositionAddress],
         [secondShortPositionAddress, secondLongPositionAddress],
       ],
-      [optionCall, secondOptionCall],
       [redeemAmount, secondRedeemAmount],
     );
     const receipt3 = await tx3.wait();
@@ -258,7 +262,9 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyBalanceAfterRedeem, "wrong token balance").to.equal(
       marketNeutralPartyBalanceAfterSecondCreation
         .add(computeDerivativeMargin(optionCall.margin, redeemAmount))
-        .add(computeDerivativeMargin(secondOptionCall.margin, secondRedeemAmount)).sub(derivativeAuthorFee).sub(secondDerivativeAuthorFee),
+        .add(computeDerivativeMargin(secondOptionCall.margin, secondRedeemAmount))
+        .sub(derivativeAuthorFee)
+        .sub(secondDerivativeAuthorFee),
     );
     /**
      * expects the amount of LONG/SHORT positions to be equal to the created amount - redeemed amount

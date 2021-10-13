@@ -7,4 +7,10 @@ contract RegistryErrors {
     string internal constant ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS = "REGISTRY:CANT_BE_ZERO_ADDRESS";
 
     string internal constant ERROR_REGISTRY_ALREADY_SET = "REGISTRY:ALREADY_SET";
+
+    string internal constant NOT_GOVERNOR = "NOT_GOVERNOR";
+
+    string internal constant NOT_LONG_EXECUTOR = "NOT_LONG_EXECUTOR";
+
+    string internal constant NOT_SHORT_EXECUTOR = "NOT_SHORT_EXECUTOR";
 }

@@ -2,7 +2,12 @@ pragma solidity 0.8.5;
 pragma experimental ABIEncoderV2;
 
 /// @title Opium.Lib.LibDerivative contract should be inherited by contracts that use Derivative structure and calculate derivativeHash
-contract LibDerivative {
+abstract contract LibDerivative {
+    enum PositionType {
+        SHORT,
+        LONG
+    }
+    
     // Opium derivative structure (ticker) definition
     struct Derivative {
         // Margin parameter for syntheticId

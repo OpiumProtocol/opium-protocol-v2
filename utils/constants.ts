@@ -8,3 +8,4 @@ export const SECONDS_30_MINS = 60 * 30;
 export const SECONDS_40_MINS = 60 * 40;
 export const SECONDS_50_MINS = 60 * 50;
 export const SECONDS_3_WEEKS = 60 * 60 * 24 * 7 * 3;
+export const SECONDS_2_WEEKS = 60 * 60 * 24 * 7 * 2;

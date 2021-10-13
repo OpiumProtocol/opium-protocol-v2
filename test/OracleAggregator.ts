@@ -51,10 +51,9 @@ describe("OracleAggregator", () => {
   it("should query OracleAggregator before data being pushed for the given timpestamp and revert with ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST error message", async () => {
     try {
       const { oracleAggregator, oracleIdMock } = await setup();
-  
+
       await oracleAggregator.getData(oracleIdMock.address, timestamp);
-  
-    } catch(error) {
+    } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:DATA_DOESNT_EXIST");
     }
@@ -66,7 +65,6 @@ describe("OracleAggregator", () => {
 
       await oracleIdMock.triggerCallback(timestamp, mockDataTwo);
       await oracleIdMock.triggerCallback(timestamp, mockDataTwo);
-
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:DATA_ALREADY_EXIST");
@@ -79,7 +77,6 @@ describe("OracleAggregator", () => {
 
       await oracleAggregator.__callback(timestamp, mockDataTwo);
       await oracleAggregator.__callback(timestamp, mockDataTwo);
-
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("ORACLE_AGGREGATOR:DATA_ALREADY_EXIST");

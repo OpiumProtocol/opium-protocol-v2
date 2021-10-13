@@ -66,3 +66,7 @@ export const addPositionTokens = (
 export const computeDerivativeMargin = (margin: BigNumber, amount: number): BigNumber => {
   return margin.mul(amount);
 };
+
+export const createValidExpiry = (days: number): number => {
+  return ~~(Date.now() / 1000) + 60 * 60 * 24 * days;
+};

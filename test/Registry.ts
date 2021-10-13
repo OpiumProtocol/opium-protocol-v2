@@ -5,6 +5,8 @@ import { expect } from "chai";
 import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
+import { DEFAULT_ADMIN_ROLE, longExecutorRole, shortExecutorRole } from "../utils/addresses";
+import { SECONDS_2_WEEKS } from "../utils/constants";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;
@@ -13,71 +15,99 @@ describe("Registry", () => {
     namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
   });
 
-  it("should revert for non initializer address", async () => {
-    try {
-      const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-      const { deployer, notAllowed } = namedSigners;
+  it("should ensure the initial roles are as expected", async () => {
+    const { registry } = await setup();
+    const { deployer, governor, longExecutorOne, longExecutorTwo, shortExecutorOne, shortExecutorTwo, notAllowed } =
+      await ethers.getNamedSigners();
 
+    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not governor").to.be.true;
+    expect(await registry.hasRole(longExecutorRole, longExecutorOne.address), "not long executor").to.be.true;
+    expect(await registry.hasRole(longExecutorRole, longExecutorTwo.address), "not long executor").to.be.true;
+    expect(await registry.hasRole(shortExecutorRole, shortExecutorOne.address), "not short executor").to.be.true;
+    expect(await registry.hasRole(shortExecutorRole, shortExecutorTwo.address), "not short executor").to.be.true;
+    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, deployer.address), "wrong governor").to.be.false;
+    expect(await registry.hasRole(longExecutorRole, notAllowed.address), "wrong long executor").to.be.false;
+    expect(await registry.hasRole(longExecutorRole, notAllowed.address), "wrong short executor").to.be.false;
+  });
+
+  it("should ensure the initial protocol parameters are as expected", async () => {
+    const { registry } = await setup();
+
+    const protocolParams = await registry.getProtocolCommissionParams();
+    expect(protocolParams.derivativeAuthorCommissionBase, "wrong derivative author commission base").to.be.eq(10000);
+    expect(protocolParams.protocolFeeCommissionBase, "wrong protocol commission base").to.be.eq(10);
+    expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
+    expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
+  });
+
+  it("should ensure the protocol addresses are as expected", async () => {
+    const { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender } = await setup();
+
+    const protocolAddresses = await registry.getProtocolAddresses();
+    expect(protocolAddresses.opiumProxyFactory).to.be.eq(opiumProxyFactory.address);
+    expect(protocolAddresses.syntheticAggregator).to.be.eq(syntheticAggregator.address);
+    expect(protocolAddresses.oracleAggregator).to.be.eq(oracleAggregator.address);
+    expect(protocolAddresses.core).to.be.equal(core.address);
+    expect(protocolAddresses.tokenSpender).to.be.equal(tokenSpender.address);
+  });
+
+  it("should ensure ACL is applied correctly", async () => {
+    const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
+    const { notAllowed } = namedSigners;
+
+    try {
       await registry
         .connect(notAllowed)
-        .init(
+        .registerProtocol(
           opiumProxyFactory.address,
           core.address,
           oracleAggregator.address,
           syntheticAggregator.address,
           tokenSpender.address,
-          deployer.address,
+          notAllowed.address,
         );
     } catch (error) {
       const { message } = error as Error;
-      expect(message).to.include("Ownable: caller is not the owner");
+      expect(message).to.include("NOT_GOVERNOR");
     }
-  });
 
-  it("should revert on a second init call", async () => {
     try {
-      const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-      const { deployer } = namedSigners;
-
-      await registry.init(
-        opiumProxyFactory.address,
-        core.address,
-        oracleAggregator.address,
-        syntheticAggregator.address,
-        tokenSpender.address,
-        deployer.address,
-      );
+      await registry.connect(notAllowed).addToWhitelist(notAllowed.address);
     } catch (error) {
       const { message } = error as Error;
-      expect(message).to.include("REGISTRY:ALREADY_SET");
+      expect(message).to.include("NOT_LONG_EXECUTOR");
+    }
+
+    try {
+      await registry.connect(notAllowed).removeFromWhitelist(notAllowed.address);
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include("NOT_LONG_EXECUTOR");
+    }
+
+    try {
+      await registry.connect(notAllowed).setOpiumCommissionPart(4);
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include("NOT_LONG_EXECUTOR");
     }
   });
 
-  it("should correctly get core address", async () => {
-    const { registry, core } = await setup();
+  it(`should allow the authorized roles to change the protocol's parameters`, async () => {
+    const { registry } = await setup();
+    const { authorized, longExecutorOne, longExecutorTwo } = namedSigners;
 
-    const result = await registry.getCore();
-    expect(result).to.be.equal(core.address);
-  });
+    expect(await registry.isWhitelisted(authorized.address)).to.be.false;
+    await registry.connect(longExecutorOne).addToWhitelist(authorized.address);
+    expect(await registry.isWhitelisted(authorized.address)).to.be.true;
 
-  it("should correctly get opium proxy factory address", async () => {
-    const { registry, opiumProxyFactory } = await setup();
+    await registry.connect(longExecutorTwo).removeFromWhitelist(authorized.address);
 
-    const result = await registry.getOpiumProxyFactory();
-    expect(result).to.be.equal(opiumProxyFactory.address);
-  });
+    expect(await registry.isWhitelisted(authorized.address)).to.be.false;
 
-  it("should correctly get oracle aggregator address", async () => {
-    const { registry, oracleAggregator } = await setup();
+    await registry.connect(longExecutorTwo).setOpiumCommissionPart(4);
 
-    const result = await registry.getOracleAggregator();
-    expect(result).to.be.equal(oracleAggregator.address);
-  });
-
-  it("should correctly get synthetic aggregator address", async () => {
-    const { registry, syntheticAggregator } = await setup();
-
-    const result = await registry.getSyntheticAggregator();
-    expect(result).to.be.equal(syntheticAggregator.address);
+    const commissionParams = await registry.getProtocolCommissionParams();
+    expect(commissionParams.protocolCommissionPart).to.be.eq(4);
   });
 });

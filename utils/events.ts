@@ -39,8 +39,8 @@ export const retrievePositionTokensAddresses = (
   const longPostionLog = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogLongPositionTokenAddress", receipt);
   const shortPostionLog = decodeLogs<OpiumProxyFactory>(opiumProxyFactory, "LogShortPositionTokenAddress", receipt);
 
-  const shortPositionAddress = formatAddress(shortPostionLog[0].data);
-  const longPositionAddress = formatAddress(longPostionLog[0].data);
+  const shortPositionAddress = formatAddress(shortPostionLog[0].topics[1]);
+  const longPositionAddress = formatAddress(longPostionLog[0].topics[1]);
 
   return [shortPositionAddress, longPositionAddress];
 };
