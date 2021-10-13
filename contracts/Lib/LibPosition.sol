@@ -14,4 +14,8 @@ library LibPosition {
 
     return Clones.predictDeterministicAddress(IOpiumProxyFactory(_factoryAddress).getImplementationAddress(), salt, _factoryAddress);
   }
+
+  function predictDeterministicAddress(bytes32 _salt, address _positionImplementationAddress, address _factoryAddress) internal pure returns(address) {
+    return Clones.predictDeterministicAddress(_positionImplementationAddress, _salt, _factoryAddress);
+  }
 }

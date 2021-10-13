@@ -1,5 +1,4 @@
 pragma solidity 0.8.5;
-pragma experimental ABIEncoderV2;
 
 import "../Interface/IDerivativeLogic.sol";
 import "../Lib/LibDerivative.sol";

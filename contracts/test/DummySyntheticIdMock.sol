@@ -1,5 +1,4 @@
 pragma solidity 0.8.5;
-pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 
@@ -9,8 +8,6 @@ import "../Helpers/ExecutableByThirdParty.sol";
 import "../Helpers/HasCommission.sol";
 
 contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {
-    using SafeMath for uint256;
-
     constructor() {
         /*
         {

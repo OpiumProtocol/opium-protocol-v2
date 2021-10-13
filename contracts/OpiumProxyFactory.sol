@@ -1,13 +1,12 @@
 pragma solidity 0.8.5;
 
 import "openzeppelin-solidity/contracts/proxy/Clones.sol";
-import "./Lib/LibDerivative.sol";
 
-import "./OpiumPositionToken.sol";
-import "./Interface/IOpiumPositionToken.sol";
+import "./Lib/LibDerivative.sol";
 import "./Lib/UsingRegistry.sol";
 import "./Lib/LibPosition.sol";
-import "hardhat/console.sol";
+import "./OpiumPositionToken.sol";
+import "./Interface/IOpiumPositionToken.sol";
 
 contract OpiumProxyFactory is UsingRegistry, LibDerivative {
     using LibPosition for bytes32;
@@ -42,10 +41,6 @@ contract OpiumProxyFactory is UsingRegistry, LibDerivative {
         return size > 0;
     }
 
-    function _computeDeploymentAddress(bytes32 _salt) private view returns (address) {
-        return Clones.predictDeterministicAddress(opiumPositionTokenImplementation, _salt, address(this));
-    }
-
     function _checkOrDeployPosition(
         bool _isLong,
         bytes32 _salt,
@@ -53,7 +48,7 @@ contract OpiumProxyFactory is UsingRegistry, LibDerivative {
         Derivative memory _derivative
     ) private implementationAddressExists returns (address) {
         address opiumPositionAddress;
-        opiumPositionAddress = _computeDeploymentAddress(_salt);
+        opiumPositionAddress = _salt.predictDeterministicAddress(opiumPositionTokenImplementation, address(this));
         if (!_isContract(opiumPositionAddress)) {
             opiumPositionAddress = Clones.cloneDeterministic(opiumPositionTokenImplementation, _salt);
             if (_isLong) {

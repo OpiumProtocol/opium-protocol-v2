@@ -28,18 +28,4 @@ contract TokenSpender is UsingRegistry {
     ) external onlyWhitelisted {
         token.safeTransferFrom(from, to, amount);
     }
-
-    /// @notice Using this function whitelisted contracts could call ERC20 transfers
-    /// @param token IERC20 Instance of token
-    /// @param from address Address from which tokens are transferred
-    /// @param to address Address of tokens receiver
-    /// @param amount uint256 Amount of tokens to be transferred
-    function claimPositions(
-        IERC20Upgradeable token,
-        address from,
-        address to,
-        uint256 amount
-    ) external onlyWhitelisted {
-        token.safeTransferFrom(from, to, amount);
-    }
 }
