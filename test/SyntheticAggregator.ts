@@ -14,21 +14,6 @@ describe("SyntheticAggregator", () => {
   before(async () => {
     namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
   });
-  it(`should successfully return isPool`, async () => {
-    const { syntheticAggregator, optionCallMock } = await setup();
-
-    const derivative = derivativeFactory({
-      margin: toBN('30'),
-      endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [toBN('200')],
-      syntheticId: optionCallMock.address,
-    });
-
-    const hash = getDerivativeHash(derivative);
-    const isPool = await syntheticAggregator.callStatic.isPool(hash, derivative);
-
-    expect(isPool).to.be.not.true;
-  });
 
   it("should successfully return getMargin", async () => {
     const { syntheticAggregator, optionCallMock } = await setup();

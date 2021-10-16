@@ -38,11 +38,6 @@ contract Core is UsingRegistryACL, CoreErrors, ReentrancyGuardUpgradeable {
     // Emitted when Core redeems an amount of market neutral positions
     event LogRedeem(uint256 amount, bytes32 derivativeHash);
 
-    // Vaults for pools
-    // This mapping holds balances of pooled positions
-    // poolVaults[syntheticAddress][tokenAddress] => availableBalance
-    mapping(address => mapping(address => uint256)) public poolVaults;
-
     // Vaults for p2p derivatives
     // This mapping holds balances of p2p positions
     // p2pVaults[derivativeHash] => availableBalance
@@ -244,9 +239,6 @@ contract Core is UsingRegistryACL, CoreErrors, ReentrancyGuardUpgradeable {
 
         // Generate hash for derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
-
-        // Check with Opium.SyntheticAggregator if syntheticId is not a pool
-        require(!vars.syntheticAggregator.isPool(derivativeHash, _derivative), ERROR_CORE_CANT_BE_POOL);
 
         // Check if ticker was canceled
         require(!cancelled[derivativeHash], ERROR_CORE_TICKER_WAS_CANCELLED);

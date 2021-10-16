@@ -59,7 +59,9 @@ describe("CoreCreation", () => {
       await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
       const { message } = error as Error;
-      expect(message).to.include("SYNTHETIC_AGGREGATOR:WRONG_MARGIN");
+      expect(message).to.satisfy(() => {
+        return message.includes('SYNTHETIC_AGGREGATOR:WRONG_MARGIN') || message.includes('CORE:SYNTHETIC_VALIDATION_ERROR')
+      })
     }
   });
 
