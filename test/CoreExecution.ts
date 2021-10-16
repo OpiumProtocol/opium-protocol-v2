@@ -8,6 +8,7 @@ import {
   computeTotalNetPayout,
   computeFees,
   computeTotalGrossPayout,
+  getDerivativeHash,
 } from "../utils/derivatives";
 import { toBN, mul } from "../utils/bn";
 import setup from "../utils/setup";
@@ -81,7 +82,7 @@ describe("CoreExecution", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const noDataOptionDerivativeHash = await core.getDerivativeHash(noDataOptionDerivative);
+    const noDataOptionDerivativeHash = getDerivativeHash(noDataOptionDerivative);
     const noDataOptionPayload = {
       derivative: noDataOptionDerivative,
       amount: toBN("3"),
@@ -100,7 +101,7 @@ describe("CoreExecution", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const fullMarginOptionDerivativeHash = await core.getDerivativeHash(fullMarginOptionDerivative);
+    const fullMarginOptionDerivativeHash = getDerivativeHash(fullMarginOptionDerivative);
     const fullMarginOptionPayload = {
       derivative: fullMarginOptionDerivative,
       amount: toBN("3"),
@@ -123,7 +124,7 @@ describe("CoreExecution", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const overMarginOptionDerivativeHash = await core.getDerivativeHash(overMarginOptionDerivative);
+    const overMarginOptionDerivativeHash = getDerivativeHash(overMarginOptionDerivative);
     const overMarginOptionPayload = {
       derivative: overMarginOptionDerivative,
       amount: toBN("3"),
@@ -146,7 +147,7 @@ describe("CoreExecution", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const underMarginOptionDerivativeHash = await core.getDerivativeHash(underMarginOptionDerivative);
+    const underMarginOptionDerivativeHash = getDerivativeHash(underMarginOptionDerivative);
     const underMarginOptionPayload = {
       derivative: underMarginOptionDerivative,
       amount: toBN("3"),
@@ -169,7 +170,7 @@ describe("CoreExecution", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const nonProfitOptionDerivativeHash = await core.getDerivativeHash(nonProfitOptionDerivative);
+    const nonProfitOptionDerivativeHash = getDerivativeHash(nonProfitOptionDerivative);
     const nonProfitOptionPayload = {
       derivative: nonProfitOptionDerivative,
       amount: toBN("3"),

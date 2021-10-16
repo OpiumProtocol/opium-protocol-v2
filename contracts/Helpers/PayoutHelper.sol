@@ -3,14 +3,14 @@ pragma solidity 0.8.5;
 import "../Interface/IDerivativeLogic.sol";
 import "../Lib/LibDerivative.sol";
 
-contract PayoutHelper is LibDerivative {
+contract PayoutHelper {
     struct ExecutionPayout {
         uint256 buyerPayout;
         uint256 sellerPayout;
     }
 
-    function getExecutionPayouts(Derivative memory _derivative, uint256[] memory _results)
-        public
+    function getExecutionPayouts(LibDerivative.Derivative calldata _derivative, uint256[] calldata _results)
+        external
         view
         returns (ExecutionPayout[] memory executionPayouts)
     {

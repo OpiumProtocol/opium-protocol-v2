@@ -34,12 +34,12 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         return HasCommission.getAuthorCommission();
     }
 
-    function validateInput(Derivative memory _derivative) public view override returns (bool) {
+    function validateInput(LibDerivative.Derivative memory _derivative) public view override returns (bool) {
         _derivative;
         return true;
     }
 
-    function getMargin(Derivative memory _derivative)
+    function getMargin(LibDerivative.Derivative memory _derivative)
         public
         view
         override
@@ -49,7 +49,7 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         sellerMargin = _derivative.margin;
     }
 
-    function getExecutionPayout(Derivative memory _derivative, uint256 _result)
+    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)
         public
         view
         override

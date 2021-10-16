@@ -12,9 +12,10 @@ import "./Registry/RegistryEntities.sol";
 import "./Errors/SyntheticAggregatorErrors.sol";
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
-contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, ReentrancyGuardUpgradeable {
+contract SyntheticAggregator is SyntheticAggregatorErrors, ReentrancyGuardUpgradeable {
+    using LibDerivative for LibDerivative.Derivative;
     // Emitted when new ticker is initialized
-    event Create(Derivative derivative, bytes32 derivativeHash);
+    event Create(LibDerivative.Derivative derivative, bytes32 derivativeHash);
 
     IRegistry registry;
 
@@ -58,7 +59,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return commission uint256 Synthetic author commission
-    function getAuthorCommission(bytes32 _derivativeHash, Derivative memory _derivative)
+    function getAuthorCommission(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative)
         public
         nonReentrant
         returns (uint256 commission)
@@ -72,7 +73,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return authorAddress address Synthetic author address
-    function getAuthorAddress(bytes32 _derivativeHash, Derivative memory _derivative)
+    function getAuthorAddress(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative)
         public
         nonReentrant
         returns (address authorAddress)
@@ -87,7 +88,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
     /// @param _derivative Derivative Derivative itself
     /// @return buyerMargin uint256 Margin of buyer
     /// @return sellerMargin uint256 Margin of seller
-    function getMargin(bytes32 _derivativeHash, Derivative memory _derivative)
+    function getMargin(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative)
         public
         nonReentrant
         returns (uint256 buyerMargin, uint256 sellerMargin)
@@ -109,7 +110,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return result bool Returns whether synthetic implements pooled logic
-    function isPool(bytes32 _derivativeHash, Derivative memory _derivative) public nonReentrant returns (bool result) {
+    function isPool(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) public nonReentrant returns (bool result) {
         result = _isPool(_derivativeHash, _derivative);
     }
 
@@ -119,7 +120,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return result bool Returns whether synthetic implements pooled logic
-    function _isPool(bytes32 _derivativeHash, Derivative memory _derivative) private returns (bool result) {
+    function _isPool(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) private returns (bool result) {
         // Initialize derivative if wasn't initialized before
         _initDerivative(_derivativeHash, _derivative);
         result = typeByHash[_derivativeHash] == SyntheticTypes.Pool;
@@ -128,7 +129,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
     /// @notice Initializes ticker: caches syntheticId type, margin, author address and commission
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
-    function _initDerivative(bytes32 _derivativeHash, Derivative memory _derivative) private {
+    function _initDerivative(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) private {
         // Check if type for _derivativeHash was already cached
         SyntheticTypes syntheticType = typeByHash[_derivativeHash];
 
@@ -138,7 +139,7 @@ contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, Reentr
         }
 
         // For security reasons we calculate hash of provided _derivative
-        bytes32 derivativeHash = getDerivativeHash(_derivative);
+        bytes32 derivativeHash = _derivative.getDerivativeHash();
         require(derivativeHash == _derivativeHash, ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH);
 
         // POOL

@@ -8,7 +8,8 @@ import "./Lib/LibPosition.sol";
 import "./OpiumPositionToken.sol";
 import "./Interface/IOpiumPositionToken.sol";
 
-contract OpiumProxyFactory is UsingRegistryACL, LibDerivative {
+contract OpiumProxyFactory is UsingRegistryACL {
+    using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
     event LogShortPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
     event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
@@ -45,7 +46,7 @@ contract OpiumProxyFactory is UsingRegistryACL, LibDerivative {
         bool _isLong,
         bytes32 _salt,
         bytes32 _derivativeHash,
-        Derivative memory _derivative
+        LibDerivative.Derivative memory _derivative
     ) private implementationAddressExists returns (address) {
         address opiumPositionAddress;
         opiumPositionAddress = _salt.predictDeterministicAddress(opiumPositionTokenImplementation, address(this));
@@ -57,7 +58,7 @@ contract OpiumProxyFactory is UsingRegistryACL, LibDerivative {
                     longTokenSymbol,
                     _derivative,
                     _derivativeHash,
-                    PositionType.LONG
+                    LibDerivative.PositionType.LONG
                 );
                 emit LogLongPositionTokenAddress(_derivativeHash, opiumPositionAddress);
             } else {
@@ -66,7 +67,7 @@ contract OpiumProxyFactory is UsingRegistryACL, LibDerivative {
                     shortTokenSymbol,
                     _derivative,
                     _derivativeHash,
-                    PositionType.SHORT
+                    LibDerivative.PositionType.SHORT
                 );
                 emit LogShortPositionTokenAddress(_derivativeHash, opiumPositionAddress);
             }
@@ -78,7 +79,7 @@ contract OpiumProxyFactory is UsingRegistryACL, LibDerivative {
         address _buyer,
         address _seller,
         bytes32 _derivativeHash,
-        Derivative calldata _derivative,
+        LibDerivative.Derivative calldata _derivative,
         uint256 _amount
     ) external onlyCore implementationAddressExists whenNotPaused {
         bytes32 shortSalt = keccak256(abi.encodePacked(_derivativeHash, "SHORT"));

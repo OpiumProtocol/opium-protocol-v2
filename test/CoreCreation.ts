@@ -5,7 +5,7 @@ import { expect } from "chai";
 // utils
 import { retrievePositionTokensAddresses } from "../utils/events";
 import { toBN } from "../utils/bn";
-import { computeTotalGrossPayout, createValidDerivativeExpiry, derivativeFactory } from "../utils/derivatives";
+import { computeTotalGrossPayout, createValidDerivativeExpiry, derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
@@ -30,7 +30,7 @@ describe("CoreCreation", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const hash = await core.getDerivativeHash(optionCall);
+    const hash = await getDerivativeHash(optionCall);
     const expectedHash = utils.solidityKeccak256(
       ["uint256", "uint256", "uint256[]", "address", "address", "address"],
       Object.values(optionCall),
@@ -122,7 +122,7 @@ describe("CoreCreation", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    const hash = await core.getDerivativeHash(optionCall);
+    const hash = await getDerivativeHash(optionCall);
 
     const balance = await testToken.balanceOf(deployer.address);
 
@@ -167,7 +167,7 @@ describe("CoreCreation", () => {
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
 
-    const hash = await core.getDerivativeHash(optionCall);
+    const hash = await getDerivativeHash(optionCall);
 
     const oldCoreTokenBalance = await testToken.balanceOf(core.address);
 

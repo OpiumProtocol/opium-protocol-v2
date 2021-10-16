@@ -3,17 +3,17 @@ pragma solidity 0.8.5;
 import "../Lib/LibDerivative.sol";
 
 /// @title Opium.Interface.IDerivativeLogic contract is an interface that every syntheticId should implement
-abstract contract IDerivativeLogic is LibDerivative {
+abstract contract IDerivativeLogic {
     /// @notice Validates ticker
     /// @param _derivative Derivative Instance of derivative to validate
     /// @return Returns boolean whether ticker is valid
-    function validateInput(Derivative memory _derivative) public view virtual returns (bool);
+    function validateInput(LibDerivative.Derivative memory _derivative) public view virtual returns (bool);
 
     /// @notice Calculates margin required for derivative creation
     /// @param _derivative Derivative Instance of derivative
     /// @return buyerMargin uint256 Margin needed from buyer (LONG position)
     /// @return sellerMargin uint256 Margin needed from seller (SHORT position)
-    function getMargin(Derivative memory _derivative)
+    function getMargin(LibDerivative.Derivative memory _derivative)
         public
         view
         virtual
@@ -24,7 +24,7 @@ abstract contract IDerivativeLogic is LibDerivative {
     /// @param _result uint256 Data retrieved from oracleId on the maturity
     /// @return buyerPayout uint256 Payout in ratio for buyer (LONG position holder)
     /// @return sellerPayout uint256 Payout in ratio for seller (SHORT position holder)
-    function getExecutionPayout(Derivative memory _derivative, uint256 _result)
+    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)
         public
         view
         virtual

@@ -20,8 +20,9 @@ import "./Lib/UsingRegistryACL.sol";
 import "./Lib/LibCalculator.sol";
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
-contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpgradeable {
+contract Core is UsingRegistryACL, CoreErrors, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
+    using LibDerivative for LibDerivative.Derivative;
     using LibCalculator for uint256;
     using LibPosition for bytes32;
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -90,7 +91,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     /// [0] - buyer address
     /// [1] - seller address - if seller is set to `address(0)`, consider as pooled position
     function create(
-        Derivative calldata _derivative,
+        LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
         address[2] calldata _addresses
     ) external nonReentrant {
@@ -173,16 +174,16 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         bytes32 longDerivativeHash = IOpiumPositionToken(_positionAddresses[1]).getDerivativeHash();
         require(derivativeHash == longDerivativeHash, "WRONG_HASH");
         require(
-            IOpiumPositionToken(_positionAddresses[0]).getPositionType() == PositionType.SHORT,
+            IOpiumPositionToken(_positionAddresses[0]).getPositionType() == LibDerivative.PositionType.SHORT,
             "WRONG_POSITION_TYPE"
         );
         require(
-            IOpiumPositionToken(_positionAddresses[1]).getPositionType() == PositionType.LONG,
+            IOpiumPositionToken(_positionAddresses[1]).getPositionType() == LibDerivative.PositionType.LONG,
             "WRONG_POSITION_TYPE"
         );
         require(shortBalance >= _amount, "NOT_ENOUGH_SHORT_POSITIONS");
         require(longBalance >= _amount, "NOT_ENOUGH_LONG_POSITIONS");
-        Derivative memory derivative = IOpiumPositionToken(_positionAddresses[0]).getDerivative();
+        LibDerivative.Derivative memory derivative = IOpiumPositionToken(_positionAddresses[0]).getDerivative();
 
         RegistryEntities.ExecuteAndCancelLocalVars memory vars = registry.getExecuteAndCancelLocalVars();
 
@@ -222,7 +223,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     /// [0] - buyer address
     /// [1] - seller address
     function _create(
-        Derivative calldata _derivative,
+        LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
         address[2] calldata _addresses
     ) private whenNotPaused {
@@ -242,7 +243,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         vars.opiumProxyFactory = OpiumProxyFactory(protocolAddresses.opiumProxyFactory);
 
         // Generate hash for derivative
-        bytes32 derivativeHash = getDerivativeHash(_derivative);
+        bytes32 derivativeHash = _derivative.getDerivativeHash();
 
         // Check with Opium.SyntheticAggregator if syntheticId is not a pool
         require(!vars.syntheticAggregator.isPool(derivativeHash, _derivative), ERROR_CORE_CANT_BE_POOL);
@@ -292,12 +293,12 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         // Local variables
         RegistryEntities.ExecuteAndCancelLocalVars memory vars = registry.getExecuteAndCancelLocalVars();
 
-        Derivative memory derivative = IOpiumPositionToken(_positionAddress).getDerivative();
+        LibDerivative.Derivative memory derivative = IOpiumPositionToken(_positionAddress).getDerivative();
 
         // Check if execution is performed after endTime
         require(block.timestamp > derivative.endTime, ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED);
 
-        PositionType positionType = IOpiumPositionToken(_positionAddress).getPositionType();
+        LibDerivative.PositionType positionType = IOpiumPositionToken(_positionAddress).getPositionType();
 
         // Checking whether execution is performed by `_positionsOwner` or `_positionsOwner` allowed third party executions on it's behalf
         require(
@@ -330,7 +331,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         // Local variables
         RegistryEntities.ExecuteAndCancelLocalVars memory vars = registry.getExecuteAndCancelLocalVars();
 
-        Derivative memory derivative = IOpiumPositionToken(_positionAddress).getDerivative();
+        LibDerivative.Derivative memory derivative = IOpiumPositionToken(_positionAddress).getDerivative();
         // Don't allow to cancel tickers with "dummy" oracleIds
         require(derivative.oracleId != address(0), ERROR_CORE_CANT_CANCEL_DUMMY_ORACLE_ID);
 
@@ -342,9 +343,9 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         );
 
         // Generate hash for derivative
-        bytes32 derivativeHash = getDerivativeHash(derivative);
+        bytes32 derivativeHash = derivative.getDerivativeHash();
 
-        PositionType positionType = IOpiumPositionToken(_positionAddress).getPositionType();
+        LibDerivative.PositionType positionType = IOpiumPositionToken(_positionAddress).getPositionType();
 
         // Emit `Canceled` event only once and mark ticker as canceled
         if (!cancelled[derivativeHash]) {
@@ -360,7 +361,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
 
         uint256 payout;
         // Check if `_positionAddresses` is a LONG position
-        if (positionType == PositionType.LONG) {
+        if (positionType == LibDerivative.PositionType.LONG) {
             // Set payout to buyerPayout
             payout = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[0], _amount);
 
@@ -387,8 +388,8 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     /// @param _vars ExecuteAndCancelLocalVars Helping local variables
     /// @return payout uint256 Payout for all tokens
     function _getPayout(
-        Derivative memory _derivative,
-        PositionType _positionType,
+        LibDerivative.Derivative memory _derivative,
+        LibDerivative.PositionType _positionType,
         uint256 _amount,
         RegistryEntities.ExecuteAndCancelLocalVars memory _vars
     ) private returns (uint256 payout) {
@@ -411,7 +412,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         );
 
         // Generate hash for derivative
-        bytes32 derivativeHash = getDerivativeHash(_derivative);
+        bytes32 derivativeHash = _derivative.getDerivativeHash();
 
         // Check if ticker was canceled
         require(!cancelled[derivativeHash], ERROR_CORE_TICKER_WAS_CANCELLED);
@@ -435,7 +436,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         payouts[1] = margins[0].add(margins[1]).mul(payoutRatio[1]).div(payoutRatio[0].add(payoutRatio[1]));
 
         // Check if `_positionType` is LONG
-        if (_positionType == PositionType.LONG) {
+        if (_positionType == LibDerivative.PositionType.LONG) {
             // Set payout to buyerPayout
             payout = payouts[0];
 
@@ -495,7 +496,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     function _getFees(
         SyntheticAggregator _syntheticAggregator,
         bytes32 _derivativeHash,
-        Derivative memory _derivative,
+        LibDerivative.Derivative memory _derivative,
         uint256 _profit
     ) private returns (uint256 fee) {
         // Get cached `syntheticId` author address from Opium.SyntheticAggregator

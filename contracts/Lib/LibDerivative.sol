@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
 /// @title Opium.Lib.LibDerivative contract should be inherited by contracts that use Derivative structure and calculate derivativeHash
-abstract contract LibDerivative {
+library LibDerivative {
     enum PositionType {
         SHORT,
         LONG
@@ -26,7 +26,7 @@ abstract contract LibDerivative {
     /// @notice Calculates hash of provided Derivative
     /// @param _derivative Derivative Instance of derivative to hash
     /// @return derivativeHash bytes32 Derivative hash
-    function getDerivativeHash(Derivative memory _derivative) public pure returns (bytes32 derivativeHash) {
+    function getDerivativeHash(Derivative memory _derivative) internal pure returns (bytes32 derivativeHash) {
         derivativeHash = keccak256(abi.encodePacked(
             _derivative.margin,
             _derivative.endTime,

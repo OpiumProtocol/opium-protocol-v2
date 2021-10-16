@@ -38,7 +38,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         return HasCommission.getAuthorCommission();
     }
 
-    function validateInput(Derivative memory _derivative) public view override returns (bool) {
+    function validateInput(LibDerivative.Derivative memory _derivative) public view override returns (bool) {
         if (_derivative.params.length < 1) {
             return false;
         }
@@ -55,7 +55,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         return (_derivative.margin > 0 && _derivative.endTime > block.timestamp && strikePrice > 0 && ppt > 0);
     }
 
-    function getMargin(Derivative memory _derivative)
+    function getMargin(LibDerivative.Derivative memory _derivative)
         public
         view
         override
@@ -65,7 +65,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         sellerMargin = _derivative.margin;
     }
 
-    function getExecutionPayout(Derivative memory _derivative, uint256 _result)
+    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)
         public
         view
         override
