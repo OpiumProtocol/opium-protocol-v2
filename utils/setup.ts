@@ -20,6 +20,7 @@ export type TContracts = {
   tokenSpender: TokenSpender;
   core: Core;
   testToken: TestToken;
+  testTokenSixDecimals: TestToken;
   optionCallMock: OptionCallSyntheticIdMock;
   oracleAggregator: OracleAggregator;
   syntheticAggregator: SyntheticAggregator;
@@ -64,6 +65,7 @@ const setup = async (): Promise<TContracts> => {
     await upgrades.deployProxy(SyntheticAggregator, [registry.address], { initializer: "initialize" })
   );
   const testToken = <TestToken>await TestToken.deploy("test", "test", 18);
+  const testTokenSixDecimals = <TestToken>await TestToken.deploy("test", "test", 6);
 
   const optionCallMock = <OptionCallSyntheticIdMock>await OptionCallSyntheticIdMock.deploy();
   const oracleIdMock = <OracleIdMock>await OracleIdMock.deploy(toBN("0.1"), registry.address);
@@ -77,6 +79,7 @@ const setup = async (): Promise<TContracts> => {
   await opiumProxyFactory.deployed();
   await optionCallMock.deployed();
   await oracleIdMock.deployed();
+  await testTokenSixDecimals.deployed();
 
   await registry
     .connect(governor)
@@ -102,6 +105,7 @@ const setup = async (): Promise<TContracts> => {
     oracleAggregator,
     syntheticAggregator,
     oracleIdMock,
+    testTokenSixDecimals,
   };
 };
 

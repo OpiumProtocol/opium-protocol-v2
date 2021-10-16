@@ -4,7 +4,7 @@ import { expect } from "chai";
 // utils
 import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
 import setup from "../utils/setup";
-import { cast } from "../utils/bn";
+import { toBN } from "../utils/bn";
 // types and constants
 import { TNamedSigners } from "../types";
 
@@ -18,9 +18,9 @@ describe("SyntheticAggregator", () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 
     const derivative = derivativeFactory({
-      margin: cast(30),
+      margin: toBN('30'),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [cast(200)],
+      params: [toBN('200')],
       syntheticId: optionCallMock.address,
     });
 
@@ -34,9 +34,9 @@ describe("SyntheticAggregator", () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 
     const derivative = derivativeFactory({
-      margin: cast(30),
+      margin: toBN('30'),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [cast(200)],
+      params: [toBN('200')],
       syntheticId: optionCallMock.address,
     });
 
@@ -53,9 +53,9 @@ describe("SyntheticAggregator", () => {
     const { deployer } = namedSigners;
 
     const derivative = derivativeFactory({
-      margin: cast(30),
+      margin: toBN('30'),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [cast(200)],
+      params: [toBN('200')],
       syntheticId: optionCallMock.address,
     });
     const hash = getDerivativeHash(derivative);
@@ -69,9 +69,9 @@ describe("SyntheticAggregator", () => {
     const { syntheticAggregator, optionCallMock } = await setup();
 
     const derivative = derivativeFactory({
-      margin: cast(30),
+      margin: toBN('30'),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [cast(200)],
+      params: [toBN('200')],
       syntheticId: optionCallMock.address,
     });
 

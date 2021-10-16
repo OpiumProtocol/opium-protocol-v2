@@ -17,8 +17,16 @@ describe("Registry", () => {
 
   it("should ensure the initial roles are as expected", async () => {
     const { registry } = await setup();
-    const { deployer, governor, guardian, longExecutorOne, longExecutorTwo, shortExecutorOne, shortExecutorTwo, notAllowed } =
-      await ethers.getNamedSigners();
+    const {
+      deployer,
+      governor,
+      guardian,
+      longExecutorOne,
+      longExecutorTwo,
+      shortExecutorOne,
+      shortExecutorTwo,
+      notAllowed,
+    } = await ethers.getNamedSigners();
 
     expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not governor").to.be.true;
     expect(await registry.hasRole(guardianRole, guardian.address), "not guardian").to.be.true;
@@ -131,12 +139,12 @@ describe("Registry", () => {
     try {
       // should throw a failure if "paused" is set to true
       await registry.connect(guardian).pause();
-    } catch(error) {
+    } catch (error) {
       const { message } = error as Error;
       expect(message).to.include("already paused");
     }
 
     await registry.connect(guardian).unpause();
     expect(await registry.isPaused(), "it's unpaused").to.be.false;
-  })
+  });
 });

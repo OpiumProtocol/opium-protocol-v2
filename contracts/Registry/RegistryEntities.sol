@@ -7,9 +7,11 @@ library RegistryEntities {
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
         uint32 noDataCancellationPeriod;
         // Represents 100% base for Opium commission
-        uint8 protocolFeeCommissionBase; 
-        // Represents which part of `syntheticId` author commissions goes to opium    
-        uint8 protocolCommissionPart;     
+        uint8 protocolFeeCommissionBase;
+        // Represents which part of `syntheticId` author commissions goes to opium
+        uint8 protocolCommissionPart;
+        // scaling factor
+        uint8 precisionFactor;
     }
 
     struct ProtocolAddressesArgs {
@@ -31,5 +33,5 @@ library RegistryEntities {
         address opiumProxyFactory;
         address oracleAggregator;
         address syntheticAggregator;
-    }    
+    }
 }

@@ -37,6 +37,7 @@ contract OpiumPositionToken is ERC20Upgradeable, LibDerivative {
         _burn(_positionHolder, _amount);
     }
 
+    //GETTERS
     function getPositionType() external view returns (LibDerivative.PositionType) {
         return positionType;
     }

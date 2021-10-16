@@ -36,7 +36,7 @@ export type TDerivative = {
 
 export type TDerivativeOrder = {
   derivative: TDerivative;
-  amount: number;
+  amount: BigNumber;
   price: BigNumber;
   hash: string;
 };

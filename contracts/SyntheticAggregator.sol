@@ -11,7 +11,6 @@ import "./Registry/RegistryEntities.sol";
 
 import "./Errors/SyntheticAggregatorErrors.sol";
 
-
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
 contract SyntheticAggregator is SyntheticAggregatorErrors, LibDerivative, ReentrancyGuardUpgradeable {
     // Emitted when new ticker is initialized

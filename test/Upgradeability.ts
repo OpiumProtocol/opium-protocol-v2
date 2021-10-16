@@ -7,7 +7,7 @@ import { SECONDS_40_MINS } from "../utils/constants";
 import { decodeLogs, retrievePositionTokensAddresses } from "../utils/events";
 import { formatAddress } from "../utils/addresses";
 import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
-import { cast } from "../utils/bn";
+import { toBN } from "../utils/bn";
 // types and constants
 import { TNamedSigners } from "../types";
 import {
@@ -104,9 +104,9 @@ describe("Upgradeability", () => {
     expect(syntheticAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
     const derivative = derivativeFactory({
-      margin: cast(30),
+      margin: toBN('30'),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [cast(200)],
+      params: [toBN('200')],
       syntheticId: optionCallMock.address,
     });
 
@@ -180,12 +180,12 @@ describe("Upgradeability", () => {
      * TODO:
      * remove code duplication and set up test suites to keep it DRY
      */
-    const amount = 3;
+    const amount = toBN('3');
     const optionCall = derivativeFactory({
-      margin: cast(30),
+      margin: toBN('30'),
       endTime,
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN('20000'), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,

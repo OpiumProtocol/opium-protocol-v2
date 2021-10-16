@@ -14,15 +14,10 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     function initialize(
         address _governor,
         address _guardian,
-        address[] memory _longExecutors, 
+        address[] memory _longExecutors,
         address[] memory _shortExecutors
     ) external initializer {
-        __RegistryStorage__init(
-        _governor,
-        _guardian,
-        _longExecutors, 
-        _shortExecutors
-        );
+        __RegistryStorage__init(_governor, _guardian, _longExecutors, _shortExecutors);
     }
 
     modifier onlyGovernor() {
@@ -31,12 +26,18 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     modifier onlyLongExecutor() {
-        require(isRole(LibRoles.LONG_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), NOT_LONG_EXECUTOR);
+        require(
+            isRole(LibRoles.LONG_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            NOT_LONG_EXECUTOR
+        );
         _;
     }
 
     modifier onlyShortExecutor() {
-        require(isRole(LibRoles.SHORT_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), NOT_SHORT_EXECUTOR);
+        require(
+            isRole(LibRoles.SHORT_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender),
+            NOT_SHORT_EXECUTOR
+        );
         _;
     }
 
@@ -55,11 +56,11 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     ) external onlyGovernor {
         require(
             _opiumProxyFactory != address(0) &&
-            _core != address(0) &&
-            _oracleAggregator != address(0) &&
-            _syntheticAggregator != address(0) &&
-            _tokenSpender != address(0) &&
-            _protocolFeeReceiver != address(0),
+                _core != address(0) &&
+                _oracleAggregator != address(0) &&
+                _syntheticAggregator != address(0) &&
+                _tokenSpender != address(0) &&
+                _protocolFeeReceiver != address(0),
             ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS
         );
 
@@ -96,19 +97,20 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     // GETTERS
-    function isPaused() external view returns(bool) {
+    function isPaused() external view returns (bool) {
         return paused;
     }
 
-    function getExecuteAndCancelLocalVars() external view returns(RegistryEntities.ExecuteAndCancelLocalVars memory) {
-        return RegistryEntities.ExecuteAndCancelLocalVars({
-            opiumProxyFactory: protocolAddressesArgs.opiumProxyFactory,
-            oracleAggregator: protocolAddressesArgs.oracleAggregator,
-            syntheticAggregator: protocolAddressesArgs.syntheticAggregator
-        });
+    function getExecuteAndCancelLocalVars() external view returns (RegistryEntities.ExecuteAndCancelLocalVars memory) {
+        return
+            RegistryEntities.ExecuteAndCancelLocalVars({
+                opiumProxyFactory: protocolAddressesArgs.opiumProxyFactory,
+                oracleAggregator: protocolAddressesArgs.oracleAggregator,
+                syntheticAggregator: protocolAddressesArgs.syntheticAggregator
+            });
     }
 
-    function getProtocolAddresses() external view returns(RegistryEntities.ProtocolAddressesArgs memory) {
+    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
         return protocolAddressesArgs;
     }
 
@@ -142,7 +144,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         return protocolAddressesArgs.protocolFeeReceiver;
     }
 
-    function isWhitelisted(address _address) external view returns(bool) {
+    function isWhitelisted(address _address) external view returns (bool) {
         return whitelist[_address];
     }
 
@@ -150,7 +152,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         return protocolCommissionArgs.noDataCancellationPeriod;
     }
 
-    function getProtocolCommissionParams() external view returns(RegistryEntities.ProtocolCommissionArgs memory) {
+    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolCommissionArgs memory) {
         return protocolCommissionArgs;
     }
 }

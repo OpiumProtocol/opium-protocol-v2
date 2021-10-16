@@ -9,7 +9,6 @@ import "./OpiumProxyFactory.sol";
 import "./OracleAggregator.sol";
 import "./SyntheticAggregator.sol";
 import "./TokenSpender.sol";
-
 import "./Interface/IDerivativeLogic.sol";
 
 import "./Errors/CoreErrors.sol";
@@ -18,12 +17,16 @@ import "./Registry/RegistryEntities.sol";
 import "./Lib/LibDerivative.sol";
 import "./Lib/LibPosition.sol";
 import "./Lib/UsingRegistryACL.sol";
+import "./Lib/LibCalculator.sol";
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
 contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
+    using LibCalculator for uint256;
     using LibPosition for bytes32;
     using SafeERC20Upgradeable for IERC20Upgradeable;
+
+    RegistryEntities.ProtocolCommissionArgs private protocolCommissionArgs;
 
     // Emitted when Core creates new position
     event Created(address buyer, address seller, bytes32 derivativeHash, uint256 amount);
@@ -39,6 +42,15 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     // poolVaults[syntheticAddress][tokenAddress] => availableBalance
     mapping(address => mapping(address => uint256)) public poolVaults;
 
+    // Vaults for p2p derivatives
+    // This mapping holds balances of p2p positions
+    // p2pVaults[derivativeHash] => availableBalance
+    mapping(bytes32 => uint256) public p2pVaults;
+
+    // Derivative payouts cache
+    // Once paid out (executed), the payout ratio is stored in cache
+    mapping(bytes32 => uint256[2]) public derivativePayouts;
+
     // Vaults for fees
     // This mapping holds balances of fee recipients
     // feesVaults[feeRecipientAddress][tokenAddress] => availableBalance
@@ -47,9 +59,18 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     // Hashes of cancelled tickers
     mapping(bytes32 => bool) public cancelled;
 
+    struct CreateLocalVars {
+        SyntheticAggregator syntheticAggregator;
+        IDerivativeLogic derivativeLogic;
+        IERC20Upgradeable marginToken;
+        TokenSpender tokenSpender;
+        OpiumProxyFactory opiumProxyFactory;
+    }
+
     /// @notice Calls Core.Lib.__UsingRegistryACL__init constructor
     function initialize(address _registry) external initializer {
         __UsingRegistryACL__init(_registry);
+        protocolCommissionArgs = registry.getProtocolCommissionParams();
     }
 
     // PUBLIC FUNCTIONS
@@ -73,6 +94,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         uint256 _amount,
         address[2] calldata _addresses
     ) external nonReentrant {
+        require((10**protocolCommissionArgs.precisionFactor).modWithPrecisionFactor(_derivative.margin * _amount) == 0, "WRONG MOD");
         _create(_derivative, _amount, _addresses);
     }
 
@@ -169,7 +191,7 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
 
         uint256[2] memory margins;
         (margins[0], margins[1]) = SyntheticAggregator(vars.syntheticAggregator).getMargin(derivativeHash, derivative);
-        uint256 totalMargin = margins[0].add(margins[1]).mul(_amount);
+        uint256 totalMargin =  (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[0].add(margins[1]), _amount);
         uint256 fees = _getFees(SyntheticAggregator(vars.syntheticAggregator), derivativeHash, derivative, totalMargin);
 
         IERC20Upgradeable(derivative.token).safeTransfer(_positionsOwner, totalMargin.sub(fees));
@@ -191,24 +213,6 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         for (uint256 i; i < _positionsAddresses.length; i++) {
             _cancel(_positionsAddresses[i], _amounts[i]);
         }
-    }
-
-    // PRIVATE FUNCTIONS
-
-    struct CreatePooledLocalVars {
-        SyntheticAggregator syntheticAggregator;
-        IDerivativeLogic derivativeLogic;
-        IERC20Upgradeable marginToken;
-        TokenSpender tokenSpender;
-        OpiumProxyFactory opiumProxyFactory;
-    }
-
-    struct CreateLocalVars {
-        SyntheticAggregator syntheticAggregator;
-        IDerivativeLogic derivativeLogic;
-        IERC20Upgradeable marginToken;
-        TokenSpender tokenSpender;
-        OpiumProxyFactory opiumProxyFactory;
     }
 
     /// @notice This function creates p2p positions
@@ -255,21 +259,20 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         // margins[1] - sellerMargin
         (margins[0], margins[1]) = vars.syntheticAggregator.getMargin(derivativeHash, _derivative);
 
+        uint256 totalMargin = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[0].add(margins[1]), _amount);
+
         // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
         // `msg.sender` must provide margin for position creation
         require(
-            vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >=
-                margins[0].add(margins[1]).mul(_amount),
+            vars.marginToken.allowance(msg.sender, address(vars.tokenSpender)) >= totalMargin,
             ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE
         );
 
         // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        vars.tokenSpender.claimTokens(
-            vars.marginToken,
-            msg.sender,
-            address(this),
-            margins[0].add(margins[1]).mul(_amount)
-        );
+        vars.tokenSpender.claimTokens(vars.marginToken, msg.sender, address(this), totalMargin);
+
+        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
+        _increaseP2PVault(derivativeHash, totalMargin);
 
         // Mint LONG and SHORT positions tokens
         vars.opiumProxyFactory.mint(_addresses[0], _addresses[1], derivativeHash, _derivative, _amount);
@@ -310,7 +313,6 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         if (payout > 0) {
             IERC20Upgradeable(derivative.token).safeTransfer(_positionOwner, payout);
         }
-
         // Burn executed position tokens
         OpiumProxyFactory(vars.opiumProxyFactory).burn(_positionOwner, _positionAddress, _amount);
 
@@ -320,7 +322,11 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
     /// @notice Cancels tickers, burns positions and returns margins to positions owners in case no data were provided within `NO_DATA_CANCELLATION_PERIOD`
     /// @param _positionAddress PositionTypes of positions to be canceled
     /// @param _amount uint256[] Amount of positions to cancel for each `positionAddress`
-    function _cancel(address _positionAddress, uint256 _amount) private onlyOpiumFactoryTokens(_positionAddress) whenNotPaused {
+    function _cancel(address _positionAddress, uint256 _amount)
+        private
+        onlyOpiumFactoryTokens(_positionAddress)
+        whenNotPaused
+    {
         // Local variables
         RegistryEntities.ExecuteAndCancelLocalVars memory vars = registry.getExecuteAndCancelLocalVars();
 
@@ -356,17 +362,18 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         // Check if `_positionAddresses` is a LONG position
         if (positionType == PositionType.LONG) {
             // Set payout to buyerPayout
-            payout = margins[0];
+            payout = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[0], _amount);
 
             // Check if `positionAddress` is a SHORT position
         } else {
             // Set payout to sellerPayout
-            payout = margins[1];
+            payout = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[1], _amount);
         }
+        _decreaseP2PVault(derivativeHash, payout);
 
         // Transfer payout * _amounts[i]
         if (payout > 0) {
-            IERC20Upgradeable(derivative.token).safeTransfer(msg.sender, payout.mul(_amount));
+            IERC20Upgradeable(derivative.token).safeTransfer(msg.sender, payout);
         }
 
         // Burn canceled position tokens
@@ -418,6 +425,8 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
             _derivative
         );
 
+        // uint256 totalMargin = mulWithPrecisionFactor(margins[0].add(margins[1]), _amount);
+
         uint256[2] memory payouts;
         // Calculate payouts from ratio
         // payouts[0] -> buyerPayout = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
@@ -427,42 +436,25 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
 
         // Check if `_positionType` is LONG
         if (_positionType == PositionType.LONG) {
-            // Check if it's a pooled position
-            if (SyntheticAggregator(_vars.syntheticAggregator).isPool(derivativeHash, _derivative)) {
-                // Pooled position payoutRatio is considered as full payout, not as payoutRatio
-                payout = payoutRatio[0];
+            // Set payout to buyerPayout
+            payout = payouts[0];
 
-                // Multiply payout by amount
-                payout = payout.mul(_amount);
+            // Multiply payout by amount
+            payout = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(payout, _amount);
 
-                // Check sufficiency of syntheticId balance in poolVaults
-                require(
-                    poolVaults[_derivative.syntheticId][_derivative.token] >= payout,
-                    ERROR_CORE_INSUFFICIENT_POOL_BALANCE
-                );
-
-                // Subtract paid out margin from poolVault
-                poolVaults[_derivative.syntheticId][_derivative.token] = poolVaults[_derivative.syntheticId][
-                    _derivative.token
-                ].sub(payout);
-            } else {
-                // Set payout to buyerPayout
-                payout = payouts[0];
-
-                // Multiply payout by amount
-                payout = payout.mul(_amount);
-            }
+            uint256 longMargin = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[0], _amount);
+            _decreaseP2PVault(derivativeHash, payout);
 
             // Take fees only from profit makers
             // Check: payout > buyerMargin * amount
-            if (payout > margins[0].mul(_amount)) {
+            if (payout > longMargin) {
                 // Get Opium and `syntheticId` author fees and subtract it from payout
                 payout = payout.sub(
                     _getFees(
                         SyntheticAggregator(_vars.syntheticAggregator),
                         derivativeHash,
                         _derivative,
-                        payout - margins[0].mul(_amount)
+                        payout - longMargin
                     )
                 );
             }
@@ -473,18 +465,21 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
             payout = payouts[1];
 
             // Multiply payout by amount
-            payout = payout.mul(_amount);
+            payout = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(payout, _amount);
+            uint256 shortMargin = (10**protocolCommissionArgs.precisionFactor).mulWithPrecisionFactor(margins[1], _amount);
 
+            _decreaseP2PVault(derivativeHash, payout);
             // Take fees only from profit makers
             // Check: payout > sellerMargin * amount
-            if (payout > margins[1].mul(_amount)) {
+
+            if (payout > shortMargin) {
                 // Get Opium fees and subtract it from payout
                 payout = payout.sub(
                     _getFees(
                         SyntheticAggregator(_vars.syntheticAggregator),
                         derivativeHash,
                         _derivative,
-                        payout - margins[1].mul(_amount)
+                        payout - shortMargin
                     )
                 );
             }
@@ -508,7 +503,6 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         // Get cached `syntheticId` fee percentage from Opium.SyntheticAggregator
         uint256 commission = _syntheticAggregator.getAuthorCommission(_derivativeHash, _derivative);
 
-        RegistryEntities.ProtocolCommissionArgs memory protocolCommissionArgs = registry.getProtocolCommissionParams();
         // Calculate fee
         // fee = profit * commission / COMMISSION_BASE
         fee = _profit.mul(commission).div(protocolCommissionArgs.derivativeAuthorCommissionBase);
@@ -538,5 +532,14 @@ contract Core is LibDerivative, UsingRegistryACL, CoreErrors, ReentrancyGuardUpg
         // Update feeVault for `syntheticId` author
         // feeVault[author][token] += authorFee
         feesVaults[authorAddress][_derivative.token] = feesVaults[authorAddress][_derivative.token].add(authorFee);
+    }
+
+    function _increaseP2PVault(bytes32 _derivativeHash, uint256 _amount) private {
+        p2pVaults[_derivativeHash] = p2pVaults[_derivativeHash].add(_amount);
+    }
+
+    function _decreaseP2PVault(bytes32 _derivativeHash, uint256 _amount) private {
+        require(p2pVaults[_derivativeHash] >= _amount, "ERROR_CORE_INSUFFICIENT_P2P_BALANCE");
+        p2pVaults[_derivativeHash] = p2pVaults[_derivativeHash].sub(_amount);
     }
 }

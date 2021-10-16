@@ -20,7 +20,7 @@ interface IRegistry {
 
     function getExecuteAndCancelLocalVars() external view returns (RegistryEntities.ExecuteAndCancelLocalVars memory);
 
-    function isRole(bytes32 _role, address _address) external view returns(bool);
+    function isRole(bytes32 _role, address _address) external view returns (bool);
 
-    function isPaused() external view returns(bool);
+    function isPaused() external view returns (bool);
 }

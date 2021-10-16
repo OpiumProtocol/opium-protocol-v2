@@ -4,16 +4,16 @@ import { utils } from "ethers";
 import { expect } from "chai";
 // utils
 import { retrievePositionTokensAddresses } from "../utils/events";
-import { cast } from "../utils/bn";
-import { derivativeFactory } from "../utils/derivatives";
+import { toBN } from "../utils/bn";
+import { computeTotalGrossPayout, createValidDerivativeExpiry, derivativeFactory } from "../utils/derivatives";
 import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
 import { OpiumPositionToken } from "../typechain";
 import { SECONDS_40_MINS } from "../utils/constants";
+import { resetNetwork } from "../utils/timeTravel";
 
 describe("CoreCreation", () => {
-  const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
   let namedSigners: TNamedSigners;
 
   before(async () => {
@@ -22,10 +22,10 @@ describe("CoreCreation", () => {
   it(`should return the correct getDerivativeHash`, async () => {
     const { core, testToken, optionCallMock } = await setup();
     const optionCall = derivativeFactory({
-      margin: cast(30),
-      endTime,
+      margin: toBN("30"),
+      endTime: await createValidDerivativeExpiry(3),
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN("20000"), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -46,15 +46,15 @@ describe("CoreCreation", () => {
       const { core, testToken, optionCallMock, tokenSpender } = await setup();
 
       const optionCall = derivativeFactory({
-        margin: cast(0),
-        endTime,
+        margin: toBN("0"),
+        endTime: await createValidDerivativeExpiry(3),
         params: [
-          cast(20000), // Strike Price 200.00$
+          toBN("20000"), // Strike Price 200.00$
         ],
         token: testToken.address,
         syntheticId: optionCallMock.address,
       });
-      const amount = 3;
+      const amount = toBN("3");
       await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
       await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
@@ -69,15 +69,15 @@ describe("CoreCreation", () => {
       const { core, testToken, optionCallMock, tokenSpender } = await setup();
 
       const optionCall = derivativeFactory({
-        margin: cast(30),
+        margin: toBN("30"),
         endTime: 0,
         params: [
-          cast(20000), // Strike Price 200.00$
+          toBN("20000"), // Strike Price 200.00$
         ],
         token: testToken.address,
         syntheticId: optionCallMock.address,
       });
-      const amount = 3;
+      const amount = toBN("3");
       await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
       await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
@@ -92,10 +92,10 @@ describe("CoreCreation", () => {
       const { buyer, seller } = namedSigners;
 
       const optionCall = derivativeFactory({
-        margin: cast(3),
-        endTime,
+        margin: toBN("3"),
+        endTime: await createValidDerivativeExpiry(3),
         params: [
-          cast(20000), // Strike Price 200.00$
+          toBN("20000"), // Strike Price 200.00$
         ],
         token: testToken.address,
         syntheticId: optionCallMock.address,
@@ -112,12 +112,12 @@ describe("CoreCreation", () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
     const { deployer, buyer, seller } = namedSigners;
 
-    const amount = 3;
+    const amount = toBN("3");
     const optionCall = derivativeFactory({
-      margin: cast(30),
-      endTime,
+      margin: toBN("30"),
+      endTime: await createValidDerivativeExpiry(10),
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN("20000"), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -154,12 +154,12 @@ describe("CoreCreation", () => {
     const { buyer, seller } = namedSigners;
 
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
-    const amount = 3;
+    const amount = toBN("3");
     const optionCall = derivativeFactory({
-      margin: cast(30),
-      endTime,
+      margin: toBN("30"),
+      endTime: await createValidDerivativeExpiry(10),
       params: [
-        cast(20000), // Strike Price 200.00$
+        toBN("20000"), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,
@@ -183,12 +183,12 @@ describe("CoreCreation", () => {
 
     const newCoreTokenBalance = await testToken.balanceOf(core.address);
 
-    expect(newCoreTokenBalance).to.equal(oldCoreTokenBalance.add(optionCall.margin.mul(amount)));
+    expect(newCoreTokenBalance, 'wrong core balance').to.equal(oldCoreTokenBalance.add(computeTotalGrossPayout(optionCall.margin, amount)));
 
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
 
-    expect(buyerPositionsLongBalance).to.equal(amount);
+    expect(buyerPositionsLongBalance, ).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
     const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
@@ -197,4 +197,8 @@ describe("CoreCreation", () => {
     expect(sellerPositionsLongBalance).to.equal(0);
     expect(sellerPositionsShortBalance).to.equal(amount);
   });
+
+  after(async() => {
+    await resetNetwork()
+  })
 });
