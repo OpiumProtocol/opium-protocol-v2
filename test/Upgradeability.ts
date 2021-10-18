@@ -104,9 +104,9 @@ describe("Upgradeability", () => {
     expect(syntheticAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
     const derivative = derivativeFactory({
-      margin: toBN('30'),
+      margin: toBN("30"),
       endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [toBN('200')],
+      params: [toBN("200")],
       syntheticId: optionCallMock.address,
     });
 
@@ -180,12 +180,12 @@ describe("Upgradeability", () => {
      * TODO:
      * remove code duplication and set up test suites to keep it DRY
      */
-    const amount = toBN('3');
+    const amount = toBN("3");
     const optionCall = derivativeFactory({
-      margin: toBN('30'),
+      margin: toBN("30"),
       endTime,
       params: [
-        toBN('20000'), // Strike Price 200.00$
+        toBN("20000"), // Strike Price 200.00$
       ],
       token: testToken.address,
       syntheticId: optionCallMock.address,

@@ -1,18 +1,14 @@
 pragma solidity 0.8.5;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../Lib/LibRoles.sol";
 import "./RegistryEntities.sol";
-import "../Errors/RegistryErrors.sol";
 
-contract RegistryStorageUpgradeable is AccessControlUpgradeable, RegistryErrors {
+contract RegistryStorageUpgradeable is AccessControlUpgradeable {
     RegistryEntities.ProtocolCommissionArgs internal protocolCommissionArgs;
     RegistryEntities.ProtocolAddressesArgs internal protocolAddressesArgs;
-
     mapping(address => bool) internal whitelist;
-    bool internal paused;
 
     function __RegistryStorage__init(
         address _governor,
@@ -30,13 +26,13 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable, RegistryErrors 
         _setupRole(DEFAULT_ADMIN_ROLE, _governor);
         _setupRole(LibRoles.GUARDIAN, _guardian);
 
-        paused = false;
         protocolCommissionArgs = RegistryEntities.ProtocolCommissionArgs({
             derivativeAuthorCommissionBase: 10000,
             noDataCancellationPeriod: 2 weeks,
             protocolFeeCommissionBase: 10,
             protocolCommissionPart: 1,
-            precisionFactor: 18
+            precisionFactor: 18,
+            paused: false
         });
     }
 

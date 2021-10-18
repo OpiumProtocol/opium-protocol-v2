@@ -6,7 +6,7 @@ import { getEVMElapsedSeconds } from "./timeTravel";
 
 export const derivativeFactory = (derivative: Partial<TDerivative>): TDerivative => {
   const def = {
-    margin: toBN('0'),
+    margin: toBN("0"),
     endTime: 0,
     params: [],
     oracleId: zeroAddress,
@@ -50,8 +50,8 @@ export const computeDerivativeMargin = (margin: BigNumber, amount: BigNumber): B
   return margin.mul(amount);
 };
 
-export const createValidDerivativeExpiry = async(days: number): Promise<number> => {
-  return ~~(Date.now() / 1000) + await getEVMElapsedSeconds() + + 60 * 60 * 24 * days;
+export const createValidDerivativeExpiry = async (days: number): Promise<number> => {
+  return ~~(Date.now() / 1000) + (await getEVMElapsedSeconds()) + +60 * 60 * 24 * days;
 };
 
 type TFees = {

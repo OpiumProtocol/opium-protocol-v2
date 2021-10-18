@@ -17,22 +17,22 @@ abstract contract UsingRegistryACL is Initializable {
 
     /// @notice This modifier restricts access to functions, which could be called only by Opium.Core
     modifier onlyCore() {
-        require(msg.sender == registry.getCore(), "only core");
+        require(msg.sender == registry.getCore(), "U1"); //only core
         _;
     }
 
     modifier onlyWhitelisted() {
-        require(registry.isWhitelisted(msg.sender), "not whitelisted");
+        require(registry.isWhitelisted(msg.sender), "U2"); // not whitelisted
         _;
     }
 
     modifier onlyOpiumFactoryTokens(address _tokenAddress) {
-        require(IOpiumPositionToken(_tokenAddress).getFactoryAddress() == registry.getOpiumProxyFactory(), "not factory");
+        require(IOpiumPositionToken(_tokenAddress).getFactoryAddress() == registry.getOpiumProxyFactory(), "U3"); // only proxy factory
         _;
     }
 
     modifier whenNotPaused() {
-        require(registry.isPaused() == false, "paused");
+        require(registry.isPaused() == false, "U4"); //paused
         _;
     }
 

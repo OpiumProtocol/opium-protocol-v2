@@ -15,10 +15,6 @@ contract OpiumProxyFactory is UsingRegistryACL {
     event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
 
     address private immutable opiumPositionTokenImplementation;
-    string private constant longTokenName = "OPIUM LONG TOKEN";
-    string private constant longTokenSymbol = "OPLN";
-    string private constant shortTokenName = "OPIUM SHORT TOKEN";
-    string private constant shortTokenSymbol = "OPSH";
 
     constructor(address _registry) {
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
@@ -26,7 +22,7 @@ contract OpiumProxyFactory is UsingRegistryACL {
     }
 
     modifier implementationAddressExists() {
-        require(opiumPositionTokenImplementation != address(0), "IMPLEMENTATION_IS_NULL");
+        require(opiumPositionTokenImplementation != address(0), "F1"); //IMPLEMENTATION_IS_NULL
         _;
     }
 
@@ -54,8 +50,6 @@ contract OpiumProxyFactory is UsingRegistryACL {
             opiumPositionAddress = Clones.cloneDeterministic(opiumPositionTokenImplementation, _salt);
             if (_isLong) {
                 IOpiumPositionToken(opiumPositionAddress).initialize(
-                    longTokenName,
-                    longTokenSymbol,
                     _derivative,
                     _derivativeHash,
                     LibDerivative.PositionType.LONG
@@ -63,8 +57,6 @@ contract OpiumProxyFactory is UsingRegistryACL {
                 emit LogLongPositionTokenAddress(_derivativeHash, opiumPositionAddress);
             } else {
                 IOpiumPositionToken(opiumPositionAddress).initialize(
-                    shortTokenName,
-                    shortTokenSymbol,
                     _derivative,
                     _derivativeHash,
                     LibDerivative.PositionType.SHORT

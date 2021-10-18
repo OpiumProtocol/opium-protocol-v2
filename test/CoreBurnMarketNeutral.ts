@@ -27,7 +27,6 @@ describe("Core: burn market neutral positions", () => {
 
   before(async () => {
     namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-
   });
 
   it(`should redeem an entire market neutral position and return the entire initial margin`, async () => {
@@ -74,8 +73,8 @@ describe("Core: burn market neutral positions", () => {
     /**
      * checks the emitted event arguments
      */
-    expect(log.amount, "wrong amount event argument").to.be.eq(redeemAmount);
-    expect(log.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
+    expect(log._amount, "wrong amount event argument").to.be.eq(redeemAmount);
+    expect(log._derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
 
     const marketNeutralPartyLongBalanceAfter = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
@@ -143,8 +142,8 @@ describe("Core: burn market neutral positions", () => {
     /**
      * checks the emitted event arguments
      */
-    expect(log.amount, "wrong amount event argument").to.be.eq(redeemAmount);
-    expect(log.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
+    expect(log._amount, "wrong amount event argument").to.be.eq(redeemAmount);
+    expect(log._derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
 
     const marketNeutralPartyLongBalanceAfter = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
@@ -257,10 +256,10 @@ describe("Core: burn market neutral positions", () => {
     /**
      * checks the emitted event arguments
      */
-    expect(log1.amount, "wrong amount event argument").to.be.eq(redeemAmount);
-    expect(log1.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
-    expect(log2.amount, "wrong amount event argument").to.be.eq(secondRedeemAmount);
-    expect(log2.derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(secondOptionCall));
+    expect(log1._amount, "wrong amount event argument").to.be.eq(redeemAmount);
+    expect(log1._derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(optionCall));
+    expect(log2._amount, "wrong amount event argument").to.be.eq(secondRedeemAmount);
+    expect(log2._derivativeHash, "wrong derivativeHash event argument").to.be.eq(getDerivativeHash(secondOptionCall));
 
     const marketNeutralPartyLongBalanceAfter = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
@@ -318,7 +317,7 @@ describe("Core: burn market neutral positions", () => {
     );
   });
 
-  after(async() => {
-    await resetNetwork()
-  })
+  after(async () => {
+    await resetNetwork();
+  });
 });

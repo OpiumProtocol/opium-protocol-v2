@@ -21,14 +21,14 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     modifier onlyGovernor() {
-        require(isRole(DEFAULT_ADMIN_ROLE, msg.sender), NOT_GOVERNOR);
+        require(isRole(DEFAULT_ADMIN_ROLE, msg.sender), "R1"); //not governor
         _;
     }
 
     modifier onlyLongExecutor() {
         require(
             isRole(LibRoles.LONG_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender),
-            NOT_LONG_EXECUTOR
+            "R2" // not long exec
         );
         _;
     }
@@ -36,13 +36,13 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     modifier onlyShortExecutor() {
         require(
             isRole(LibRoles.SHORT_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender),
-            NOT_SHORT_EXECUTOR
+            "R3" // not short exec
         );
         _;
     }
 
     modifier onlyGuardian() {
-        require(isRole(LibRoles.GUARDIAN, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), "NOT_GUARDIAN");
+        require(isRole(LibRoles.GUARDIAN, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), "R4"); //NOT_GUARDIAN
         _;
     }
 
@@ -61,7 +61,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
                 _syntheticAggregator != address(0) &&
                 _tokenSpender != address(0) &&
                 _protocolFeeReceiver != address(0),
-            ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS
+            "R5" //ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS
         );
 
         protocolAddressesArgs = RegistryEntities.ProtocolAddressesArgs({
@@ -75,13 +75,13 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     function pause() external onlyGuardian {
-        require(paused == false, "already paused");
-        paused = true;
+        require(protocolCommissionArgs.paused == false, "R6"); //already paused
+        protocolCommissionArgs.paused = true;
     }
 
     function unpause() external onlyGuardian {
-        require(paused == true, "not paused");
-        paused = false;
+        require(protocolCommissionArgs.paused == true, "R7"); //not paused
+        protocolCommissionArgs.paused = false;
     }
 
     function addToWhitelist(address _whitelisted) external onlyLongExecutor {
@@ -98,7 +98,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     // GETTERS
     function isPaused() external view returns (bool) {
-        return paused;
+        return protocolCommissionArgs.paused;
     }
 
     function getExecuteAndCancelLocalVars() external view returns (RegistryEntities.ExecuteAndCancelLocalVars memory) {

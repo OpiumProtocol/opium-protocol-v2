@@ -12,6 +12,7 @@ library RegistryEntities {
         uint8 protocolCommissionPart;
         // scaling factor
         uint8 precisionFactor;
+        bool paused;
     }
 
     struct ProtocolAddressesArgs {

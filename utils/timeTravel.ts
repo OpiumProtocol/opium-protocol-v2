@@ -24,27 +24,26 @@ export const setBalance = async (account: string, balance: BigNumber): Promise<v
   await hre.network.provider.send("hardhat_setBalance", [account, hre.ethers.utils.hexlify(balance)]);
 };
 
-export const resetNetwork = async(): Promise<void> => {
+export const resetNetwork = async (): Promise<void> => {
   await hre.network.provider.request({
     method: "hardhat_reset",
     params: [],
   });
-  
-}
+};
 
-export const takeEVMSnapshot = async(): Promise<void> => {
+export const takeEVMSnapshot = async (): Promise<void> => {
   // check if it is testnet
   const snapshot = await hre.network.provider.request({
     method: " evm_snapshot",
     params: [],
   });
-  console.log('SNAPSHOT: ', snapshot)  
-}
+  console.log("SNAPSHOT: ", snapshot);
+};
 
-export const getEVMElapsedSeconds = async(): Promise<number> => {
+export const getEVMElapsedSeconds = async (): Promise<number> => {
   const time = await hre.network.provider.send("evm_increaseTime", [0]);
   await hre.network.provider.send("evm_mine");
-  return time
-}
+  return time;
+};
 
 export default timeTravel;

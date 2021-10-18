@@ -8,6 +8,7 @@ import { toBN } from "../utils/bn";
 import { impersonateAccount, setBalance } from "../utils/timeTravel";
 // types
 import { TNamedSigners } from "../types";
+import { pickError, semanticErrors } from "../utils/constants";
 
 describe("TokenSpender", () => {
   let dai: MockContract;
@@ -22,15 +23,12 @@ describe("TokenSpender", () => {
   });
 
   it("should revert spending by non whitelisted address", async () => {
-    try {
-      const { deployer, hacker } = namedSigners;
-      const { tokenSpender } = await setup();
+    const { deployer, hacker } = namedSigners;
+    const { tokenSpender } = await setup();
 
-      await tokenSpender.claimTokens(dai.address, deployer.address, hacker.address, toBN("0.01"));
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("not whitelisted");
-    }
+    await expect(
+      tokenSpender.claimTokens(dai.address, deployer.address, hacker.address, toBN("0.01")),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_ACL_ONLY_WHITELISTED));
   });
 
   it("should successfully spend by core", async () => {

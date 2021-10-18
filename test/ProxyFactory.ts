@@ -12,6 +12,7 @@ import { TDerivative } from "../types";
 import { retrievePositionTokensAddresses } from "../utils/events";
 import { impersonateAccount, setBalance } from "../utils/timeTravel";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+import { pickError, semanticErrors } from "../utils/constants";
 
 describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;
@@ -48,17 +49,14 @@ describe("OpiumProxyFactory", () => {
   });
 
   it("expects to revert if caller is not core", async () => {
-    try {
-      const { buyer, seller } = namedSigners;
-      await impersonateAccount(core.address);
-      const amount = 1;
+    const { buyer, seller } = namedSigners;
+    await impersonateAccount(core.address);
+    const amount = 1;
 
-      const hash = getDerivativeHash(derivative);
-      await opiumProxyFactory.mint(buyer.address, seller.address, hash, derivative, amount);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("only core");
-    }
+    const hash = getDerivativeHash(derivative);
+    await expect(opiumProxyFactory.mint(buyer.address, seller.address, hash, derivative, amount)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_ACL_ONLY_CORE),
+    );
   });
 
   it("expects to mint the correct number of erc20 long/short positions", async () => {
@@ -130,6 +128,13 @@ describe("OpiumProxyFactory", () => {
     const shortOpiumPositionToken = await (<OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortOpiumPositionTokenAddress)
     ));
+
+    const tokenData = await shortOpiumPositionToken.getPositionTokenData();
+    // console.log("tokenData ", tokenData);
+    // console.log("tokenData positiontype ", tokenData.positionType);
+    const longTokenData = await longOpiumPositionToken.getPositionTokenData();
+    // console.log("longTokenData ", longTokenData);
+    // console.log("longTokenData positiontype ", longTokenData.positionType);
 
     const beforeShortOpiumPositionTokenSellerBalance = await shortOpiumPositionToken.balanceOf(seller.address);
     const beforeShortOpiumPositionTokenBuyerBalance = await shortOpiumPositionToken.balanceOf(buyer.address);

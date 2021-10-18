@@ -5,12 +5,17 @@ import { expect } from "chai";
 // utils
 import { retrievePositionTokensAddresses } from "../utils/events";
 import { toBN } from "../utils/bn";
-import { computeTotalGrossPayout, createValidDerivativeExpiry, derivativeFactory, getDerivativeHash } from "../utils/derivatives";
+import {
+  computeTotalGrossPayout,
+  createValidDerivativeExpiry,
+  derivativeFactory,
+  getDerivativeHash,
+} from "../utils/derivatives";
 import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
 import { OpiumPositionToken } from "../typechain";
-import { SECONDS_40_MINS } from "../utils/constants";
+import { pickError, SECONDS_40_MINS, semanticErrors } from "../utils/constants";
 import { resetNetwork } from "../utils/timeTravel";
 
 describe("CoreCreation", () => {
@@ -60,54 +65,51 @@ describe("CoreCreation", () => {
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.satisfy(() => {
-        return message.includes('SYNTHETIC_AGGREGATOR:WRONG_MARGIN') || message.includes('CORE:SYNTHETIC_VALIDATION_ERROR')
-      })
+        return (
+          message.includes(pickError(semanticErrors.ERROR_SYNTHETIC_AGGREGATOR_WRONG_MARGIN)) ||
+          message.includes(pickError(semanticErrors.ERROR_CORE_SYNTHETIC_VALIDATION_ERROR))
+        );
+      });
     }
   });
 
   it(`should revert create OptionCall derivative with CORE:SYNTHETIC_VALIDATION_ERROR`, async () => {
-    try {
-      const { buyer, seller } = namedSigners;
-      const { core, testToken, optionCallMock, tokenSpender } = await setup();
+    const { buyer, seller } = namedSigners;
+    const { core, testToken, optionCallMock, tokenSpender } = await setup();
 
-      const optionCall = derivativeFactory({
-        margin: toBN("30"),
-        endTime: 0,
-        params: [
-          toBN("20000"), // Strike Price 200.00$
-        ],
-        token: testToken.address,
-        syntheticId: optionCallMock.address,
-      });
-      const amount = toBN("3");
-      await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-      await core.create(optionCall, amount, [buyer.address, seller.address]);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:SYNTHETIC_VALIDATION_ERROR");
-    }
+    const optionCall = derivativeFactory({
+      margin: toBN("30"),
+      endTime: 0,
+      params: [
+        toBN("20000"), // Strike Price 200.00$
+      ],
+      token: testToken.address,
+      syntheticId: optionCallMock.address,
+    });
+    const amount = toBN("3");
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
+    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_SYNTHETIC_VALIDATION_ERROR),
+    );
   });
 
   it(`should revert create OptionCall derivative with 'CORE:NOT_ENOUGH_TOKEN_ALLOWANCE`, async () => {
-    try {
-      const { core, testToken, optionCallMock } = await setup();
-      const { buyer, seller } = namedSigners;
+    const { core, testToken, optionCallMock } = await setup();
+    const { buyer, seller } = namedSigners;
 
-      const optionCall = derivativeFactory({
-        margin: toBN("3"),
-        endTime: await createValidDerivativeExpiry(3),
-        params: [
-          toBN("20000"), // Strike Price 200.00$
-        ],
-        token: testToken.address,
-        syntheticId: optionCallMock.address,
-      });
-      const amount = 3;
-      await core.create(optionCall, amount, [buyer.address, seller.address]);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:NOT_ENOUGH_TOKEN_ALLOWANCE");
-    }
+    const optionCall = derivativeFactory({
+      margin: toBN("3"),
+      endTime: await createValidDerivativeExpiry(3),
+      params: [
+        toBN("20000"), // Strike Price 200.00$
+      ],
+      token: testToken.address,
+      syntheticId: optionCallMock.address,
+    });
+    const amount = 3;
+    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE),
+    );
   });
 
   it(`should create OptionCall derivative`, async () => {
@@ -185,12 +187,14 @@ describe("CoreCreation", () => {
 
     const newCoreTokenBalance = await testToken.balanceOf(core.address);
 
-    expect(newCoreTokenBalance, 'wrong core balance').to.equal(oldCoreTokenBalance.add(computeTotalGrossPayout(optionCall.margin, amount)));
+    expect(newCoreTokenBalance, "wrong core balance").to.equal(
+      oldCoreTokenBalance.add(computeTotalGrossPayout(optionCall.margin, amount)),
+    );
 
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
 
-    expect(buyerPositionsLongBalance, ).to.equal(amount);
+    expect(buyerPositionsLongBalance).to.equal(amount);
     expect(buyerPositionsShortBalance).to.equal(0);
 
     const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
@@ -200,7 +204,7 @@ describe("CoreCreation", () => {
     expect(sellerPositionsShortBalance).to.equal(amount);
   });
 
-  after(async() => {
-    await resetNetwork()
-  })
+  after(async () => {
+    await resetNetwork();
+  });
 });

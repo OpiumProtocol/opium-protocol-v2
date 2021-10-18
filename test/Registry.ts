@@ -6,7 +6,7 @@ import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
 import { DEFAULT_ADMIN_ROLE, guardianRole, longExecutorRole, shortExecutorRole } from "../utils/addresses";
-import { SECONDS_2_WEEKS } from "../utils/constants";
+import { pickError, SECONDS_2_WEEKS, semanticErrors } from "../utils/constants";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;
@@ -66,8 +66,8 @@ describe("Registry", () => {
     const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
     const { notAllowed, longExecutorOne } = namedSigners;
 
-    try {
-      await registry
+    await expect(
+      registry
         .connect(longExecutorOne)
         .registerProtocol(
           opiumProxyFactory.address,
@@ -76,39 +76,24 @@ describe("Registry", () => {
           syntheticAggregator.address,
           tokenSpender.address,
           notAllowed.address,
-        );
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("NOT_GOVERNOR");
-    }
+        ),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_GOVERNOR));
 
-    try {
-      await registry.connect(notAllowed).addToWhitelist(notAllowed.address);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("NOT_LONG_EXECUTOR");
-    }
+    await expect(registry.connect(notAllowed).addToWhitelist(notAllowed.address)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_LONG_EXECUTOR),
+    );
 
-    try {
-      await registry.connect(notAllowed).removeFromWhitelist(notAllowed.address);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("NOT_LONG_EXECUTOR");
-    }
+    await expect(registry.connect(notAllowed).removeFromWhitelist(notAllowed.address)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_LONG_EXECUTOR),
+    );
 
-    try {
-      await registry.connect(notAllowed).setOpiumCommissionPart(4);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("NOT_LONG_EXECUTOR");
-    }
+    await expect(registry.connect(notAllowed).setOpiumCommissionPart(4)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_LONG_EXECUTOR),
+    );
 
-    try {
-      await registry.connect(longExecutorOne).pause();
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("NOT_GUARDIAN");
-    }
+    await expect(registry.connect(longExecutorOne).pause()).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_GUARDIAN),
+    );
   });
 
   it(`should allow the authorized roles to change the protocol's parameters`, async () => {
@@ -136,13 +121,10 @@ describe("Registry", () => {
     await registry.connect(guardian).pause();
     expect(await registry.isPaused(), "it's paused").to.be.true;
 
-    try {
-      // should throw a failure if "paused" is set to true
-      await registry.connect(guardian).pause();
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("already paused");
-    }
+    // should throw a failure if "paused" is set to true
+    await expect(registry.connect(guardian).pause()).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_ALREADY_PAUSED),
+    );
 
     await registry.connect(guardian).unpause();
     expect(await registry.isPaused(), "it's unpaused").to.be.false;

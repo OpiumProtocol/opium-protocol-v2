@@ -31,6 +31,9 @@ import {
   SECONDS_40_MINS,
   SECONDS_50_MINS,
   SECONDS_3_WEEKS,
+  protocolErrors,
+  semanticErrors,
+  pickError,
 } from "../utils/constants";
 import { retrievePositionTokensAddresses } from "../utils/events";
 
@@ -256,82 +259,51 @@ describe("CoreExecution", () => {
   });
 
   it("should revert execution with CORE:ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH", async () => {
-    try {
-      const { seller } = namedSigners;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await core
+    const { seller } = namedSigners;
+    console.log("TESTING THE C1 REVERT");
+    await expect(
+      core
         .connect(seller)
         [executeManyWithAddress](
           seller.address,
           [fullMarginOption.longPositionAddress, fullMarginOption.shortPositionAddress],
           [1],
-        );
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH");
-    }
+        ),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH));
   });
 
   it("should revert execution before endTime with CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED", async () => {
     const { buyer, seller } = namedSigners;
-    try {
-      await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
 
-    try {
-      await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
+    await expect(core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, 1)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED),
+    );
 
-    try {
-      await core.connect(buyer)[executeMany]([fullMarginOption.longPositionAddress], [1]);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
+    await expect(core.connect(buyer)[executeMany]([fullMarginOption.longPositionAddress], [1])).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED),
+    );
 
-    try {
-      await core.connect(buyer)[executeManyWithAddress](buyer.address, [fullMarginOption.longPositionAddress], [1]);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
+    await expect(
+      core.connect(buyer)[executeManyWithAddress](buyer.address, [fullMarginOption.longPositionAddress], [1]),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED));
 
     // Seller
-    try {
-      await core.connect(seller)[executeOne](fullMarginOption.longPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
 
-    try {
-      await core.connect(seller)[executeOneWithAddress](seller.address, fullMarginOption.shortPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
+    await expect(core.connect(seller)[executeOne](fullMarginOption.longPositionAddress, 1)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED),
+    );
 
-    try {
-      await core.connect(seller)[executeMany]([fullMarginOption.shortPositionAddress], [1]);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
+    await expect(
+      core.connect(seller)[executeOneWithAddress](seller.address, fullMarginOption.shortPositionAddress, 1),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED));
 
-    try {
-      await core.connect(seller)[executeManyWithAddress](seller.address, [fullMarginOption.longPositionAddress], [1]);
-      throw null;
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED");
-    }
+    await expect(core.connect(seller)[executeMany]([fullMarginOption.shortPositionAddress], [1])).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED),
+    );
+
+    await expect(
+      core.connect(seller)[executeManyWithAddress](seller.address, [fullMarginOption.longPositionAddress], [1]),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED));
   });
 
   it("should execute full margin option", async () => {
@@ -385,19 +357,13 @@ describe("CoreExecution", () => {
   it("should revert execution before endTime with CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED", async () => {
     const { buyer, seller, thirdParty } = namedSigners;
 
-    try {
-      await core.connect(thirdParty)[executeOneWithAddress](buyer.address, fullMarginOption.longPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED");
-    }
+    await expect(
+      core.connect(thirdParty)[executeOneWithAddress](buyer.address, fullMarginOption.longPositionAddress, 1),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED));
 
-    try {
-      await core.connect(thirdParty)[executeOneWithAddress](seller.address, fullMarginOption.longPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED");
-    }
+    await expect(
+      core.connect(thirdParty)[executeOneWithAddress](seller.address, fullMarginOption.longPositionAddress, 1),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED));
   });
 
   it("should allow execution for third parties", async () => {
@@ -599,14 +565,11 @@ describe("CoreExecution", () => {
   // });
 
   it("should revert execution with ORACLE_AGGREGATOR:DATA_DOESNT_EXIST", async () => {
-    try {
-      const { buyer } = namedSigners;
-      await timeTravel(SECONDS_3_WEEKS);
-      await core.connect(buyer)[executeOne](noDataOption.longPositionAddress, noDataOption.amount);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("ORACLE_AGGREGATOR:DATA_DOESNT_EXIST");
-    }
+    const { buyer } = namedSigners;
+    await timeTravel(SECONDS_3_WEEKS);
+    await expect(
+      core.connect(buyer)[executeOne](noDataOption.longPositionAddress, noDataOption.amount),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST));
   });
 
   it("should successfully cancel position after 2 weeks with no data", async () => {
@@ -634,13 +597,9 @@ describe("CoreExecution", () => {
 
     // Data occasionally appeared
     await oracleAggregator.connect(oracle).__callback(noDataOption.derivative.endTime, noDataOption.price);
-
-    try {
-      await core.connect(buyer)[executeOne](noDataOption.longPositionAddress, 1);
-    } catch (error) {
-      const { message } = error as Error;
-      expect(message).to.include("CORE:TICKER_WAS_CANCELLED");
-    }
+    await expect(core.connect(buyer)[executeOne](noDataOption.longPositionAddress, 1)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_TICKER_WAS_CANCELLED),
+    );
   });
 
   it("should successfully withdraw commission", async () => {

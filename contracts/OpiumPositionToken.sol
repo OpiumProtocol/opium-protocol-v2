@@ -5,23 +5,28 @@ import "./Lib/LibDerivative.sol";
 
 contract OpiumPositionToken is ERC20Upgradeable {
     using LibDerivative for LibDerivative.Derivative;
-    LibDerivative.Derivative private derivative;
-    LibDerivative.PositionType private positionType;
     address private factory;
-    bytes32 private derivativeHash;
+    struct OpiumPositionTokenParams {
+        LibDerivative.Derivative derivative;
+        LibDerivative.PositionType positionType;
+        bytes32 derivativeHash;
+    }
+    OpiumPositionTokenParams private opiumPositionTokenParams;
 
     function initialize(
-        string memory name,
-        string memory symbol,
         LibDerivative.Derivative calldata _derivative,
         bytes32 _derivativeHash,
         LibDerivative.PositionType _positionType
     ) external initializer {
-        __ERC20_init(name, symbol);
+        _positionType == LibDerivative.PositionType.LONG
+            ? __ERC20_init("OPIUM LONG TOKEN", "OPLN")
+            : __ERC20_init("OPIUM SHORT TOKEN", "OPSH");
         factory = msg.sender;
-        derivative = _derivative;
-        derivativeHash = _derivativeHash;
-        positionType = _positionType;
+        opiumPositionTokenParams = OpiumPositionTokenParams({
+            derivative: _derivative,
+            positionType: _positionType,
+            derivativeHash: _derivativeHash
+        });
     }
 
     modifier isFactory() {
@@ -39,19 +44,11 @@ contract OpiumPositionToken is ERC20Upgradeable {
     }
 
     //GETTERS
-    function getPositionType() external view returns (LibDerivative.PositionType) {
-        return positionType;
-    }
-
-    function getDerivative() external view returns (LibDerivative.Derivative memory _derivative) {
-        return derivative;
-    }
-
     function getFactoryAddress() external view returns (address) {
         return factory;
     }
 
-    function getDerivativeHash() external view returns (bytes32) {
-        return derivativeHash;
+    function getPositionTokenData() external view returns (OpiumPositionTokenParams memory _opiumPositionTokenParams) {
+        return opiumPositionTokenParams;
     }
 }
