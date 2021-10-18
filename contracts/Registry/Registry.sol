@@ -2,7 +2,10 @@ pragma solidity 0.8.5;
 
 import "./RegistryStorageUpgradeable.sol";
 import "../Lib/LibRoles.sol";
-
+import "../Interface/IOpiumProxyFactory.sol";
+import "../Interface/ISyntheticAggregator.sol";
+import "../Interface/IOracleAggregator.sol";
+import "hardhat/console.sol";
 contract RegistryUpgradeable is RegistryStorageUpgradeable {
     //add events
     event LogOpiumCommissionChange(address _committer, uint256 _opiumCommission);
@@ -65,10 +68,10 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         );
 
         protocolAddressesArgs = RegistryEntities.ProtocolAddressesArgs({
-            opiumProxyFactory: _opiumProxyFactory,
+            opiumProxyFactory: IOpiumProxyFactory(_opiumProxyFactory),
             core: _core,
-            oracleAggregator: _oracleAggregator,
-            syntheticAggregator: _syntheticAggregator,
+            oracleAggregator: IOracleAggregator(_oracleAggregator),
+            syntheticAggregator: ISyntheticAggregator(_syntheticAggregator),
             tokenSpender: _tokenSpender,
             protocolFeeReceiver: _protocolFeeReceiver
         });
@@ -104,9 +107,9 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     function getExecuteAndCancelLocalVars() external view returns (RegistryEntities.ExecuteAndCancelLocalVars memory) {
         return
             RegistryEntities.ExecuteAndCancelLocalVars({
-                opiumProxyFactory: protocolAddressesArgs.opiumProxyFactory,
-                oracleAggregator: protocolAddressesArgs.oracleAggregator,
-                syntheticAggregator: protocolAddressesArgs.syntheticAggregator
+                opiumProxyFactory: IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory),
+                oracleAggregator: IOracleAggregator(protocolAddressesArgs.oracleAggregator),
+                syntheticAggregator: ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator)
             });
     }
 
@@ -117,7 +120,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     /// @notice Returns address of Opium.OpiumProxyFactory
     /// @param result address Address of Opium.OpiumProxyFactory
     function getOpiumProxyFactory() external view returns (address result) {
-        return protocolAddressesArgs.opiumProxyFactory;
+        return address(protocolAddressesArgs.opiumProxyFactory);
     }
 
     /// @notice Returns address of Opium.Core
@@ -126,11 +129,11 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         return protocolAddressesArgs.core;
     }
 
-    /// @notice Returns address of Opium.OracleAggregator
-    /// @param result address Address of Opium.OracleAggregator
-    function getOracleAggregator() external view returns (address result) {
-        return protocolAddressesArgs.oracleAggregator;
-    }
+    // /// @notice Returns address of Opium.OracleAggregator
+    // /// @param result address Address of Opium.OracleAggregator
+    // function getOracleAggregator() external view returns (address result) {
+    //     return protocolAddressesArgs.oracleAggregator;
+    // }
 
     /// @notice Returns address of Opium.TokenSpender
     /// @param result address Address of Opium.TokenSpender

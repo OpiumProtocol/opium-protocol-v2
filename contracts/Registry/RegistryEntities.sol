@@ -1,5 +1,9 @@
 pragma solidity 0.8.5;
 
+import "../Interface/IOpiumProxyFactory.sol";
+import "../Interface/ISyntheticAggregator.sol";
+import "../Interface/IOracleAggregator.sol";
+
 library RegistryEntities {
     struct ProtocolCommissionArgs {
         // Represents 100% base for commissions calculation
@@ -19,11 +23,11 @@ library RegistryEntities {
         // Address of Opium.Core contract
         address core;
         // Address of Opium.OpiumProxyFactory contract
-        address opiumProxyFactory;
+        IOpiumProxyFactory opiumProxyFactory;
         // Address of Opium.OracleAggregator contract
-        address oracleAggregator;
+        IOracleAggregator oracleAggregator;
         // Address of Opium.SyntheticAggregator contract
-        address syntheticAggregator;
+        ISyntheticAggregator syntheticAggregator;
         // Address of Opium.TokenSpender contract
         address tokenSpender;
         // Address of protocol commission receiver
@@ -31,8 +35,8 @@ library RegistryEntities {
     }
 
     struct ExecuteAndCancelLocalVars {
-        address opiumProxyFactory;
-        address oracleAggregator;
-        address syntheticAggregator;
+        IOpiumProxyFactory opiumProxyFactory;
+        IOracleAggregator oracleAggregator;
+        ISyntheticAggregator syntheticAggregator;
     }
 }

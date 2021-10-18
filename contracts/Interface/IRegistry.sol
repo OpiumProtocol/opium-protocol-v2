@@ -16,6 +16,8 @@ interface IRegistry {
 
     function isWhitelisted(address _address) external view returns (bool);
 
+    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
+
     function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolCommissionArgs memory);
 
     function getExecuteAndCancelLocalVars() external view returns (RegistryEntities.ExecuteAndCancelLocalVars memory);

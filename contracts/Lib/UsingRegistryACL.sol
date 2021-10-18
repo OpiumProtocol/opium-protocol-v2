@@ -27,7 +27,7 @@ abstract contract UsingRegistryACL is Initializable {
     }
 
     modifier onlyOpiumFactoryTokens(address _tokenAddress) {
-        require(IOpiumPositionToken(_tokenAddress).getFactoryAddress() == registry.getOpiumProxyFactory(), "U3"); // only proxy factory
+        require(IOpiumPositionToken(_tokenAddress).getFactoryAddress() == address(registry.getOpiumProxyFactory()), "U3"); // only proxy factory
         _;
     }
 

@@ -43,10 +43,6 @@ abstract contract IDerivativeLogic {
     /// @return Returns boolean whether _derivativeOwner allowed third party execution
     function thirdpartyExecutionAllowed(address _derivativeOwner) public view virtual returns (bool);
 
-    /// @notice Returns whether syntheticId implements pool logic
-    /// @return Returns whether syntheticId implements pool logic
-    function isPool() public view virtual returns (bool);
-
     /// @notice Sets whether thirds parties are allowed or not to execute derivative's on msg.sender's behalf
     /// @param _allow bool Flag for execution allowance
     function allowThirdpartyExecution(bool _allow) public virtual;

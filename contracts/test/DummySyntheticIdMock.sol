@@ -60,10 +60,6 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         _result;
     }
 
-    function isPool() public view override returns (bool) {
-        return false;
-    }
-
     function allowThirdpartyExecution(bool allow) public virtual override(IDerivativeLogic, ExecutableByThirdParty) {
         ExecutableByThirdParty.allowThirdpartyExecution(allow);
     }

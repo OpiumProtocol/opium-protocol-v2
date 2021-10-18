@@ -2,7 +2,6 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-// import "./Interface/IOracleId.sol";
 import "./Interface/IDerivativeLogic.sol";
 import "./Interface/IRegistry.sol";
 
@@ -24,7 +23,6 @@ contract SyntheticAggregator is Initializable {
         uint256 commission;
         address authorAddress;
         bool init;
-        // SyntheticTypes typeByHash;
     }
     mapping(bytes32 => SyntheticCache) private syntheticCaches;
 
@@ -32,33 +30,6 @@ contract SyntheticAggregator is Initializable {
 
     function initialize(address _registry) external initializer {
         registry = IRegistry(_registry);
-    }
-
-    /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author commission from cache
-    /// @param _derivativeHash bytes32 Hash of derivative
-    /// @param _derivative Derivative Derivative itself
-    /// @return commission uint256 Synthetic author commission
-    function getAuthorCommission(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
-        external
-        returns (uint256 commission)
-    {
-        // SyntheticCache memory syntheticCache = syntheticCaches[_derivativeHash];
-        // Initialize derivative if wasn't initialized before
-        _initDerivative(_derivativeHash, _derivative);
-        commission = syntheticCaches[_derivativeHash].commission;
-    }
-
-    /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author address from cache
-    /// @param _derivativeHash bytes32 Hash of derivative
-    /// @param _derivative Derivative Derivative itself
-    /// @return authorAddress address Synthetic author address
-    function getAuthorAddress(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
-        external
-        returns (address authorAddress)
-    {
-        // Initialize derivative if wasn't initialized before
-        _initDerivative(_derivativeHash, _derivative);
-        authorAddress = syntheticCaches[_derivativeHash].authorAddress;
     }
 
     /// @notice Initializes ticker, if was not initialized and returns buyer and seller margin from cache
@@ -76,6 +47,7 @@ contract SyntheticAggregator is Initializable {
         return (syntheticCache.buyerMargin, syntheticCache.sellerMargin);
     }
 
+    /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author address from cache
     function getSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
         external
         returns (SyntheticCache memory)

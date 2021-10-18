@@ -118,42 +118,42 @@ describe("Upgradeability", () => {
     expect(margin.sellerMargin).to.be.equal(derivative.margin);
   });
 
-  it("should upgrade OracleAggregator", async () => {
-    const { oracleAggregator, registry } = await setup();
-    const { oracle } = namedSigners;
+  // it("should upgrade OracleAggregator", async () => {
+  //   const { oracleAggregator, registry } = await setup();
+  //   const { oracle } = namedSigners;
 
-    const oracleAggregatorAddressBefore = await registry.getOracleAggregator();
-    const oracleAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
-      oracleAggregator.address,
-    );
+  //   const oracleAggregatorAddressBefore = await registry.getOracleAggregator();
+  //   const oracleAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
+  //     oracleAggregator.address,
+  //   );
 
-    const OracleAggregatorUpgrade = await ethers.getContractFactory("TestOracleAggregatorUpgrade");
-    const upgraded = <TestOracleAggregatorUpgrade>(
-      await upgrades.upgradeProxy(oracleAggregator.address, OracleAggregatorUpgrade)
-    );
-    const oracleAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
-      oracleAggregator.address,
-    );
-    const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
-    const oracleAggregatorAddressAfter = await registry.getOracleAggregator();
+  //   const OracleAggregatorUpgrade = await ethers.getContractFactory("TestOracleAggregatorUpgrade");
+  //   const upgraded = <TestOracleAggregatorUpgrade>(
+  //     await upgrades.upgradeProxy(oracleAggregator.address, OracleAggregatorUpgrade)
+  //   );
+  //   const oracleAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
+  //     oracleAggregator.address,
+  //   );
+  //   const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
+  //   const oracleAggregatorAddressAfter = await registry.getOracleAggregator();
 
-    expect(upgraded.address).to.be.eq(oracleAggregator.address);
-    expect(oracleAggregatorImplementationAddressBefore).to.not.be.eq(oracleAggregatorImplementationAddressAfter);
-    expect(oracleAggregatorAddressBefore).to.be.eq(oracleAggregatorAddressAfter);
-    expect(oracleAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
+  //   expect(upgraded.address).to.be.eq(oracleAggregator.address);
+  //   expect(oracleAggregatorImplementationAddressBefore).to.not.be.eq(oracleAggregatorImplementationAddressAfter);
+  //   expect(oracleAggregatorAddressBefore).to.be.eq(oracleAggregatorAddressAfter);
+  //   expect(oracleAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
-    /**
-     * repeats the OracleAggregator `should accept data from oracle` test with the upgraded core contract
-     * TODO:
-     * remove code duplication and set up test suites to keep it DRY
-     */
-    const timestamp = Math.floor(Date.now() / 1000);
-    const data = 123456789;
-    await upgraded.connect(oracle).__callback(timestamp, data);
-    const result = await upgraded.getData(oracle.address, timestamp);
+  //   /**
+  //    * repeats the OracleAggregator `should accept data from oracle` test with the upgraded core contract
+  //    * TODO:
+  //    * remove code duplication and set up test suites to keep it DRY
+  //    */
+  //   const timestamp = Math.floor(Date.now() / 1000);
+  //   const data = 123456789;
+  //   await upgraded.connect(oracle).__callback(timestamp, data);
+  //   const result = await upgraded.getData(oracle.address, timestamp);
 
-    expect(result).to.be.equal(data);
-  });
+  //   expect(result).to.be.equal(data);
+  // });
 
   it("should upgrade Core", async () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry } = await setup();

@@ -33,36 +33,36 @@ describe("SyntheticAggregator", () => {
     expect(margin.sellerMargin).to.be.equal(derivative.margin);
   });
 
-  it("should successfully return authorAddress", async () => {
-    const { syntheticAggregator, optionCallMock } = await setup();
-    const { deployer } = namedSigners;
+  // it("should successfully return authorAddress", async () => {
+  //   const { syntheticAggregator, optionCallMock } = await setup();
+  //   const { deployer } = namedSigners;
 
-    const derivative = derivativeFactory({
-      margin: toBN("30"),
-      endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [toBN("200")],
-      syntheticId: optionCallMock.address,
-    });
-    const hash = getDerivativeHash(derivative);
+  //   const derivative = derivativeFactory({
+  //     margin: toBN("30"),
+  //     endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
+  //     params: [toBN("200")],
+  //     syntheticId: optionCallMock.address,
+  //   });
+  //   const hash = getDerivativeHash(derivative);
 
-    const authorAddress = await syntheticAggregator.callStatic.getAuthorAddress(hash, derivative);
+  //   const authorAddress = await syntheticAggregator.callStatic.getAuthorAddress(hash, derivative);
 
-    expect(authorAddress).to.be.equal(deployer.address);
-  });
+  //   expect(authorAddress).to.be.equal(deployer.address);
+  // });
 
-  it("should successfully return authorCommission", async () => {
-    const { syntheticAggregator, optionCallMock } = await setup();
+  // it("should successfully return authorCommission", async () => {
+  //   const { syntheticAggregator, optionCallMock } = await setup();
 
-    const derivative = derivativeFactory({
-      margin: toBN("30"),
-      endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
-      params: [toBN("200")],
-      syntheticId: optionCallMock.address,
-    });
+  //   const derivative = derivativeFactory({
+  //     margin: toBN("30"),
+  //     endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
+  //     params: [toBN("200")],
+  //     syntheticId: optionCallMock.address,
+  //   });
 
-    const hash = getDerivativeHash(derivative);
-    const commission = await syntheticAggregator.callStatic.getAuthorCommission(hash, derivative);
+  //   const hash = getDerivativeHash(derivative);
+  //   const commission = await syntheticAggregator.callStatic.getAuthorCommission(hash, derivative);
 
-    expect(commission).to.be.equal(25);
-  });
+  //   expect(commission).to.be.equal(25);
+  // });
 });

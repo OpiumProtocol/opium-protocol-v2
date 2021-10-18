@@ -91,4 +91,14 @@ contract OpiumProxyFactory is UsingRegistryACL {
     ) external onlyCore implementationAddressExists whenNotPaused {
         IOpiumPositionToken(_token).burn(_tokenOwner, _amount);
     }
+
+    function burnPair(
+        address _tokenOwner,
+        address _longToken,
+        address _shortToken,
+        uint256 _amount
+    ) external onlyCore implementationAddressExists whenNotPaused {
+        IOpiumPositionToken(_longToken).burn(_tokenOwner, _amount);
+        IOpiumPositionToken(_shortToken).burn(_tokenOwner, _amount);
+    }
 }
