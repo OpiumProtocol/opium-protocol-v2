@@ -5,50 +5,36 @@ import "../Lib/LibRoles.sol";
 import "../Interface/IOpiumProxyFactory.sol";
 import "../Interface/ISyntheticAggregator.sol";
 import "../Interface/IOracleAggregator.sol";
-import "hardhat/console.sol";
+import "../Interface/ITokenSpender.sol";
+
+/**
+    Error codes:
+    - R5 = ERROR_REGISTRY_NOT_PAUSED
+    - R6 = ERROR_REGISTRY_ALREADY_PAUSED
+ */
+
 contract RegistryUpgradeable is RegistryStorageUpgradeable {
     //add events
-    event LogOpiumCommissionChange(address _committer, uint256 _opiumCommission);
-    event LogOpiumFeeReceiverChange(address _committer, uint256 _opiumCommission);
-    event LogNoDataCancellationPeriodChange(address _committer, address _whitelisted);
-    event LogWhitelistAccount(address _committer, address _whitelisted);
-    event LogWhitelistAccountRemoved(address _committer, address _whitelisted);
+    event LogOpiumCommissionChange(uint256 _opiumCommission);
+    event LogNoDataCancellationPeriodChange(uint256 _noDataCancellationPeriod);
+    event LogWhitelistAccount(address _whitelisted);
+    event LogWhitelistAccountRemoved(address _whitelisted);
 
-    function initialize(
-        address _governor,
-        address _guardian,
-        address[] memory _longExecutors,
-        address[] memory _shortExecutors
-    ) external initializer {
-        __RegistryStorage__init(_governor, _guardian, _longExecutors, _shortExecutors);
+    /// @notice it is called only once upon deployment of the contract plus the protocol's fee receiver. It initializes the registry storage with the given governor address as the admin role
+    /// @dev Calls RegistryStorageUpgradeable.__RegistryStorage__init
+    /// @param _governor address of the governance account which will be assigned the initial admin role
+    function initialize(address _governor) external initializer {
+        __RegistryStorage__init(_governor);
     }
 
-    modifier onlyGovernor() {
-        require(isRole(DEFAULT_ADMIN_ROLE, msg.sender), "R1"); //not governor
-        _;
-    }
-
-    modifier onlyLongExecutor() {
-        require(
-            isRole(LibRoles.LONG_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender),
-            "R2" // not long exec
-        );
-        _;
-    }
-
-    modifier onlyShortExecutor() {
-        require(
-            isRole(LibRoles.SHORT_EXECUTOR, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender),
-            "R3" // not short exec
-        );
-        _;
-    }
-
-    modifier onlyGuardian() {
-        require(isRole(LibRoles.GUARDIAN, msg.sender) || isRole(DEFAULT_ADMIN_ROLE, msg.sender), "R4"); //NOT_GUARDIAN
-        _;
-    }
-
+    /// @notice it allows the PROTOCOL_REGISTER role to set the addresses of Opium Protocol's contracts
+    /// @dev the contracts' addresses are set using their respective interfaces
+    /// @param _opiumProxyFactory address of Opium.OpiumProxyFactory
+    /// @param _core address of Opium.Core
+    /// @param _oracleAggregator address of Opium.OracleAggregator
+    /// @param _syntheticAggregator address of Opium.SyntheticAggregator
+    /// @param _tokenSpender address of Opium.TokenSpender
+    /// @param _protocolFeeReceiver address of the recipient of Opium Protocol's fees
     function registerProtocol(
         address _opiumProxyFactory,
         address _core,
@@ -56,7 +42,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         address _syntheticAggregator,
         address _tokenSpender,
         address _protocolFeeReceiver
-    ) external onlyGovernor {
+    ) external onlyProtocolRegister {
         require(
             _opiumProxyFactory != address(0) &&
                 _core != address(0) &&
@@ -72,90 +58,82 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
             core: _core,
             oracleAggregator: IOracleAggregator(_oracleAggregator),
             syntheticAggregator: ISyntheticAggregator(_syntheticAggregator),
-            tokenSpender: _tokenSpender,
+            tokenSpender: ITokenSpender(_tokenSpender),
             protocolFeeReceiver: _protocolFeeReceiver
         });
     }
 
+    // SETTERS
+
+    /// @notice allows the GUARDIAN role to pause the Opium Protocol
+    /// @dev it fails if the protocol is already paused
     function pause() external onlyGuardian {
         require(protocolCommissionArgs.paused == false, "R6"); //already paused
         protocolCommissionArgs.paused = true;
     }
 
+    /// @notice allows the GUARDIAN role to unpause the Opium Protocol
+    /// @dev it fails if the protocol is not paused
     function unpause() external onlyGuardian {
         require(protocolCommissionArgs.paused == true, "R7"); //not paused
         protocolCommissionArgs.paused = false;
     }
 
-    function addToWhitelist(address _whitelisted) external onlyLongExecutor {
-        whitelist[_whitelisted] = true;
+    /// @notice it allows the WHITELISTER role to add an address to the whitelist
+    function addToWhitelist(address _whitelisted) external onlyWhitelister {
+        coreSpenderWhitelist[_whitelisted] = true;
+        emit LogWhitelistAccount(_whitelisted);
     }
 
-    function removeFromWhitelist(address _whitelisted) external onlyLongExecutor {
-        delete whitelist[_whitelisted];
+    /// @notice it allows the WHITELISTER role to remove an address from the whitelist
+    function removeFromWhitelist(address _whitelisted) external onlyWhitelister {
+        delete coreSpenderWhitelist[_whitelisted];
+        emit LogWhitelistAccountRemoved(_whitelisted);
     }
 
-    function setOpiumCommissionPart(uint8 _protocolCommissionPart) external onlyLongExecutor {
+    /// @notice allows the COMMISSIONER role to change the protocolReceiver's fee
+    function setOpiumCommissionPart(uint8 _protocolCommissionPart) external onlyCommissionSetter {
         protocolCommissionArgs.protocolCommissionPart = _protocolCommissionPart;
+        emit LogOpiumCommissionChange(_protocolCommissionPart);
+    }
+
+    /// @notice allows the COMMISSIONER role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)
+    function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external onlyCommissionSetter {
+        protocolCommissionArgs.noDataCancellationPeriod = _noDataCancellationPeriod;
+        emit LogNoDataCancellationPeriodChange(_noDataCancellationPeriod);
     }
 
     // GETTERS
-    function isPaused() external view returns (bool) {
-        return protocolCommissionArgs.paused;
+
+    /// @notice Returns all the commission-related parameters of the Opium protocol contracts
+    ///@return RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol.
+    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolCommissionArgs memory) {
+        return protocolCommissionArgs;
     }
 
-    function getExecuteAndCancelLocalVars() external view returns (RegistryEntities.ExecuteAndCancelLocalVars memory) {
-        return
-            RegistryEntities.ExecuteAndCancelLocalVars({
-                opiumProxyFactory: IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory),
-                oracleAggregator: IOracleAggregator(protocolAddressesArgs.oracleAggregator),
-                syntheticAggregator: ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator)
-            });
-    }
-
+    /// @notice Returns the interfaces of the Opium protocol contracts
+    ///@return RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
         return protocolAddressesArgs;
     }
 
-    /// @notice Returns address of Opium.OpiumProxyFactory
-    /// @param result address Address of Opium.OpiumProxyFactory
-    function getOpiumProxyFactory() external view returns (address result) {
-        return address(protocolAddressesArgs.opiumProxyFactory);
-    }
-
     /// @notice Returns address of Opium.Core
-    /// @param result address Address of Opium.Core
-    function getCore() external view returns (address result) {
+    function getCore() external view returns (address) {
         return protocolAddressesArgs.core;
     }
 
-    // /// @notice Returns address of Opium.OracleAggregator
-    // /// @param result address Address of Opium.OracleAggregator
-    // function getOracleAggregator() external view returns (address result) {
-    //     return protocolAddressesArgs.oracleAggregator;
-    // }
-
-    /// @notice Returns address of Opium.TokenSpender
-    /// @param result address Address of Opium.TokenSpender
-    function getTokenSpender() external view returns (address result) {
-        return protocolAddressesArgs.tokenSpender;
+    /// @notice Returns address of Opium.OracleAggregator
+    function getOracleAggregator() external view returns (address) {
+        return address(protocolAddressesArgs.oracleAggregator);
     }
 
-    /// @notice Returns address of Opium commission receiver
-    /// @param result address Address of Opium commission receiver
-    function getOpiumFeeReceiver() external view returns (address result) {
-        return protocolAddressesArgs.protocolFeeReceiver;
+    /// @notice Returns whether the Opium protocol is paused
+    function isPaused() external view returns (bool) {
+        return protocolCommissionArgs.paused;
     }
 
-    function isWhitelisted(address _address) external view returns (bool) {
-        return whitelist[_address];
-    }
-
-    function getNoDataCancellationPeriod() external view returns (uint256) {
-        return protocolCommissionArgs.noDataCancellationPeriod;
-    }
-
-    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolCommissionArgs memory) {
-        return protocolCommissionArgs;
+    /// @notice Returns whether a given address is allowed to manage Opium.Core ERC20 balances
+    function isCoreSpenderWhitelisted(address _address) external view returns (bool) {
+        return coreSpenderWhitelist[_address];
     }
 }

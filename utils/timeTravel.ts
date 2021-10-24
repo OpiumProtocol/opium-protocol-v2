@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { BigNumber } from "ethers";
 import hre from "hardhat";
 
-const timeTravel = async (seconds: number): Promise<void> => {
+export const timeTravel = async (seconds: number): Promise<void> => {
   await hre.network.provider.send("evm_increaseTime", [seconds]);
   await hre.network.provider.send("evm_mine");
 };
@@ -31,13 +31,13 @@ export const resetNetwork = async (): Promise<void> => {
   });
 };
 
-export const takeEVMSnapshot = async (): Promise<void> => {
-  // check if it is testnet
+export const takeEVMSnapshot = async (): Promise<any> => {
+  // TODO: check and skip if it is unsupported testnet
   const snapshot = await hre.network.provider.request({
     method: " evm_snapshot",
     params: [],
   });
-  console.log("SNAPSHOT: ", snapshot);
+  return snapshot
 };
 
 export const getEVMElapsedSeconds = async (): Promise<number> => {
@@ -45,5 +45,3 @@ export const getEVMElapsedSeconds = async (): Promise<number> => {
   await hre.network.provider.send("evm_mine");
   return time;
 };
-
-export default timeTravel;

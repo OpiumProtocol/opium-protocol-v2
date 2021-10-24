@@ -4,10 +4,13 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./Interface/IDerivativeLogic.sol";
 import "./Interface/IRegistry.sol";
-
 import "./Lib/LibDerivative.sol";
 
-// import "./Registry/RegistryEntities.sol";
+/**
+    Error codes:
+    - S1 = ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH
+    - S2 = ERROR_SYNTHETIC_AGGREGATOR_WRONG_MARGIN
+ */
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
 contract SyntheticAggregator is Initializable {
@@ -67,12 +70,12 @@ contract SyntheticAggregator is Initializable {
         }
         // For security reasons we calculate hash of provided _derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
-        require(derivativeHash == _derivativeHash, "S1"); //ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH
+        require(derivativeHash == _derivativeHash, "S1");
 
         // Get margin from SyntheticId
         (uint256 buyerMargin, uint256 sellerMargin) = IDerivativeLogic(_derivative.syntheticId).getMargin(_derivative);
         // We are not allowing both margins to be equal to 0
-        require(buyerMargin != 0 || sellerMargin != 0, "S2"); //ERROR_SYNTHETIC_AGGREGATOR_WRONG_MARGIN
+        require(buyerMargin != 0 || sellerMargin != 0, "S2");
 
         // AUTHOR COMMISSION
         // Get commission from syntheticId

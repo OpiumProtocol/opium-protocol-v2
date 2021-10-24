@@ -72,9 +72,9 @@ export const computeFees = (
 ): TFees => {
   const authorFee = +fromBN(payout) * (+derivativeFeeCommissionPercentage.toString() / derivativeAuthorCommissionBase);
   const protocolFee = (authorFee * protocolCommissionPercentage) / protocolFeeCommissionBase;
-
+  
   const authorFeeToBN = toBN(authorFee.toString());
-  const protocolFeeToBN = toBN(protocolFee.toString());
+  const protocolFeeToBN = toBN(parseFloat(protocolFee.toString()).toFixed(18).toString());
   const totalFee = authorFee * +fromBN(amount).toString();
   const totalProtocolFee = protocolFee * +fromBN(amount).toString();
   const totalAuthorFee = totalFee - totalProtocolFee;

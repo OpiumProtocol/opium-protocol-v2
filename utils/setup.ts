@@ -28,8 +28,7 @@ export type TContracts = {
 };
 
 const setup = async (): Promise<TContracts> => {
-  const { deployer, governor, guardian, longExecutorOne, longExecutorTwo, shortExecutorOne, shortExecutorTwo } =
-    await ethers.getNamedSigners();
+  const { deployer, governor } = await ethers.getNamedSigners();
 
   const Registry = await ethers.getContractFactory("RegistryUpgradeable");
   const TokenSpender = await ethers.getContractFactory("TokenSpender");
@@ -43,19 +42,12 @@ const setup = async (): Promise<TContracts> => {
   const Core = await ethers.getContractFactory("Core");
   const OpiumProxyFactory = await ethers.getContractFactory("OpiumProxyFactory");
   const registry = <RegistryUpgradeable>(
-    await upgrades.deployProxy(
-      Registry,
-      [
-        governor.address,
-        guardian.address,
-        [longExecutorOne.address, longExecutorTwo.address],
-        [shortExecutorOne.address, shortExecutorTwo.address],
-      ],
-      { initializer: "initialize" },
-    )
+    await upgrades.deployProxy(Registry, [governor.address], { initializer: "initialize" })
   );
 
-  const opiumProxyFactory = <OpiumProxyFactory>await OpiumProxyFactory.deploy(registry.address);
+  const opiumProxyFactory = <OpiumProxyFactory>(
+    await upgrades.deployProxy(OpiumProxyFactory, [registry.address], { initializer: "initialize" })
+  );
   const tokenSpender = <TokenSpender>(
     await upgrades.deployProxy(TokenSpender, [registry.address], { initializer: "initialize" })
   );

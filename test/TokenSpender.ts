@@ -28,7 +28,7 @@ describe("TokenSpender", () => {
 
     await expect(
       tokenSpender.claimTokens(dai.address, deployer.address, hacker.address, toBN("0.01")),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_ACL_ONLY_WHITELISTED));
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_TOKEN_SPENDER_NOT_WHITELISTED));
   });
 
   it("should successfully spend by core", async () => {

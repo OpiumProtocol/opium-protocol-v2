@@ -9,9 +9,9 @@ interface IOpiumPositionToken {
     }
 
     function initialize(
-        LibDerivative.Derivative calldata _derivative,
         bytes32 _derivativeHash,
-        LibDerivative.PositionType _positionType
+        LibDerivative.PositionType _positionType,
+        LibDerivative.Derivative calldata _derivative
     ) external;
 
     function mint(address _address, uint256 _amount) external;

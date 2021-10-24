@@ -54,8 +54,8 @@ describe("OpiumProxyFactory", () => {
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
-    await expect(opiumProxyFactory.mint(buyer.address, seller.address, hash, derivative, amount)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_ACL_ONLY_CORE),
+    await expect(opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE),
     );
   });
 
@@ -66,7 +66,7 @@ describe("OpiumProxyFactory", () => {
     const hash = getDerivativeHash(derivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .mint(buyer.address, seller.address, hash, derivative, amount);
+      .create(buyer.address, seller.address, amount, hash, derivative);
     const receipt = await tx.wait();
 
     const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
@@ -114,7 +114,7 @@ describe("OpiumProxyFactory", () => {
     const hash = getDerivativeHash(secondDerivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .mint(buyer.address, seller.address, hash, secondDerivative, amount);
+      .create(buyer.address, seller.address, amount, hash, secondDerivative);
     const receipt = await tx.wait();
 
     const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
@@ -129,7 +129,7 @@ describe("OpiumProxyFactory", () => {
       await ethers.getContractAt("OpiumPositionToken", shortOpiumPositionTokenAddress)
     ));
 
-    const tokenData = await shortOpiumPositionToken.getPositionTokenData();
+    const shortTokenData = await shortOpiumPositionToken.getPositionTokenData();
     // console.log("tokenData ", tokenData);
     // console.log("tokenData positiontype ", tokenData.positionType);
     const longTokenData = await longOpiumPositionToken.getPositionTokenData();

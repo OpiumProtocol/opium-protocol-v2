@@ -2,6 +2,12 @@ pragma solidity 0.8.5;
 
 import "./Interface/IOracleId.sol";
 
+/**
+    Error codes:
+    - O1 = ERROR_OPIUM_PROXY_FACTORY_ALREADY_DEPLOYED
+    - O2 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
+ */
+
 /// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution
 contract OracleAggregator {
     // Storage for the `oracleId` results

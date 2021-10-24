@@ -5,8 +5,9 @@ import { expect } from "chai";
 import setup from "../utils/setup";
 // types
 import { TNamedSigners } from "../types";
-import { DEFAULT_ADMIN_ROLE, guardianRole, longExecutorRole, shortExecutorRole } from "../utils/addresses";
+import { DEFAULT_ADMIN_ROLE, protocolRegisterRole, guardianRole, commissionSetterRole } from "../utils/addresses";
 import { pickError, SECONDS_2_WEEKS, semanticErrors } from "../utils/constants";
+import alternativeSetup from "../utils/alternative";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;
@@ -16,28 +17,17 @@ describe("Registry", () => {
   });
 
   it("should ensure the initial roles are as expected", async () => {
-    const { registry } = await setup();
-    const {
-      deployer,
-      governor,
-      guardian,
-      longExecutorOne,
-      longExecutorTwo,
-      shortExecutorOne,
-      shortExecutorTwo,
-      notAllowed,
-    } = await ethers.getNamedSigners();
+    const { registry } = await alternativeSetup();
+    const { deployer, governor, notAllowed } = await ethers.getNamedSigners();
 
-    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not governor").to.be.true;
-    expect(await registry.hasRole(guardianRole, guardian.address), "not guardian").to.be.true;
-    expect(await registry.hasRole(longExecutorRole, longExecutorOne.address), "not long executor").to.be.true;
-    expect(await registry.hasRole(longExecutorRole, longExecutorTwo.address), "not long executor").to.be.true;
-    expect(await registry.hasRole(shortExecutorRole, shortExecutorOne.address), "not short executor").to.be.true;
-    expect(await registry.hasRole(shortExecutorRole, shortExecutorTwo.address), "not short executor").to.be.true;
-    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, deployer.address), "wrong governor").to.be.false;
-    expect(await registry.hasRole(guardianRole, deployer.address), "wrong GUARDIAN").to.be.false;
-    expect(await registry.hasRole(longExecutorRole, notAllowed.address), "wrong long executor").to.be.false;
-    expect(await registry.hasRole(longExecutorRole, notAllowed.address), "wrong short executor").to.be.false;
+    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not admin").to.be.true;
+    expect(await registry.hasRole(guardianRole, governor.address), "not guardianRole").to.be.true;
+    expect(await registry.hasRole(commissionSetterRole, governor.address), "not commissionSetterRole").to.be.true;
+    expect(await registry.hasRole(protocolRegisterRole, governor.address), "not protocolRegisterRole").to.be.true;
+    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, deployer.address), "wrong admin").to.be.false;
+    expect(await registry.hasRole(guardianRole, deployer.address), "wrong guardianRole").to.be.false;
+    expect(await registry.hasRole(commissionSetterRole, notAllowed.address), "wrong commissionSetterRole").to.be.false;
+    expect(await registry.hasRole(protocolRegisterRole, notAllowed.address), "wrong protocolRegisterRole").to.be.false;
   });
 
   it("should ensure the initial protocol parameters are as expected", async () => {
@@ -64,11 +54,11 @@ describe("Registry", () => {
 
   it("should ensure the internal ACL is applied correctly", async () => {
     const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-    const { notAllowed, longExecutorOne } = namedSigners;
+    const { notAllowed } = namedSigners;
 
     await expect(
       registry
-        .connect(longExecutorOne)
+        .connect(notAllowed)
         .registerProtocol(
           opiumProxyFactory.address,
           core.address,
@@ -77,38 +67,38 @@ describe("Registry", () => {
           tokenSpender.address,
           notAllowed.address,
         ),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_GOVERNOR));
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE));
 
     await expect(registry.connect(notAllowed).addToWhitelist(notAllowed.address)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_LONG_EXECUTOR),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
     );
 
     await expect(registry.connect(notAllowed).removeFromWhitelist(notAllowed.address)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_LONG_EXECUTOR),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
     );
 
     await expect(registry.connect(notAllowed).setOpiumCommissionPart(4)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_LONG_EXECUTOR),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_COMMISSION_SETTER_ROLE),
     );
 
-    await expect(registry.connect(longExecutorOne).pause()).to.be.revertedWith(
+    await expect(registry.connect(notAllowed).pause()).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_ONLY_GUARDIAN),
     );
   });
 
   it(`should allow the authorized roles to change the protocol's parameters`, async () => {
     const { registry } = await setup();
-    const { authorized, longExecutorOne, longExecutorTwo } = namedSigners;
+    const { authorized, governor } = namedSigners;
 
-    expect(await registry.isWhitelisted(authorized.address)).to.be.false;
-    await registry.connect(longExecutorOne).addToWhitelist(authorized.address);
-    expect(await registry.isWhitelisted(authorized.address)).to.be.true;
+    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
+    await registry.connect(governor).addToWhitelist(authorized.address);
+    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.true;
 
-    await registry.connect(longExecutorTwo).removeFromWhitelist(authorized.address);
+    await registry.connect(governor).removeFromWhitelist(authorized.address);
 
-    expect(await registry.isWhitelisted(authorized.address)).to.be.false;
+    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
 
-    await registry.connect(longExecutorTwo).setOpiumCommissionPart(4);
+    await registry.connect(governor).setOpiumCommissionPart(4);
 
     const commissionParams = await registry.getProtocolCommissionParams();
     expect(commissionParams.protocolCommissionPart).to.be.eq(4);
@@ -116,17 +106,17 @@ describe("Registry", () => {
 
   it("should allow the guardian to toggle the paused state variable", async () => {
     const { registry } = await setup();
-    const { guardian } = namedSigners;
+    const { governor } = namedSigners;
     expect(await registry.isPaused(), "it's paused").to.be.false;
-    await registry.connect(guardian).pause();
+    await registry.connect(governor).pause();
     expect(await registry.isPaused(), "it's paused").to.be.true;
 
     // should throw a failure if "paused" is set to true
-    await expect(registry.connect(guardian).pause()).to.be.revertedWith(
+    await expect(registry.connect(governor).pause()).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_ALREADY_PAUSED),
     );
 
-    await registry.connect(guardian).unpause();
+    await registry.connect(governor).unpause();
     expect(await registry.isPaused(), "it's unpaused").to.be.false;
   });
 });

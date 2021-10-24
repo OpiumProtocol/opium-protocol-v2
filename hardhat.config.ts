@@ -30,7 +30,7 @@ const bscMainnetEndpoint = process.env.BSC_MAINNET_ENDPOINT;
 if (!bscMainnetEndpoint) {
   throw new Error("Please set your BSC_MAINNET_ENDPOINT in a .env file");
 }
-const polygonMumbaiEndpoint = process.env.POLYGON_MUMBAI_ENDPOINT || "https://rpc-mumbai.matic.today";
+const polygonMumbaiEndpoint = process.env.POLYGON_MUMBAI_ENDPOINT || "https://matic-mumbai.chainstacklabs.com";
 const polygonMainnetEndpoint = process.env.POLYGON_MAINNET_ENDPOINT;
 if (!polygonMainnetEndpoint) {
   throw new Error("Please set your POLYGON_MAINNET_ENDPOINT in a .env file");
@@ -54,6 +54,11 @@ const mnemonic = process.env.MNEMONIC;
 if (!mnemonic) {
   throw new Error("Please set your MNEMONIC in a .env file");
 }
+// const privateKey = process.env.PRIVATE_KEY;
+// if (!privateKey) {
+//   throw new Error("Please set your PRIVATE_KEY in a .env file");
+// }
+// console.log("private key: ", privateKey);
 
 const infuraApiKey = process.env.INFURA_API_KEY;
 if (!infuraApiKey) {
@@ -76,6 +81,13 @@ const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): N
     url: nodeUrl,
   };
 };
+// const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): NetworkUserConfig => {
+//   return {
+//     accounts: [privateKey],
+//     chainId: chainIds[network],
+//     url: nodeUrl,
+//   };
+// };
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -87,6 +99,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
+      allowUnlimitedContractSize: false,
       accounts: {
         mnemonic,
       },

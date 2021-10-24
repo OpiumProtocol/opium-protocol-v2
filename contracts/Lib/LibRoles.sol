@@ -1,7 +1,8 @@
 pragma solidity 0.8.5;
 
 library LibRoles {
-    bytes32 internal constant LONG_EXECUTOR = keccak256("LONG_EXECUTOR");
-    bytes32 internal constant SHORT_EXECUTOR = keccak256("SHORT_EXECUTOR");
-    bytes32 internal constant GUARDIAN = keccak256("GUARDIAN"); 
+    bytes32 internal constant PROTOCOL_REGISTER_ROLE = keccak256("PROTOCOL_REGISTER_ROLE");
+    bytes32 internal constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
+    bytes32 internal constant WHITELISTER_ROLE = keccak256("WHITELISTER_ROLE"); 
+    bytes32 internal constant COMMISSION_SETTER_ROLE = keccak256("COMMISSION_SETTER_ROLE");
 }

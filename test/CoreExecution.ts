@@ -22,7 +22,7 @@ import {
   TestToken,
   TokenSpender,
 } from "../typechain";
-import timeTravel from "../utils/timeTravel";
+import {timeTravel} from "../utils/timeTravel";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../types";
 import {
   SECONDS_10_MINS,
@@ -31,7 +31,6 @@ import {
   SECONDS_40_MINS,
   SECONDS_50_MINS,
   SECONDS_3_WEEKS,
-  protocolErrors,
   semanticErrors,
   pickError,
 } from "../utils/constants";
@@ -260,7 +259,6 @@ describe("CoreExecution", () => {
 
   it("should revert execution with CORE:ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH", async () => {
     const { seller } = namedSigners;
-    console.log("TESTING THE C1 REVERT");
     await expect(
       core
         .connect(seller)
@@ -309,9 +307,8 @@ describe("CoreExecution", () => {
   it("should execute full margin option", async () => {
     const { deployer, buyer, seller, author } = namedSigners;
 
-    await timeTravel(SECONDS_40_MINS);
+    await timeTravel(SECONDS_40_MINS + 10);
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
-
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.feesVaults(deployer.address, testToken.address);
     const authorFeesBefore = await core.feesVaults(author.address, testToken.address);
@@ -321,9 +318,6 @@ describe("CoreExecution", () => {
 
     const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
 
-    // const buyerPayout = fullMarginOption.derivative.margin
-    //   .sub(calculatePayoutFee(fullMarginOption.derivative.margin))
-    //   .mul(fullMarginOption.amount);
     const { buyerPayout, sellerPayout } = await optionCallMock.getExecutionPayout(
       fullMarginOption.derivative,
       fullMarginOption.price,

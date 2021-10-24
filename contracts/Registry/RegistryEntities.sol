@@ -3,6 +3,7 @@ pragma solidity 0.8.5;
 import "../Interface/IOpiumProxyFactory.sol";
 import "../Interface/ISyntheticAggregator.sol";
 import "../Interface/IOracleAggregator.sol";
+import "../Interface/ITokenSpender.sol";
 
 library RegistryEntities {
     struct ProtocolCommissionArgs {
@@ -29,14 +30,8 @@ library RegistryEntities {
         // Address of Opium.SyntheticAggregator contract
         ISyntheticAggregator syntheticAggregator;
         // Address of Opium.TokenSpender contract
-        address tokenSpender;
+        ITokenSpender tokenSpender;
         // Address of protocol commission receiver
         address protocolFeeReceiver;
-    }
-
-    struct ExecuteAndCancelLocalVars {
-        IOpiumProxyFactory opiumProxyFactory;
-        IOracleAggregator oracleAggregator;
-        ISyntheticAggregator syntheticAggregator;
     }
 }
