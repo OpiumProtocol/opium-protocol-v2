@@ -1,15 +1,10 @@
 pragma solidity 0.8.5;
 
-import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
-
-import "../Interface/IDerivativeLogic.sol";
-
-import "../Helpers/ExecutableByThirdParty.sol";
-import "../Helpers/HasCommission.sol";
+import "../../../Interface/IDerivativeLogic.sol";
+import "../../../Helpers/ExecutableByThirdParty.sol";
+import "../../../Helpers/HasCommission.sol";
 
 contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {
-    using SafeMath for uint256;
-
     uint256 constant BASE_PPT = 1 ether;
 
     constructor() {
@@ -38,7 +33,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         return HasCommission.getAuthorCommission();
     }
 
-    function validateInput(LibDerivative.Derivative memory _derivative) public view override returns (bool) {
+    function validateInput(LibDerivative.Derivative calldata _derivative) external view override returns (bool) {
         if (_derivative.params.length < 1) {
             return false;
         }
@@ -55,8 +50,8 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         return (_derivative.margin > 0 && _derivative.endTime > block.timestamp && strikePrice > 0 && ppt > 0);
     }
 
-    function getMargin(LibDerivative.Derivative memory _derivative)
-        public
+    function getMargin(LibDerivative.Derivative calldata _derivative)
+        external
         view
         override
         returns (uint256 buyerMargin, uint256 sellerMargin)
@@ -65,8 +60,8 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         sellerMargin = _derivative.margin;
     }
 
-    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)
-        public
+    function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result)
+        external
         view
         override
         returns (uint256 buyerPayout, uint256 sellerPayout)
@@ -82,12 +77,12 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         }
 
         if (_result > strikePrice) {
-            uint256 profit = _result.sub(strikePrice);
-            profit = profit.mul(ppt).div(BASE_PPT);
+            uint256 profit = _result - strikePrice;
+            profit = (profit * ppt) / BASE_PPT;
 
             if (profit < _derivative.margin) {
                 buyerPayout = profit;
-                sellerPayout = _derivative.margin.sub(profit);
+                sellerPayout = _derivative.margin - profit;
             } else {
                 buyerPayout = _derivative.margin;
                 sellerPayout = 0;

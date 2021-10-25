@@ -5,7 +5,7 @@ interface ISyntheticAggregator {
     struct SyntheticCache {
         uint256 buyerMargin;
         uint256 sellerMargin;
-        uint256 commission; // rename it to author commission for clarity
+        uint256 authorCommission;
         address authorAddress;
         bool init;
         // SyntheticTypes typeByHash;

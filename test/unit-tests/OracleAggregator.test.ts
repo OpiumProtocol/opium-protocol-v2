@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
-import setup from "../utils/setup";
-import { TNamedSigners } from "../types";
-import { pickError, semanticErrors } from "../utils/constants";
+import setup from "../__fixtures__";
+import { TNamedSigners } from "../../types";
+import { pickError, semanticErrors } from "../../utils/constants";
 
 describe("OracleAggregator", () => {
   const timestamp = Math.floor(Date.now() / 1000);

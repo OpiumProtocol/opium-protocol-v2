@@ -22,8 +22,6 @@ contract OpiumProxyFactory is Initializable {
     event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
     event LogMintShortPosition(address indexed _positionAddress, uint256 _amount);
     event LogMintLongPosition(address indexed _positionAddress, uint256 _amount);
-    // event LogMintShortPosition(address indexed _positionAddress, uint256 _amount);
-    // event LogMintLongPosition(address indexed _positionAddress, uint256 _amount);
 
     IRegistry private registry;
 
@@ -34,6 +32,8 @@ contract OpiumProxyFactory is Initializable {
         require(msg.sender == registry.getCore(), "F2");
         _;
     }
+
+    // ****************** EXTERNAL FUNCTIONS ******************
 
     /// @notice it is called only once upon deployment of the contract
     /// @dev it sets the the address of the implementation of the OpiumPositionToken contract which will be used for the factory-deployment of erc20 positions via the minimal proxy contract
@@ -47,16 +47,6 @@ contract OpiumProxyFactory is Initializable {
     /// @return _opiumPositionTokenParams OpiumPositionTokenParams struct which contains `LibDerivative.Derivative` schema of the derivative, the ` LibDerivative.PositionType` of the present ERC20 token and the bytes32 hash `derivativeHash` of the `LibDerivative.Derivative` derivative
     function getImplementationAddress() external view returns (address) {
         return opiumPositionTokenImplementation;
-    }
-
-    /// @notice checks whether a contract has already been deployed at a specific address
-    /// @return bool true if a contract has been deployed at a specific address and false otherwise
-    function _isContract(address _address) private view returns (bool) {
-        uint256 size;
-        assembly {
-            size := extcodesize(_address)
-        }
-        return size > 0;
     }
 
     /// @notice it creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
@@ -145,5 +135,17 @@ contract OpiumProxyFactory is Initializable {
     ) external onlyCore {
         IOpiumPositionToken(_longPositionAddress).burn(_positionOwner, _amount);
         IOpiumPositionToken(_shortPositionAddress).burn(_positionOwner, _amount);
+    }
+
+    // ****************** PRIVATE FUNCTIONS ******************
+
+    /// @notice checks whether a contract has already been deployed at a specific address
+    /// @return bool true if a contract has been deployed at a specific address and false otherwise
+    function _isContract(address _address) private view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(_address)
+        }
+        return size > 0;
     }
 }

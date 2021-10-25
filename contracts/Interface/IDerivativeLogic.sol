@@ -39,11 +39,11 @@ interface IDerivativeLogic {
     /// @notice Returns whether thirdparty could execute on derivative's owner's behalf
     /// @param _derivativeOwner address Derivative owner address
     /// @return Returns boolean whether _derivativeOwner allowed third party execution
-    function thirdpartyExecutionAllowed(address _derivativeOwner) external view virtual returns (bool);
+    function thirdpartyExecutionAllowed(address _derivativeOwner) external view returns (bool);
 
     /// @notice Sets whether thirds parties are allowed or not to execute derivative's on msg.sender's behalf
     /// @param _allow bool Flag for execution allowance
-    function allowThirdpartyExecution(bool _allow) external virtual;
+    function allowThirdpartyExecution(bool _allow) external;
 
     // Event with syntheticId metadata JSON string (for DIB.ONE derivative explorer)
     event MetadataSet(string metadata);

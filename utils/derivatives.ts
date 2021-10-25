@@ -2,7 +2,7 @@ import { utils, BigNumber } from "ethers";
 import { zeroAddress } from "./constants";
 import { fromBN, toBN } from "./bn";
 import { ICreatedDerivativeOrder, TDerivative, TDerivativeOrder } from "../types";
-import { getEVMElapsedSeconds } from "./timeTravel";
+import { getEVMElapsedSeconds } from "./evm";
 
 export const derivativeFactory = (derivative: Partial<TDerivative>): TDerivative => {
   const def = {
@@ -47,50 +47,12 @@ export const addPositionTokens = (
 };
 
 export const computeDerivativeMargin = (margin: BigNumber, amount: BigNumber): BigNumber => {
-  return margin.mul(amount);
+  const result = margin.mul(amount);
+  return result.div(utils.parseUnits("1", 18));
 };
 
 export const createValidDerivativeExpiry = async (days: number): Promise<number> => {
   return ~~(Date.now() / 1000) + (await getEVMElapsedSeconds()) + +60 * 60 * 24 * days;
-};
-
-type TFees = {
-  authorFee: BigNumber;
-  protocolFee: BigNumber;
-  totalFee: BigNumber;
-  totalAuthorFee: BigNumber;
-  totalProtocolFee: BigNumber;
-};
-
-export const computeFees = (
-  payout: BigNumber,
-  amount: BigNumber,
-  derivativeFeeCommissionPercentage: BigNumber,
-  derivativeAuthorCommissionBase: number,
-  protocolCommissionPercentage: number,
-  protocolFeeCommissionBase: number,
-): TFees => {
-  const authorFee = +fromBN(payout) * (+derivativeFeeCommissionPercentage.toString() / derivativeAuthorCommissionBase);
-  const protocolFee = (authorFee * protocolCommissionPercentage) / protocolFeeCommissionBase;
-  
-  const authorFeeToBN = toBN(authorFee.toString());
-  const protocolFeeToBN = toBN(parseFloat(protocolFee.toString()).toFixed(18).toString());
-  const totalFee = authorFee * +fromBN(amount).toString();
-  const totalProtocolFee = protocolFee * +fromBN(amount).toString();
-  const totalAuthorFee = totalFee - totalProtocolFee;
-
-  console.log("authorFee ", authorFee);
-  console.log("protocolFee ", protocolFee);
-  console.log("totalProtocolFee ", totalProtocolFee);
-  console.log("totalAuthorFee ", totalAuthorFee);
-
-  return {
-    authorFee: authorFeeToBN,
-    protocolFee: protocolFeeToBN,
-    totalFee: toBN(totalFee.toString()),
-    totalAuthorFee: toBN(totalAuthorFee.toString()),
-    totalProtocolFee: toBN(totalProtocolFee.toString()),
-  };
 };
 
 //for losing parties and under margin options
@@ -99,7 +61,100 @@ export const computeTotalGrossPayout = (payout: BigNumber, amount: BigNumber): B
   return toBN(grossPayout.toString());
 };
 
+type TFees = {
+  totalFee: BigNumber;
+  authorFee: BigNumber;
+  protocolFee: BigNumber;
+};
+
+export const computeFees = (
+  payout: BigNumber,
+  derivativeFeeCommissionPercentage: BigNumber,
+  derivativeAuthorCommissionBase: number,
+  protocolCommissionPercentage: number,
+  protocolFeeCommissionBase: number,
+): TFees => {
+  const totalFee = payout.mul(derivativeFeeCommissionPercentage).div(derivativeAuthorCommissionBase);
+  const protocolFee = totalFee.mul(protocolCommissionPercentage).div(protocolFeeCommissionBase);
+  const authorFee = totalFee.sub(protocolFee);
+  console.log(`totalFee: ${totalFee.toString()}`);
+  console.log(`authorFee ${authorFee.toString()}`);
+  console.log(`protocolFee: ${protocolFee.toString()}`);
+
+  return {
+    totalFee,
+    authorFee,
+    protocolFee,
+  };
+};
+
 export const computeTotalNetPayout = (payout: BigNumber, amount: BigNumber, totalFee: BigNumber): BigNumber => {
-  const netPayout = +fromBN(computeTotalGrossPayout(payout, amount)).toString() - +fromBN(totalFee).toString();
-  return toBN(netPayout.toString());
+  return computeDerivativeMargin(payout, amount).sub(totalFee);
+};
+
+export enum EPayout {
+  BUYER = "BUYER",
+  SELLER = "SELLER",
+}
+
+export const calculateTotalGrossPayout = (
+  buyerMargin: BigNumber,
+  sellerMargin: BigNumber,
+  buyerPayoutRatio: BigNumber,
+  sellerPayoutRatio: BigNumber,
+  amount: BigNumber,
+  payoutType: EPayout,
+): BigNumber => {
+  const holderPayoutRatio = payoutType === EPayout.BUYER ? buyerPayoutRatio : sellerPayoutRatio;
+  const payout = buyerMargin
+    .add(sellerMargin)
+    .mul(holderPayoutRatio)
+    .div(buyerPayoutRatio.add(sellerPayoutRatio))
+    .mul(amount)
+    .div(toBN("1"));
+  return payout;
+};
+
+export const calculateTotalGrossProfit = (
+  buyerMargin: BigNumber,
+  sellerMargin: BigNumber,
+  buyerPayoutRatio: BigNumber,
+  sellerPayoutRatio: BigNumber,
+  amount: BigNumber,
+  payoutType: EPayout,
+): BigNumber => {
+  const holderMargin = payoutType === EPayout.BUYER ? buyerMargin : sellerMargin;
+  const holderPayoutRatio = payoutType === EPayout.BUYER ? buyerPayoutRatio : sellerPayoutRatio;
+  if (holderPayoutRatio.gt(holderMargin)) {
+    const payout = buyerMargin.add(sellerMargin).mul(holderPayoutRatio).div(buyerPayoutRatio.add(sellerPayoutRatio));
+    return payout.sub(holderMargin).mul(amount).div(toBN("1"));
+  } else {
+    return toBN("0");
+  }
+};
+
+export const calculateTotalNetPayout = (
+  buyerMargin: BigNumber,
+  sellerMargin: BigNumber,
+  buyerPayoutRatio: BigNumber,
+  sellerPayoutRatio: BigNumber,
+  amount: BigNumber,
+  totalProtocolFee: BigNumber,
+  payoutType: EPayout,
+): BigNumber => {
+  const holderMargin = payoutType === EPayout.BUYER ? buyerMargin : sellerMargin;
+  const holderPayoutRatio = payoutType === EPayout.BUYER ? buyerPayoutRatio : sellerPayoutRatio;
+  const grossPayout = calculateTotalGrossPayout(
+    buyerMargin,
+    sellerMargin,
+    buyerPayoutRatio,
+    sellerPayoutRatio,
+    amount,
+    payoutType,
+  );
+  if (holderPayoutRatio.gt(holderMargin)) {
+    return grossPayout.sub(totalProtocolFee);
+  } else {
+    return grossPayout;
+  }
 };

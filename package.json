@@ -14,6 +14,7 @@
     "@openzeppelin/test-helpers": "^0.5.12",
     "@typechain/ethers-v5": "^7.0.1",
     "@typechain/hardhat": "^2.1.0",
+    "@types/async": "^3.2.8",
     "@types/chai": "^4.2.19",
     "@types/fs-extra": "^9.0.11",
     "@types/mocha": "^8.2.2",
@@ -72,6 +73,7 @@
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "^4.3.0",
     "@openzeppelin/hardhat-upgrades": "^1.10.0",
+    "async": "^3.2.1",
     "openzeppelin-solidity": "^4.2.0"
   },
   "engines": {

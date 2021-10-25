@@ -2,20 +2,20 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 // utils
-import { decodeEvents, retrievePositionTokensAddresses } from "../utils/events";
-import { toBN } from "../utils/bn";
+import { decodeEvents, retrievePositionTokensAddresses } from "../../utils/events";
+import { toBN } from "../../utils/bn";
 import {
   computeTotalGrossPayout,
   createValidDerivativeExpiry,
   derivativeFactory,
   getDerivativeHash,
-} from "../utils/derivatives";
-import setup from "../utils/setup";
+} from "../../utils/derivatives";
+import setup from "./../__fixtures__";
 // types
-import { TNamedSigners } from "../types";
-import { Core, OpiumPositionToken } from "../typechain";
-import { pickError, SECONDS_40_MINS, semanticErrors } from "../utils/constants";
-import { resetNetwork } from "../utils/timeTravel";
+import { TNamedSigners } from "../../types";
+import { Core, OpiumPositionToken } from "../../typechain";
+import { pickError, semanticErrors } from "../../utils/constants";
+import { resetNetwork } from "../../utils/evm";
 
 describe("CoreCreation", () => {
   let namedSigners: TNamedSigners;

@@ -54,11 +54,6 @@ const mnemonic = process.env.MNEMONIC;
 if (!mnemonic) {
   throw new Error("Please set your MNEMONIC in a .env file");
 }
-// const privateKey = process.env.PRIVATE_KEY;
-// if (!privateKey) {
-//   throw new Error("Please set your PRIVATE_KEY in a .env file");
-// }
-// console.log("private key: ", privateKey);
 
 const infuraApiKey = process.env.INFURA_API_KEY;
 if (!infuraApiKey) {
@@ -81,13 +76,6 @@ const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): N
     url: nodeUrl,
   };
 };
-// const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): NetworkUserConfig => {
-//   return {
-//     accounts: [privateKey],
-//     chainId: chainIds[network],
-//     url: nodeUrl,
-//   };
-// };
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -181,6 +169,9 @@ const config: HardhatUserConfig = {
     },
     impersonator: {
       default: 16,
+    },
+    derivativeAuthor: {
+      default: 17,
     },
   },
   typechain: {

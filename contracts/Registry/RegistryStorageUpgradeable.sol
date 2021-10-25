@@ -49,8 +49,8 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _setupRole(LibRoles.COMMISSION_SETTER_ROLE, _governor);
 
         protocolCommissionArgs = RegistryEntities.ProtocolCommissionArgs({
-            derivativeAuthorCommissionBase: 10000,
             noDataCancellationPeriod: 2 weeks,
+            derivativeAuthorCommissionBase: 10000,
             protocolFeeCommissionBase: 10,
             protocolCommissionPart: 1,
             precisionFactor: 18,

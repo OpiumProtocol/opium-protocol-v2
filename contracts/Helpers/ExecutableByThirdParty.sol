@@ -1,9 +1,9 @@
 pragma solidity 0.8.5;
 
 /// @title Opium.Helpers.ExecutableByThirdParty contract helps to syntheticId development and responsible for getting and setting thirdparty execution settings
-contract ExecutableByThirdParty {
+abstract contract ExecutableByThirdParty {
     // Mapping holds whether position owner allows thirdparty execution
-    mapping(address => bool) internal thirdpartyExecutionAllowance;
+    mapping(address => bool) private thirdpartyExecutionAllowance;
 
     /// @notice Getter for thirdparty execution allowance
     /// @param derivativeOwner Address of position holder that's going to be executed

@@ -23,7 +23,7 @@ contract SyntheticAggregator is Initializable {
     struct SyntheticCache {
         uint256 buyerMargin;
         uint256 sellerMargin;
-        uint256 commission;
+        uint256 authorCommission;
         address authorAddress;
         bool init;
     }
@@ -79,18 +79,18 @@ contract SyntheticAggregator is Initializable {
 
         // AUTHOR COMMISSION
         // Get commission from syntheticId
-        uint256 commission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
+        uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         // Check if commission is not set > 100%
         RegistryEntities.ProtocolCommissionArgs memory protocolCommissionArgs = registry.getProtocolCommissionParams();
         require(
-            commission <= protocolCommissionArgs.derivativeAuthorCommissionBase,
+            authorCommission <= protocolCommissionArgs.derivativeAuthorCommissionBase,
             "S3" //ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG
         );
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({
             buyerMargin: buyerMargin,
             sellerMargin: sellerMargin,
-            commission: commission,
+            authorCommission: authorCommission,
             authorAddress: IDerivativeLogic(_derivative.syntheticId).getAuthorAddress(),
             init: true
         });

@@ -3,12 +3,12 @@ import { artifacts, ethers } from "hardhat";
 import { expect } from "chai";
 import { deployMockContract, MockContract } from "ethereum-waffle";
 // utils
-import setup from "../utils/setup";
-import { toBN } from "../utils/bn";
-import { impersonateAccount, setBalance } from "../utils/timeTravel";
+import setup from "../__fixtures__";
+import { toBN } from "../../utils/bn";
+import { impersonateAccount, setBalance } from "../../utils/evm";
 // types
-import { TNamedSigners } from "../types";
-import { pickError, semanticErrors } from "../utils/constants";
+import { TNamedSigners } from "../../types";
+import { pickError, semanticErrors } from "../../utils/constants";
 
 describe("TokenSpender", () => {
   let dai: MockContract;

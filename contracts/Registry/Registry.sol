@@ -6,6 +6,7 @@ import "../Interface/IOpiumProxyFactory.sol";
 import "../Interface/ISyntheticAggregator.sol";
 import "../Interface/IOracleAggregator.sol";
 import "../Interface/ITokenSpender.sol";
+import "../Interface/ICore.sol";
 
 /**
     Error codes:
@@ -50,12 +51,12 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
                 _syntheticAggregator != address(0) &&
                 _tokenSpender != address(0) &&
                 _protocolFeeReceiver != address(0),
-            "R5" //ERROR_REGISTRY_CANT_BE_ZERO_ADDRESS
+            "R5"
         );
 
         protocolAddressesArgs = RegistryEntities.ProtocolAddressesArgs({
             opiumProxyFactory: IOpiumProxyFactory(_opiumProxyFactory),
-            core: _core,
+            core: ICore(_core),
             oracleAggregator: IOracleAggregator(_oracleAggregator),
             syntheticAggregator: ISyntheticAggregator(_syntheticAggregator),
             tokenSpender: ITokenSpender(_tokenSpender),
@@ -119,7 +120,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     /// @notice Returns address of Opium.Core
     function getCore() external view returns (address) {
-        return protocolAddressesArgs.core;
+        return address(protocolAddressesArgs.core);
     }
 
     /// @notice Returns address of Opium.OracleAggregator

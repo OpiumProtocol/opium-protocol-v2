@@ -37,11 +37,11 @@ export const takeEVMSnapshot = async (): Promise<any> => {
     method: " evm_snapshot",
     params: [],
   });
-  return snapshot
+  return snapshot;
 };
 
 export const getEVMElapsedSeconds = async (): Promise<number> => {
   const time = await hre.network.provider.send("evm_increaseTime", [0]);
   await hre.network.provider.send("evm_mine");
-  return time;
+  return +time;
 };

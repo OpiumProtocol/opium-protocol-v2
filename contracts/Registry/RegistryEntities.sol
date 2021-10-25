@@ -4,13 +4,14 @@ import "../Interface/IOpiumProxyFactory.sol";
 import "../Interface/ISyntheticAggregator.sol";
 import "../Interface/IOracleAggregator.sol";
 import "../Interface/ITokenSpender.sol";
+import "../Interface/ICore.sol";
 
 library RegistryEntities {
     struct ProtocolCommissionArgs {
-        // Represents 100% base for commissions calculation
-        uint32 derivativeAuthorCommissionBase;
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
         uint32 noDataCancellationPeriod;
+        // Represents 100% base for commissions calculation
+        uint32 derivativeAuthorCommissionBase;
         // Represents 100% base for Opium commission
         uint8 protocolFeeCommissionBase;
         // Represents which part of `syntheticId` author commissions goes to opium
@@ -22,7 +23,7 @@ library RegistryEntities {
 
     struct ProtocolAddressesArgs {
         // Address of Opium.Core contract
-        address core;
+        ICore core;
         // Address of Opium.OpiumProxyFactory contract
         IOpiumProxyFactory opiumProxyFactory;
         // Address of Opium.OracleAggregator contract

@@ -1,11 +1,8 @@
 pragma solidity 0.8.5;
 
-import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
-
-import "../Interface/IDerivativeLogic.sol";
-
-import "../Helpers/ExecutableByThirdParty.sol";
-import "../Helpers/HasCommission.sol";
+import "../../../Interface/IDerivativeLogic.sol";
+import "../../../Helpers/ExecutableByThirdParty.sol";
+import "../../../Helpers/HasCommission.sol";
 
 contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {
     constructor() {
@@ -34,13 +31,13 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         return HasCommission.getAuthorCommission();
     }
 
-    function validateInput(LibDerivative.Derivative memory _derivative) public view override returns (bool) {
+    function validateInput(LibDerivative.Derivative memory _derivative) external view override returns (bool) {
         _derivative;
         return true;
     }
 
     function getMargin(LibDerivative.Derivative memory _derivative)
-        public
+        external
         view
         override
         returns (uint256 buyerMargin, uint256 sellerMargin)
@@ -50,7 +47,7 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
     }
 
     function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)
-        public
+        external
         view
         override
         returns (uint256 buyerPayout, uint256 sellerPayout)

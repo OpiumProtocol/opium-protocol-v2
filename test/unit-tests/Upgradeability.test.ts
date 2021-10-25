@@ -2,24 +2,20 @@
 import { ethers, upgrades } from "hardhat";
 import { expect } from "chai";
 // utils
-import setup from "../utils/setup";
-import { SECONDS_40_MINS } from "../utils/constants";
-import { decodeLogs, retrievePositionTokensAddresses } from "../utils/events";
-import { formatAddress } from "../utils/addresses";
-import { derivativeFactory, getDerivativeHash } from "../utils/derivatives";
-import { toBN } from "../utils/bn";
+import setup from "../../utils/setup";
+import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
+import { toBN } from "../../utils/bn";
 // types and constants
-import { TNamedSigners } from "../types";
+import { TNamedSigners } from "../../types";
 import {
-  OpiumPositionToken,
-  OpiumProxyFactory,
   TestOracleAggregatorUpgrade,
   TestRegistryUpgrade,
   TestSyntheticAggregatorUpgrade,
   TestTokenSpenderUpgrade,
   TestCoreUpgrade,
-} from "../typechain";
-import { shouldBehaveLikeCore } from "./Core.behavior";
+} from "../../typechain";
+import { shouldBehaveLikeCore } from "../Core.behavior";
+import { generateRandomDerivativeSetup } from "../../utils/testCaseGenerator";
 
 describe("Upgradeability", () => {
   let namedSigners: TNamedSigners;
@@ -29,8 +25,7 @@ describe("Upgradeability", () => {
   });
 
   it("should upgrade TokenSpender", async () => {
-    const { core, tokenSpender, registry } = await setup();
-    const { governor } = namedSigners;
+    const { tokenSpender, registry } = await setup();
 
     const tokenSpenderRegistryAddressBefore = (await registry.getProtocolAddresses()).tokenSpender;
     const tokenSpenderImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
@@ -53,32 +48,27 @@ describe("Upgradeability", () => {
     expect(tokenSpenderRegistryAddressBefore).to.be.eq(tokenSpenderRegistryAddresAfter);
   });
 
-  // it("should upgrade Registry", async () => {
-  //   const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-  //   const { deployer } = namedSigners;
+  it("should upgrade Registry", async () => {
+    const { registry } = await setup();
 
-  //   const [protocolAddressesBefore, protocolCommissionsBefore] = await Promise.all([
-  //     registry.getProtocolAddresses(),
-  //     registry.getProtocolCommissionParams(),
-  //   ]);
-  //   const coreRegistryAddressBefore = await core.getRegistry();
-  //   const registryImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(registry.address);
+    const [protocolAddressesBefore, protocolCommissionsBefore] = await Promise.all([
+      registry.getProtocolAddresses(),
+      registry.getProtocolCommissionParams(),
+    ]);
+    const registryImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(registry.address);
 
-  //   const Registry = await ethers.getContractFactory("TestRegistryUpgrade");
-  //   const upgraded = <TestRegistryUpgrade>await upgrades.upgradeProxy(registry.address, Registry);
-  //   const registryImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(registry.address);
-  //   const upgradedImplementationAddress = await upgrades.erc1967.getImplementationAddress(upgraded.address);
+    const Registry = await ethers.getContractFactory("TestRegistryUpgrade");
+    const upgraded = <TestRegistryUpgrade>await upgrades.upgradeProxy(registry.address, Registry);
+    const registryImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(registry.address);
+    const upgradedImplementationAddress = await upgrades.erc1967.getImplementationAddress(upgraded.address);
 
-  //   const coreRegistryAddressAfter = await core.getRegistry();
+    expect(upgraded.address).to.be.eq(registry.address);
+    expect(registryImplementationAddressBefore).to.not.be.eq(registryImplementationAddressAfter);
+    expect(registryImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
 
-  //   expect(upgraded.address).to.be.eq(registry.address);
-  //   expect(registryImplementationAddressBefore).to.not.be.eq(registryImplementationAddressAfter);
-  //   expect(registryImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
-  //   expect(coreRegistryAddressBefore).to.be.eq(coreRegistryAddressAfter);
-
-  //   expect(protocolAddressesBefore).to.be.deep.eq(await upgraded.getProtocolAddresses());
-  //   expect(protocolCommissionsBefore).to.be.deep.eq(await upgraded.getProtocolCommissionParams());
-  // });
+    expect(protocolAddressesBefore).to.be.deep.eq(await upgraded.getProtocolAddresses());
+    expect(protocolCommissionsBefore).to.be.deep.eq(await upgraded.getProtocolCommissionParams());
+  });
 
   it("should upgrade SyntheticAggregator", async () => {
     const { syntheticAggregator, optionCallMock, registry } = await setup();
@@ -157,9 +147,8 @@ describe("Upgradeability", () => {
   });
 
   it("should upgrade Core", async () => {
-    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry } = await setup();
+    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry, oracleIdMock } = await setup();
     const { buyer, seller } = namedSigners;
-    const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
 
     const coreAddressBefore = await registry.getCore();
     const coreImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(core.address);
@@ -176,14 +165,29 @@ describe("Upgradeability", () => {
     expect(coreAddressBefore).to.be.eq(coreAddressAfter);
     expect(coreImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
+    await upgraded.updateProtocolAddresses()
+
+    const derivativeOrder = await generateRandomDerivativeSetup(
+      oracleIdMock.address,
+      testToken.address,
+      optionCallMock.address,
+    );
+
+    const oracleCallback = async () => {
+      await oracleIdMock.triggerCallback(derivativeOrder.derivative.endTime, derivativeOrder.price);
+    };
+
     await shouldBehaveLikeCore(
       upgraded,
+      registry,
       testToken,
       tokenSpender,
       opiumProxyFactory,
       optionCallMock,
-      namedSigners.deployer,
-      namedSigners.buyer,
-    ).creation();
+      oracleCallback,
+      seller,
+      buyer,
+      derivativeOrder,
+    );
   });
 });

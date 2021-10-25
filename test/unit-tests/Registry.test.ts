@@ -2,12 +2,11 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 // utils
-import setup from "../utils/setup";
+import setup from "../__fixtures__";
 // types
-import { TNamedSigners } from "../types";
-import { DEFAULT_ADMIN_ROLE, protocolRegisterRole, guardianRole, commissionSetterRole } from "../utils/addresses";
-import { pickError, SECONDS_2_WEEKS, semanticErrors } from "../utils/constants";
-import alternativeSetup from "../utils/alternative";
+import { TNamedSigners } from "../../types";
+import { DEFAULT_ADMIN_ROLE, protocolRegisterRole, guardianRole, commissionSetterRole } from "../../utils/addresses";
+import { pickError, SECONDS_2_WEEKS, semanticErrors } from "../../utils/constants";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;
@@ -17,7 +16,7 @@ describe("Registry", () => {
   });
 
   it("should ensure the initial roles are as expected", async () => {
-    const { registry } = await alternativeSetup();
+    const { registry } = await setup();
     const { deployer, governor, notAllowed } = await ethers.getNamedSigners();
 
     expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not admin").to.be.true;
