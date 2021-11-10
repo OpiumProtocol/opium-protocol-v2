@@ -133,7 +133,6 @@ contract Core is ReentrancyGuardUpgradeable {
         uint256 _amount,
         address[2] calldata _positionsOwners
     ) external whenNotPaused nonReentrant {
-        uint256 _multiplier = 10**protocolParametersArgs.precisionFactor;
         // Generate hash for derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
 
@@ -153,8 +152,8 @@ contract Core is ReentrancyGuardUpgradeable {
         );
 
         uint256 totalMargin = margins[0] + margins[1];
-        require(_multiplier.modWithPrecisionFactor(totalMargin * _amount) == 0, "C5");
-        uint256 totalMarginToE18 = _multiplier.mulWithPrecisionFactor(totalMargin, _amount);
+        require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
+        uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
 
         // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
         // `msg.sender` must provide margin for position creation
@@ -200,7 +199,6 @@ contract Core is ReentrancyGuardUpgradeable {
         address[2] calldata _positionAddresses,
         address[2] calldata _positionsOwners
     ) external whenNotPaused nonReentrant {
-        uint256 _multiplier = 10**protocolParametersArgs.precisionFactor;
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionAddresses[0]
         ).getPositionTokenData();
@@ -226,8 +224,8 @@ contract Core is ReentrancyGuardUpgradeable {
         );
 
         uint256 totalMargin = margins[0] + margins[1];
-        require(_multiplier.modWithPrecisionFactor(totalMargin * _amount) == 0, "C5");
-        uint256 totalMarginToE18 = _multiplier.mulWithPrecisionFactor(totalMargin, _amount);
+        require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
+        uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
 
         // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
         // `msg.sender` must provide margin for position creation
@@ -368,8 +366,7 @@ contract Core is ReentrancyGuardUpgradeable {
             .syntheticAggregator
             .getSyntheticCache(opiumPositionTokenParams.derivativeHash, opiumPositionTokenParams.derivative);
 
-        uint256 totalMargin = (10**protocolParametersArgs.precisionFactor).mulWithPrecisionFactor(
-            syntheticCache.buyerMargin + syntheticCache.sellerMargin,
+        uint256 totalMargin = (syntheticCache.buyerMargin + syntheticCache.sellerMargin).mulWithPrecisionFactor(
             _amount
         );
         uint256 fees = _getFees(
@@ -441,7 +438,6 @@ contract Core is ReentrancyGuardUpgradeable {
     /// @param _positionAddress PositionTypes of positions to be canceled
     /// @param _amount uint256[] Amount of positions to cancel for each `positionAddress`
     function _cancel(address _positionAddress, uint256 _amount) private whenNotPaused {
-        uint256 _multiplier = 10**protocolParametersArgs.precisionFactor;
         IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
             _positionAddress
         ).getPositionTokenData();
@@ -480,12 +476,12 @@ contract Core is ReentrancyGuardUpgradeable {
         // Check if `_positionAddresses` is a LONG position
         if (opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
             // Set payout to buyerPayout
-            payout = _multiplier.mulWithPrecisionFactor(margins[0], _amount);
+            payout = margins[0].mulWithPrecisionFactor(_amount);
 
             // Check if `positionAddress` is a SHORT position
         } else {
             // Set payout to sellerPayout
-            payout = _multiplier.mulWithPrecisionFactor(margins[1], _amount);
+            payout = margins[1].mulWithPrecisionFactor(_amount);
         }
 
         // Burn canceled position tokens
@@ -550,17 +546,15 @@ contract Core is ReentrancyGuardUpgradeable {
             ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
             (buyerPayoutRatio + sellerPayoutRatio);
 
-        uint256 _multiplier = 10**protocolParametersArgs.precisionFactor;
-
         // Check if `_positionType` is LONG
         if (_opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
             // Set payout to buyerPayout
             payout = payouts[0];
 
             // Multiply payout by amount
-            payout = _multiplier.mulWithPrecisionFactor(payout, _amount);
+            payout = payout.mulWithPrecisionFactor(_amount);
 
-            uint256 longMargin = _multiplier.mulWithPrecisionFactor(syntheticCache.buyerMargin, _amount);
+            uint256 longMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
 
             // Take fees only from profit makers
             // Check: payout > buyerMargin * amount
@@ -584,8 +578,8 @@ contract Core is ReentrancyGuardUpgradeable {
             payout = payouts[1];
 
             // Multiply payout by amount
-            payout = _multiplier.mulWithPrecisionFactor(payout, _amount);
-            uint256 shortMargin = _multiplier.mulWithPrecisionFactor(syntheticCache.sellerMargin, _amount);
+            payout = payout.mulWithPrecisionFactor(_amount);
+            uint256 shortMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
 
             // Take fees only from profit makers
             // Check: payout > sellerMargin * amount

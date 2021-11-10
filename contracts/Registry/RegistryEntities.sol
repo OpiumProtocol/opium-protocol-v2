@@ -16,8 +16,7 @@ library RegistryEntities {
         uint8 protocolFeeCommissionBase;
         // Represents which part of `syntheticId` author commissions goes to opium
         uint8 protocolCommissionPart;
-        // scaling factor
-        uint8 precisionFactor;
+        // Represents whether the protocol is paused
         bool paused;
     }
 

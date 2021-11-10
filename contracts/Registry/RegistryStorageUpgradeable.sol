@@ -53,7 +53,6 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
             derivativeAuthorCommissionBase: 10000,
             protocolFeeCommissionBase: 10,
             protocolCommissionPart: 1,
-            precisionFactor: 18,
             paused: false
         });
     }
