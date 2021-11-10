@@ -106,12 +106,6 @@ describe("CoreCreation", () => {
       token: testToken.address,
       syntheticId: optionCallMock.address,
     });
-    // const optionPayload = {
-    //   derivative: optionCall,
-    //   amount: toBN("3"),
-    //   settlementPrice: toBN("230"),
-    //   hash: getDerivativeHash(optionCall),
-    // };
     const expectedDerivativeHash = getDerivativeHash(optionCall);
 
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
@@ -120,7 +114,7 @@ describe("CoreCreation", () => {
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
-    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
     /**
      * emits _buyer, _seller, _derivativeHash, _amount
      */
@@ -258,12 +252,12 @@ describe("CoreCreation", () => {
     expect(coreCreateEvent[2]).to.equal(expectedDerivativeHash);
     expect(coreCreateEvent[3]).to.equal(creationAmount);
 
-    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
+    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
     );
-    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
 
     const marginBalanceAfter = await testToken.balanceOf(deployer.address);
     expect(marginBalanceAfter).to.equal(marginBalanceBefore);
@@ -280,7 +274,11 @@ describe("CoreCreation", () => {
     expect(sellerPositionsShortBalance).to.equal(creationAmount);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(mintAmount));
-    await core.mint(mintAmount, [shortPositionERC20.address, longPositionERC20.address]);
+    await core.mint(
+      mintAmount,
+      [longPositionERC20.address, shortPositionERC20.address],
+      [buyer.address, seller.address],
+    );
 
     const marginBalanceAfterMint = await testToken.balanceOf(deployer.address);
     expect(marginBalanceAfterMint).to.equal(
@@ -289,18 +287,19 @@ describe("CoreCreation", () => {
 
     const buyerPositionsLongBalanceAfterMint = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalanceAfterMint = await shortPositionERC20.balanceOf(buyer.address);
-    expect(buyerPositionsLongBalanceAfterMint).to.equal(creationAmount);
-    expect(buyerPositionsShortBalanceAfterMint).to.equal(0);
+    expect(buyerPositionsLongBalanceAfterMint, "wrong buyer mint amount").to.equal(mintAmount);
+    expect(buyerPositionsShortBalanceAfterMint, "wrong buyer mint amount").to.equal(0);
 
     const sellerPositionsLongBalanceAfterMint = await longPositionERC20.balanceOf(seller.address);
     const sellerPositionsShortBalanceAfterMint = await shortPositionERC20.balanceOf(seller.address);
 
-    expect(sellerPositionsLongBalanceAfterMint).to.equal(0);
-    expect(sellerPositionsShortBalanceAfterMint).to.equal(creationAmount);
+    expect(sellerPositionsLongBalanceAfterMint, "wrong seller mint amount").to.equal(0);
+    expect(sellerPositionsShortBalanceAfterMint, "wrong seller mint amount").to.equal(mintAmount);
   });
 
-  it("should not be able to mint positions for a non-existend LONG/SHORT position pair", async () => {
+  it("should not be able to mint positions for a non-existent LONG/SHORT position pair", async () => {
     const { core, testToken, optionCallMock, tokenSpender } = await setup();
+    const { deployer } = namedSigners;
     const amount = toBN("3");
     const optionCall = derivativeFactory({
       margin: toBN("30"),
@@ -314,8 +313,12 @@ describe("CoreCreation", () => {
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     await expect(
-      core.mint(amount, ["0xb32ebff83243c7c676dba08e3688d81ad579ad35", "0x537cd27f9cb132ff613119f7b942959ad62a4f8c"]),
-    ).to.be.revertedWith("function call to a non-contract account");
+      core.mint(
+        amount,
+        ["0xb32ebff83243c7c676dba08e3688d81ad579ad35", "0x537cd27f9cb132ff613119f7b942959ad62a4f8c"],
+        [deployer.address, deployer.address],
+      ),
+    ).to.be.revertedWith("Transaction reverted: function call to a non-contract account");
   });
 
   after(async () => {

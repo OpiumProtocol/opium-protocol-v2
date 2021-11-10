@@ -52,7 +52,7 @@ export const shouldBehaveLikeCore = async (
   const tx = await core.connect(seller).create(derivative, amount, [buyer.address, seller.address]);
   const receipt = await tx.wait();
 
-  const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+  const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
   /**
    * emits _buyer, _seller, _derivativeHash, _amount
    */

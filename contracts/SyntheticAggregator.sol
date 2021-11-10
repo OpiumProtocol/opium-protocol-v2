@@ -81,9 +81,9 @@ contract SyntheticAggregator is Initializable {
         // Get commission from syntheticId
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         // Check if commission is not set > 100%
-        RegistryEntities.ProtocolCommissionArgs memory protocolCommissionArgs = registry.getProtocolCommissionParams();
+        RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolCommissionParams();
         require(
-            authorCommission <= protocolCommissionArgs.derivativeAuthorCommissionBase,
+            authorCommission <= protocolParametersArgs.derivativeAuthorCommissionBase,
             "S3" //ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG
         );
         // Cache values by derivative hash

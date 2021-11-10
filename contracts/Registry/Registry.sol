@@ -69,15 +69,15 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     /// @notice allows the GUARDIAN role to pause the Opium Protocol
     /// @dev it fails if the protocol is already paused
     function pause() external onlyGuardian {
-        require(protocolCommissionArgs.paused == false, "R6"); //already paused
-        protocolCommissionArgs.paused = true;
+        require(protocolParametersArgs.paused == false, "R6"); //already paused
+        protocolParametersArgs.paused = true;
     }
 
     /// @notice allows the GUARDIAN role to unpause the Opium Protocol
     /// @dev it fails if the protocol is not paused
     function unpause() external onlyGuardian {
-        require(protocolCommissionArgs.paused == true, "R7"); //not paused
-        protocolCommissionArgs.paused = false;
+        require(protocolParametersArgs.paused == true, "R7"); //not paused
+        protocolParametersArgs.paused = false;
     }
 
     /// @notice it allows the WHITELISTER role to add an address to the whitelist
@@ -94,13 +94,13 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     /// @notice allows the COMMISSIONER role to change the protocolReceiver's fee
     function setOpiumCommissionPart(uint8 _protocolCommissionPart) external onlyCommissionSetter {
-        protocolCommissionArgs.protocolCommissionPart = _protocolCommissionPart;
+        protocolParametersArgs.protocolCommissionPart = _protocolCommissionPart;
         emit LogOpiumCommissionChange(_protocolCommissionPart);
     }
 
     /// @notice allows the COMMISSIONER role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)
     function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external onlyCommissionSetter {
-        protocolCommissionArgs.noDataCancellationPeriod = _noDataCancellationPeriod;
+        protocolParametersArgs.noDataCancellationPeriod = _noDataCancellationPeriod;
         emit LogNoDataCancellationPeriodChange(_noDataCancellationPeriod);
     }
 
@@ -108,8 +108,8 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     /// @notice Returns all the commission-related parameters of the Opium protocol contracts
     ///@return RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol.
-    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolCommissionArgs memory) {
-        return protocolCommissionArgs;
+    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
+        return protocolParametersArgs;
     }
 
     /// @notice Returns the interfaces of the Opium protocol contracts
@@ -130,7 +130,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     /// @notice Returns whether the Opium protocol is paused
     function isPaused() external view returns (bool) {
-        return protocolCommissionArgs.paused;
+        return protocolParametersArgs.paused;
     }
 
     /// @notice Returns whether a given address is allowed to manage Opium.Core ERC20 balances

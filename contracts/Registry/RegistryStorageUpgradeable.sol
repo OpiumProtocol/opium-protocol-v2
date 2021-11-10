@@ -13,7 +13,7 @@ import "./RegistryEntities.sol";
  */
 
 contract RegistryStorageUpgradeable is AccessControlUpgradeable {
-    RegistryEntities.ProtocolCommissionArgs internal protocolCommissionArgs;
+    RegistryEntities.ProtocolParametersArgs internal protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs internal protocolAddressesArgs;
     mapping(address => bool) internal coreSpenderWhitelist;
 
@@ -48,7 +48,7 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
         _setupRole(LibRoles.COMMISSION_SETTER_ROLE, _governor);
 
-        protocolCommissionArgs = RegistryEntities.ProtocolCommissionArgs({
+        protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,
             derivativeAuthorCommissionBase: 10000,
             protocolFeeCommissionBase: 10,

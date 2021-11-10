@@ -20,8 +20,6 @@ contract OpiumProxyFactory is Initializable {
     using LibPosition for bytes32;
     event LogShortPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
     event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
-    event LogMintShortPosition(address indexed _positionAddress, uint256 _amount);
-    event LogMintLongPosition(address indexed _positionAddress, uint256 _amount);
 
     IRegistry private registry;
 
@@ -63,8 +61,8 @@ contract OpiumProxyFactory is Initializable {
         bytes32 _derivativeHash,
         LibDerivative.Derivative calldata _derivative
     ) external onlyCore {
-        address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
+        address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
         IOpiumPositionToken(longPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.LONG,
@@ -78,8 +76,6 @@ contract OpiumProxyFactory is Initializable {
         if (_amount > 0) {
             IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);
             IOpiumPositionToken(shortPositionAddress).mint(_seller, _amount);
-            emit LogMintShortPosition(longPositionAddress, _amount);
-            emit LogMintLongPosition(shortPositionAddress, _amount);
         }
         emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
         emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
@@ -103,8 +99,6 @@ contract OpiumProxyFactory is Initializable {
         require(_isContract(_shortPositionAddress) == true, "F1");
         IOpiumPositionToken(_longPositionAddress).mint(_buyer, _amount);
         IOpiumPositionToken(_shortPositionAddress).mint(_seller, _amount);
-        // emit LogMintShortPosition(_longPositionAddress, _amount);
-        // emit LogMintLongPosition(_shortPositionAddress, _amount);
     }
 
     /// @notice it burns specified amount of a specific position tokens on behalf of a specified owner

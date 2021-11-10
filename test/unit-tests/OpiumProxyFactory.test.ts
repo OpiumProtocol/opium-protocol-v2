@@ -14,7 +14,6 @@ import { impersonateAccount, setBalance } from "../../utils/evm";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { pickError, semanticErrors } from "../../utils/constants";
 
-
 describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;
   let coreImpersonator: SignerWithAddress;
@@ -70,11 +69,11 @@ describe("OpiumProxyFactory", () => {
       .create(buyer.address, seller.address, amount, hash, derivative);
     const receipt = await tx.wait();
 
-    const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
+    const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
       opiumProxyFactory,
       receipt,
     );
-
+    console.log(shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress);
     const longOpiumPositionToken = await (<OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", longOpiumPositionTokenAddress)
     ));
@@ -118,7 +117,7 @@ describe("OpiumProxyFactory", () => {
       .create(buyer.address, seller.address, amount, hash, secondDerivative);
     const receipt = await tx.wait();
 
-    const [shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
+    const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
       opiumProxyFactory,
       receipt,
     );
@@ -131,19 +130,24 @@ describe("OpiumProxyFactory", () => {
     ));
 
     const shortTokenData = await shortOpiumPositionToken.getPositionTokenData();
-    expect(shortTokenData.derivative.margin, 'wrong short position token derivative data').to.be.eq(secondDerivative.margin)
-    expect(shortTokenData.derivative.endTime, 'wrong short position token derivative data').to.be.eq(secondDerivative.endTime)
-    expect(shortTokenData.derivativeHash, 'wrong short position token derivative hash').to.be.eq(hash)
-    expect(shortTokenData.positionType, 'wrong short position token positionType').to.be.eq(0)
-
+    expect(shortTokenData.derivative.margin, "wrong short position token derivative data").to.be.eq(
+      secondDerivative.margin,
+    );
+    expect(shortTokenData.derivative.endTime, "wrong short position token derivative data").to.be.eq(
+      secondDerivative.endTime,
+    );
+    expect(shortTokenData.derivativeHash, "wrong short position token derivative hash").to.be.eq(hash);
+    expect(shortTokenData.positionType, "wrong short position token positionType").to.be.eq(0);
 
     const longTokenData = await longOpiumPositionToken.getPositionTokenData();
-    expect(longTokenData.derivative.margin, 'wrong short position token derivative data').to.be.eq(secondDerivative.margin)
-    expect(longTokenData.derivative.endTime, 'wrong short position token derivative data').to.be.eq(secondDerivative.endTime)
-    expect(longTokenData.derivativeHash, 'long short position token derivative hash').to.be.eq(hash)
-    expect(longTokenData.positionType, 'long short position token positionType').to.be.eq(1)
-
-
+    expect(longTokenData.derivative.margin, "wrong short position token derivative data").to.be.eq(
+      secondDerivative.margin,
+    );
+    expect(longTokenData.derivative.endTime, "wrong short position token derivative data").to.be.eq(
+      secondDerivative.endTime,
+    );
+    expect(longTokenData.derivativeHash, "long short position token derivative hash").to.be.eq(hash);
+    expect(longTokenData.positionType, "long short position token positionType").to.be.eq(1);
 
     const beforeShortOpiumPositionTokenSellerBalance = await shortOpiumPositionToken.balanceOf(seller.address);
     const beforeShortOpiumPositionTokenBuyerBalance = await shortOpiumPositionToken.balanceOf(buyer.address);

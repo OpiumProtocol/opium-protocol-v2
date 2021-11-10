@@ -2,7 +2,12 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 // utils
-import { computeFees, createValidDerivativeExpiry, derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
+import {
+  computeFees,
+  createValidDerivativeExpiry,
+  derivativeFactory,
+  getDerivativeHash,
+} from "../../utils/derivatives";
 import setup from "../__fixtures__";
 import { decodeEvents, retrievePositionTokensAddresses } from "../../utils/events";
 import { toBN } from "../../utils/bn";
@@ -43,7 +48,7 @@ describe("Core: burn market neutral positions", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait();
-    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
     const marketNeutralBalanceAfterCreation = await testToken.balanceOf(marketNeutralParty.address);
 
@@ -58,7 +63,7 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartysShortBalance).to.equal(amount);
 
-    const tx2 = await core["redeem(address[2],uint256)"]([shortPositionAddress, longPositionAddress], redeemAmount);
+    const tx2 = await core["redeem(address[2],uint256)"]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
 
     const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
@@ -114,7 +119,7 @@ describe("Core: burn market neutral positions", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait();
-    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
     const marketNeutralBalanceAfterCreation = await testToken.balanceOf(marketNeutralParty.address);
 
@@ -129,7 +134,7 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartysShortBalance).to.equal(amount);
 
-    const tx2 = await core[redeemOne]([shortPositionAddress, longPositionAddress], redeemAmount);
+    const tx2 = await core[redeemOne]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
     const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
     /**
@@ -184,7 +189,7 @@ describe("Core: burn market neutral positions", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait();
-    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
     // creation of the second market neutral position
 
@@ -206,7 +211,7 @@ describe("Core: burn market neutral positions", () => {
       marketNeutralParty.address,
     ]);
     const receipt2 = await tx2.wait();
-    const [secondShortPositionAddress, secondLongPositionAddress] = retrievePositionTokensAddresses(
+    const [secondLongPositionAddress, secondShortPositionAddress] = retrievePositionTokensAddresses(
       opiumProxyFactory,
       receipt2,
     );
@@ -239,8 +244,8 @@ describe("Core: burn market neutral positions", () => {
 
     const tx3 = await core[redeemMany](
       [
-        [shortPositionAddress, longPositionAddress],
-        [secondShortPositionAddress, secondLongPositionAddress],
+        [longPositionAddress, shortPositionAddress],
+        [secondLongPositionAddress, secondShortPositionAddress],
       ],
       [redeemAmount, secondRedeemAmount],
     );

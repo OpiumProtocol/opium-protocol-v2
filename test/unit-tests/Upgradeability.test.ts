@@ -165,7 +165,7 @@ describe("Upgradeability", () => {
     expect(coreAddressBefore).to.be.eq(coreAddressAfter);
     expect(coreImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
-    await upgraded.updateProtocolAddresses()
+    await upgraded.updateProtocolAddresses();
 
     const derivativeOrder = await generateRandomDerivativeSetup(
       oracleIdMock.address,

@@ -7,7 +7,7 @@ import "../Interface/ITokenSpender.sol";
 import "../Interface/ICore.sol";
 
 library RegistryEntities {
-    struct ProtocolCommissionArgs {
+    struct ProtocolParametersArgs {
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
         uint32 noDataCancellationPeriod;
         // Represents 100% base for commissions calculation

@@ -11,7 +11,11 @@ interface ICore {
         address[2] calldata _addresses
     ) external;
 
-    function mint(uint256 _amount, address[2] calldata _positionAddresses) external;
+    function mint(
+        uint256 _amount,
+        address[2] calldata _positionAddresses,
+        address[2] calldata _positionsOwners
+    ) external;
 
     function execute(address _positionAddress, uint256 _amount) external;
 

@@ -36,13 +36,13 @@ export const getDerivativeHash = (derivative: TDerivative): string => {
 
 export const addPositionTokens = (
   derivativeOrder: TDerivativeOrder,
-  shortPositionAddress: string,
   longPositionAddress: string,
+  shortPositionAddress: string,
 ): ICreatedDerivativeOrder => {
   return {
     ...derivativeOrder,
-    shortPositionAddress,
     longPositionAddress,
+    shortPositionAddress,
   };
 };
 

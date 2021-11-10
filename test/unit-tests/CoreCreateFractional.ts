@@ -121,12 +121,12 @@ describe("Core with fractional quantities", () => {
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
-    const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
+    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
     );
-    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
 
     const marginBalanceAfter = await testToken.balanceOf(deployer.address);
     expect(marginBalanceAfter).to.equal(marginBalanceBefore.sub(computeTotalGrossPayout(optionCall.margin, amount)));
