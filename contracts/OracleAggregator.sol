@@ -1,7 +1,5 @@
 pragma solidity 0.8.5;
 
-import "./Interface/IOracleId.sol";
-
 /**
     Error codes:
     - O1 = ERROR_OPIUM_PROXY_FACTORY_ALREADY_DEPLOYED

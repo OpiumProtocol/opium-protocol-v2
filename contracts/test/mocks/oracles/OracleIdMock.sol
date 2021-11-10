@@ -1,10 +1,9 @@
 pragma solidity 0.8.5;
 
-import "../../../Interface/IOracleId.sol";
 import "../../../Interface/IRegistry.sol";
 import "../../../Interface/IOracleAggregator.sol";
 
-contract OracleIdMock is IOracleId {
+contract OracleIdMock {
     uint256 fetchPrice;
     IRegistry registry;
 
@@ -13,7 +12,7 @@ contract OracleIdMock is IOracleId {
         registry = IRegistry(_registry);
     }
 
-    function triggerCallback(uint256 timestamp, uint256 returnData) external override {
+    function triggerCallback(uint256 timestamp, uint256 returnData) external {
         IOracleAggregator(registry.getOracleAggregator()).__callback(timestamp, returnData);
     }
 }
