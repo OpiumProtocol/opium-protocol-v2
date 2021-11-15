@@ -1,7 +1,8 @@
 pragma solidity 0.8.5;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "./Lib/LibDerivative.sol";
+import "hardhat/console.sol";
 
 /**
     Error codes:
@@ -9,7 +10,7 @@ import "./Lib/LibDerivative.sol";
  */
 
 /// @title Opium.OpiumPositionToken is Opium.OpiumProxyFactory's child contract. It inherits of ERC20Upgradeable and represents a specific position (either LONG or SHORT) for a given `LibDerivative.Derivative` derivative
-contract OpiumPositionToken is ERC20Upgradeable {
+contract OpiumPositionToken is ERC20PermitUpgradeable {
     using LibDerivative for LibDerivative.Derivative;
 
     address private factory;
@@ -32,10 +33,13 @@ contract OpiumPositionToken is ERC20Upgradeable {
         LibDerivative.PositionType _positionType,
         LibDerivative.Derivative calldata _derivative
     ) external initializer {
-        // string memory addressToString = toAsciiString(address(this));
-        _positionType == LibDerivative.PositionType.LONG
-            ? __ERC20_init("OPIUM LONG TOKEN", "OPLN")
-            : __ERC20_init("OPIUM SHORT TOKEN", "OPSH");
+        if(_positionType == LibDerivative.PositionType.LONG) {
+            __ERC20_init("OPIUM LONG TOKEN", "OPLN");
+            __ERC20Permit_init("OPIUM LONG TOKEN");
+        } else {
+            __ERC20_init("OPIUM SHORT TOKEN", "OPSH");
+            __ERC20Permit_init("OPIUM SHORT TOKEN");
+        }
         factory = msg.sender;
         opiumPositionTokenParams = OpiumPositionTokenParams({
             derivative: _derivative,
@@ -77,22 +81,5 @@ contract OpiumPositionToken is ERC20Upgradeable {
     /// @return _opiumPositionTokenParams OpiumPositionTokenParams struct which contains `LibDerivative.Derivative` schema of the derivative, the `LibDerivative.PositionType` of the present ERC20 token and the bytes32 hash `derivativeHash` of the `LibDerivative.Derivative` derivative
     function getPositionTokenData() external view returns (OpiumPositionTokenParams memory _opiumPositionTokenParams) {
         return opiumPositionTokenParams;
-    }
-
-    function toAsciiString(address x) private view returns (string memory) {
-        bytes memory s = new bytes(40);
-        for (uint256 i = 0; i < 20; i++) {
-            bytes1 b = bytes1(uint8(uint256(uint160(x)) / (2**(8 * (19 - i)))));
-            bytes1 hi = bytes1(uint8(b) / 16);
-            bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
-            s[2 * i] = char(hi);
-            s[2 * i + 1] = char(lo);
-        }
-        return string(s);
-    }
-
-    function char(bytes1 b) internal view returns (bytes1 c) {
-        if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
-        else return bytes1(uint8(b) + 0x57);
     }
 }

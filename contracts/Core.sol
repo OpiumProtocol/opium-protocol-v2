@@ -15,7 +15,6 @@ import "./Interface/IRegistry.sol";
 import "./Lib/LibDerivative.sol";
 import "./Lib/LibPosition.sol";
 import "./Lib/LibCalculator.sol";
-import "hardhat/console.sol";
 
 /**
     Error codes:
