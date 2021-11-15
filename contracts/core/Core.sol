@@ -485,15 +485,17 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         ).getPositionTokenData();
         _onlyOpiumFactoryTokens(_positionAddress, opiumPositionTokenParams);
 
-        // Don't allow to cancel tickers with "dummy" oracleIds
-        require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
+        // It's sufficient to perform all the sanity checks only if a derivative has not yet been canceled
+        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+            // Don't allow to cancel tickers with "dummy" oracleIds
+            require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
 
-        // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
-        require(
-            opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
+            // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
+            require(
+                opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
                 block.timestamp,
-            "C13"
-        );
+                "C13"
+            );
 
         if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
             // Ensures that `Opium.OracleAggregator` has still not been provided with data after noDataCancellationperiod
