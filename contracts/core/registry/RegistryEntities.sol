@@ -1,10 +1,10 @@
 pragma solidity 0.8.5;
 
-import "../Interface/IOpiumProxyFactory.sol";
-import "../Interface/ISyntheticAggregator.sol";
-import "../Interface/IOracleAggregator.sol";
-import "../Interface/ITokenSpender.sol";
-import "../Interface/ICore.sol";
+import "../../interfaces/IOpiumProxyFactory.sol";
+import "../../interfaces/ISyntheticAggregator.sol";
+import "../../interfaces/IOracleAggregator.sol";
+import "../../interfaces/ITokenSpender.sol";
+import "../../interfaces/ICore.sol";
 
 library RegistryEntities {
     struct ProtocolParametersArgs {
@@ -12,8 +12,10 @@ library RegistryEntities {
         uint32 noDataCancellationPeriod;
         // Represents 100% base for commissions calculation
         uint32 derivativeAuthorCommissionBase;
-        // Represents 100% base for Opium commission
-        uint8 protocolFeeCommissionBase;
+        // Represents 100% base for the total fee applied to the profitable execution of a derivative position
+        uint8 protocolExecutionFeeCommissionBase;
+        // Represents 100% base for the total fee applied to the successful redemption of a market neutral position
+        uint8 protocolRedemptionFeeCommissionBase;
         // Represents which part of `syntheticId` author commissions goes to opium
         uint8 protocolCommissionPart;
         // Represents whether the protocol is paused
@@ -31,7 +33,9 @@ library RegistryEntities {
         ISyntheticAggregator syntheticAggregator;
         // Address of Opium.TokenSpender contract
         ITokenSpender tokenSpender;
-        // Address of protocol commission receiver
-        address protocolFeeReceiver;
+        // Address of the recipient of Opium Protocol's fees originated from the profitable execution of a derivative's position
+        address protocolExecutionFeeReceiver;
+        // Address of the recipient of Opium Protocol's fees originated from the successful redemption of a market neutral position
+        address protocolRedemptionFeeReceiver;
     }
 }

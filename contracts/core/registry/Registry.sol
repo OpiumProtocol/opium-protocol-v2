@@ -1,12 +1,12 @@
 pragma solidity 0.8.5;
 
 import "./RegistryStorageUpgradeable.sol";
-import "../Lib/LibRoles.sol";
-import "../Interface/IOpiumProxyFactory.sol";
-import "../Interface/ISyntheticAggregator.sol";
-import "../Interface/IOracleAggregator.sol";
-import "../Interface/ITokenSpender.sol";
-import "../Interface/ICore.sol";
+import "../../libs/LibRoles.sol";
+import "../../interfaces/IOpiumProxyFactory.sol";
+import "../../interfaces/ISyntheticAggregator.sol";
+import "../../interfaces/IOracleAggregator.sol";
+import "../../interfaces/ITokenSpender.sol";
+import "../../interfaces/ICore.sol";
 
 /**
     Error codes:
@@ -40,14 +40,16 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     /// @param _oracleAggregator address of Opium.OracleAggregator
     /// @param _syntheticAggregator address of Opium.SyntheticAggregator
     /// @param _tokenSpender address of Opium.TokenSpender
-    /// @param _protocolFeeReceiver address of the recipient of Opium Protocol's fees
+    /// @param _protocolExecutionFeeReceiver address of the recipient of Opium Protocol's fees originated from the profitable execution of a derivative's position
+    /// @param _protocolRedemptionFeeReceiver address of the recipient of Opium Protocol's fees originated from the successful redemption of a market neutral position
     function registerProtocol(
         address _opiumProxyFactory,
         address _core,
         address _oracleAggregator,
         address _syntheticAggregator,
         address _tokenSpender,
-        address _protocolFeeReceiver
+        address _protocolExecutionFeeReceiver,
+        address _protocolRedemptionFeeReceiver
     ) external onlyProtocolRegister {
         require(
             _opiumProxyFactory != address(0) &&
@@ -55,7 +57,8 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
                 _oracleAggregator != address(0) &&
                 _syntheticAggregator != address(0) &&
                 _tokenSpender != address(0) &&
-                _protocolFeeReceiver != address(0),
+                _protocolExecutionFeeReceiver != address(0) &&
+                _protocolRedemptionFeeReceiver != address(0),
             "R5"
         );
 
@@ -65,7 +68,8 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
             oracleAggregator: IOracleAggregator(_oracleAggregator),
             syntheticAggregator: ISyntheticAggregator(_syntheticAggregator),
             tokenSpender: ITokenSpender(_tokenSpender),
-            protocolFeeReceiver: _protocolFeeReceiver
+            protocolExecutionFeeReceiver: _protocolExecutionFeeReceiver,
+            protocolRedemptionFeeReceiver: _protocolRedemptionFeeReceiver
         });
     }
 

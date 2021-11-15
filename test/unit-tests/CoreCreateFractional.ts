@@ -166,7 +166,7 @@ describe("Core with fractional quantities", () => {
 
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
+    const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
       await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
@@ -181,7 +181,7 @@ describe("Core with fractional quantities", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const sellerFees = computeFees(
       calculateTotalGrossPayout(
@@ -195,7 +195,7 @@ describe("Core with fractional quantities", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
 
     const buyerNetPayout = calculateTotalNetPayout(

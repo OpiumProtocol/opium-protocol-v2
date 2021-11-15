@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "./Lib/LibDerivative.sol";
+import "../libs/LibDerivative.sol";
 
 /**
     Error codes:

@@ -1,6 +1,6 @@
 pragma solidity 0.8.5;
 
-import "../Lib/LibDerivative.sol";
+import "../libs/LibDerivative.sol";
 
 /// @title Opium.Interface.IDerivativeLogic is an interface that every syntheticId should implement
 interface IDerivativeLogic {

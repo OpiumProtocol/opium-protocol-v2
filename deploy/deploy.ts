@@ -98,13 +98,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       syntheticAggregator.address,
       tokenSpender.address,
       deployer.address,
+      deployer.address,
     );
 
   await registryInstance.connect(governor).addToWhitelist(core.address);
 
   const coreInstance = <Core>await ethers.getContract("Core");
   await coreInstance.updateProtocolAddresses();
-  console.log('set addresses: ', await registryInstance.getProtocolAddresses())
 };
 
 export default func;

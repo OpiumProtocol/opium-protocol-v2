@@ -34,7 +34,8 @@ describe("Registry", () => {
 
     const protocolParams = await registry.getProtocolParameters();
     expect(protocolParams.derivativeAuthorCommissionBase, "wrong derivative author commission base").to.be.eq(10000);
-    expect(protocolParams.protocolFeeCommissionBase, "wrong protocol commission base").to.be.eq(10);
+    expect(protocolParams.protocolExecutionFeeCommissionBase, "wrong protocol's execution commission base").to.be.eq(10);
+    expect(protocolParams.protocolRedemptionFeeCommissionBase, "wrong protocol's redemption commission base").to.be.eq(1);
     expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
     expect(await registry.isPaused(), "it's paused").to.be.false;
@@ -65,6 +66,7 @@ describe("Registry", () => {
           syntheticAggregator.address,
           tokenSpender.address,
           notAllowed.address,
+          notAllowed.address
         ),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE));
 

@@ -1,5 +1,5 @@
 pragma solidity 0.8.5;
-import "../Registry/RegistryEntities.sol";
+import "../core/registry/RegistryEntities.sol";
 
 interface IRegistry {
     function getCore() external view returns (address);
