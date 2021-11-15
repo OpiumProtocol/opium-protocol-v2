@@ -10,7 +10,6 @@ import "hardhat/console.sol";
 
 /**
     Error codes:
-    - F1 = ERROR_OPIUM_POSITION_TOKEN_ALREADY_DEPLOYED
     - F2 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
  */
 
@@ -27,7 +26,7 @@ contract OpiumProxyFactory is Initializable {
 
     /// @notice it restricts access to the consumer functions to the Opium.Core contract
     modifier onlyCore() {
-        require(msg.sender == registry.getCore(), "F2");
+        require(msg.sender == registry.getCore(), "F1");
         _;
     }
 
