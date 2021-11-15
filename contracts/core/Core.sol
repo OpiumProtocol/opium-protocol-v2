@@ -5,16 +5,17 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./TokenSpender.sol";
-import "./Registry/RegistryEntities.sol";
-import "./Interface/IOpiumProxyFactory.sol";
-import "./Interface/IOpiumPositionToken.sol";
-import "./Interface/ISyntheticAggregator.sol";
-import "./Interface/IOracleAggregator.sol";
-import "./Interface/IDerivativeLogic.sol";
-import "./Interface/IRegistry.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
-import "./Lib/LibCalculator.sol";
+import "./registry/RegistryEntities.sol";
+import "./base/RegistryManager.sol";
+import "../interfaces/IOpiumProxyFactory.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/ISyntheticAggregator.sol";
+import "../interfaces/IOracleAggregator.sol";
+import "../interfaces/IDerivativeLogic.sol";
+import "../interfaces/IRegistry.sol";
+import "../libs/LibDerivative.sol";
+import "../libs/LibPosition.sol";
+import "../libs/LibCalculator.sol";
 import "hardhat/console.sol";
 
 /**
@@ -36,7 +37,7 @@ import "hardhat/console.sol";
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
-contract Core is ReentrancyGuardUpgradeable {
+contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibCalculator for uint256;
     using LibPosition for bytes32;
@@ -52,8 +53,6 @@ contract Core is ReentrancyGuardUpgradeable {
     event LogCanceled(address indexed _positionOwner, bytes32 _derivativeHash);
     // Emitted when Core redeems an amount of market neutral positions
     event LogRedeem(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 indexed _amount);
-
-    IRegistry private registry;
 
     RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
@@ -82,7 +81,7 @@ contract Core is ReentrancyGuardUpgradeable {
 
     /// @notice it is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
-        registry = IRegistry(_registry);
+        __RegistrySetter__init(msg.sender, _registry);
         protocolParametersArgs = registry.getProtocolParameters();
     }
 
@@ -90,13 +89,13 @@ contract Core is ReentrancyGuardUpgradeable {
 
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev should be called immediately after the deployment of the contract
-    function updateProtocolAddresses() external {
+    function updateProtocolAddresses() external onlyOwner {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
     /// @notice Allows to set Opium Protocol parameters
     ///
-    function updateProtocolParametersArgs() external {
+    function updateProtocolParametersArgs() external onlyOwner {
         protocolParametersArgs = registry.getProtocolParameters();
     }
 
@@ -154,7 +153,7 @@ contract Core is ReentrancyGuardUpgradeable {
             address(protocolAddressesArgs.opiumProxyFactory)
         );
         require(isLongDeployed == isShortDeployed);
-        if(isLongDeployed) {
+        if (isLongDeployed) {
             _create(_derivative, _amount, _positionsOwners);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
@@ -486,23 +485,28 @@ contract Core is ReentrancyGuardUpgradeable {
         ).getPositionTokenData();
         _onlyOpiumFactoryTokens(_positionAddress, opiumPositionTokenParams);
 
-        // Don't allow to cancel tickers with "dummy" oracleIds
-        require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
+        // It's sufficient to perform all the sanity checks only if a derivative has not yet been canceled
+        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+            // Don't allow to cancel tickers with "dummy" oracleIds
+            require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
 
-        // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
-        require(
-            opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
-                block.timestamp &&
+            // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
+            require(
+                opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
+                    block.timestamp,
+                "C13"
+            );
+            // Ensures that `Opium.OracleAggregator` has still not been provided with data after noDataCancellationperiod
+            // The check needs to be performed only the first time a derivative is being canceled as to avoid preventing other parties from canceling their positions in case `Opium.OracleAggregator` receives data after the successful cancelation
+            require(
                 !protocolAddressesArgs.oracleAggregator.hasData(
                     opiumPositionTokenParams.derivative.oracleId,
                     opiumPositionTokenParams.derivative.endTime
                 ),
-            "C13"
-        );
-
-        // Emit `Canceled` event only once and mark ticker as canceled
-        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+                "C13"
+            );
             cancelled[opiumPositionTokenParams.derivativeHash] = true;
+            // Emit `Canceled` event only once and mark ticker as canceled
             emit LogCanceled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
 
@@ -551,10 +555,12 @@ contract Core is ReentrancyGuardUpgradeable {
         ) {
             /// fetches the derivative's data from the related oracleId
             /// opium allows the usage of "dummy" oracleIds - oracleIds whose address is the null address - in which case the data is set to 0
-            uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0) ? 0 :_oracleAggregator.getData(
-                _opiumPositionTokenParams.derivative.oracleId,
-                _opiumPositionTokenParams.derivative.endTime
-            );
+            uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0)
+                ? 0
+                : _oracleAggregator.getData(
+                    _opiumPositionTokenParams.derivative.oracleId,
+                    _opiumPositionTokenParams.derivative.endTime
+                );
             // Get payout ratio from Derivative logic
             // payoutRatio[0] - buyerPayout
             // payoutRatio[1] - sellerPayout
@@ -573,29 +579,22 @@ contract Core is ReentrancyGuardUpgradeable {
         ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(_syntheticAggregator)
             .getSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
 
-        uint256[2] memory payouts;
-        // Calculate payouts from ratio
-        // payouts[0] -> buyerPayout = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
-        // payouts[1] -> sellerPayout = (buyerMargin + sellerMargin) * sellerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
-        payouts[0] =
-            ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * buyerPayoutRatio) /
-            (buyerPayoutRatio + sellerPayoutRatio);
-        payouts[1] =
-            ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
-            (buyerPayoutRatio + sellerPayoutRatio);
-
         uint256 positionMargin;
 
         // Check if `_positionType` is LONG
         if (_opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
+            // Calculates buyerPayout from ratio = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
             // Set payout to buyerPayout multiplied by amount
-            payout = payouts[0].mulWithPrecisionFactor(_amount);
+            payout = (((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * buyerPayoutRatio) /
+                (buyerPayoutRatio + sellerPayoutRatio)).mulWithPrecisionFactor(_amount);
             // sets positionMargin to buyerMargin * amount
             positionMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
-        // Check if `_positionType` is a SHORT position
+            // Check if `_positionType` is a SHORT position
         } else {
+            // Calculates sellerPayout from ratio = sellerPayout = (buyerMargin + sellerMargin) * sellerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
             // Set payout to sellerPayout multiplied by amount
-            payout = payouts[1].mulWithPrecisionFactor(_amount);
+            payout = (((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
+                (buyerPayoutRatio + sellerPayoutRatio)).mulWithPrecisionFactor(_amount);
             // sets positionMargin to sellerMargin * amount
             positionMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
         }

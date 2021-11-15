@@ -1,6 +1,6 @@
 pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "../Lib/LibDerivative.sol";
+import "../libs/LibDerivative.sol";
 
 interface ICore {
     function withdrawFee(address _tokenAddress) external;

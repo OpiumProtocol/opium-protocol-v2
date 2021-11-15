@@ -1,11 +1,12 @@
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
-import "./Interface/IOpiumPositionToken.sol";
-import "./Interface/IRegistry.sol";
 import "./OpiumPositionToken.sol";
+import "./base/RegistryManager.sol";
+import "../libs/LibDerivative.sol";
+import "../libs/LibPosition.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/IRegistry.sol";
 import "hardhat/console.sol";
 
 /**
@@ -14,13 +15,11 @@ import "hardhat/console.sol";
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
-contract OpiumProxyFactory is Initializable {
+contract OpiumProxyFactory is Initializable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
     event LogShortPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
     event LogLongPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
-
-    IRegistry private registry;
 
     address private opiumPositionTokenImplementation;
 
@@ -36,8 +35,8 @@ contract OpiumProxyFactory is Initializable {
     /// @dev it sets the the address of the implementation of the OpiumPositionToken contract which will be used for the factory-deployment of erc20 positions via the minimal proxy contract
     /// @param _registry address of Opium.Registry
     function initialize(address _registry) external initializer {
+        __RegistrySetter__init(msg.sender, _registry);
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
-        registry = IRegistry(_registry);
     }
 
     /// @notice read-only getter to retrieve the information about the underlying derivative
