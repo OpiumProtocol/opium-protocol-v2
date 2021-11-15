@@ -105,7 +105,7 @@ export const shouldBehaveLikeCore = async (
   const authorFeeCommission = await syntheticContract.getAuthorCommission();
 
   const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
-    await registry.getProtocolCommissionParams();
+    await registry.getProtocolParameters();
 
   const sellerFees = computeFees(
     calculateTotalGrossProfit(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.SELLER),

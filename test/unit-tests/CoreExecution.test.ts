@@ -330,7 +330,7 @@ describe("CoreExecution", () => {
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolCommissionParams();
+      await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
       calculateTotalGrossPayout(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.BUYER),
@@ -407,7 +407,7 @@ describe("CoreExecution", () => {
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolCommissionParams();
+      await registry.getProtocolParameters();
 
     const fees = computeFees(
       buyerPayout,
@@ -471,7 +471,7 @@ describe("CoreExecution", () => {
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolCommissionParams();
+      await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
       calculateTotalGrossPayout(
@@ -551,7 +551,7 @@ describe("CoreExecution", () => {
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolCommissionParams();
+      await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
       calculateTotalGrossPayout(
@@ -627,7 +627,7 @@ describe("CoreExecution", () => {
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolCommissionParams();
+      await registry.getProtocolParameters();
 
     const fees = computeFees(
       buyerPayout,

@@ -44,7 +44,7 @@ contract OpiumPositionToken is ERC20Upgradeable {
         });
     }
 
-    modifier isFactory() {
+    modifier onlyFactory() {
         require(msg.sender == factory, "P1");
         _;
     }
@@ -53,7 +53,7 @@ contract OpiumPositionToken is ERC20Upgradeable {
     /// @dev can only be called by the factory contract set in the `initialize` function
     /// @param _positionHolder address of the recipient of the position tokens
     /// @param _amount amount of position tokens to be minted to the _positionHolder
-    function mint(address _positionHolder, uint256 _amount) external isFactory {
+    function mint(address _positionHolder, uint256 _amount) external onlyFactory {
         _mint(_positionHolder, _amount);
     }
 
@@ -61,7 +61,7 @@ contract OpiumPositionToken is ERC20Upgradeable {
     /// @dev can only be called by the factory contract set in the `initialize` function
     /// @param _positionHolder address of the owner of the position tokens
     /// @param _amount amount of position tokens to be burnt
-    function burn(address _positionHolder, uint256 _amount) external isFactory {
+    function burn(address _positionHolder, uint256 _amount) external onlyFactory {
         _burn(_positionHolder, _amount);
     }
 

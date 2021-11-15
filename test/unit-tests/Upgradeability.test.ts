@@ -53,7 +53,7 @@ describe("Upgradeability", () => {
 
     const [protocolAddressesBefore, protocolCommissionsBefore] = await Promise.all([
       registry.getProtocolAddresses(),
-      registry.getProtocolCommissionParams(),
+      registry.getProtocolParameters(),
     ]);
     const registryImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(registry.address);
 
@@ -67,7 +67,7 @@ describe("Upgradeability", () => {
     expect(registryImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
 
     expect(protocolAddressesBefore).to.be.deep.eq(await upgraded.getProtocolAddresses());
-    expect(protocolCommissionsBefore).to.be.deep.eq(await upgraded.getProtocolCommissionParams());
+    expect(protocolCommissionsBefore).to.be.deep.eq(await upgraded.getProtocolParameters());
   });
 
   it("should upgrade SyntheticAggregator", async () => {
@@ -166,6 +166,7 @@ describe("Upgradeability", () => {
     expect(coreImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
     await upgraded.updateProtocolAddresses();
+    await upgraded.updateProtocolParametersArgs();
 
     const derivativeOrder = await generateRandomDerivativeSetup(
       oracleIdMock.address,

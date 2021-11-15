@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "./Interface/IDerivativeLogic.sol";
 import "./Interface/IRegistry.sol";
 import "./Lib/LibDerivative.sol";
@@ -10,13 +10,14 @@ import "./Lib/LibDerivative.sol";
     Error codes:
     - S1 = ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH
     - S2 = ERROR_SYNTHETIC_AGGREGATOR_WRONG_MARGIN
+    - S3 = ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG
  */
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
-contract SyntheticAggregator is Initializable {
+contract SyntheticAggregator is ReentrancyGuardUpgradeable {
     using LibDerivative for LibDerivative.Derivative;
     // Emitted when new ticker is initialized
-    event LogSyntheticInit(LibDerivative.Derivative derivative, bytes32 derivativeHash);
+    event LogSyntheticInit(LibDerivative.Derivative indexed derivative, bytes32 indexed derivativeHash);
 
     IRegistry private registry;
 
@@ -33,6 +34,7 @@ contract SyntheticAggregator is Initializable {
 
     function initialize(address _registry) external initializer {
         registry = IRegistry(_registry);
+        __ReentrancyGuard_init();
     }
 
     /// @notice Initializes ticker, if was not initialized and returns buyer and seller margin from cache
@@ -64,7 +66,7 @@ contract SyntheticAggregator is Initializable {
     /// @notice Initializes ticker: caches syntheticId type, margin, author address and commission
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
-    function _initDerivative(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) private {
+    function _initDerivative(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) private nonReentrant {
         if (syntheticCaches[_derivativeHash].init == true) {
             return;
         }
@@ -81,10 +83,10 @@ contract SyntheticAggregator is Initializable {
         // Get commission from syntheticId
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         // Check if commission is not set > 100%
-        RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolCommissionParams();
+        RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolParameters();
         require(
             authorCommission <= protocolParametersArgs.derivativeAuthorCommissionBase,
-            "S3" //ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG
+            "S3"
         );
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({

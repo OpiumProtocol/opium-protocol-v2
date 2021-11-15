@@ -80,17 +80,10 @@ contract Core is ReentrancyGuardUpgradeable {
         _;
     }
 
-    /// @notice sets registry and protocolParametersArgs
-    /// noDataCancellationPeriod - buyer address
-    /// derivativeAuthorCommissionBase - seller address
-    /// derivativeAuthorCommissionBase - buyer address
-    /// protocolFeeCommissionBase - seller address
-    /// protocolCommissionPart - buyer address
-    /// precisionFactor - seller address
-    /// paused - protocol paused
+    /// @notice it is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
         registry = IRegistry(_registry);
-        protocolParametersArgs = registry.getProtocolCommissionParams();
+        protocolParametersArgs = registry.getProtocolParameters();
     }
 
     // ****************** EXTERNAL FUNCTIONS ******************
@@ -104,7 +97,7 @@ contract Core is ReentrancyGuardUpgradeable {
     /// @notice Allows to set Opium Protocol parameters
     ///
     function updateProtocolParametersArgs() external {
-        protocolParametersArgs = registry.getProtocolCommissionParams();
+        protocolParametersArgs = registry.getProtocolParameters();
     }
 
     /// @notice Allows to set the addresses

@@ -10,7 +10,7 @@ import "./Interface/IRegistry.sol";
     - T1 = ERROR_TOKEN_SPENDER_NOT_WHITELISTED
  */
 
-/// @title Opium.TokenSpender contract holds users ERC20 approvals and allows whitelisted contracts to use tokens
+/// @title Opium.TokenSpender contract holds users ERC20 allowances and allows whitelisted contracts to use ERC20 tokens
 contract TokenSpender is Initializable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     IRegistry private registry;
@@ -20,8 +20,8 @@ contract TokenSpender is Initializable {
         _;
     }
 
-    /// @notice Calls constructors of super-contracts
-    /// @param _registry address Address of governor, who is allowed to adjust whitelist
+    /// @notice it is called only once upon deployment of the contract
+    /// @param _registry sets the address of the Opium.Registry
     function initialize(address _registry) external initializer {
         registry = IRegistry(_registry);
     }

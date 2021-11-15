@@ -10,8 +10,13 @@ import "../Interface/ICore.sol";
 
 /**
     Error codes:
-    - R5 = ERROR_REGISTRY_NOT_PAUSED
+    - R1 = ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE
+    - R2 = ERROR_REGISTRY_ONLY_GUARDIAN
+    - R3 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE
+    - R4 = ERROR_REGISTRY_ONLY_PARAMETER_SETTER_ROLE
+    - R5 = ERROR_REGISTRY_NULL_PROTOCOL_ADDRESS
     - R6 = ERROR_REGISTRY_ALREADY_PAUSED
+    - R7 = ERROR_REGISTRY_NOT_PAUSED
  */
 
 contract RegistryUpgradeable is RegistryStorageUpgradeable {
@@ -21,9 +26,9 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     event LogWhitelistAccount(address _whitelisted);
     event LogWhitelistAccountRemoved(address _whitelisted);
 
-    /// @notice it is called only once upon deployment of the contract plus the protocol's fee receiver. It initializes the registry storage with the given governor address as the admin role
+    /// @notice it is called only once upon deployment of the contract. It initializes the registry storage with the given governor address as the admin role.
     /// @dev Calls RegistryStorageUpgradeable.__RegistryStorage__init
-    /// @param _governor address of the governance account which will be assigned the initial admin role
+    /// @param _governor address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE
     function initialize(address _governor) external initializer {
         __RegistryStorage__init(_governor);
     }
@@ -93,13 +98,13 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     /// @notice allows the COMMISSIONER role to change the protocolReceiver's fee
-    function setOpiumCommissionPart(uint8 _protocolCommissionPart) external onlyCommissionSetter {
+    function setOpiumCommissionPart(uint8 _protocolCommissionPart) external onlyParameterSetter {
         protocolParametersArgs.protocolCommissionPart = _protocolCommissionPart;
         emit LogOpiumCommissionChange(_protocolCommissionPart);
     }
 
     /// @notice allows the COMMISSIONER role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)
-    function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external onlyCommissionSetter {
+    function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external onlyParameterSetter {
         protocolParametersArgs.noDataCancellationPeriod = _noDataCancellationPeriod;
         emit LogNoDataCancellationPeriodChange(_noDataCancellationPeriod);
     }
@@ -107,8 +112,8 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     // GETTERS
 
     /// @notice Returns all the commission-related parameters of the Opium protocol contracts
-    ///@return RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol.
-    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
+    ///@return RegistryEntities.getProtocolParameters struct that packs the protocol parameters {see RegistryEntities comments}
+    function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
         return protocolParametersArgs;
     }
 

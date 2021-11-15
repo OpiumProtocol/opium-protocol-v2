@@ -10,7 +10,7 @@ import "hardhat/console.sol";
 
 /**
     Error codes:
-    - F1 = ERROR_OPIUM_PROXY_FACTORY_ALREADY_DEPLOYED
+    - F1 = ERROR_OPIUM_POSITION_TOKEN_ALREADY_DEPLOYED
     - F2 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
  */
 
@@ -18,8 +18,8 @@ import "hardhat/console.sol";
 contract OpiumProxyFactory is Initializable {
     using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
-    event LogShortPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
-    event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
+    event LogShortPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
+    event LogLongPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
 
     IRegistry private registry;
 
@@ -73,12 +73,12 @@ contract OpiumProxyFactory is Initializable {
             LibDerivative.PositionType.SHORT,
             _derivative
         );
+        emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
+        emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
         if (_amount > 0) {
             IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);
             IOpiumPositionToken(shortPositionAddress).mint(_seller, _amount);
         }
-        emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
-        emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
     }
 
     /// @notice it creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
@@ -95,8 +95,8 @@ contract OpiumProxyFactory is Initializable {
         address _shortPositionAddress,
         uint256 _amount
     ) external onlyCore {
-        require(_isContract(_longPositionAddress) == true, "F1");
-        require(_isContract(_shortPositionAddress) == true, "F1");
+        require(_isContract(_longPositionAddress), "F1");
+        require(_isContract(_shortPositionAddress), "F1");
         IOpiumPositionToken(_longPositionAddress).mint(_buyer, _amount);
         IOpiumPositionToken(_shortPositionAddress).mint(_seller, _amount);
     }

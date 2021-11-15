@@ -4,6 +4,9 @@ import "../Lib/LibDerivative.sol";
 
 /// @title Opium.Interface.IDerivativeLogic is an interface that every syntheticId should implement
 interface IDerivativeLogic {
+    // Event with syntheticId metadata JSON string (for DIB.ONE derivative explorer)
+    event LogMetadataSet(string metadata);
+
     /// @notice Validates ticker
     /// @param _derivative Derivative Instance of derivative to validate
     /// @return Returns boolean whether ticker is valid
@@ -44,7 +47,4 @@ interface IDerivativeLogic {
     /// @notice Sets whether thirds parties are allowed or not to execute derivative's on msg.sender's behalf
     /// @param _allow bool Flag for execution allowance
     function allowThirdpartyExecution(bool _allow) external;
-
-    // Event with syntheticId metadata JSON string (for DIB.ONE derivative explorer)
-    event MetadataSet(string metadata);
 }

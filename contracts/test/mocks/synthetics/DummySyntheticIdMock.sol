@@ -14,7 +14,7 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
             "description": "Dummy synthetic for testing purposes"
         }
         */
-        emit MetadataSet(
+        emit LogMetadataSet(
             '{"author":"opium.team","type":"synthetic","subtype":"none","description":"Dummy synthetic for testing purposes"}'
         );
     }

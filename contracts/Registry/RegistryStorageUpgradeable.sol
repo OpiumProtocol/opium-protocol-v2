@@ -9,7 +9,7 @@ import "./RegistryEntities.sol";
     - R1 = ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE
     - R2 = ERROR_REGISTRY_ONLY_GUARDIAN
     - R3 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE
-    - R4 = ERROR_REGISTRY_ONLY_COMMISSION_SETTER_ROLE
+    - R4 = ERROR_REGISTRY_ONLY_PARAMETER_SETTER_ROLE
  */
 
 contract RegistryStorageUpgradeable is AccessControlUpgradeable {
@@ -17,23 +17,31 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
     RegistryEntities.ProtocolAddressesArgs internal protocolAddressesArgs;
     mapping(address => bool) internal coreSpenderWhitelist;
 
+    /// @notice it ensures that the calling account has been granted the PROTOCOL_REGISTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
     modifier onlyProtocolRegister() {
         require(hasRole(LibRoles.PROTOCOL_REGISTER_ROLE, msg.sender), "R1");
         _;
     }
 
+    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE
+    /// @dev by default, it is granted to the `governor` account
     modifier onlyGuardian() {
         require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), "R2");
         _;
     }
 
+    /// @notice it ensures that the calling account has been granted the WHITELISTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
     modifier onlyWhitelister() {
         require(hasRole(LibRoles.WHITELISTER_ROLE, msg.sender), "R3");
         _;
     }
 
-    modifier onlyCommissionSetter() {
-        require(hasRole(LibRoles.COMMISSION_SETTER_ROLE, msg.sender), "R4");
+    /// @notice it ensures that the calling account has been granted the PARAMETER_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyParameterSetter() {
+        require(hasRole(LibRoles.PARAMETER_SETTER_ROLE, msg.sender), "R4");
         _;
     }
 
@@ -46,7 +54,7 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _setupRole(LibRoles.PROTOCOL_REGISTER_ROLE, _governor);
         _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
-        _setupRole(LibRoles.COMMISSION_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.PARAMETER_SETTER_ROLE, _governor);
 
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,

@@ -104,6 +104,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const coreInstance = <Core>await ethers.getContract("Core");
   await coreInstance.updateProtocolAddresses();
+  console.log('set addresses: ', await registryInstance.getProtocolAddresses())
 };
 
 export default func;

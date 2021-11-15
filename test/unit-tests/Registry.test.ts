@@ -32,7 +32,7 @@ describe("Registry", () => {
   it("should ensure the initial protocol parameters are as expected", async () => {
     const { registry } = await setup();
 
-    const protocolParams = await registry.getProtocolCommissionParams();
+    const protocolParams = await registry.getProtocolParameters();
     expect(protocolParams.derivativeAuthorCommissionBase, "wrong derivative author commission base").to.be.eq(10000);
     expect(protocolParams.protocolFeeCommissionBase, "wrong protocol commission base").to.be.eq(10);
     expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
@@ -77,7 +77,7 @@ describe("Registry", () => {
     );
 
     await expect(registry.connect(notAllowed).setOpiumCommissionPart(4)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_COMMISSION_SETTER_ROLE),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARAMETER_SETTER_ROLE),
     );
 
     await expect(registry.connect(notAllowed).pause()).to.be.revertedWith(
@@ -99,7 +99,7 @@ describe("Registry", () => {
 
     await registry.connect(governor).setOpiumCommissionPart(4);
 
-    const commissionParams = await registry.getProtocolCommissionParams();
+    const commissionParams = await registry.getProtocolParameters();
     expect(commissionParams.protocolCommissionPart).to.be.eq(4);
   });
 

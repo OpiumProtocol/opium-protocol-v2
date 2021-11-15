@@ -10,7 +10,7 @@ interface IRegistry {
 
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
 
-    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolParametersArgs memory);
+    function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory);
 
     function isPaused() external view returns (bool);
 }

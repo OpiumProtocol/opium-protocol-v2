@@ -85,6 +85,7 @@ const setup = async (): Promise<TContracts> => {
     );
 
   await registry.connect(governor).addToWhitelist(core.address);
+  await core.connect(governor).updateProtocolAddresses();
 
   return {
     libPosition,
