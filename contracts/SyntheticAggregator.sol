@@ -2,6 +2,7 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "./Base/RegistryManager.sol";
 import "./Interface/IDerivativeLogic.sol";
 import "./Interface/IRegistry.sol";
 import "./Lib/LibDerivative.sol";
@@ -14,12 +15,10 @@ import "./Lib/LibDerivative.sol";
  */
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
-contract SyntheticAggregator is ReentrancyGuardUpgradeable {
+contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     // Emitted when new ticker is initialized
     event LogSyntheticInit(LibDerivative.Derivative indexed derivative, bytes32 indexed derivativeHash);
-
-    IRegistry private registry;
 
     struct SyntheticCache {
         uint256 buyerMargin;
@@ -33,7 +32,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable {
     // EXTERNAL FUNCTIONS
 
     function initialize(address _registry) external initializer {
-        registry = IRegistry(_registry);
+        __RegistrySetter__init(msg.sender, _registry);
         __ReentrancyGuard_init();
     }
 

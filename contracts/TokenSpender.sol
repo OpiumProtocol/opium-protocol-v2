@@ -3,6 +3,7 @@ pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./Base/RegistryManager.sol";
 import "./Interface/IRegistry.sol";
 
 /**
@@ -11,9 +12,8 @@ import "./Interface/IRegistry.sol";
  */
 
 /// @title Opium.TokenSpender contract holds users ERC20 allowances and allows whitelisted contracts to use ERC20 tokens
-contract TokenSpender is Initializable {
+contract TokenSpender is Initializable, RegistryManager {
     using SafeERC20Upgradeable for IERC20Upgradeable;
-    IRegistry private registry;
 
     modifier onlyCoreSpenders() {
         require(registry.isCoreSpenderWhitelisted(msg.sender), "T1");
@@ -23,7 +23,7 @@ contract TokenSpender is Initializable {
     /// @notice it is called only once upon deployment of the contract
     /// @param _registry sets the address of the Opium.Registry
     function initialize(address _registry) external initializer {
-        registry = IRegistry(_registry);
+        __RegistrySetter__init(msg.sender, _registry);
     }
 
     /// @notice Using this function whitelisted contracts could call ERC20 transfers

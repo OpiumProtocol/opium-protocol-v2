@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "./TokenSpender.sol";
 import "./Registry/RegistryEntities.sol";
+import "./Base/RegistryManager.sol";
 import "./Interface/IOpiumProxyFactory.sol";
 import "./Interface/IOpiumPositionToken.sol";
 import "./Interface/ISyntheticAggregator.sol";
@@ -36,7 +37,7 @@ import "hardhat/console.sol";
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
-contract Core is ReentrancyGuardUpgradeable {
+contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibCalculator for uint256;
     using LibPosition for bytes32;
@@ -52,8 +53,6 @@ contract Core is ReentrancyGuardUpgradeable {
     event LogCanceled(address indexed _positionOwner, bytes32 _derivativeHash);
     // Emitted when Core redeems an amount of market neutral positions
     event LogRedeem(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 indexed _amount);
-
-    IRegistry private registry;
 
     RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
@@ -82,7 +81,7 @@ contract Core is ReentrancyGuardUpgradeable {
 
     /// @notice it is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
-        registry = IRegistry(_registry);
+        __RegistrySetter__init(msg.sender, _registry);
         protocolParametersArgs = registry.getProtocolParameters();
     }
 
@@ -90,13 +89,13 @@ contract Core is ReentrancyGuardUpgradeable {
 
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev should be called immediately after the deployment of the contract
-    function updateProtocolAddresses() external {
+    function updateProtocolAddresses() external onlyOwner {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
     /// @notice Allows to set Opium Protocol parameters
     ///
-    function updateProtocolParametersArgs() external {
+    function updateProtocolParametersArgs() external onlyOwner {
         protocolParametersArgs = registry.getProtocolParameters();
     }
 

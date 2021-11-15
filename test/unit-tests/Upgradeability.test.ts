@@ -25,13 +25,12 @@ describe("Upgradeability", () => {
   });
 
   it("should upgrade TokenSpender", async () => {
-    const { tokenSpender, registry } = await setup();
+    const { registry, tokenSpender } = await setup();
 
     const tokenSpenderRegistryAddressBefore = (await registry.getProtocolAddresses()).tokenSpender;
     const tokenSpenderImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
       tokenSpender.address,
     );
-
     const TestTokenSpenderUpgrade = await ethers.getContractFactory("TestTokenSpenderUpgrade");
     const upgraded = <TestTokenSpenderUpgrade>(
       await upgrades.upgradeProxy(tokenSpender.address, TestTokenSpenderUpgrade)
