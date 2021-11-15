@@ -46,6 +46,7 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
     }
 
     /// @notice internal init function that it is called only once upon deployment of the Opium.Registry contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address
+    /// @notice it sets the default ProtocolParametersArgs protocol parameters
     /// @dev internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters
     /// @param _governor address of the governance account which will be assigned the initial admin role
     function __RegistryStorage__init(address _governor) internal initializer {
@@ -59,7 +60,8 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,
             derivativeAuthorCommissionBase: 10000,
-            protocolFeeCommissionBase: 10,
+            protocolExecutionFeeCommissionBase: 10,
+            protocolRedemptionFeeCommissionBase: 1,
             protocolCommissionPart: 1,
             paused: false
         });

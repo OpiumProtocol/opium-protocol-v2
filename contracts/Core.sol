@@ -412,8 +412,10 @@ contract Core is ReentrancyGuardUpgradeable {
         );
         uint256 fees = _getFees(
             syntheticCache.authorAddress,
-            syntheticCache.authorCommission,
             opiumPositionTokenParams.derivative.token,
+            protocolAddressesArgs.protocolRedemptionFeeReceiver,
+            syntheticCache.authorCommission,
+            protocolParametersArgs.protocolRedemptionFeeCommissionBase,
             totalMargin
         );
 
@@ -606,8 +608,10 @@ contract Core is ReentrancyGuardUpgradeable {
                     (
                         _getFees(
                             syntheticCache.authorAddress,
-                            syntheticCache.authorCommission,
                             _opiumPositionTokenParams.derivative.token,
+                            protocolAddressesArgs.protocolExecutionFeeReceiver,
+                            syntheticCache.authorCommission,
+                            protocolParametersArgs.protocolExecutionFeeCommissionBase,
                             payout - longMargin
                         )
                     );
@@ -632,8 +636,10 @@ contract Core is ReentrancyGuardUpgradeable {
                     (
                         _getFees(
                             syntheticCache.authorAddress,
-                            syntheticCache.authorCommission,
                             _opiumPositionTokenParams.derivative.token,
+                            protocolAddressesArgs.protocolExecutionFeeReceiver,
+                            syntheticCache.authorCommission,
+                            protocolParametersArgs.protocolExecutionFeeCommissionBase,
                             payout - shortMargin
                         )
                     );
@@ -646,8 +652,10 @@ contract Core is ReentrancyGuardUpgradeable {
     /// @return fee uint256 Opium and `syntheticId` author fee
     function _getFees(
         address _authorAddress,
-        uint256 _authorCommission,
         address _tokenAddress,
+        address _protocolFeeReceiver,
+        uint256 _authorCommission,
+        uint256 _protocolBaseCommission,
         uint256 _profit
     ) private returns (uint256 fee) {
         // Calculate fee
@@ -660,8 +668,7 @@ contract Core is ReentrancyGuardUpgradeable {
 
         // Calculate opium fee
         // opiumFee = fee * OPIUM_COMMISSION_PART / OPIUM_COMMISSION_BASE
-        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart) /
-            protocolParametersArgs.protocolFeeCommissionBase;
+        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart) / _protocolBaseCommission;
 
         // Calculate author fee
         // authorFee = fee - opiumFee
@@ -669,7 +676,7 @@ contract Core is ReentrancyGuardUpgradeable {
 
         // Update feeVault for Opium team
         // feesVault[protocolFeeReceiver][token] += protocolFee
-        feesVaults[protocolAddressesArgs.protocolFeeReceiver][_tokenAddress] += opiumFee;
+        feesVaults[_protocolFeeReceiver][_tokenAddress] += opiumFee;
 
         // Update feeVault for `syntheticId` author
         // feeVault[author][token] += authorFee

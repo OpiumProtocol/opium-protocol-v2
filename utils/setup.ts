@@ -82,6 +82,7 @@ const setup = async (): Promise<TContracts> => {
       syntheticAggregator.address,
       tokenSpender.address,
       deployer.address,
+      deployer.address
     );
 
   await registry.connect(governor).addToWhitelist(core.address);

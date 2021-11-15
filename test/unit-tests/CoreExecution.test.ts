@@ -329,7 +329,7 @@ describe("CoreExecution", () => {
 
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
+    const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
       await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
@@ -337,14 +337,14 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const sellerFees = computeFees(
       calculateTotalGrossPayout(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.SELLER),
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const buyerNetPayout = calculateTotalNetPayout(
       buyerMargin,
@@ -406,7 +406,7 @@ describe("CoreExecution", () => {
     );
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
+    const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
       await registry.getProtocolParameters();
 
     const fees = computeFees(
@@ -414,7 +414,7 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const buyerNetPayout = computeTotalNetPayout(buyerPayout, amount, fees.totalFee);
     expect(buyerBalanceAfter).to.be.equal(buyerBalanceBefore.add(buyerNetPayout));
@@ -470,7 +470,7 @@ describe("CoreExecution", () => {
 
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
+    const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
       await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
@@ -485,7 +485,7 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const sellerFees = computeFees(
       calculateTotalGrossPayout(
@@ -499,7 +499,7 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const buyerNetPayout = calculateTotalNetPayout(
       buyerMargin,
@@ -550,7 +550,7 @@ describe("CoreExecution", () => {
 
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
+    const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
       await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
@@ -565,7 +565,7 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const sellerFees = computeFees(
       calculateTotalGrossPayout(
@@ -579,7 +579,7 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
     const buyerNetPayout = calculateTotalNetPayout(
       buyerMargin,
@@ -626,7 +626,7 @@ describe("CoreExecution", () => {
     );
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { derivativeAuthorCommissionBase, protocolFeeCommissionBase, protocolCommissionPart } =
+    const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
       await registry.getProtocolParameters();
 
     const fees = computeFees(
@@ -634,7 +634,7 @@ describe("CoreExecution", () => {
       authorFeeCommission,
       derivativeAuthorCommissionBase,
       protocolCommissionPart,
-      protocolFeeCommissionBase,
+      protocolExecutionFeeCommissionBase,
     );
 
     const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testToken.address);
