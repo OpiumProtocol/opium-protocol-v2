@@ -544,22 +544,17 @@ contract Core is ReentrancyGuardUpgradeable {
         ISyntheticAggregator _syntheticAggregator,
         IOracleAggregator _oracleAggregator
     ) private returns (uint256 payout) {
-        // Trying to getData from Opium.OracleAggregator, could be reverted
-        // Opium allows to use "dummy" oracleIds, in this case data is set to `0`
-        uint256 data;
-        if (_opiumPositionTokenParams.derivative.oracleId != address(0)) {
-            data = _oracleAggregator.getData(
-                _opiumPositionTokenParams.derivative.oracleId,
-                _opiumPositionTokenParams.derivative.endTime
-            );
-        } else {
-            data = 0;
-        }
-
+        /// if the derivativePayout for both the buyer and the seller are 0 it means that it's the first time the _getPayout function is being executed, hence it will fetch the fetch the payouts from the syntheticId and cache them.
         if (
             derivativePayouts[_opiumPositionTokenParams.derivativeHash][0] == 0 &&
             derivativePayouts[_opiumPositionTokenParams.derivativeHash][1] == 0
         ) {
+            /// fetches the derivative's data from the related oracleId
+            /// opium allows the usage of "dummy" oracleIds - oracleIds whose address is the null address - in which case the data is set to 0
+            uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0) ? 0 :_oracleAggregator.getData(
+                _opiumPositionTokenParams.derivative.oracleId,
+                _opiumPositionTokenParams.derivative.endTime
+            );
             // Get payout ratio from Derivative logic
             // payoutRatio[0] - buyerPayout
             // payoutRatio[1] - sellerPayout
@@ -589,61 +584,38 @@ contract Core is ReentrancyGuardUpgradeable {
             ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
             (buyerPayoutRatio + sellerPayoutRatio);
 
+        uint256 positionMargin;
+
         // Check if `_positionType` is LONG
         if (_opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
-            // Set payout to buyerPayout
-            payout = payouts[0];
-
-            // Multiply payout by amount
-            payout = payout.mulWithPrecisionFactor(_amount);
-
-            uint256 longMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
-
-            // Take fees only from profit makers
-            // Check: payout > buyerMargin * amount
-            if (payout > longMargin) {
-                // Get Opium and `syntheticId` author fees and subtract it from payout
-                payout =
-                    payout -
-                    (
-                        _getFees(
-                            syntheticCache.authorAddress,
-                            _opiumPositionTokenParams.derivative.token,
-                            protocolAddressesArgs.protocolExecutionFeeReceiver,
-                            syntheticCache.authorCommission,
-                            protocolParametersArgs.protocolExecutionFeeCommissionBase,
-                            payout - longMargin
-                        )
-                    );
-            }
-
-            // Check if `_positionType` is a SHORT position
+            // Set payout to buyerPayout multiplied by amount
+            payout = payouts[0].mulWithPrecisionFactor(_amount);
+            // sets positionMargin to buyerMargin * amount
+            positionMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
+        // Check if `_positionType` is a SHORT position
         } else {
-            // Set payout to sellerPayout
-            payout = payouts[1];
+            // Set payout to sellerPayout multiplied by amount
+            payout = payouts[1].mulWithPrecisionFactor(_amount);
+            // sets positionMargin to sellerMargin * amount
+            positionMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
+        }
 
-            // Multiply payout by amount
-            payout = payout.mulWithPrecisionFactor(_amount);
-            uint256 shortMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
-
-            // Take fees only from profit makers
-            // Check: payout > sellerMargin * amount
-
-            if (payout > shortMargin) {
-                // Get Opium fees and subtract it from payout
-                payout =
-                    payout -
-                    (
-                        _getFees(
-                            syntheticCache.authorAddress,
-                            _opiumPositionTokenParams.derivative.token,
-                            protocolAddressesArgs.protocolExecutionFeeReceiver,
-                            syntheticCache.authorCommission,
-                            protocolParametersArgs.protocolExecutionFeeCommissionBase,
-                            payout - shortMargin
-                        )
-                    );
-            }
+        // Take fees only from profit makers
+        // Check: payout > positionMargin * amount
+        if (payout > positionMargin) {
+            // Get Opium and `syntheticId` author fees and subtract it from payout
+            payout =
+                payout -
+                (
+                    _getFees(
+                        syntheticCache.authorAddress,
+                        _opiumPositionTokenParams.derivative.token,
+                        protocolAddressesArgs.protocolExecutionFeeReceiver,
+                        syntheticCache.authorCommission,
+                        protocolParametersArgs.protocolExecutionFeeCommissionBase,
+                        payout - positionMargin
+                    )
+                );
         }
     }
 
