@@ -2,10 +2,10 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "./Base/RegistryManager.sol";
-import "./Interface/IDerivativeLogic.sol";
-import "./Interface/IRegistry.sol";
-import "./Lib/LibDerivative.sol";
+import "./base/RegistryManager.sol";
+import "../interfaces/IDerivativeLogic.sol";
+import "../interfaces/IRegistry.sol";
+import "../libs/LibDerivative.sol";
 
 /**
     Error codes:

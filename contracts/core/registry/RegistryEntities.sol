@@ -1,10 +1,10 @@
 pragma solidity 0.8.5;
 
-import "../Interface/IOpiumProxyFactory.sol";
-import "../Interface/ISyntheticAggregator.sol";
-import "../Interface/IOracleAggregator.sol";
-import "../Interface/ITokenSpender.sol";
-import "../Interface/ICore.sol";
+import "../../interfaces/IOpiumProxyFactory.sol";
+import "../../interfaces/ISyntheticAggregator.sol";
+import "../../interfaces/IOracleAggregator.sol";
+import "../../interfaces/ITokenSpender.sol";
+import "../../interfaces/ICore.sol";
 
 library RegistryEntities {
     struct ProtocolParametersArgs {

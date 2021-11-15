@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
-import "../Interface/IDerivativeLogic.sol";
-import "../Lib/LibDerivative.sol";
+import "../interfaces/IDerivativeLogic.sol";
+import "../libs/LibDerivative.sol";
 
 contract PayoutHelper {
     struct ExecutionPayout {

@@ -2,11 +2,11 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./OpiumPositionToken.sol";
-import "./Base/RegistryManager.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
-import "./Interface/IOpiumPositionToken.sol";
-import "./Interface/IRegistry.sol";
+import "./base/RegistryManager.sol";
+import "../libs/LibDerivative.sol";
+import "../libs/LibPosition.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/IRegistry.sol";
 import "hardhat/console.sol";
 
 /**

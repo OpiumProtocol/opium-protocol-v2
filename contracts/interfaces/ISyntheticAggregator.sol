@@ -1,5 +1,5 @@
 pragma solidity 0.8.5;
-import "../Lib/LibDerivative.sol";
+import "../libs/LibDerivative.sol";
 
 interface ISyntheticAggregator {
     struct SyntheticCache {

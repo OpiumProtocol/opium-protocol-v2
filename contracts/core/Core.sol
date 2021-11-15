@@ -5,17 +5,17 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./TokenSpender.sol";
-import "./Registry/RegistryEntities.sol";
-import "./Base/RegistryManager.sol";
-import "./Interface/IOpiumProxyFactory.sol";
-import "./Interface/IOpiumPositionToken.sol";
-import "./Interface/ISyntheticAggregator.sol";
-import "./Interface/IOracleAggregator.sol";
-import "./Interface/IDerivativeLogic.sol";
-import "./Interface/IRegistry.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
-import "./Lib/LibCalculator.sol";
+import "./registry/RegistryEntities.sol";
+import "./base/RegistryManager.sol";
+import "../interfaces/IOpiumProxyFactory.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/ISyntheticAggregator.sol";
+import "../interfaces/IOracleAggregator.sol";
+import "../interfaces/IDerivativeLogic.sol";
+import "../interfaces/IRegistry.sol";
+import "../libs/LibDerivative.sol";
+import "../libs/LibPosition.sol";
+import "../libs/LibCalculator.sol";
 import "hardhat/console.sol";
 
 /**
