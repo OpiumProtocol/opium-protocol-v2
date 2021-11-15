@@ -95,8 +95,6 @@ contract OpiumProxyFactory is Initializable {
         address _shortPositionAddress,
         uint256 _amount
     ) external onlyCore {
-        require(_isContract(_longPositionAddress), "F1");
-        require(_isContract(_shortPositionAddress), "F1");
         IOpiumPositionToken(_longPositionAddress).mint(_buyer, _amount);
         IOpiumPositionToken(_shortPositionAddress).mint(_seller, _amount);
     }
@@ -129,17 +127,5 @@ contract OpiumProxyFactory is Initializable {
     ) external onlyCore {
         IOpiumPositionToken(_longPositionAddress).burn(_positionOwner, _amount);
         IOpiumPositionToken(_shortPositionAddress).burn(_positionOwner, _amount);
-    }
-
-    // ****************** PRIVATE FUNCTIONS ******************
-
-    /// @notice checks whether a contract has already been deployed at a specific address
-    /// @return bool true if a contract has been deployed at a specific address and false otherwise
-    function _isContract(address _address) private view returns (bool) {
-        uint256 size;
-        assembly {
-            size := extcodesize(_address)
-        }
-        return size > 0;
     }
 }

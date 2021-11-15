@@ -9,8 +9,28 @@ library LibPosition {
     address _positionImplementationAddress, 
     address _factoryAddress
   ) internal pure returns(address) {
-    bytes32 salt = keccak256(abi.encodePacked( _derivativeHash, _isLong ? "L" : "S"));
-    return Clones.predictDeterministicAddress(_positionImplementationAddress, salt, _factoryAddress);
+    return _predictDeterministicAddress(
+      _derivativeHash,
+      _isLong,
+      _positionImplementationAddress,
+      _factoryAddress
+    );
+  }
+
+  function predictAndCheckDeterministicAddress(
+    bytes32 _derivativeHash,
+    bool _isLong, 
+    address _positionImplementationAddress, 
+    address _factoryAddress
+  ) internal view returns(address, bool) {
+    address predicted = _predictDeterministicAddress(
+      _derivativeHash,
+      _isLong,
+      _positionImplementationAddress,
+      _factoryAddress
+    );
+    bool isDeployed = _isContract(predicted);
+    return(predicted, isDeployed);
   }
 
   function deployOpiumPosition(
@@ -21,4 +41,24 @@ library LibPosition {
     bytes32 salt = keccak256(abi.encodePacked( _derivativeHash, _isLong ? "L" : "S"));
     return Clones.cloneDeterministic(_positionImplementationAddress, salt);
   }
+
+  function _predictDeterministicAddress(
+    bytes32 _derivativeHash,
+    bool _isLong, 
+    address _positionImplementationAddress, 
+    address _factoryAddress
+  ) private pure returns(address) {
+    bytes32 salt = keccak256(abi.encodePacked( _derivativeHash, _isLong ? "L" : "S"));
+    return Clones.predictDeterministicAddress(_positionImplementationAddress, salt, _factoryAddress);
+  }
+
+    /// @notice checks whether a contract has already been deployed at a specific address
+    /// @return bool true if a contract has been deployed at a specific address and false otherwise
+    function _isContract(address _address) private view returns (bool) {
+      uint256 size;
+      assembly {
+        size := extcodesize(_address)
+      }
+      return size > 0;
+    }
 }
