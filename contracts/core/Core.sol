@@ -491,17 +491,22 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
         require(
             opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
-                block.timestamp &&
+                block.timestamp,
+            "C13"
+        );
+
+        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+            // Ensures that `Opium.OracleAggregator` has still not been provided with data after noDataCancellationperiod
+            // The check needs to be performed only the first time a derivative is being canceled as to avoid preventing other parties from canceling their positions in case `Opium.OracleAggregator` receives data after the successful cancelation
+            require(
                 !protocolAddressesArgs.oracleAggregator.hasData(
                     opiumPositionTokenParams.derivative.oracleId,
                     opiumPositionTokenParams.derivative.endTime
                 ),
-            "C13"
-        );
-
-        // Emit `Canceled` event only once and mark ticker as canceled
-        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+                "C13"
+            );
             cancelled[opiumPositionTokenParams.derivativeHash] = true;
+            // Emit `Canceled` event only once and mark ticker as canceled
             emit LogCanceled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
 
