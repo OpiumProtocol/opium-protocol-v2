@@ -153,7 +153,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             address(protocolAddressesArgs.opiumProxyFactory)
         );
         require(isLongDeployed == isShortDeployed);
-        if(isLongDeployed) {
+        if (isLongDeployed) {
             _create(_derivative, _amount, _positionsOwners);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
@@ -493,11 +493,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
             require(
                 opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
-                block.timestamp,
+                    block.timestamp,
                 "C13"
             );
-
-        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
             // Ensures that `Opium.OracleAggregator` has still not been provided with data after noDataCancellationperiod
             // The check needs to be performed only the first time a derivative is being canceled as to avoid preventing other parties from canceling their positions in case `Opium.OracleAggregator` receives data after the successful cancelation
             require(
@@ -557,10 +555,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         ) {
             /// fetches the derivative's data from the related oracleId
             /// opium allows the usage of "dummy" oracleIds - oracleIds whose address is the null address - in which case the data is set to 0
-            uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0) ? 0 :_oracleAggregator.getData(
-                _opiumPositionTokenParams.derivative.oracleId,
-                _opiumPositionTokenParams.derivative.endTime
-            );
+            uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0)
+                ? 0
+                : _oracleAggregator.getData(
+                    _opiumPositionTokenParams.derivative.oracleId,
+                    _opiumPositionTokenParams.derivative.endTime
+                );
             // Get payout ratio from Derivative logic
             // payoutRatio[0] - buyerPayout
             // payoutRatio[1] - sellerPayout
@@ -579,29 +579,22 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(_syntheticAggregator)
             .getSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
 
-        uint256[2] memory payouts;
-        // Calculate payouts from ratio
-        // payouts[0] -> buyerPayout = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
-        // payouts[1] -> sellerPayout = (buyerMargin + sellerMargin) * sellerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
-        payouts[0] =
-            ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * buyerPayoutRatio) /
-            (buyerPayoutRatio + sellerPayoutRatio);
-        payouts[1] =
-            ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
-            (buyerPayoutRatio + sellerPayoutRatio);
-
         uint256 positionMargin;
 
         // Check if `_positionType` is LONG
         if (_opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
+            // Calculates buyerPayout from ratio = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
             // Set payout to buyerPayout multiplied by amount
-            payout = payouts[0].mulWithPrecisionFactor(_amount);
+            payout = (((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * buyerPayoutRatio) /
+                (buyerPayoutRatio + sellerPayoutRatio)).mulWithPrecisionFactor(_amount);
             // sets positionMargin to buyerMargin * amount
             positionMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
-        // Check if `_positionType` is a SHORT position
+            // Check if `_positionType` is a SHORT position
         } else {
+            // Calculates sellerPayout from ratio = sellerPayout = (buyerMargin + sellerMargin) * sellerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
             // Set payout to sellerPayout multiplied by amount
-            payout = payouts[1].mulWithPrecisionFactor(_amount);
+            payout = (((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
+                (buyerPayoutRatio + sellerPayoutRatio)).mulWithPrecisionFactor(_amount);
             // sets positionMargin to sellerMargin * amount
             positionMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
         }
