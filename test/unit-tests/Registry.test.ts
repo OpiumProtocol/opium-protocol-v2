@@ -32,9 +32,10 @@ describe("Registry", () => {
   it("should ensure the initial protocol parameters are as expected", async () => {
     const { registry } = await setup();
 
-    const protocolParams = await registry.getProtocolCommissionParams();
+    const protocolParams = await registry.getProtocolParameters();
     expect(protocolParams.derivativeAuthorCommissionBase, "wrong derivative author commission base").to.be.eq(10000);
-    expect(protocolParams.protocolFeeCommissionBase, "wrong protocol commission base").to.be.eq(10);
+    expect(protocolParams.protocolExecutionFeeCommissionBase, "wrong protocol's execution commission base").to.be.eq(10);
+    expect(protocolParams.protocolRedemptionFeeCommissionBase, "wrong protocol's redemption commission base").to.be.eq(1);
     expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
     expect(await registry.isPaused(), "it's paused").to.be.false;
@@ -65,6 +66,7 @@ describe("Registry", () => {
           syntheticAggregator.address,
           tokenSpender.address,
           notAllowed.address,
+          notAllowed.address
         ),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE));
 
@@ -77,7 +79,7 @@ describe("Registry", () => {
     );
 
     await expect(registry.connect(notAllowed).setOpiumCommissionPart(4)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_COMMISSION_SETTER_ROLE),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARAMETER_SETTER_ROLE),
     );
 
     await expect(registry.connect(notAllowed).pause()).to.be.revertedWith(
@@ -99,7 +101,7 @@ describe("Registry", () => {
 
     await registry.connect(governor).setOpiumCommissionPart(4);
 
-    const commissionParams = await registry.getProtocolCommissionParams();
+    const commissionParams = await registry.getProtocolParameters();
     expect(commissionParams.protocolCommissionPart).to.be.eq(4);
   });
 

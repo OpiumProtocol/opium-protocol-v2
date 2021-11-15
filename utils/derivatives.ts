@@ -158,3 +158,38 @@ export const calculateTotalNetPayout = (
     return grossPayout;
   }
 };
+
+// //@ts-ignore
+// export const parseDerivativeStructValues = (struct: {[key: any]: any}): TDerivative => {
+//     const properties = ['margin', 'endTime', 'params', 'oracleId', 'token','syntheticId']
+
+//   const derivative = properties.reduce((acc, key) => {
+//     // if(key === 'params') {
+//     //   //@ts-ignore
+//     //   const params = struct[key].map(param => param.toString());
+//     //   //@ts-ignore
+//     //   acc[key] = params
+//     //   return acc
+//     // }
+//        if (key === "endTime") {
+//          //@ts-ignore
+        
+//          //@ts-ignore
+//          acc[key] = +struct[key].toString();
+//          return acc;
+//        }
+//     //@ts-ignore
+//     acc[key] = struct[key]
+//     //@ts-ignore
+//     console.log('isbignum: ', BigNumber.isBigNumber(struct[key]));
+//     return acc
+//   }, {})
+//   return derivative as TDerivative
+// }
+
+        // const parsed = parseDerivativeStructValues(shortTokenData.derivative);
+        // console.log("parsed: ", parsed);
+
+        // console.log("secondDerivative", secondDerivative);
+        // console.log("shortTokenData.derivative", typeof shortTokenData.derivative);
+        // expect(parsed, "short deep").to.be.deep.eq(secondDerivative);

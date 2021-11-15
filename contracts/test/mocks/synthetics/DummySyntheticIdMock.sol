@@ -1,8 +1,8 @@
 pragma solidity 0.8.5;
 
-import "../../../Interface/IDerivativeLogic.sol";
-import "../../../Helpers/ExecutableByThirdParty.sol";
-import "../../../Helpers/HasCommission.sol";
+import "../../../interfaces/IDerivativeLogic.sol";
+import "../../../helpers/ExecutableByThirdParty.sol";
+import "../../../helpers/HasCommission.sol";
 
 contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {
     constructor() {
@@ -14,7 +14,7 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
             "description": "Dummy synthetic for testing purposes"
         }
         */
-        emit MetadataSet(
+        emit LogMetadataSet(
             '{"author":"opium.team","type":"synthetic","subtype":"none","description":"Dummy synthetic for testing purposes"}'
         );
     }

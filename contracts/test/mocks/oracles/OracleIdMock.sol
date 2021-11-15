@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
-import "../../../Interface/IRegistry.sol";
-import "../../../Interface/IOracleAggregator.sol";
+import "../../../interfaces/IRegistry.sol";
+import "../../../interfaces/IOracleAggregator.sol";
 
 contract OracleIdMock {
     uint256 fetchPrice;

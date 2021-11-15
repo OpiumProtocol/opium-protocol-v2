@@ -1,8 +1,8 @@
 pragma solidity 0.8.5;
 
-import "../../../Interface/IDerivativeLogic.sol";
-import "../../../Helpers/ExecutableByThirdParty.sol";
-import "../../../Helpers/HasCommission.sol";
+import "../../../interfaces/IDerivativeLogic.sol";
+import "../../../helpers/ExecutableByThirdParty.sol";
+import "../../../helpers/HasCommission.sol";
 
 contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {
     uint256 constant BASE_PPT = 1 ether;
@@ -16,7 +16,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
             "description": "Option Call logic contract"
         }
         */
-        emit MetadataSet(
+        emit LogMetadataSet(
             '{"author":"DIB.ONE","type":"option","subtype":"call","description":"Option Call logic contract"}'
         );
     }

@@ -1,5 +1,5 @@
 pragma solidity 0.8.5;
-import "../Registry/RegistryEntities.sol";
+import "../core/registry/RegistryEntities.sol";
 
 interface IRegistry {
     function getCore() external view returns (address);
@@ -10,7 +10,7 @@ interface IRegistry {
 
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
 
-    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolParametersArgs memory);
+    function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory);
 
     function isPaused() external view returns (bool);
 }

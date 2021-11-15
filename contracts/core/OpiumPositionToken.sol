@@ -1,7 +1,7 @@
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
-import "./Lib/LibDerivative.sol";
+import "../libs/LibDerivative.sol";
 import "hardhat/console.sol";
 
 /**
@@ -48,7 +48,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
         });
     }
 
-    modifier isFactory() {
+    modifier onlyFactory() {
         require(msg.sender == factory, "P1");
         _;
     }
@@ -57,7 +57,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     /// @dev can only be called by the factory contract set in the `initialize` function
     /// @param _positionHolder address of the recipient of the position tokens
     /// @param _amount amount of position tokens to be minted to the _positionHolder
-    function mint(address _positionHolder, uint256 _amount) external isFactory {
+    function mint(address _positionHolder, uint256 _amount) external onlyFactory {
         _mint(_positionHolder, _amount);
     }
 
@@ -65,7 +65,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     /// @dev can only be called by the factory contract set in the `initialize` function
     /// @param _positionHolder address of the owner of the position tokens
     /// @param _amount amount of position tokens to be burnt
-    function burn(address _positionHolder, uint256 _amount) external isFactory {
+    function burn(address _positionHolder, uint256 _amount) external onlyFactory {
         _burn(_positionHolder, _amount);
     }
 

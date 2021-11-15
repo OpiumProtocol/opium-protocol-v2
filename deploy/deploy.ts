@@ -98,6 +98,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       syntheticAggregator.address,
       tokenSpender.address,
       deployer.address,
+      deployer.address,
     );
 
   await registryInstance.connect(governor).addToWhitelist(core.address);

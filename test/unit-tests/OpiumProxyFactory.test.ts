@@ -130,6 +130,7 @@ describe("OpiumProxyFactory", () => {
     ));
 
     const shortTokenData = await shortOpiumPositionToken.getPositionTokenData();
+
     expect(shortTokenData.derivative.margin, "wrong short position token derivative data").to.be.eq(
       secondDerivative.margin,
     );

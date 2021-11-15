@@ -1,33 +1,31 @@
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
-import "./Interface/IOpiumPositionToken.sol";
-import "./Interface/IRegistry.sol";
 import "./OpiumPositionToken.sol";
+import "./base/RegistryManager.sol";
+import "../libs/LibDerivative.sol";
+import "../libs/LibPosition.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/IRegistry.sol";
 import "hardhat/console.sol";
 
 /**
     Error codes:
-    - F1 = ERROR_OPIUM_PROXY_FACTORY_ALREADY_DEPLOYED
     - F2 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
-contract OpiumProxyFactory is Initializable {
+contract OpiumProxyFactory is Initializable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
-    event LogShortPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
-    event LogLongPositionTokenAddress(bytes32 _derivativeHash, address indexed _positionAddress);
-
-    IRegistry private registry;
+    event LogShortPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
+    event LogLongPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
 
     address private opiumPositionTokenImplementation;
 
     /// @notice it restricts access to the consumer functions to the Opium.Core contract
     modifier onlyCore() {
-        require(msg.sender == registry.getCore(), "F2");
+        require(msg.sender == registry.getCore(), "F1");
         _;
     }
 
@@ -37,8 +35,8 @@ contract OpiumProxyFactory is Initializable {
     /// @dev it sets the the address of the implementation of the OpiumPositionToken contract which will be used for the factory-deployment of erc20 positions via the minimal proxy contract
     /// @param _registry address of Opium.Registry
     function initialize(address _registry) external initializer {
+        __RegistrySetter__init(msg.sender, _registry);
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
-        registry = IRegistry(_registry);
     }
 
     /// @notice read-only getter to retrieve the information about the underlying derivative
@@ -73,12 +71,12 @@ contract OpiumProxyFactory is Initializable {
             LibDerivative.PositionType.SHORT,
             _derivative
         );
+        emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
+        emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
         if (_amount > 0) {
             IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);
             IOpiumPositionToken(shortPositionAddress).mint(_seller, _amount);
         }
-        emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
-        emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
     }
 
     /// @notice it creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
@@ -95,8 +93,6 @@ contract OpiumProxyFactory is Initializable {
         address _shortPositionAddress,
         uint256 _amount
     ) external onlyCore {
-        require(_isContract(_longPositionAddress) == true, "F1");
-        require(_isContract(_shortPositionAddress) == true, "F1");
         IOpiumPositionToken(_longPositionAddress).mint(_buyer, _amount);
         IOpiumPositionToken(_shortPositionAddress).mint(_seller, _amount);
     }
@@ -129,17 +125,5 @@ contract OpiumProxyFactory is Initializable {
     ) external onlyCore {
         IOpiumPositionToken(_longPositionAddress).burn(_positionOwner, _amount);
         IOpiumPositionToken(_shortPositionAddress).burn(_positionOwner, _amount);
-    }
-
-    // ****************** PRIVATE FUNCTIONS ******************
-
-    /// @notice checks whether a contract has already been deployed at a specific address
-    /// @return bool true if a contract has been deployed at a specific address and false otherwise
-    function _isContract(address _address) private view returns (bool) {
-        uint256 size;
-        assembly {
-            size := extcodesize(_address)
-        }
-        return size > 0;
     }
 }

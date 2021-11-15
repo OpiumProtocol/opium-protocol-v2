@@ -5,16 +5,18 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./TokenSpender.sol";
-import "./Registry/RegistryEntities.sol";
-import "./Interface/IOpiumProxyFactory.sol";
-import "./Interface/IOpiumPositionToken.sol";
-import "./Interface/ISyntheticAggregator.sol";
-import "./Interface/IOracleAggregator.sol";
-import "./Interface/IDerivativeLogic.sol";
-import "./Interface/IRegistry.sol";
-import "./Lib/LibDerivative.sol";
-import "./Lib/LibPosition.sol";
-import "./Lib/LibCalculator.sol";
+import "./registry/RegistryEntities.sol";
+import "./base/RegistryManager.sol";
+import "../interfaces/IOpiumProxyFactory.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/ISyntheticAggregator.sol";
+import "../interfaces/IOracleAggregator.sol";
+import "../interfaces/IDerivativeLogic.sol";
+import "../interfaces/IRegistry.sol";
+import "../libs/LibDerivative.sol";
+import "../libs/LibPosition.sol";
+import "../libs/LibCalculator.sol";
+import "hardhat/console.sol";
 
 /**
     Error codes:
@@ -35,7 +37,7 @@ import "./Lib/LibCalculator.sol";
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
-contract Core is ReentrancyGuardUpgradeable {
+contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibCalculator for uint256;
     using LibPosition for bytes32;
@@ -51,8 +53,6 @@ contract Core is ReentrancyGuardUpgradeable {
     event LogCanceled(address indexed _positionOwner, bytes32 _derivativeHash);
     // Emitted when Core redeems an amount of market neutral positions
     event LogRedeem(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 indexed _amount);
-
-    IRegistry private registry;
 
     RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
@@ -79,31 +79,24 @@ contract Core is ReentrancyGuardUpgradeable {
         _;
     }
 
-    /// @notice sets registry and protocolParametersArgs
-    /// noDataCancellationPeriod - buyer address
-    /// derivativeAuthorCommissionBase - seller address
-    /// derivativeAuthorCommissionBase - buyer address
-    /// protocolFeeCommissionBase - seller address
-    /// protocolCommissionPart - buyer address
-    /// precisionFactor - seller address
-    /// paused - protocol paused
+    /// @notice it is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
-        registry = IRegistry(_registry);
-        protocolParametersArgs = registry.getProtocolCommissionParams();
+        __RegistrySetter__init(msg.sender, _registry);
+        protocolParametersArgs = registry.getProtocolParameters();
     }
 
     // ****************** EXTERNAL FUNCTIONS ******************
 
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev should be called immediately after the deployment of the contract
-    function updateProtocolAddresses() external {
+    function updateProtocolAddresses() external onlyOwner {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
     /// @notice Allows to set Opium Protocol parameters
     ///
-    function updateProtocolParametersArgs() external {
-        protocolParametersArgs = registry.getProtocolCommissionParams();
+    function updateProtocolParametersArgs() external onlyOwner {
+        protocolParametersArgs = registry.getProtocolParameters();
     }
 
     /// @notice Allows to set the addresses
@@ -121,7 +114,7 @@ contract Core is ReentrancyGuardUpgradeable {
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
     }
 
-    /// @notice This function deploys two ERC20 contracts representing respectively the LONG and SHORT position of the provided `LibDerivative.Derivative` derivative and mints the provided amount of SHORT positions to a seller and LONG positions to a buyer
+    /// @notice It deploys two ERC20 contracts representing respectively the LONG and SHORT position of the provided `LibDerivative.Derivative` derivative and mints the provided amount of SHORT positions to a seller and LONG positions to a buyer
     /// @param _derivative LibDerivative.Derivative Derivative definition
     /// @param _amount uint256 Amount of positions to create
     /// @param _positionsOwners address[2] Addresses of buyer and seller
@@ -132,57 +125,40 @@ contract Core is ReentrancyGuardUpgradeable {
         uint256 _amount,
         address[2] calldata _positionsOwners
     ) external whenNotPaused nonReentrant {
-        // Generate hash for derivative
+        _create(_derivative, _amount, _positionsOwners);
+    }
+
+    /// @notice It can either 1) deploy AND mint 2) only mint.
+    ///It checks whether the ERC20 contracts representing the LONG and SHORT positions of the provided `LibDerivative.Derivative`. If they have not been deployed yet, and it deploys the respective ERC20 contracts and mints the supplied _amount respectively to the provided buyer's and seller's accounts. If they have already been deployed, it only mints the provided _amount to the provided buyer's and seller's accounts.
+    /// @param _derivative LibDerivative.Derivative Derivative definition
+    /// @param _amount uint256 Amount of positions to create
+    /// @param _positionsOwners address[2] Addresses of buyer and seller
+    /// [0] - buyer address
+    /// [1] - seller address
+    function createAndMint(
+        LibDerivative.Derivative calldata _derivative,
+        uint256 _amount,
+        address[2] calldata _positionsOwners
+    ) external whenNotPaused nonReentrant {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
-
-        // Check if ticker was canceled
-        require(!cancelled[derivativeHash], "C7");
-
-        // Validate input data against Derivative logic (`syntheticId`)
-        require(IDerivativeLogic(_derivative.syntheticId).validateInput(_derivative), "C8");
-
-        uint256[2] memory margins;
-        // Get cached margin required according to logic from Opium.SyntheticAggregator
-        // margins[0] - buyerMargin
-        // margins[1] - sellerMargin
-        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
-            derivativeHash,
-            _derivative
+        address implementationAddress = protocolAddressesArgs.opiumProxyFactory.getImplementationAddress();
+        (address longPositionTokenAddress, bool isLongDeployed) = derivativeHash.predictAndCheckDeterministicAddress(
+            true,
+            implementationAddress,
+            address(protocolAddressesArgs.opiumProxyFactory)
         );
-
-        uint256 totalMargin = margins[0] + margins[1];
-        require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
-        uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
-
-        // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
-        // `msg.sender` must provide margin for position creation
-        require(
-            IERC20Upgradeable(_derivative.token).allowance(msg.sender, address(protocolAddressesArgs.tokenSpender)) >=
-                totalMarginToE18,
-            "C12"
+        (address shortPositionTokenAddress, bool isShortDeployed) = derivativeHash.predictAndCheckDeterministicAddress(
+            false,
+            implementationAddress,
+            address(protocolAddressesArgs.opiumProxyFactory)
         );
-
-        // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        protocolAddressesArgs.tokenSpender.claimTokens(
-            IERC20Upgradeable(_derivative.token),
-            msg.sender,
-            address(this),
-            totalMarginToE18
-        );
-
-        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
-        _increaseP2PVault(derivativeHash, totalMarginToE18);
-
-        // Mint LONG and SHORT positions tokens
-        protocolAddressesArgs.opiumProxyFactory.create(
-            _positionsOwners[0],
-            _positionsOwners[1],
-            _amount,
-            derivativeHash,
-            _derivative
-        );
-
-        emit LogCreated(_positionsOwners[0], _positionsOwners[1], derivativeHash, _amount);
+        require(isLongDeployed == isShortDeployed);
+        if (isLongDeployed) {
+            _create(_derivative, _amount, _positionsOwners);
+        } else {
+            address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
+            _mint(_amount, _positionsAddress, _positionsOwners);
+        }
     }
 
     /// @notice This function mints the provided amount of LONG/SHORT positions to msg.sender for a previously deployed pair of LONG/SHORT ERC20 contracts
@@ -198,65 +174,7 @@ contract Core is ReentrancyGuardUpgradeable {
         address[2] calldata _positionAddresses,
         address[2] calldata _positionsOwners
     ) external whenNotPaused nonReentrant {
-        IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
-            _positionAddresses[0]
-        ).getPositionTokenData();
-        IOpiumPositionToken.OpiumPositionTokenParams memory shortOpiumPositionTokenParams = IOpiumPositionToken(
-            _positionAddresses[1]
-        ).getPositionTokenData();
-        _onlyOpiumFactoryTokens(_positionAddresses[0], longOpiumPositionTokenParams);
-        _onlyOpiumFactoryTokens(_positionAddresses[1], shortOpiumPositionTokenParams);
-        require(shortOpiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
-        require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
-        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
-
-        // Check if ticker was canceled
-        require(!cancelled[longOpiumPositionTokenParams.derivativeHash], "C7");
-
-        uint256[2] memory margins;
-        // Get cached margin required according to logic from Opium.SyntheticAggregator
-        // margins[0] - buyerMargin
-        // margins[1] - sellerMargin
-        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
-            longOpiumPositionTokenParams.derivativeHash,
-            longOpiumPositionTokenParams.derivative
-        );
-
-        uint256 totalMargin = margins[0] + margins[1];
-        require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
-        uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
-
-        // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
-        // `msg.sender` must provide margin for position creation
-        require(
-            IERC20Upgradeable(longOpiumPositionTokenParams.derivative.token).allowance(
-                msg.sender,
-                address(protocolAddressesArgs.tokenSpender)
-            ) >= totalMarginToE18,
-            "C12"
-        );
-
-        // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        protocolAddressesArgs.tokenSpender.claimTokens(
-            IERC20Upgradeable(longOpiumPositionTokenParams.derivative.token),
-            msg.sender,
-            address(this),
-            totalMarginToE18
-        );
-
-        // Mint LONG and SHORT positions tokens
-        protocolAddressesArgs.opiumProxyFactory.mintPair(
-            _positionsOwners[0],
-            _positionsOwners[1],
-            _positionAddresses[0],
-            _positionAddresses[1],
-            _amount
-        );
-
-        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
-        _increaseP2PVault(longOpiumPositionTokenParams.derivativeHash, totalMarginToE18);
-
-        emit LogMinted(_positionsOwners[0], _positionsOwners[1], longOpiumPositionTokenParams.derivativeHash, _amount);
+        _mint(_amount, _positionAddresses, _positionsOwners);
     }
 
     /// @notice Executes a single position of `msg.sender` with specified `positionAddress`
@@ -338,6 +256,129 @@ contract Core is ReentrancyGuardUpgradeable {
     }
 
     // ****************** PRIVATE FUNCTIONS ******************
+    function _create(
+        LibDerivative.Derivative calldata _derivative,
+        uint256 _amount,
+        address[2] calldata _positionsOwners
+    ) private {
+        // Generate hash for derivative
+        bytes32 derivativeHash = _derivative.getDerivativeHash();
+
+        // Check if ticker was canceled
+        require(!cancelled[derivativeHash], "C7");
+
+        // Validate input data against Derivative logic (`syntheticId`)
+        require(IDerivativeLogic(_derivative.syntheticId).validateInput(_derivative), "C8");
+
+        uint256[2] memory margins;
+        // Get cached margin required according to logic from Opium.SyntheticAggregator
+        // margins[0] - buyerMargin
+        // margins[1] - sellerMargin
+        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
+            derivativeHash,
+            _derivative
+        );
+
+        uint256 totalMargin = margins[0] + margins[1];
+        require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
+        uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
+
+        // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
+        // `msg.sender` must provide margin for position creation
+        require(
+            IERC20Upgradeable(_derivative.token).allowance(msg.sender, address(protocolAddressesArgs.tokenSpender)) >=
+                totalMarginToE18,
+            "C12"
+        );
+
+        // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
+        protocolAddressesArgs.tokenSpender.claimTokens(
+            IERC20Upgradeable(_derivative.token),
+            msg.sender,
+            address(this),
+            totalMarginToE18
+        );
+
+        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
+        _increaseP2PVault(derivativeHash, totalMarginToE18);
+
+        // Mint LONG and SHORT positions tokens
+        protocolAddressesArgs.opiumProxyFactory.create(
+            _positionsOwners[0],
+            _positionsOwners[1],
+            _amount,
+            derivativeHash,
+            _derivative
+        );
+
+        emit LogCreated(_positionsOwners[0], _positionsOwners[1], derivativeHash, _amount);
+    }
+
+    function _mint(
+        uint256 _amount,
+        address[2] memory _positionAddresses,
+        address[2] memory _positionsOwners
+    ) private {
+        IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
+            _positionAddresses[0]
+        ).getPositionTokenData();
+        IOpiumPositionToken.OpiumPositionTokenParams memory shortOpiumPositionTokenParams = IOpiumPositionToken(
+            _positionAddresses[1]
+        ).getPositionTokenData();
+        _onlyOpiumFactoryTokens(_positionAddresses[0], longOpiumPositionTokenParams);
+        _onlyOpiumFactoryTokens(_positionAddresses[1], shortOpiumPositionTokenParams);
+        require(shortOpiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
+        require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
+        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
+
+        // Check if ticker was canceled
+        require(!cancelled[longOpiumPositionTokenParams.derivativeHash], "C7");
+
+        uint256[2] memory margins;
+        // Get cached margin required according to logic from Opium.SyntheticAggregator
+        // margins[0] - buyerMargin
+        // margins[1] - sellerMargin
+        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
+            longOpiumPositionTokenParams.derivativeHash,
+            longOpiumPositionTokenParams.derivative
+        );
+
+        uint256 totalMargin = margins[0] + margins[1];
+        require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
+        uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
+
+        // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
+        // `msg.sender` must provide margin for position creation
+        require(
+            IERC20Upgradeable(longOpiumPositionTokenParams.derivative.token).allowance(
+                msg.sender,
+                address(protocolAddressesArgs.tokenSpender)
+            ) >= totalMarginToE18,
+            "C12"
+        );
+
+        // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
+        protocolAddressesArgs.tokenSpender.claimTokens(
+            IERC20Upgradeable(longOpiumPositionTokenParams.derivative.token),
+            msg.sender,
+            address(this),
+            totalMarginToE18
+        );
+
+        // Mint LONG and SHORT positions tokens
+        protocolAddressesArgs.opiumProxyFactory.mintPair(
+            _positionsOwners[0],
+            _positionsOwners[1],
+            _positionAddresses[0],
+            _positionAddresses[1],
+            _amount
+        );
+
+        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
+        _increaseP2PVault(longOpiumPositionTokenParams.derivativeHash, totalMarginToE18);
+
+        emit LogMinted(_positionsOwners[0], _positionsOwners[1], longOpiumPositionTokenParams.derivativeHash, _amount);
+    }
 
     /// @notice Redeems market neutral position for a `_positionAddresses` pair
     /// @param _positionAddresses address[2] `positionAddresses` of the position that needs to be burnt
@@ -370,8 +411,10 @@ contract Core is ReentrancyGuardUpgradeable {
         );
         uint256 fees = _getFees(
             syntheticCache.authorAddress,
-            syntheticCache.authorCommission,
             opiumPositionTokenParams.derivative.token,
+            protocolAddressesArgs.protocolRedemptionFeeReceiver,
+            syntheticCache.authorCommission,
+            protocolParametersArgs.protocolRedemptionFeeCommissionBase,
             totalMargin
         );
 
@@ -442,23 +485,28 @@ contract Core is ReentrancyGuardUpgradeable {
         ).getPositionTokenData();
         _onlyOpiumFactoryTokens(_positionAddress, opiumPositionTokenParams);
 
-        // Don't allow to cancel tickers with "dummy" oracleIds
-        require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
+        // It's sufficient to perform all the sanity checks only if a derivative has not yet been canceled
+        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+            // Don't allow to cancel tickers with "dummy" oracleIds
+            require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
 
-        // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
-        require(
-            opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
-                block.timestamp &&
+            // Check if cancellation is called after `protocolParametersArgs.noDataCancellationPeriod` and `oracleId` didn't provided data
+            require(
+                opiumPositionTokenParams.derivative.endTime + protocolParametersArgs.noDataCancellationPeriod <=
+                    block.timestamp,
+                "C13"
+            );
+            // Ensures that `Opium.OracleAggregator` has still not been provided with data after noDataCancellationperiod
+            // The check needs to be performed only the first time a derivative is being canceled as to avoid preventing other parties from canceling their positions in case `Opium.OracleAggregator` receives data after the successful cancelation
+            require(
                 !protocolAddressesArgs.oracleAggregator.hasData(
                     opiumPositionTokenParams.derivative.oracleId,
                     opiumPositionTokenParams.derivative.endTime
                 ),
-            "C13"
-        );
-
-        // Emit `Canceled` event only once and mark ticker as canceled
-        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+                "C13"
+            );
             cancelled[opiumPositionTokenParams.derivativeHash] = true;
+            // Emit `Canceled` event only once and mark ticker as canceled
             emit LogCanceled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
 
@@ -500,22 +548,19 @@ contract Core is ReentrancyGuardUpgradeable {
         ISyntheticAggregator _syntheticAggregator,
         IOracleAggregator _oracleAggregator
     ) private returns (uint256 payout) {
-        // Trying to getData from Opium.OracleAggregator, could be reverted
-        // Opium allows to use "dummy" oracleIds, in this case data is set to `0`
-        uint256 data;
-        if (_opiumPositionTokenParams.derivative.oracleId != address(0)) {
-            data = _oracleAggregator.getData(
-                _opiumPositionTokenParams.derivative.oracleId,
-                _opiumPositionTokenParams.derivative.endTime
-            );
-        } else {
-            data = 0;
-        }
-
+        /// if the derivativePayout for both the buyer and the seller are 0 it means that it's the first time the _getPayout function is being executed, hence it will fetch the fetch the payouts from the syntheticId and cache them.
         if (
             derivativePayouts[_opiumPositionTokenParams.derivativeHash][0] == 0 &&
             derivativePayouts[_opiumPositionTokenParams.derivativeHash][1] == 0
         ) {
+            /// fetches the derivative's data from the related oracleId
+            /// opium allows the usage of "dummy" oracleIds - oracleIds whose address is the null address - in which case the data is set to 0
+            uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0)
+                ? 0
+                : _oracleAggregator.getData(
+                    _opiumPositionTokenParams.derivative.oracleId,
+                    _opiumPositionTokenParams.derivative.endTime
+                );
             // Get payout ratio from Derivative logic
             // payoutRatio[0] - buyerPayout
             // payoutRatio[1] - sellerPayout
@@ -534,68 +579,42 @@ contract Core is ReentrancyGuardUpgradeable {
         ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(_syntheticAggregator)
             .getSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
 
-        uint256[2] memory payouts;
-        // Calculate payouts from ratio
-        // payouts[0] -> buyerPayout = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
-        // payouts[1] -> sellerPayout = (buyerMargin + sellerMargin) * sellerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
-        payouts[0] =
-            ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * buyerPayoutRatio) /
-            (buyerPayoutRatio + sellerPayoutRatio);
-        payouts[1] =
-            ((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
-            (buyerPayoutRatio + sellerPayoutRatio);
+        uint256 positionMargin;
 
         // Check if `_positionType` is LONG
         if (_opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
-            // Set payout to buyerPayout
-            payout = payouts[0];
-
-            // Multiply payout by amount
-            payout = payout.mulWithPrecisionFactor(_amount);
-
-            uint256 longMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
-
-            // Take fees only from profit makers
-            // Check: payout > buyerMargin * amount
-            if (payout > longMargin) {
-                // Get Opium and `syntheticId` author fees and subtract it from payout
-                payout =
-                    payout -
-                    (
-                        _getFees(
-                            syntheticCache.authorAddress,
-                            syntheticCache.authorCommission,
-                            _opiumPositionTokenParams.derivative.token,
-                            payout - longMargin
-                        )
-                    );
-            }
-
+            // Calculates buyerPayout from ratio = (buyerMargin + sellerMargin) * buyerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
+            // Set payout to buyerPayout multiplied by amount
+            payout = (((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * buyerPayoutRatio) /
+                (buyerPayoutRatio + sellerPayoutRatio)).mulWithPrecisionFactor(_amount);
+            // sets positionMargin to buyerMargin * amount
+            positionMargin = syntheticCache.buyerMargin.mulWithPrecisionFactor(_amount);
             // Check if `_positionType` is a SHORT position
         } else {
-            // Set payout to sellerPayout
-            payout = payouts[1];
+            // Calculates sellerPayout from ratio = sellerPayout = (buyerMargin + sellerMargin) * sellerPayoutRatio / (buyerPayoutRatio + sellerPayoutRatio)
+            // Set payout to sellerPayout multiplied by amount
+            payout = (((syntheticCache.buyerMargin + syntheticCache.sellerMargin) * sellerPayoutRatio) /
+                (buyerPayoutRatio + sellerPayoutRatio)).mulWithPrecisionFactor(_amount);
+            // sets positionMargin to sellerMargin * amount
+            positionMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
+        }
 
-            // Multiply payout by amount
-            payout = payout.mulWithPrecisionFactor(_amount);
-            uint256 shortMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
-
-            // Take fees only from profit makers
-            // Check: payout > sellerMargin * amount
-
-            if (payout > shortMargin) {
-                // Get Opium fees and subtract it from payout
-                payout =
-                    payout -
-                    (
-                        _getFees(
-                            syntheticCache.authorAddress,
-                            syntheticCache.authorCommission,
-                            _opiumPositionTokenParams.derivative.token,
-                            payout - shortMargin
-                        )
-                    );
-            }
+        // Take fees only from profit makers
+        // Check: payout > positionMargin * amount
+        if (payout > positionMargin) {
+            // Get Opium and `syntheticId` author fees and subtract it from payout
+            payout =
+                payout -
+                (
+                    _getFees(
+                        syntheticCache.authorAddress,
+                        _opiumPositionTokenParams.derivative.token,
+                        protocolAddressesArgs.protocolExecutionFeeReceiver,
+                        syntheticCache.authorCommission,
+                        protocolParametersArgs.protocolExecutionFeeCommissionBase,
+                        payout - positionMargin
+                    )
+                );
         }
     }
 
@@ -604,8 +623,10 @@ contract Core is ReentrancyGuardUpgradeable {
     /// @return fee uint256 Opium and `syntheticId` author fee
     function _getFees(
         address _authorAddress,
-        uint256 _authorCommission,
         address _tokenAddress,
+        address _protocolFeeReceiver,
+        uint256 _authorCommission,
+        uint256 _protocolBaseCommission,
         uint256 _profit
     ) private returns (uint256 fee) {
         // Calculate fee
@@ -618,8 +639,7 @@ contract Core is ReentrancyGuardUpgradeable {
 
         // Calculate opium fee
         // opiumFee = fee * OPIUM_COMMISSION_PART / OPIUM_COMMISSION_BASE
-        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart) /
-            protocolParametersArgs.protocolFeeCommissionBase;
+        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart) / _protocolBaseCommission;
 
         // Calculate author fee
         // authorFee = fee - opiumFee
@@ -627,7 +647,7 @@ contract Core is ReentrancyGuardUpgradeable {
 
         // Update feeVault for Opium team
         // feesVault[protocolFeeReceiver][token] += protocolFee
-        feesVaults[protocolAddressesArgs.protocolFeeReceiver][_tokenAddress] += opiumFee;
+        feesVaults[_protocolFeeReceiver][_tokenAddress] += opiumFee;
 
         // Update feeVault for `syntheticId` author
         // feeVault[author][token] += authorFee
