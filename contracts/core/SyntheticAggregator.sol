@@ -56,7 +56,9 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         external
         returns (SyntheticCache memory)
     {
-        _initDerivative(_derivativeHash, _derivative);
+        if (!syntheticCaches[_derivativeHash].init) {
+            _initDerivative(_derivativeHash, _derivative);
+        }
         return syntheticCaches[_derivativeHash];
     }
 
@@ -65,10 +67,10 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice Initializes ticker: caches syntheticId type, margin, author address and commission
     /// @param _derivativeHash bytes32 Hash of derivative
     /// @param _derivative Derivative Derivative itself
-    function _initDerivative(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) private nonReentrant {
-        if (syntheticCaches[_derivativeHash].init == true) {
-            return;
-        }
+    function _initDerivative(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative)
+        private
+        nonReentrant
+    {
         // For security reasons we calculate hash of provided _derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
         require(derivativeHash == _derivativeHash, "S1");
@@ -83,10 +85,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         // Check if commission is not set > 100%
         RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolParameters();
-        require(
-            authorCommission <= protocolParametersArgs.derivativeAuthorCommissionBase,
-            "S3"
-        );
+        require(authorCommission <= protocolParametersArgs.derivativeAuthorCommissionBase, "S3");
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({
             buyerMargin: buyerMargin,
