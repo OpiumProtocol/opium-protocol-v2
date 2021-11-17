@@ -7,6 +7,8 @@ import "../../interfaces/IRegistry.sol";
     - M1:ERROR_REGISTRY_MANAGER_ONLY_REGISTRY_MANAGER_ROLE
  */
 contract RegistryManager is Initializable {
+    event LogRegistryChange(address indexed _changer, address indexed _newRegistryAddress);
+
     IRegistry internal registry;
 
     modifier onlyRegistryManager() {
@@ -21,6 +23,7 @@ contract RegistryManager is Initializable {
 
     function setRegistry(address _registry) external onlyRegistryManager {
         registry = IRegistry(_registry);
+        emit LogRegistryChange(msg.sender, _registry);
     }
 
     function getRegistry(address _registry) external returns (address) {
