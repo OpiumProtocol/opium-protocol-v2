@@ -11,7 +11,7 @@ import "hardhat/console.sol";
 
 /**
     Error codes:
-    - F2 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
+    - F1 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
@@ -35,7 +35,7 @@ contract OpiumProxyFactory is Initializable, RegistryManager {
     /// @dev it sets the the address of the implementation of the OpiumPositionToken contract which will be used for the factory-deployment of erc20 positions via the minimal proxy contract
     /// @param _registry address of Opium.Registry
     function initialize(address _registry) external initializer {
-        __RegistrySetter__init(msg.sender, _registry);
+        __RegistryManager__init(_registry);
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
     }
 

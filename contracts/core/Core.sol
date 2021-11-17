@@ -81,7 +81,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice it is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
-        __RegistrySetter__init(msg.sender, _registry);
+        __RegistryManager__init(_registry);
         protocolParametersArgs = registry.getProtocolParameters();
     }
 
@@ -89,13 +89,13 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev should be called immediately after the deployment of the contract
-    function updateProtocolAddresses() external onlyOwner {
+    function updateProtocolAddresses() external onlyRegistryManager {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
     /// @notice Allows to set Opium Protocol parameters
     ///
-    function updateProtocolParametersArgs() external onlyOwner {
+    function updateProtocolParametersArgs() external onlyRegistryManager {
         protocolParametersArgs = registry.getProtocolParameters();
     }
 

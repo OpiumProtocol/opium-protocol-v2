@@ -32,7 +32,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     // EXTERNAL FUNCTIONS
 
     function initialize(address _registry) external initializer {
-        __RegistrySetter__init(msg.sender, _registry);
+        __RegistryManager__init(_registry);
         __ReentrancyGuard_init();
     }
 

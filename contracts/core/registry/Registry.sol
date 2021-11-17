@@ -17,6 +17,8 @@ import "../../interfaces/ICore.sol";
     - R5 = ERROR_REGISTRY_NULL_PROTOCOL_ADDRESS
     - R6 = ERROR_REGISTRY_ALREADY_PAUSED
     - R7 = ERROR_REGISTRY_NOT_PAUSED
+    - R8 = ERROR_REGISTRY_ONLY_EXECUTION_FEE_REGISTER_ROLE
+    - R9 = ERROR_REGISTRY_ONLY_REDEMPTION_FEE_REGISTER_ROLE
  */
 
 contract RegistryUpgradeable is RegistryStorageUpgradeable {
@@ -33,6 +35,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         __RegistryStorage__init(_governor);
     }
 
+    // SETTERS
     /// @notice it allows the PROTOCOL_REGISTER role to set the addresses of Opium Protocol's contracts
     /// @dev the contracts' addresses are set using their respective interfaces
     /// @param _opiumProxyFactory address of Opium.OpiumProxyFactory
@@ -73,7 +76,19 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         });
     }
 
-    // SETTERS
+    /// @notice allows the EXECUTION_FEE_RECIPIENT_REGISTER_ROLE role to change the address that receives the fees originated from the successful execution of a profitable derivative's position
+    /// @dev it must be a non-null address
+    function registerExecutionFeeReceiver(address _executionFeeRecipient) external onlyProtocolExecutionFeeRegister {
+        require(_executionFeeRecipient != address(0));
+        protocolAddressesArgs.protocolExecutionFeeReceiver = _executionFeeRecipient;
+    }
+
+    /// @notice allows the REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE role to change the address that receives the fees originated from the redemption of a market-neutral position
+    /// @dev it must be a non-null address
+    function registerRedemptionFeeReceiver(address _redemptionFeeRecipient) external onlyProtocolRedemptionFeeRegister {
+        require(_redemptionFeeRecipient != address(0));
+        protocolAddressesArgs.protocolRedemptionFeeReceiver = _redemptionFeeRecipient;
+    }
 
     /// @notice allows the GUARDIAN role to pause the Opium Protocol
     /// @dev it fails if the protocol is already paused
@@ -114,6 +129,13 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     // GETTERS
+
+    /// @notice Returns true if msg.sender has been assigned the REGISTRY_MANAGER_ROLE role
+    /// @param _address address to be checked
+    /// @dev it is meant to be consumed by the RegistryManager module
+    function getRegistryManager(address _address) external view returns (bool) {
+        return hasRole(LibRoles.REGISTRY_MANAGER_ROLE, _address);
+    }
 
     /// @notice Returns all the commission-related parameters of the Opium protocol contracts
     ///@return RegistryEntities.getProtocolParameters struct that packs the protocol parameters {see RegistryEntities comments}

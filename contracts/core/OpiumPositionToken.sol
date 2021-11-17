@@ -33,7 +33,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
         LibDerivative.PositionType _positionType,
         LibDerivative.Derivative calldata _derivative
     ) external initializer {
-        if(_positionType == LibDerivative.PositionType.LONG) {
+        if (_positionType == LibDerivative.PositionType.LONG) {
             __ERC20_init("OPIUM LONG TOKEN", "OPLN");
             __ERC20Permit_init("OPIUM LONG TOKEN");
         } else {

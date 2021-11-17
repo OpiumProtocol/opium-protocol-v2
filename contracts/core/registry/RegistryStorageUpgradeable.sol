@@ -6,10 +6,7 @@ import "./RegistryEntities.sol";
 
 /**
     Error codes:
-    - R1 = ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE
-    - R2 = ERROR_REGISTRY_ONLY_GUARDIAN
-    - R3 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE
-    - R4 = ERROR_REGISTRY_ONLY_PARAMETER_SETTER_ROLE
+    {check the ./Registry.sol contract}
  */
 
 contract RegistryStorageUpgradeable is AccessControlUpgradeable {
@@ -45,6 +42,20 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _;
     }
 
+    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_RECIPIENT_REGISTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolExecutionFeeRegister() {
+        require(hasRole(LibRoles.EXECUTION_FEE_RECIPIENT_REGISTER_ROLE, msg.sender), "R8");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolRedemptionFeeRegister() {
+        require(hasRole(LibRoles.REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE, msg.sender), "R9");
+        _;
+    }
+
     /// @notice internal init function that it is called only once upon deployment of the Opium.Registry contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address
     /// @notice it sets the default ProtocolParametersArgs protocol parameters
     /// @dev internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters
@@ -56,6 +67,9 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
         _setupRole(LibRoles.PARAMETER_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.EXECUTION_FEE_RECIPIENT_REGISTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE, _governor);
+        _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
 
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,

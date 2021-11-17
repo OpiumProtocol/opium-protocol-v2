@@ -23,7 +23,7 @@ contract TokenSpender is Initializable, RegistryManager {
     /// @notice it is called only once upon deployment of the contract
     /// @param _registry sets the address of the Opium.Registry
     function initialize(address _registry) external initializer {
-        __RegistrySetter__init(msg.sender, _registry);
+        __RegistryManager__init(_registry);
     }
 
     /// @notice Using this function whitelisted contracts could call ERC20 transfers
