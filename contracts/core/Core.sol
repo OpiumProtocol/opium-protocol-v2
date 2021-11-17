@@ -394,27 +394,25 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionAddresses[0]
         ).getPositionTokenData();
-        IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
+        IOpiumPositionToken.OpiumPositionTokenParams memory shortOpiumPositionTokenParams = IOpiumPositionToken(
             _positionAddresses[1]
         ).getPositionTokenData();
         _onlyOpiumFactoryTokens(_positionAddresses[0], longOpiumPositionTokenParams);
-        _onlyOpiumFactoryTokens(_positionAddresses[1], opiumPositionTokenParams);
-        require(opiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
-        require(opiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
+        _onlyOpiumFactoryTokens(_positionAddresses[1], shortOpiumPositionTokenParams);
+        require(shortOpiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
+        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
-        require(shortBalance >= _amount, "C4");
-        require(longBalance >= _amount, "C4");
 
         ISyntheticAggregator.SyntheticCache memory syntheticCache = protocolAddressesArgs
             .syntheticAggregator
-            .getSyntheticCache(opiumPositionTokenParams.derivativeHash, opiumPositionTokenParams.derivative);
+            .getSyntheticCache(shortOpiumPositionTokenParams.derivativeHash, shortOpiumPositionTokenParams.derivative);
 
         uint256 totalMargin = (syntheticCache.buyerMargin + syntheticCache.sellerMargin).mulWithPrecisionFactor(
             _amount
         );
         uint256 fees = _getFees(
             syntheticCache.authorAddress,
-            opiumPositionTokenParams.derivative.token,
+            shortOpiumPositionTokenParams.derivative.token,
             protocolAddressesArgs.protocolRedemptionFeeReceiver,
             syntheticCache.authorCommission,
             protocolParametersArgs.protocolRedemptionFeeCommissionBase,
@@ -427,10 +425,11 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _positionAddresses[1],
             _amount
         );
-        IERC20Upgradeable(opiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, totalMargin - fees);
-        _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, totalMargin);
 
-        emit LogRedeem(msg.sender, opiumPositionTokenParams.derivativeHash, _amount);
+        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
+        IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, totalMargin - fees);
+
+        emit LogRedeem(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice Executes several positions of `_positionOwner` with different `positionAddresses`
