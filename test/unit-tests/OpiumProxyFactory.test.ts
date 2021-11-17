@@ -1,6 +1,6 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "chai";
+import { expect } from "../chai-setup";
 // utils
 import { toBN } from "../../utils/bn";
 import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
@@ -12,7 +12,8 @@ import { TDerivative } from "../../types";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
-import { pickError, semanticErrors } from "../../utils/constants";
+import { pickError, SECONDS_50_MINS, semanticErrors } from "../../utils/constants";
+import { _TypedDataEncoder } from "@ethersproject/hash";
 
 describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;
@@ -87,6 +88,12 @@ describe("OpiumProxyFactory", () => {
     const longOpiumPositionTokenSellerBalance = await longOpiumPositionToken.balanceOf(seller.address);
     const longOpiumPositionTokenBuyerBalance = await longOpiumPositionToken.balanceOf(buyer.address);
 
+    const shortTokenData = await shortOpiumPositionToken.getPositionTokenData();
+    const longTokenData = await longOpiumPositionToken.getPositionTokenData();
+
+    expect(shortTokenData.derivative, "wrong short token's derivative data").to.matchDerivative(derivative);
+    expect(longTokenData.derivative, "wrong long token's derivative data").to.matchDerivative(derivative);
+
     expect(shortOpiumPositionTokenSellerBalance).to.equal(amount);
     expect(shortOpiumPositionTokenBuyerBalance).to.equal(0);
     expect(longOpiumPositionTokenSellerBalance).to.equal(0);
@@ -131,6 +138,7 @@ describe("OpiumProxyFactory", () => {
 
     const shortTokenData = await shortOpiumPositionToken.getPositionTokenData();
 
+    expect(shortTokenData.derivative, "wrong derivative").to.matchDerivative(secondDerivative);
     expect(shortTokenData.derivative.margin, "wrong short position token derivative data").to.be.eq(
       secondDerivative.margin,
     );
@@ -141,6 +149,7 @@ describe("OpiumProxyFactory", () => {
     expect(shortTokenData.positionType, "wrong short position token positionType").to.be.eq(0);
 
     const longTokenData = await longOpiumPositionToken.getPositionTokenData();
+    expect(longTokenData.derivative, "wrong long token's derivative data").to.matchDerivative(secondDerivative);
     expect(longTokenData.derivative.margin, "wrong short position token derivative data").to.be.eq(
       secondDerivative.margin,
     );
