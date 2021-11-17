@@ -104,7 +104,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await registryInstance.connect(governor).addToWhitelist(core.address);
 
   const coreInstance = <Core>await ethers.getContract("Core");
-  await coreInstance.updateProtocolAddresses();
+  await coreInstance.connect(governor).updateProtocolAddresses();
 };
 
 export default func;

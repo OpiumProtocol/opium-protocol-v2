@@ -34,6 +34,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     args: ["test", "test", 6],
   });
+
+  await deploy("MockRelayer", {
+    from: deployer.address,
+    contract: "MockRelayer",
+    log: true,
+    args: [],
+  });
 };
 
 export default func;
