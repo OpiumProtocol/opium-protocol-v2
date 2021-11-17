@@ -44,13 +44,16 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     // Emitted when Core creates a new LONG/SHORT position pair
-    event LogCreated(address _buyer, address _seller, bytes32 indexed _derivativeHash, uint256 indexed _amount);
+    event LogCreated(address indexed _buyer, address indexed _seller, bytes32 indexed _derivativeHash, uint256 _amount);
     // Emitted when Core mints an amount of LONG/SHORT positions
-    event LogMinted(address _buyer, address _seller, bytes32 indexed _derivativeHash, uint256 indexed _amount);
+    event LogMinted(address indexed _buyer, address indexed _seller, bytes32 indexed _derivativeHash, uint256 _amount);
     // Emitted when Core executes positions
     event LogExecuted(address indexed _positionsOwner, address indexed _positionAddress, uint256 indexed _amount);
     // Emitted when Core cancels ticker for the first time
-    event LogCanceled(address indexed _positionOwner, bytes32 _derivativeHash);
+    event LogDerivativeHashCancelled(address indexed _positionOwner, bytes32 _derivativeHash);
+    // Emitted when Core cancels a position of a previously cancelled Derivative.derivativeHash
+    event LogPositionCancelled(address indexed _positionOwner, bytes32 _derivativeHash);
+
     // Emitted when Core redeems an amount of market neutral positions
     event LogRedeem(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 indexed _amount);
 
@@ -506,8 +509,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
                 "C13"
             );
             cancelled[opiumPositionTokenParams.derivativeHash] = true;
-            // Emit `Canceled` event only once and mark ticker as canceled
-            emit LogCanceled(msg.sender, opiumPositionTokenParams.derivativeHash);
+            // Emit `LogDerivativeHashCancelled` event only once and mark ticker as canceled
+            emit LogDerivativeHashCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
 
         uint256[2] memory margins;
@@ -540,6 +543,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         }
 
         _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
+        emit LogPositionCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
     }
 
     function _getPayout(
