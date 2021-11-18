@@ -14,10 +14,10 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
     RegistryEntities.ProtocolAddressesArgs internal protocolAddressesArgs;
     mapping(address => bool) internal coreSpenderWhitelist;
 
-    /// @notice it ensures that the calling account has been granted the PROTOCOL_REGISTER_ROLE
+    /// @notice it ensures that the calling account has been granted the PROTOCOL_ADDRESSES_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyProtocolRegister() {
-        require(hasRole(LibRoles.PROTOCOL_REGISTER_ROLE, msg.sender), "R1");
+        require(hasRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, msg.sender), "R1");
         _;
     }
 
@@ -42,17 +42,31 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _;
     }
 
-    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_RECIPIENT_REGISTER_ROLE
+    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_RECIPIENT_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
-    modifier onlyProtocolExecutionFeeRegister() {
-        require(hasRole(LibRoles.EXECUTION_FEE_RECIPIENT_REGISTER_ROLE, msg.sender), "R8");
+    modifier onlyProtocolExecutionFeeAddressSetter() {
+        require(hasRole(LibRoles.EXECUTION_FEE_RECIPIENT_SETTER_ROLE, msg.sender), "R8");
         _;
     }
 
-    /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE
+    /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_RECIPIENT_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
-    modifier onlyProtocolRedemptionFeeRegister() {
-        require(hasRole(LibRoles.REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE, msg.sender), "R9");
+    modifier onlyProtocolRedemptionAddressFeeSetter() {
+        require(hasRole(LibRoles.REDEMPTION_FEE_RECIPIENT_SETTER_ROLE, msg.sender), "R9");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_CAP_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyExecutionFeeCapSetter() {
+        require(hasRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), "R10");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyRedemptionFeeSetter() {
+        require(hasRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, msg.sender), "R10");
         _;
     }
 
@@ -63,13 +77,15 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
     function __RegistryStorage__init(address _governor) internal initializer {
         __AccessControl_init();
         _setupRole(DEFAULT_ADMIN_ROLE, _governor);
-        _setupRole(LibRoles.PROTOCOL_REGISTER_ROLE, _governor);
+        _setupRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.EXECUTION_FEE_RECIPIENT_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_FEE_RECIPIENT_SETTER_ROLE, _governor);
         _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
         _setupRole(LibRoles.PARAMETER_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.EXECUTION_FEE_RECIPIENT_REGISTER_ROLE, _governor);
-        _setupRole(LibRoles.REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE, _governor);
         _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, _governor);
 
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,

@@ -13,6 +13,6 @@ contract OracleIdMock {
     }
 
     function triggerCallback(uint256 timestamp, uint256 returnData) external {
-        IOracleAggregator(registry.getOracleAggregator()).__callback(timestamp, returnData);
+        IOracleAggregator(registry.getProtocolAddresses().oracleAggregator).__callback(timestamp, returnData);
     }
 }

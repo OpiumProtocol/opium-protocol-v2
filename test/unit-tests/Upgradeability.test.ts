@@ -112,7 +112,7 @@ describe("Upgradeability", () => {
     const { oracleAggregator, registry } = await setup();
     const { oracle } = namedSigners;
 
-    const oracleAggregatorAddressBefore = await registry.getOracleAggregator();
+    const oracleAggregatorAddressBefore = (await registry.getProtocolAddresses()).oracleAggregator;
     const oracleAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
       oracleAggregator.address,
     );
@@ -125,7 +125,7 @@ describe("Upgradeability", () => {
       oracleAggregator.address,
     );
     const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
-    const oracleAggregatorAddressAfter = await registry.getOracleAggregator();
+    const oracleAggregatorAddressAfter = (await registry.getProtocolAddresses()).oracleAggregator;
 
     expect(upgraded.address).to.be.eq(oracleAggregator.address);
     expect(oracleAggregatorImplementationAddressBefore).to.not.be.eq(oracleAggregatorImplementationAddressAfter);

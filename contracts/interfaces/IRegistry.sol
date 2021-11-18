@@ -4,8 +4,6 @@ import "../core/registry/RegistryEntities.sol";
 interface IRegistry {
     function getCore() external view returns (address);
 
-    function getOracleAggregator() external view returns (address);
-
     function isCoreSpenderWhitelisted(address _address) external view returns (bool);
 
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
