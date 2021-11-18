@@ -466,14 +466,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             protocolAddressesArgs.oracleAggregator
         );
 
+        // Burn executed position tokens
+        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
+
         // Transfer payout
         if (payout > 0) {
             IERC20Upgradeable(opiumPositionTokenParams.derivative.token).safeTransfer(_positionOwner, payout);
         }
-        // Burn executed position tokens
-        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
 
-        _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
         emit LogExecuted(_positionOwner, _positionAddress, _amount);
     }
 
@@ -600,6 +600,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             // sets positionMargin to sellerMargin * amount
             positionMargin = syntheticCache.sellerMargin.mulWithPrecisionFactor(_amount);
         }
+
+        _decreaseP2PVault(_opiumPositionTokenParams.derivativeHash, payout);
 
         // Take fees only from profit makers
         // Check: payout > positionMargin * amount
