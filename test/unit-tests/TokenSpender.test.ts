@@ -8,7 +8,8 @@ import { toBN } from "../../utils/bn";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 // types
 import { TNamedSigners } from "../../types";
-import { pickError, semanticErrors } from "../../utils/constants";
+import { pickError } from "../../utils/misc";
+import { semanticErrors } from "../../utils/constants";
 
 describe("TokenSpender", () => {
   let dai: MockContract;

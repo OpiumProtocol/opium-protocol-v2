@@ -147,7 +147,7 @@ describe("Upgradeability", () => {
 
   it("should upgrade Core", async () => {
     const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry, oracleIdMock } = await setup();
-    const { buyer, seller } = namedSigners;
+    const { buyer, seller, governor } = namedSigners;
 
     const coreAddressBefore = await registry.getCore();
     const coreImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(core.address);
@@ -164,8 +164,8 @@ describe("Upgradeability", () => {
     expect(coreAddressBefore).to.be.eq(coreAddressAfter);
     expect(coreImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
 
-    await upgraded.updateProtocolAddresses();
-    await upgraded.updateProtocolParametersArgs();
+    await upgraded.connect(governor).updateProtocolAddresses();
+    await upgraded.connect(governor).updateProtocolParametersArgs();
 
     const derivativeOrder = await generateRandomDerivativeSetup(
       oracleIdMock.address,

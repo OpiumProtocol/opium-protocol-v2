@@ -10,7 +10,7 @@ import {
 } from "../../utils/derivatives";
 import setup from "../__fixtures__";
 import { decodeEvents, retrievePositionTokensAddresses } from "../../utils/events";
-import { toBN } from "../../utils/bn";
+import { cast, toBN } from "../../utils/bn";
 // types and constants
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
@@ -80,16 +80,13 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
     // author fee (includes opium fee)
-    const { derivativeAuthorCommissionBase, protocolRedemptionFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolParameters();
+    const { derivativeAuthorRedemptionFee, protocolCommissionPart } = await registry.getProtocolParameters();
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const marketNeutralFees = computeFees(
       optionCall.margin.mul(redeemAmount).div(toBN("1")),
-      authorFeeCommission,
-      derivativeAuthorCommissionBase,
+      cast(derivativeAuthorRedemptionFee),
       protocolCommissionPart,
-      protocolRedemptionFeeCommissionBase,
     );
     expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.equal(
       marketNeutralBalanceAfterCreation.add(
@@ -148,16 +145,12 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
-    const { derivativeAuthorCommissionBase, protocolRedemptionFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolParameters();
-    const authorFeeCommission = await optionCallMock.getAuthorCommission();
+    const { derivativeAuthorRedemptionFee, protocolCommissionPart } = await registry.getProtocolParameters();
 
     const marketNeutralFees = computeFees(
       optionCall.margin.mul(redeemAmount).div(toBN("1")),
-      authorFeeCommission,
-      derivativeAuthorCommissionBase,
+      cast(derivativeAuthorRedemptionFee),
       protocolCommissionPart,
-      protocolRedemptionFeeCommissionBase,
     );
     expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.equal(
       marketNeutralBalanceAfterCreation.add(
@@ -271,24 +264,18 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
     // author fee (includes opium fee)
-    const { derivativeAuthorCommissionBase, protocolRedemptionFeeCommissionBase, protocolCommissionPart } =
-      await registry.getProtocolParameters();
-    const authorFeeCommission = await optionCallMock.getAuthorCommission();
+    const { derivativeAuthorRedemptionFee, protocolCommissionPart } = await registry.getProtocolParameters();
 
     const firstOptionFees = computeFees(
       optionCall.margin.mul(redeemAmount).div(toBN("1")),
-      authorFeeCommission,
-      derivativeAuthorCommissionBase,
+      cast(derivativeAuthorRedemptionFee),
       protocolCommissionPart,
-      protocolRedemptionFeeCommissionBase,
     );
 
     const secondOptionFees = computeFees(
       secondOptionCall.margin.mul(secondRedeemAmount).div(toBN("1")),
-      authorFeeCommission,
-      derivativeAuthorCommissionBase,
+      cast(derivativeAuthorRedemptionFee),
       protocolCommissionPart,
-      protocolRedemptionFeeCommissionBase,
     );
 
     /**

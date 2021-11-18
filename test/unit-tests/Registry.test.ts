@@ -5,8 +5,15 @@ import { expect } from "chai";
 import setup from "../__fixtures__";
 // types
 import { TNamedSigners } from "../../types";
-import { DEFAULT_ADMIN_ROLE, protocolRegisterRole, guardianRole, commissionSetterRole } from "../../utils/addresses";
-import { pickError, SECONDS_2_WEEKS, semanticErrors } from "../../utils/constants";
+import { pickError } from "../../utils/misc";
+import {
+  semanticErrors,
+  SECONDS_2_WEEKS,
+  DEFAULT_ADMIN_ROLE,
+  protocolRegisterRole,
+  guardianRole,
+  parameterSetterRole,
+} from "../../utils/constants";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;
@@ -21,11 +28,11 @@ describe("Registry", () => {
 
     expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not admin").to.be.true;
     expect(await registry.hasRole(guardianRole, governor.address), "not guardianRole").to.be.true;
-    expect(await registry.hasRole(commissionSetterRole, governor.address), "not commissionSetterRole").to.be.true;
+    expect(await registry.hasRole(parameterSetterRole, governor.address), "not parameterSetterRole").to.be.true;
     expect(await registry.hasRole(protocolRegisterRole, governor.address), "not protocolRegisterRole").to.be.true;
     expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, deployer.address), "wrong admin").to.be.false;
     expect(await registry.hasRole(guardianRole, deployer.address), "wrong guardianRole").to.be.false;
-    expect(await registry.hasRole(commissionSetterRole, notAllowed.address), "wrong commissionSetterRole").to.be.false;
+    expect(await registry.hasRole(parameterSetterRole, notAllowed.address), "wrong parameterSetterRole").to.be.false;
     expect(await registry.hasRole(protocolRegisterRole, notAllowed.address), "wrong protocolRegisterRole").to.be.false;
   });
 
@@ -33,9 +40,7 @@ describe("Registry", () => {
     const { registry } = await setup();
 
     const protocolParams = await registry.getProtocolParameters();
-    expect(protocolParams.derivativeAuthorCommissionBase, "wrong derivative author commission base").to.be.eq(10000);
-    expect(protocolParams.protocolExecutionFeeCommissionBase, "wrong protocol's execution commission base").to.be.eq(10);
-    expect(protocolParams.protocolRedemptionFeeCommissionBase, "wrong protocol's redemption commission base").to.be.eq(1);
+
     expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
     expect(await registry.isPaused(), "it's paused").to.be.false;
@@ -66,7 +71,7 @@ describe("Registry", () => {
           syntheticAggregator.address,
           tokenSpender.address,
           notAllowed.address,
-          notAllowed.address
+          notAllowed.address,
         ),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE));
 

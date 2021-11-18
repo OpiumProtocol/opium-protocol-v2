@@ -2,7 +2,7 @@ import { Result } from "@ethersproject/abi";
 import { Log } from "@ethersproject/providers";
 import { Contract, ContractReceipt, Event } from "ethers";
 import { OpiumProxyFactory } from "../typechain";
-import { formatAddress } from "./addresses";
+import { formatAddress } from "./misc";
 
 export const filterEvents = (events: Array<Event> | undefined, eventName: string): Array<Event> => {
   return events ? events.filter(event => event.event === eventName) : [];
@@ -30,11 +30,6 @@ export const decodeEvents = <T extends Contract>(
 export const decodeLogs = <T extends Contract>(contract: T, eventName: string, receipt: ContractReceipt): Log[] => {
   const topic = contract.interface.getEventTopic(eventName);
   return receipt.logs.filter(log => log.topics.indexOf(topic) >= 0);
-};
-
-type TPositionAddresses = {
-  longPositionAddress: string;
-  shortPositionAddress: string;
 };
 
 export const retrievePositionTokensAddresses = (

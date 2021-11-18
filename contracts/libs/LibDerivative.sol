@@ -6,7 +6,7 @@ library LibDerivative {
         SHORT,
         LONG
     }
-    
+
     // Opium derivative structure (ticker) definition
     struct Derivative {
         // Margin parameter for syntheticId
@@ -27,13 +27,15 @@ library LibDerivative {
     /// @param _derivative Derivative Instance of derivative to hash
     /// @return derivativeHash bytes32 Derivative hash
     function getDerivativeHash(Derivative memory _derivative) internal pure returns (bytes32 derivativeHash) {
-        derivativeHash = keccak256(abi.encodePacked(
-            _derivative.margin,
-            _derivative.endTime,
-            _derivative.params,
-            _derivative.oracleId,
-            _derivative.token,
-            _derivative.syntheticId
-        ));
+        derivativeHash = keccak256(
+            abi.encodePacked(
+                _derivative.margin,
+                _derivative.endTime,
+                _derivative.params,
+                _derivative.oracleId,
+                _derivative.token,
+                _derivative.syntheticId
+            )
+        );
     }
 }

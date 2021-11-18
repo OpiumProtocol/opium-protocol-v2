@@ -8,4 +8,12 @@ library LibCalculator {
     function modWithPrecisionFactor(uint256 _x) internal pure returns (uint256) {
         return _x % 1e18;
     }
+
+    function scaleBasisPointToAuthorBase(uint256 _x) internal pure returns (uint256) {
+        return _x / 10000;
+    }
+
+    function scaleBasisPointToProtocolBase(uint256 _x) internal pure returns (uint256) {
+        return _x / 10;
+    }
 }

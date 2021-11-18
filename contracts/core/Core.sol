@@ -414,8 +414,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             syntheticCache.authorAddress,
             shortOpiumPositionTokenParams.derivative.token,
             protocolAddressesArgs.protocolRedemptionFeeReceiver,
-            syntheticCache.authorCommission,
-            protocolParametersArgs.protocolRedemptionFeeCommissionBase,
+            protocolParametersArgs.derivativeAuthorRedemptionFee,
             totalMargin
         );
 
@@ -614,7 +613,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
                         _opiumPositionTokenParams.derivative.token,
                         protocolAddressesArgs.protocolExecutionFeeReceiver,
                         syntheticCache.authorCommission,
-                        protocolParametersArgs.protocolExecutionFeeCommissionBase,
                         payout - positionMargin
                     )
                 );
@@ -629,12 +627,11 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address _tokenAddress,
         address _protocolFeeReceiver,
         uint256 _authorCommission,
-        uint256 _protocolBaseCommission,
         uint256 _profit
     ) private returns (uint256 fee) {
         // Calculate fee
         // fee = profit * commission / COMMISSION_BASE
-        fee = (_profit * _authorCommission) / protocolParametersArgs.derivativeAuthorCommissionBase;
+        fee = (_profit * _authorCommission).scaleBasisPointToAuthorBase();
         // If commission is zero, finish
         if (fee == 0) {
             return 0;
@@ -642,7 +639,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         // Calculate opium fee
         // opiumFee = fee * OPIUM_COMMISSION_PART / OPIUM_COMMISSION_BASE
-        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart) / _protocolBaseCommission;
+        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart).scaleBasisPointToProtocolBase();
 
         // Calculate author fee
         // authorFee = fee - opiumFee

@@ -6,6 +6,7 @@ import "./base/RegistryManager.sol";
 import "../interfaces/IDerivativeLogic.sol";
 import "../interfaces/IRegistry.sol";
 import "../libs/LibDerivative.sol";
+import "../libs/LibCalculator.sol";
 
 /**
     Error codes:
@@ -17,6 +18,8 @@ import "../libs/LibDerivative.sol";
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
 contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
+    // using LibCalculator for uint256;
+
     // Emitted when new ticker is initialized
     event LogSyntheticInit(LibDerivative.Derivative indexed derivative, bytes32 indexed derivativeHash);
 
@@ -85,7 +88,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         // Check if commission is not set > 100%
         RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolParameters();
-        require(authorCommission <= protocolParametersArgs.derivativeAuthorCommissionBase, "S3");
+        require(authorCommission <= protocolParametersArgs.derivativeAuthorExecutionFeeCap, "S3");
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({
             buyerMargin: buyerMargin,

@@ -1,7 +1,9 @@
 pragma solidity 0.8.5;
+
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol";
 import "../libs/LibDerivative.sol";
 
-interface IOpiumPositionToken {
+interface IOpiumPositionToken is IERC20PermitUpgradeable {
     struct OpiumPositionTokenParams {
         LibDerivative.Derivative derivative;
         LibDerivative.PositionType positionType;
@@ -21,4 +23,6 @@ interface IOpiumPositionToken {
     function getFactoryAddress() external view returns (address);
 
     function getPositionTokenData() external view returns (OpiumPositionTokenParams memory opiumPositionTokenParams);
+
+    function getChainId() external view returns (uint256);
 }

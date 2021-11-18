@@ -12,5 +12,7 @@ interface IRegistry {
 
     function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory);
 
+    function getRegistryManager(address _address) external view returns (bool);
+
     function isPaused() external view returns (bool);
 }

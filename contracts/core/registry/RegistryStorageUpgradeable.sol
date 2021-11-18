@@ -73,9 +73,8 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
 
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,
-            derivativeAuthorCommissionBase: 10000,
-            protocolExecutionFeeCommissionBase: 10,
-            protocolRedemptionFeeCommissionBase: 1,
+            derivativeAuthorExecutionFeeCap: 10000,
+            derivativeAuthorRedemptionFee: 100,
             protocolCommissionPart: 1,
             paused: false
         });

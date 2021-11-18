@@ -1,3 +1,5 @@
+import { ethers } from "hardhat";
+
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 export const AUTHOR_COMMISSION = 0.0025; // 0.25%
@@ -9,6 +11,16 @@ export const SECONDS_40_MINS = 60 * 40;
 export const SECONDS_50_MINS = 60 * 50;
 export const SECONDS_3_WEEKS = 60 * 60 * 24 * 7 * 3;
 export const SECONDS_2_WEEKS = 60 * 60 * 24 * 7 * 2;
+
+export const DEFAULT_ADMIN_ROLE = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+export const protocolRegisterRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL1"));
+export const executionFeeRecipientRegisterRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL2"));
+export const redemptionFeeRecipientRegisterRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL3"));
+export const guardianRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL4"));
+export const whitelisterRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL5"));
+export const parameterSetterRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL6"));
+export const registryManagerRole = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL6"));
 
 export const semanticErrors = {
   ERROR_CORE_ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH: "ERROR_CORE_ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH",
@@ -38,7 +50,7 @@ export const semanticErrors = {
   ERROR_OPIUM_POSITION_TOKEN_NOT_FACTORY: "ERROR_OPIUM_POSITION_TOKEN_NOT_FACTORY",
   ERROR_OPIUM_PROXY_FACTORY_NOT_CORE: "ERROR_OPIUM_PROXY_FACTORY_NOT_CORE",
   ERROR_TOKEN_SPENDER_NOT_WHITELISTED: "ERROR_TOKEN_SPENDER_NOT_WHITELISTED",
-  ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS: "ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS"
+  ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS: "ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS",
 };
 
 export const protocolErrors = {
@@ -70,10 +82,4 @@ export const protocolErrors = {
   [semanticErrors.ERROR_OPIUM_POSITION_TOKEN_NOT_FACTORY]: "P1",
   [semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE]: "F1",
   [semanticErrors.ERROR_TOKEN_SPENDER_NOT_WHITELISTED]: "T1",
-};
-
-export const pickError = (
-  semanticError: typeof semanticErrors[keyof typeof semanticErrors],
-): typeof protocolErrors[keyof typeof semanticErrors] => {
-  return protocolErrors[semanticError];
 };

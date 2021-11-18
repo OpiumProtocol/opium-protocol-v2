@@ -14,7 +14,9 @@ import setup from "./../__fixtures__";
 // types
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
-import { pickError, semanticErrors } from "../../utils/constants";
+import { pickError } from "../../utils/misc";
+import { semanticErrors } from "../../utils/constants";
+
 import { resetNetwork } from "../../utils/evm";
 
 describe("CoreCreation", () => {

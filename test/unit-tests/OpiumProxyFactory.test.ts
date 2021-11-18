@@ -12,8 +12,8 @@ import { TDerivative } from "../../types";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
-import { pickError, SECONDS_50_MINS, semanticErrors } from "../../utils/constants";
-import { _TypedDataEncoder } from "@ethersproject/hash";
+import { pickError } from "../../utils/misc";
+import { semanticErrors } from "../../utils/constants";
 
 describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;

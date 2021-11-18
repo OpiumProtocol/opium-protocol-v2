@@ -88,7 +88,10 @@ export const shouldBehaveLikeCore = async (
 
   const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
   const sellerBalanceBefore = await testToken.balanceOf(seller.address);
-  const opiumFeesBefore = await core.getFeeVaultsBalance(protocolAddresses.protocolExecutionFeeReceiver, testToken.address);
+  const opiumFeesBefore = await core.getFeeVaultsBalance(
+    protocolAddresses.protocolExecutionFeeReceiver,
+    testToken.address,
+  );
   const authorFeesBefore = await core.getFeeVaultsBalance(derivativeAuthorAddress, testToken.address);
 
   await core.connect(buyer)[executeOne](longPositionAddress, amount);
@@ -104,22 +107,17 @@ export const shouldBehaveLikeCore = async (
   const { buyerMargin, sellerMargin } = await syntheticContract.getMargin(optionOrder.derivative);
   const authorFeeCommission = await syntheticContract.getAuthorCommission();
 
-  const { derivativeAuthorCommissionBase, protocolExecutionFeeCommissionBase, protocolCommissionPart } =
-    await registry.getProtocolParameters();
+  const { protocolCommissionPart } = await registry.getProtocolParameters();
 
   const sellerFees = computeFees(
     calculateTotalGrossProfit(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.SELLER),
     authorFeeCommission,
-    derivativeAuthorCommissionBase,
     protocolCommissionPart,
-    protocolExecutionFeeCommissionBase,
   );
   const buyerFees = computeFees(
     calculateTotalGrossProfit(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.BUYER),
     authorFeeCommission,
-    derivativeAuthorCommissionBase,
     protocolCommissionPart,
-    protocolExecutionFeeCommissionBase,
   );
 
   const buyerNetPayout = calculateTotalNetPayout(
@@ -149,7 +147,10 @@ export const shouldBehaveLikeCore = async (
     sellerBalanceBefore.add(sellerNetPayout),
   );
 
-  const opiumFeesAfter = await core.getFeeVaultsBalance(protocolAddresses.protocolExecutionFeeReceiver, testToken.address);
+  const opiumFeesAfter = await core.getFeeVaultsBalance(
+    protocolAddresses.protocolExecutionFeeReceiver,
+    testToken.address,
+  );
   const authorFeesAfter = await core.getFeeVaultsBalance(derivativeAuthorAddress, testToken.address);
 
   expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(
