@@ -175,7 +175,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice This function mints the provided amount of LONG/SHORT positions to msg.sender for a previously deployed pair of LONG/SHORT ERC20 contracts { see Core._mint for the business logic description }
     /// @param _amount uint256 Amount of positions to create
-    /// @param _positionAddresses address[2] Addresses of buyer and seller
+    /// @param _positionsAddresses address[2] Addresses of buyer and seller
     /// [0] - LONG erc20 position address
     /// [1] - SHORT erc20 position address
     /// @param _positionsOwners address[2] Addresses of buyer and seller
@@ -183,10 +183,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// _positionsOwners[1] - seller address
     function mint(
         uint256 _amount,
-        address[2] calldata _positionAddresses,
+        address[2] calldata _positionsAddresses,
         address[2] calldata _positionsOwners
     ) external whenNotPaused nonReentrant {
-        _mint(_amount, _positionAddresses, _positionsOwners);
+        _mint(_amount, _positionsAddresses, _positionsOwners);
     }
 
     /// @notice Executes a single position of `msg.sender` with specified `positionAddress` { see Core._execute for the business logic description }
@@ -234,10 +234,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     }
 
     /// @notice Redeems a single market neutral position pair { see Core._redeem for the business logic description }
-    /// @param _positionAddresses address[2] `_positionAddresses` of the positions that need to be redeemed
+    /// @param _positionsAddresses address[2] `_positionsAddresses` of the positions that need to be redeemed
     /// @param _amount uint256 Amount of tokens to redeem
-    function redeem(address[2] calldata _positionAddresses, uint256 _amount) external nonReentrant {
-        _redeem(_positionAddresses, _amount);
+    function redeem(address[2] calldata _positionsAddresses, uint256 _amount) external nonReentrant {
+        _redeem(_positionsAddresses, _amount);
     }
 
     /// @notice Redeems several market neutral position pairs { see Core._redeem for the business logic description }
@@ -415,21 +415,21 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     }
 
     /// @notice It redeems the provided amount of a derivative's market neutral position pair (LONG/SHORT) owned by the msg.sender - redeeming a market neutral position pair results in an equal amount of LONG and SHORT positions being burned in exchange for their original collateral
-    /// @param _positionAddresses address[2] `positionAddresses` representing the tuple of market-neutral positions ordered in the following way:
+    /// @param _positionsAddresses address[2] `positionAddresses` representing the tuple of market-neutral positions ordered in the following way:
     /// [0] LONG position
     /// [1] SHORT position
     /// @param _amount uint256 amount of the LONG and SHORT positions to be redeemed
-    function _redeem(address[2] memory _positionAddresses, uint256 _amount) private whenNotPaused {
-        uint256 longBalance = IERC20Upgradeable(_positionAddresses[0]).balanceOf(msg.sender);
-        uint256 shortBalance = IERC20Upgradeable(_positionAddresses[1]).balanceOf(msg.sender);
+    function _redeem(address[2] memory _positionsAddresses, uint256 _amount) private whenNotPaused {
+        uint256 longBalance = IERC20Upgradeable(_positionsAddresses[0]).balanceOf(msg.sender);
+        uint256 shortBalance = IERC20Upgradeable(_positionsAddresses[1]).balanceOf(msg.sender);
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
-            _positionAddresses[0]
+            _positionsAddresses[0]
         ).getPositionTokenData();
         IOpiumPositionToken.OpiumPositionTokenParams memory shortOpiumPositionTokenParams = IOpiumPositionToken(
-            _positionAddresses[1]
+            _positionsAddresses[1]
         ).getPositionTokenData();
-        _onlyOpiumFactoryTokens(_positionAddresses[0], longOpiumPositionTokenParams);
-        _onlyOpiumFactoryTokens(_positionAddresses[1], shortOpiumPositionTokenParams);
+        _onlyOpiumFactoryTokens(_positionsAddresses[0], longOpiumPositionTokenParams);
+        _onlyOpiumFactoryTokens(_positionsAddresses[1], shortOpiumPositionTokenParams);
         require(shortOpiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
         require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
@@ -451,8 +451,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         protocolAddressesArgs.opiumProxyFactory.burnPair(
             msg.sender,
-            _positionAddresses[0],
-            _positionAddresses[1],
+            _positionsAddresses[0],
+            _positionsAddresses[1],
             _amount
         );
 
@@ -552,7 +552,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
 
         uint256 payout;
-        // Check if `_positionAddresses` is a LONG position
+        // Check if `_positionsAddresses` is a LONG position
         if (opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
             // Set payout to buyerPayout
             payout = margins[0].mulWithPrecisionFactor(_amount);
