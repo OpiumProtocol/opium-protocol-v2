@@ -13,7 +13,8 @@ interface IOpiumPositionToken is IERC20PermitUpgradeable {
     function initialize(
         bytes32 _derivativeHash,
         LibDerivative.PositionType _positionType,
-        LibDerivative.Derivative calldata _derivative
+        LibDerivative.Derivative calldata _derivative,
+        bytes memory customName
     ) external;
 
     function mint(address _address, uint256 _amount) external;

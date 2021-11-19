@@ -1,10 +1,11 @@
 pragma solidity 0.8.5;
+import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./OpiumPositionToken.sol";
 import "./base/RegistryManager.sol";
 import "../libs/LibDerivative.sol";
 import "../libs/LibPosition.sol";
+import "../libs/LibBokkyPooBahsDateTimeLibrary.sol";
 import "../interfaces/IOpiumPositionToken.sol";
 import "../interfaces/IRegistry.sol";
 import "hardhat/console.sol";
@@ -15,7 +16,7 @@ import "hardhat/console.sol";
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
-contract OpiumProxyFactory is Initializable, RegistryManager {
+contract OpiumProxyFactory is RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
     event LogShortPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
@@ -61,15 +62,24 @@ contract OpiumProxyFactory is Initializable, RegistryManager {
     ) external onlyCore {
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
         address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
+
+        bytes memory baseCustomName = abi.encodePacked(
+            _toDerivativeEndTimeIdentifier(_derivative.endTime),
+            "-",
+            _toDerivativeHashStringIdentifier(_derivativeHash)
+        );
+
         IOpiumPositionToken(longPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.LONG,
-            _derivative
+            _derivative,
+            baseCustomName
         );
         IOpiumPositionToken(shortPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.SHORT,
-            _derivative
+            _derivative,
+            baseCustomName
         );
         emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
         emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
@@ -125,5 +135,52 @@ contract OpiumProxyFactory is Initializable, RegistryManager {
     ) external onlyCore {
         IOpiumPositionToken(_longPositionAddress).burn(_positionOwner, _amount);
         IOpiumPositionToken(_shortPositionAddress).burn(_positionOwner, _amount);
+    }
+
+    function _toDerivativeHashStringIdentifier(bytes32 data) private pure returns (string memory) {
+        bytes4 result;
+        assembly {
+            result := or(
+                and(
+                    or(
+                        shr(4, and(data, 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
+                        shr(8, and(data, 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
+                    ),
+                    0xffff000000000000000000000000000000000000000000000000000000000000
+                ),
+                shr(
+                    16,
+                    or(
+                        shr(4, and(shl(8, data), 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
+                        shr(8, and(shl(8, data), 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
+                    )
+                )
+            )
+        }
+
+        return
+            string(
+                abi.encodePacked(
+                    "0x",
+                    bytes4(0x30303030 + uint32(result) + (((uint32(result) + 0x06060606) >> 4) & 0x0F0F0F0F) * 7)
+                )
+            );
+    }
+
+    function _toDerivativeEndTimeIdentifier(uint256 derivativeEndTime) private pure returns (bytes memory) {
+        (uint256 year, uint256 month, uint256 day) = BokkyPooBahsDateTimeLibrary.timestampToDate(derivativeEndTime);
+
+        return
+            abi.encodePacked(
+                day < 10
+                    ? abi.encodePacked("0", StringsUpgradeable.toString(day))
+                    : bytes(StringsUpgradeable.toString(day)),
+                "/",
+                month < 10
+                    ? abi.encodePacked("0", StringsUpgradeable.toString(month))
+                    : bytes(StringsUpgradeable.toString(month)),
+                "/",
+                StringsUpgradeable.toString(year)
+            );
     }
 }

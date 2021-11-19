@@ -31,14 +31,17 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     function initialize(
         bytes32 _derivativeHash,
         LibDerivative.PositionType _positionType,
-        LibDerivative.Derivative calldata _derivative
+        LibDerivative.Derivative calldata _derivative,
+        bytes memory baseCustomName
     ) external initializer {
         if (_positionType == LibDerivative.PositionType.LONG) {
-            __ERC20_init("OPIUM LONG TOKEN", "OPLN");
-            __ERC20Permit_init("OPIUM LONG TOKEN");
+            string memory longPositionName = string(abi.encodePacked(baseCustomName, "-LONG"));
+            __ERC20_init(longPositionName, "OPLN");
+            __ERC20Permit_init(longPositionName);
         } else {
-            __ERC20_init("OPIUM SHORT TOKEN", "OPSH");
-            __ERC20Permit_init("OPIUM SHORT TOKEN");
+            string memory shortPositionName = string(abi.encodePacked(baseCustomName, "-SHORT"));
+            __ERC20_init(shortPositionName, "OPSH");
+            __ERC20Permit_init(shortPositionName);
         }
         factory = msg.sender;
         opiumPositionTokenParams = OpiumPositionTokenParams({
