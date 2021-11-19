@@ -1,19 +1,20 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "../chai-setup";
 // utils
+import { expect } from "../chai-setup";
 import { toBN } from "../../utils/bn";
 import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
 import setup from "../__fixtures__";
 // types and constants
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken, OpiumProxyFactory, OptionCallSyntheticIdMock } from "../../typechain";
 import { TDerivative } from "../../types";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { impersonateAccount, setBalance } from "../../utils/evm";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { pickError } from "../../utils/misc";
 import { customDerivativeName, semanticErrors } from "../../utils/constants";
+import { generateExpectedOpiumPositionTokenName } from "../../utils/testCaseGenerator";
 
 describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;
@@ -106,8 +107,22 @@ describe("OpiumProxyFactory", () => {
     const longTokenSymbol = await longOpiumPositionToken.symbol();
     const shortTokenSymbol = await shortOpiumPositionToken.symbol();
 
-    expect(longTokenName).to.be.eq("OPIUM LONG TOKEN");
-    expect(shortTokenName).to.be.eq("OPIUM SHORT TOKEN");
+    expect(longTokenName, "wrong long token name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        longTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        hash,
+        true,
+      ),
+    );
+    expect(shortTokenName, "wrong short token name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        shortTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        hash,
+        false,
+      ),
+    );
     expect(longTokenSymbol).to.be.eq("OPLN");
     expect(shortTokenSymbol).to.be.eq("OPSH");
     expect(longTokenSupply).to.be.eq(amount);

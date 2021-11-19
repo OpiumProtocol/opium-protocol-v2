@@ -1,7 +1,25 @@
 import { utils, BigNumber } from "ethers";
+import moment from "moment";
 import { TDerivative, TDerivativeOrder } from "../types";
 import { getEVMElapsedSeconds } from "./evm";
 import { getDerivativeHash } from "./derivatives";
+
+export const generateExpectedOpiumPositionTokenName = (
+  timestamp: number,
+  derivativeAuthorCustomName: string,
+  derivativeHash: string,
+  isLong: boolean,
+): string => {
+  const formattedTime = moment(timestamp * 1000)
+    .format("DD-MM-YYYY h:mm:ss")
+    .slice(0, 10)
+    .split("-")
+    .join("/");
+  return formattedTime
+    .concat(`-${derivativeAuthorCustomName}-`)
+    .concat(derivativeHash.slice(0, 2).concat(derivativeHash.slice(2, 6).toUpperCase()))
+    .concat(isLong ? "-LONG" : "-SHORT");
+};
 
 const generateRandomMarginOrStrike = (): BigNumber => {
   const margin = (Math.random() * 1000).toFixed(3) + 1;
