@@ -1,6 +1,5 @@
 pragma solidity 0.8.5;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "./base/RegistryManager.sol";
 import "../interfaces/IDerivativeLogic.sol";
@@ -18,7 +17,6 @@ import "../libs/LibCalculator.sol";
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
 contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
-    // using LibCalculator for uint256;
 
     // Emitted when new ticker is initialized
     event LogSyntheticInit(LibDerivative.Derivative indexed derivative, bytes32 indexed derivativeHash);
@@ -32,7 +30,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     }
     mapping(bytes32 => SyntheticCache) private syntheticCaches;
 
-    // EXTERNAL FUNCTIONS
+    // ****************** EXTERNAL FUNCTIONS ******************
 
     function initialize(address _registry) external initializer {
         __RegistryManager__init(_registry);
@@ -65,7 +63,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         return syntheticCaches[_derivativeHash];
     }
 
-    // PRIVATE FUNCTIONS
+    // ****************** PRIVATE FUNCTIONS ******************
 
     /// @notice Initializes ticker: caches syntheticId type, margin, author address and commission
     /// @param _derivativeHash bytes32 Hash of derivative

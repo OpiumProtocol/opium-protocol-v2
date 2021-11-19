@@ -13,7 +13,7 @@ import "hardhat/console.sol";
 /**
     Error codes:
     - F1 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
-    - F2 = ERROR_OPIUM_PROXY_CUSTOM_DERIVATIVE_NAME_TOO_LONG
+    - F2 = ERROR_OPIUM_PROXY_CUSTOM_POSITION_TOKEN_NAME_TOO_LONG
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
@@ -25,7 +25,7 @@ contract OpiumProxyFactory is RegistryManager {
 
     address private opiumPositionTokenImplementation;
 
-    /// @notice it restricts access to the consumer functions to the Opium.Core contract
+    /// @notice It is applied to functions that must be called only by the `Opium.Core` contract
     modifier onlyCore() {
         require(msg.sender == registry.getCore(), "F1");
         _;
@@ -54,7 +54,7 @@ contract OpiumProxyFactory is RegistryManager {
     /// @param _amount amount of position tokens to be minted to the _positionHolder
     /// @param _derivativeHash bytes32 hash of `LibDerivative.Derivative`
     /// @param _derivative LibDerivative.Derivative Derivative definition
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function create(
         address _buyer,
         address _seller,
@@ -143,22 +143,27 @@ contract OpiumProxyFactory is RegistryManager {
         IOpiumPositionToken(_shortPositionAddress).burn(_positionOwner, _amount);
     }
 
-    function _toDerivativeHashStringIdentifier(bytes32 data) private pure returns (string memory) {
+    // ****************** PRIVATE FUNCTIONS ******************
+
+    /// @notice It is used to obtain a slice of derivativeHash and convert it to a string to be used as part of an Opium position token's name
+    /// @param _data bytes32 representing a derivativeHash
+    /// @return string representing the first 4 characters of a derivativeHash prefixed by "0x"
+    function _toDerivativeHashStringIdentifier(bytes32 _data) private pure returns (string memory) {
         bytes4 result;
         assembly {
             result := or(
                 and(
                     or(
-                        shr(4, and(data, 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
-                        shr(8, and(data, 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
+                        shr(4, and(_data, 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
+                        shr(8, and(_data, 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
                     ),
                     0xffff000000000000000000000000000000000000000000000000000000000000
                 ),
                 shr(
                     16,
                     or(
-                        shr(4, and(shl(8, data), 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
-                        shr(8, and(shl(8, data), 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
+                        shr(4, and(shl(8, _data), 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
+                        shr(8, and(shl(8, _data), 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
                     )
                 )
             )
@@ -173,8 +178,12 @@ contract OpiumProxyFactory is RegistryManager {
             );
     }
 
-    function _toDerivativeEndTimeIdentifier(uint256 derivativeEndTime) private pure returns (bytes memory) {
-        (uint256 year, uint256 month, uint256 day) = BokkyPooBahsDateTimeLibrary.timestampToDate(derivativeEndTime);
+    /// @notice It is used to convert a derivative.endTime to a human-readable date to be used as part of an Opium position token's name
+    /// @dev { See the third-party library ./libs/LibBokkyPooBahsDateTimeLibrary.sol }
+    /// @param _derivativeEndTime uint256 representing the timestamp of a given derivative's maturity
+    /// @return bytes representing the encoding of the derivativeEndTime converted to day-month-year in the format DD/MM/YYYY
+    function _toDerivativeEndTimeIdentifier(uint256 _derivativeEndTime) private pure returns (bytes memory) {
+        (uint256 year, uint256 month, uint256 day) = BokkyPooBahsDateTimeLibrary.timestampToDate(_derivativeEndTime);
 
         return
             abi.encodePacked(

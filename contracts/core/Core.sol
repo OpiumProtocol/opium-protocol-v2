@@ -152,7 +152,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
@@ -171,7 +171,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// _positionsOwners[0] - buyer address -> receives LONG position
     /// _positionsOwners[1] - seller address -> receives SHORT position
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function createAndMint(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
@@ -305,7 +305,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address -> receives LONG position
     /// [1] - seller address -> receives SHORT position
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function _create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
