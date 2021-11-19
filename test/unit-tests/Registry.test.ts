@@ -64,7 +64,7 @@ describe("Registry", () => {
     await expect(
       registry
         .connect(notAllowed)
-        .registerProtocol(
+        .setProtocolAddresses(
           opiumProxyFactory.address,
           core.address,
           oracleAggregator.address,

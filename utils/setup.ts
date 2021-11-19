@@ -75,7 +75,7 @@ const setup = async (): Promise<TContracts> => {
 
   await registry
     .connect(governor)
-    .registerProtocol(
+    .setProtocolAddresses(
       opiumProxyFactory.address,
       core.address,
       oracleAggregator.address,

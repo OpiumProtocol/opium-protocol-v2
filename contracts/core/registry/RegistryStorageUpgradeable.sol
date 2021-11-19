@@ -1,8 +1,8 @@
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "../../libs/LibRoles.sol";
 import "./RegistryEntities.sol";
+import "../../libs/LibRoles.sol";
 
 /**
     Error codes:

@@ -40,6 +40,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     // SETTERS
+
     /// @notice it allows the PROTOCOL_REGISTER role to set the addresses of Opium Protocol's contracts
     /// @dev the contracts' addresses are set using their respective interfaces
     /// @param _opiumProxyFactory address of Opium.OpiumProxyFactory
@@ -49,7 +50,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     /// @param _tokenSpender address of Opium.TokenSpender
     /// @param _protocolExecutionFeeReceiver address of the recipient of Opium Protocol's fees originated from the profitable execution of a derivative's position
     /// @param _protocolRedemptionFeeReceiver address of the recipient of Opium Protocol's fees originated from the successful redemption of a market neutral position
-    function registerProtocol(
+    function setProtocolAddresses(
         address _opiumProxyFactory,
         address _core,
         address _oracleAggregator,
@@ -63,9 +64,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
                 _core != address(0) &&
                 _oracleAggregator != address(0) &&
                 _syntheticAggregator != address(0) &&
-                _tokenSpender != address(0) &&
-                _protocolExecutionFeeReceiver != address(0) &&
-                _protocolRedemptionFeeReceiver != address(0),
+                _tokenSpender != address(0),
             "R5"
         );
 
@@ -81,6 +80,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     /// @notice allows the EXECUTION_FEE_RECIPIENT_REGISTER_ROLE role to change the address that receives the fees originated from the successful execution of a profitable derivative's position
+    /// @param _executionFeeRecipient address that will replace the current `protocolExecutionFeeReceiver = _executionFeeRecipient`
     /// @dev it must be a non-null address
     function setExecutionFeeReceiver(address _executionFeeRecipient) external onlyProtocolExecutionFeeAddressSetter {
         require(_executionFeeRecipient != address(0));
@@ -89,6 +89,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     }
 
     /// @notice allows the REDEMPTION_FEE_RECIPIENT_REGISTER_ROLE role to change the address that receives the fees originated from the redemption of a market-neutral position
+    /// @param _redemptionFeeRecipient address that will replace the current `protocolAddressesArgs.protocolRedemptionFeeReceiver`
     /// @dev it must be a non-null address
     function setRedemptionFeeReceiver(address _redemptionFeeRecipient) external onlyProtocolRedemptionAddressFeeSetter {
         require(_redemptionFeeRecipient != address(0));

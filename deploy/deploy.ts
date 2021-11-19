@@ -91,7 +91,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await registryInstance
     .connect(governor)
-    .registerProtocol(
+    .setProtocolAddresses(
       opiumProxyFactory.address,
       core.address,
       oracleAggregator.address,
