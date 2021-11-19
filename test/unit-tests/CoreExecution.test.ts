@@ -35,6 +35,7 @@ import {
   SECONDS_50_MINS,
   SECONDS_3_WEEKS,
   semanticErrors,
+  customDerivativeName,
 } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { pickError } from "../../utils/misc";
@@ -211,10 +212,12 @@ describe("CoreExecution", () => {
       tokenSpender.address,
       noDataOptionPayload.derivative.margin.mul(noDataOptionPayload.amount),
     );
-    const tx = await core.create(noDataOptionPayload.derivative, noDataOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx = await core.create(
+      noDataOptionPayload.derivative,
+      noDataOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt = await tx.wait();
 
     noDataOption = addPositionTokens(
@@ -225,10 +228,12 @@ describe("CoreExecution", () => {
       tokenSpender.address,
       fullMarginOptionPayload.derivative.margin.mul(fullMarginOptionPayload.amount),
     );
-    const tx2 = await core.create(fullMarginOptionPayload.derivative, fullMarginOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx2 = await core.create(
+      fullMarginOptionPayload.derivative,
+      fullMarginOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt2 = await tx2.wait();
 
     fullMarginOption = addPositionTokens(
@@ -240,10 +245,12 @@ describe("CoreExecution", () => {
       tokenSpender.address,
       overMarginOptionPayload.derivative.margin.mul(overMarginOptionPayload.amount),
     );
-    const tx3 = await core.create(overMarginOptionPayload.derivative, overMarginOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx3 = await core.create(
+      overMarginOptionPayload.derivative,
+      overMarginOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt3 = await tx3.wait();
     overMarginOption = addPositionTokens(
       overMarginOptionPayload,
@@ -254,10 +261,12 @@ describe("CoreExecution", () => {
       tokenSpender.address,
       underMarginOptionPayload.derivative.margin.mul(underMarginOptionPayload.amount),
     );
-    const tx4 = await core.create(underMarginOptionPayload.derivative, underMarginOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx4 = await core.create(
+      underMarginOptionPayload.derivative,
+      underMarginOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt4 = await tx4.wait();
     underMarginOption = addPositionTokens(
       underMarginOptionPayload,
@@ -268,10 +277,12 @@ describe("CoreExecution", () => {
       tokenSpender.address,
       nonProfitOptionPayload.derivative.margin.mul(nonProfitOptionPayload.amount),
     );
-    const tx5 = await core.create(nonProfitOptionPayload.derivative, nonProfitOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx5 = await core.create(
+      nonProfitOptionPayload.derivative,
+      nonProfitOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt5 = await tx5.wait();
     nonProfitOption = addPositionTokens(
       nonProfitOptionPayload,
@@ -282,10 +293,12 @@ describe("CoreExecution", () => {
       tokenSpender.address,
       delayedDataOptionPayload.derivative.margin.mul(delayedDataOptionPayload.amount),
     );
-    const tx6 = await core.create(delayedDataOptionPayload.derivative, delayedDataOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx6 = await core.create(
+      delayedDataOptionPayload.derivative,
+      delayedDataOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt6 = await tx6.wait();
 
     delayedDataOption = addPositionTokens(

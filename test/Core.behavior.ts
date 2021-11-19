@@ -25,6 +25,7 @@ import {
 import { timeTravel } from "../utils/evm";
 import { TDerivativeOrder } from "../types";
 import { toBN } from "../utils/bn";
+import { customDerivativeName } from "../utils/constants";
 
 const executeOne = "execute(address,uint256)";
 
@@ -49,7 +50,9 @@ export const shouldBehaveLikeCore = async (
   const marginBalanceBefore = await testToken.balanceOf(seller.address);
 
   await testToken.connect(seller).approve(tokenSpender.address, derivative.margin.mul(amount).div(toBN("1")));
-  const tx = await core.connect(seller).create(derivative, amount, [buyer.address, seller.address]);
+  const tx = await core
+    .connect(seller)
+    .create(derivative, amount, [buyer.address, seller.address], customDerivativeName);
   const receipt = await tx.wait();
 
   const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);

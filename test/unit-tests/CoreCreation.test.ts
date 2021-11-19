@@ -15,7 +15,7 @@ import setup from "./../__fixtures__";
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
 import { pickError } from "../../utils/misc";
-import { semanticErrors } from "../../utils/constants";
+import { customDerivativeName, semanticErrors } from "../../utils/constants";
 
 import { resetNetwork } from "../../utils/evm";
 
@@ -42,7 +42,7 @@ describe("CoreCreation", () => {
       });
       const amount = toBN("3");
       await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-      await core.create(optionCall, amount, [buyer.address, seller.address]);
+      await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.satisfy(() => {
@@ -69,9 +69,9 @@ describe("CoreCreation", () => {
     });
     const amount = toBN("3");
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_CORE_SYNTHETIC_VALIDATION_ERROR),
-    );
+    await expect(
+      core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_SYNTHETIC_VALIDATION_ERROR));
   });
 
   it(`should revert create OptionCall derivative with 'CORE:NOT_ENOUGH_TOKEN_ALLOWANCE`, async () => {
@@ -88,9 +88,9 @@ describe("CoreCreation", () => {
       syntheticId: optionCallMock.address,
     });
     const amount = 3;
-    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE),
-    );
+    await expect(
+      core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE));
   });
 
   it(`should create OptionCall derivative`, async () => {
@@ -113,7 +113,7 @@ describe("CoreCreation", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
     const receipt = await tx.wait();
 
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -165,7 +165,7 @@ describe("CoreCreation", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
     const receipt = await tx.wait();
 
     const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -216,11 +216,11 @@ describe("CoreCreation", () => {
     });
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
     await tx.wait();
-    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
-      "ERC1167: create2 failed",
-    );
+    await expect(
+      core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
+    ).to.be.revertedWith("ERC1167: create2 failed");
   });
 
   it("should first create a LONG/SHORT position with 0 amount and then mint a specified amount for the previously deployed position pair", async () => {
@@ -242,7 +242,7 @@ describe("CoreCreation", () => {
     const expectedDerivativeHash = getDerivativeHash(optionCall);
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
-    const tx = await core.create(optionCall, creationAmount, [buyer.address, seller.address]);
+    const tx = await core.create(optionCall, creationAmount, [buyer.address, seller.address], customDerivativeName);
     const receipt = await tx.wait();
 
     /**

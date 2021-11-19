@@ -13,7 +13,7 @@ import { retrievePositionTokensAddresses } from "../../utils/events";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { pickError } from "../../utils/misc";
-import { semanticErrors } from "../../utils/constants";
+import { customDerivativeName, semanticErrors } from "../../utils/constants";
 
 describe("OpiumProxyFactory", () => {
   let namedSigners: TNamedSigners;
@@ -55,9 +55,9 @@ describe("OpiumProxyFactory", () => {
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
-    await expect(opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE),
-    );
+    await expect(
+      opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative, customDerivativeName),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE));
   });
 
   it("expects to mint the correct number of erc20 long/short positions", async () => {
@@ -67,7 +67,7 @@ describe("OpiumProxyFactory", () => {
     const hash = getDerivativeHash(derivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .create(buyer.address, seller.address, amount, hash, derivative);
+      .create(buyer.address, seller.address, amount, hash, derivative, customDerivativeName);
     const receipt = await tx.wait();
 
     const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
@@ -121,7 +121,7 @@ describe("OpiumProxyFactory", () => {
     const hash = getDerivativeHash(secondDerivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .create(buyer.address, seller.address, amount, hash, secondDerivative);
+      .create(buyer.address, seller.address, amount, hash, secondDerivative, customDerivativeName);
     const receipt = await tx.wait();
 
     const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(

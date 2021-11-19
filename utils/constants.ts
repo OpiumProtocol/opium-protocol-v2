@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
+export const customDerivativeName = `Riccardo's derivative shop`;
 
 export const AUTHOR_COMMISSION = 0.0025; // 0.25%
 export const OPIUM_COMMISSION = 0.1; // 10% of author commission

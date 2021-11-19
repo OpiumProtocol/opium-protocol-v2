@@ -26,7 +26,7 @@ import {
 } from "../../typechain";
 import { timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
-import { SECONDS_40_MINS } from "../../utils/constants";
+import { customDerivativeName, SECONDS_40_MINS } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 
 const executeOne = "execute(address,uint256)";
@@ -80,6 +80,7 @@ describe("Core with fractional quantities", () => {
       price: toBN("230"), // full margin profit
       hash: fullMarginOptionDerivativeHash,
     };
+    console.log("fullMarginOptionPayload", fullMarginOptionPayload);
     await oracleAggregator
       .connect(oracle)
       .__callback(fullMarginOptionPayload.derivative.endTime, fullMarginOptionPayload.price); // Current price
@@ -89,10 +90,12 @@ describe("Core with fractional quantities", () => {
       fullMarginOptionPayload.derivative.margin.mul(fullMarginOptionPayload.amount),
     );
 
-    const tx = await core.create(fullMarginOptionPayload.derivative, fullMarginOptionPayload.amount, [
-      buyer.address,
-      seller.address,
-    ]);
+    const tx = await core.create(
+      fullMarginOptionPayload.derivative,
+      fullMarginOptionPayload.amount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
     const receipt = await tx.wait();
 
     fullMarginOption = addPositionTokens(
@@ -118,7 +121,7 @@ describe("Core with fractional quantities", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
     const receipt = await tx.wait();
 
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);

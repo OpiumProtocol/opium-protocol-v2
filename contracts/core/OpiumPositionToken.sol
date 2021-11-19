@@ -36,6 +36,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     ) external initializer {
         if (_positionType == LibDerivative.PositionType.LONG) {
             string memory longPositionName = string(abi.encodePacked(baseCustomName, "-LONG"));
+            console.log(longPositionName);
             __ERC20_init(longPositionName, "OPLN");
             __ERC20Permit_init(longPositionName);
         } else {

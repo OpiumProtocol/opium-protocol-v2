@@ -13,6 +13,7 @@ import "hardhat/console.sol";
 /**
     Error codes:
     - F1 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
+    - F2 = ERROR_OPIUM_PROXY_CUSTOM_DERIVATIVE_NAME_TOO_LONG
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
@@ -53,18 +54,23 @@ contract OpiumProxyFactory is RegistryManager {
     /// @param _amount amount of position tokens to be minted to the _positionHolder
     /// @param _derivativeHash bytes32 hash of `LibDerivative.Derivative`
     /// @param _derivative LibDerivative.Derivative Derivative definition
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
     function create(
         address _buyer,
         address _seller,
         uint256 _amount,
         bytes32 _derivativeHash,
-        LibDerivative.Derivative calldata _derivative
+        LibDerivative.Derivative calldata _derivative,
+        string calldata _derivativeAuthorCustomName
     ) external onlyCore {
+        require(bytes(_derivativeAuthorCustomName).length < 30, "F2");
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
         address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
 
         bytes memory baseCustomName = abi.encodePacked(
             _toDerivativeEndTimeIdentifier(_derivative.endTime),
+            "-",
+            _derivativeAuthorCustomName,
             "-",
             _toDerivativeHashStringIdentifier(_derivativeHash)
         );

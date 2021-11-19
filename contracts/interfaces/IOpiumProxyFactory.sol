@@ -9,7 +9,8 @@ interface IOpiumProxyFactory {
         address _seller,
         uint256 _amount,
         bytes32 _derivativeHash,
-        LibDerivative.Derivative calldata _derivative
+        LibDerivative.Derivative calldata _derivative,
+        string calldata _derivativeAuthorCustomName
     ) external;
 
     function mintPair(

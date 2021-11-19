@@ -15,6 +15,7 @@ import { cast, toBN } from "../../utils/bn";
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
 import { resetNetwork } from "../../utils/evm";
+import { customDerivativeName } from "../../utils/constants";
 
 const redeemOne = "redeem(address[2],uint256)";
 const redeemMany = "redeem(address[2][],uint256[])";
@@ -46,7 +47,12 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyInitialBalance = await testToken.balanceOf(marketNeutralParty.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
+    const tx = await core.create(
+      optionCall,
+      amount,
+      [marketNeutralParty.address, marketNeutralParty.address],
+      customDerivativeName,
+    );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
@@ -115,7 +121,12 @@ describe("Core: burn market neutral positions", () => {
     });
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
+    const tx = await core.create(
+      optionCall,
+      amount,
+      [marketNeutralParty.address, marketNeutralParty.address],
+      customDerivativeName,
+    );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
@@ -181,7 +192,12 @@ describe("Core: burn market neutral positions", () => {
     });
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
+    const tx = await core.create(
+      optionCall,
+      amount,
+      [marketNeutralParty.address, marketNeutralParty.address],
+      customDerivativeName,
+    );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
 
@@ -200,10 +216,12 @@ describe("Core: burn market neutral positions", () => {
     });
 
     await testToken.approve(tokenSpender.address, secondOptionCall.margin.mul(secondAmount));
-    const tx2 = await core.create(secondOptionCall, secondAmount, [
-      marketNeutralParty.address,
-      marketNeutralParty.address,
-    ]);
+    const tx2 = await core.create(
+      secondOptionCall,
+      secondAmount,
+      [marketNeutralParty.address, marketNeutralParty.address],
+      customDerivativeName,
+    );
     const receipt2 = await tx2.wait();
     const [secondLongPositionAddress, secondShortPositionAddress] = retrievePositionTokensAddresses(
       opiumProxyFactory,

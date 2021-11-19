@@ -123,12 +123,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners
+        address[2] calldata _positionsOwners,
+        string calldata _derivativeAuthorCustomName
     ) external whenNotPaused nonReentrant {
-        _create(_derivative, _amount, _positionsOwners);
+        _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
     }
 
     /// @notice It can either 1) deploy AND mint 2) only mint.
@@ -138,10 +140,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
+    /// @param _derivativeAuthorCustomName derivative author's custom derivative name
     function createAndMint(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners
+        address[2] calldata _positionsOwners,
+        string calldata _derivativeAuthorCustomName
     ) external whenNotPaused nonReentrant {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
         address implementationAddress = protocolAddressesArgs.opiumProxyFactory.getImplementationAddress();
@@ -157,7 +161,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
         require(isLongDeployed == isShortDeployed);
         if (isLongDeployed) {
-            _create(_derivative, _amount, _positionsOwners);
+            _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
             _mint(_amount, _positionsAddress, _positionsOwners);
@@ -262,7 +266,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     function _create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners
+        address[2] calldata _positionsOwners,
+        string memory _derivativeAuthorCustomName
     ) private {
         // Generate hash for derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
@@ -311,7 +316,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _positionsOwners[1],
             _amount,
             derivativeHash,
-            _derivative
+            _derivative,
+            _derivativeAuthorCustomName
         );
 
         emit LogCreated(_positionsOwners[0], _positionsOwners[1], derivativeHash, _amount);

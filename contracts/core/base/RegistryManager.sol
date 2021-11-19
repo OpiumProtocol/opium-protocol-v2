@@ -4,7 +4,7 @@ import "../../interfaces/IRegistry.sol";
 
 /**
     Error codes:
-    - M1:ERROR_REGISTRY_MANAGER_ONLY_REGISTRY_MANAGER_ROLE
+    - M1 = ERROR_REGISTRY_MANAGER_ONLY_REGISTRY_MANAGER_ROLE
  */
 contract RegistryManager is Initializable {
     event LogRegistryChange(address indexed _changer, address indexed _newRegistryAddress);
