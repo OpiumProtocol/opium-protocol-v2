@@ -114,6 +114,28 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         return feesVaults[_feeRecipient][_token];
     }
 
+    /// @notice It queries the buyer's and seller's payouts for a given derivative
+    /// @notice if it returns [0, 0] then the derivative has not been executed yet
+    /// @param _derivativeHash bytes32 unique derivative identifier
+    /// @return uint256[2] tuple containing LONG and SHORT payouts
+    function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2]) {
+        return derivativePayouts[_derivativeHash];
+    }
+
+    /// @notice It queries the amount of funds allocated for a given derivative
+    /// @param _derivativeHash bytes32 unique derivative identifier
+    /// @return uint256 representing the remaining derivative's funds
+    function getP2pDerivativeVaultFunds(bytes32 _derivativeHash) external view returns (uint256) {
+        return p2pVaults[_derivativeHash];
+    }
+
+    /// @notice It checks whether a given derivative has been cancelled
+    /// @param _derivativeHash bytes32 unique derivative identifier
+    /// @return uint256[2] tuple containing LONG and SHORT payouts
+    function isDerivativeCancelled(bytes32 _derivativeHash) external view returns (bool) {
+        return feesVaults[_derivativeHash];
+    }
+
     // ***** SETTERS *****
 
     /// @notice It allows a fee recipient to to withdraw their fees
