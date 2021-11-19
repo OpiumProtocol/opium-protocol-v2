@@ -88,6 +88,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     // ****************** EXTERNAL FUNCTIONS ******************
 
+    // ***** GETTERS *****
+
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
     /// @dev should be called immediately after the deployment of the contract
@@ -111,6 +113,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256) {
         return feesVaults[_feeRecipient][_token];
     }
+
+    // ***** SETTERS *****
 
     /// @notice It allows a fee recipient to to withdraw their fees
     /// @param _tokenAddress address of the ERC20 token to withdraw
@@ -268,6 +272,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     }
 
     // ****************** PRIVATE FUNCTIONS ******************
+
+    // ***** SETTERS *****
 
     /// @notice It deploys two ERC20 contracts representing respectively the LONG and SHORT position of the provided `LibDerivative.Derivative` derivative and mints the provided amount of SHORT positions to a seller and LONG positions to a buyer
     /// @dev it can only be called if the ERC20 contracts for the derivative's positions have not yet been deployed
@@ -695,6 +701,23 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         feesVaults[_derivativeAuthorAddress][_tokenAddress] += authorFee;
     }
 
+    /// @notice It increases the balance associated to a given derivative stored in the p2pVaults mapping
+    /// @param _derivativeHash unique identifier of a derivative which is used as a key in the p2pVaults mapping
+    /// @param _amount uint256 representing how much the p2pVaults derivative's balance will increase
+    function _increaseP2PVault(bytes32 _derivativeHash, uint256 _amount) private {
+        p2pVaults[_derivativeHash] += _amount;
+    }
+
+    /// @notice It decreases the balance associated to a given derivative stored in the p2pVaults mapping
+    /// @param _derivativeHash unique identifier of a derivative which is used as a key in the p2pVaults mapping
+    /// @param _amount uint256 representing how much the p2pVaults derivative's balance will decrease
+    function _decreaseP2PVault(bytes32 _derivativeHash, uint256 _amount) private {
+        require(p2pVaults[_derivativeHash] >= _amount, "C9");
+        p2pVaults[_derivativeHash] -= _amount;
+    }
+
+    // ***** GETTERS *****
+
     /// @notice ensures that a token was minted by the OpiumProxyFactory
     /// @dev usage of a private function rather than a modifier to avoid `stack too deep` error
     /// @param _tokenAddress address of the erc20 token to validate
@@ -709,20 +732,5 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             address(protocolAddressesArgs.opiumProxyFactory)
         );
         require(_tokenAddress == predicted, "C14");
-    }
-
-    /// @notice It increases the balance associated to a given derivative stored in the p2pVaults mapping
-    /// @param _derivativeHash unique identifier of a derivative which is used as a key in the p2pVaults mapping
-    /// @param _amount uint256 representing how much the p2pVaults derivative's balance will increase
-    function _increaseP2PVault(bytes32 _derivativeHash, uint256 _amount) private {
-        p2pVaults[_derivativeHash] += _amount;
-    }
-
-    /// @notice It decreases the balance associated to a given derivative stored in the p2pVaults mapping
-    /// @param _derivativeHash unique identifier of a derivative which is used as a key in the p2pVaults mapping
-    /// @param _amount uint256 representing how much the p2pVaults derivative's balance will decrease
-    function _decreaseP2PVault(bytes32 _derivativeHash, uint256 _amount) private {
-        require(p2pVaults[_derivativeHash] >= _amount, "C9");
-        p2pVaults[_derivativeHash] -= _amount;
     }
 }
