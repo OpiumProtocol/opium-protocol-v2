@@ -90,20 +90,18 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     // ***** GETTERS *****
 
-    /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
-    /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
-    /// @dev should be called immediately after the deployment of the contract
-    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
-    function updateProtocolAddresses() external onlyRegistryManager {
-        protocolAddressesArgs = registry.getProtocolAddresses();
+    /// @notice It returns Opium.Core's internal state of the protocol parameters fetched from the Opium.Registry
+    /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
+    /// @return ProtocolParametersArgs struct including the protocol's main parameters
+    function getProtocolParametersArgs() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
+        return registry.getProtocolParameters();
     }
 
-    /// @notice It allows to update the Opium Protocol parameters according to the current state of the Opium.Registry
-    /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
-    /// @dev should be called immediately after the deployment of the contract
-    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
-    function updateProtocolParametersArgs() external onlyRegistryManager {
-        protocolParametersArgs = registry.getProtocolParameters();
+    /// @notice It returns Opium.Core's internal state of the protocol contracts' and recipients' addresses fetched from the Opium.Registry
+    /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
+    /// @return ProtocolAddressesArgs struct including the protocol's main addresses - contracts and fees recipients
+    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
+        return registry.getProtocolAddresses();
     }
 
     /// @notice It returns the accrued fees of a given address denominated in a specified token
@@ -137,6 +135,22 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     }
 
     // ***** SETTERS *****
+
+    /// @notice It allows to update the Opium Protocol parameters according to the current state of the Opium.Registry
+    /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
+    /// @dev should be called immediately after the deployment of the contract
+    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
+    function updateProtocolParametersArgs() external onlyRegistryManager {
+        protocolParametersArgs = registry.getProtocolParameters();
+    }
+
+    /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
+    /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
+    /// @dev should be called immediately after the deployment of the contract
+    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
+    function updateProtocolAddresses() external onlyRegistryManager {
+        protocolAddressesArgs = registry.getProtocolAddresses();
+    }
 
     /// @notice It allows a fee recipient to to withdraw their fees
     /// @param _tokenAddress address of the ERC20 token to withdraw
