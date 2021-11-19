@@ -1,7 +1,7 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "chai";
 // utils
+import { expect } from "../chai-setup";
 import {
   computeFees,
   createValidDerivativeExpiry,
@@ -14,8 +14,8 @@ import { cast, toBN } from "../../utils/bn";
 // types and constants
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
-import { resetNetwork } from "../../utils/evm";
 import { customDerivativeName } from "../../utils/constants";
+import { resetNetwork } from "../../utils/evm";
 
 const redeemOne = "redeem(address[2],uint256)";
 const redeemMany = "redeem(address[2][],uint256[])";

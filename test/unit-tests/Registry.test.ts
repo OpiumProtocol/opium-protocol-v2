@@ -1,7 +1,7 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "chai";
 // utils
+import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
 // types
 import { TNamedSigners } from "../../types";

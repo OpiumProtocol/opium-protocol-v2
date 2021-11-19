@@ -1,7 +1,7 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "chai";
 // utils
+import { expect } from "../chai-setup";
 import { decodeEvents, retrievePositionTokensAddresses } from "../../utils/events";
 import { toBN } from "../../utils/bn";
 import {
@@ -10,14 +10,13 @@ import {
   derivativeFactory,
   getDerivativeHash,
 } from "../../utils/derivatives";
+import { resetNetwork } from "../../utils/evm";
 import setup from "./../__fixtures__";
 // types
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
 import { pickError } from "../../utils/misc";
 import { customDerivativeName, semanticErrors } from "../../utils/constants";
-
-import { resetNetwork } from "../../utils/evm";
 
 describe("CoreCreation", () => {
   let namedSigners: TNamedSigners;

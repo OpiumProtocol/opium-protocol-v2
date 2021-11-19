@@ -1,8 +1,8 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { Contract } from "@ethersproject/contracts";
+import { expect } from "./chai-setup";
 // utils
 import { decodeEvents, retrievePositionTokensAddresses } from "../utils/events";
 import {

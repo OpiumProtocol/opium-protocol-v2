@@ -1,7 +1,7 @@
 // theirs
 import { ethers } from "hardhat";
-import { expect } from "chai";
 // utils
+import { expect } from "../chai-setup";
 import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
 import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";

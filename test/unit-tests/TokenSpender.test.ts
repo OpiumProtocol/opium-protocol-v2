@@ -1,8 +1,8 @@
 // theirs
 import { artifacts, ethers } from "hardhat";
-import { expect } from "chai";
 import { deployMockContract, MockContract } from "ethereum-waffle";
 // utils
+import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";
 import { impersonateAccount, setBalance } from "../../utils/evm";
