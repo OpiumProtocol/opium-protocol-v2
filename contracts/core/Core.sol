@@ -477,10 +477,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _onlyOpiumFactoryTokens(_positionAddress, opiumPositionTokenParams);
         // Check if ticker was canceled
         require(!cancelled[opiumPositionTokenParams.derivativeHash], "C7");
-        // Check if execution is performed after endTime
-        require(block.timestamp > opiumPositionTokenParams.derivative.endTime, "C10");
+        // Check if execution is performed at a timestamp greater than or equal to the maturity date of the derivative
+        require(block.timestamp >= opiumPositionTokenParams.derivative.endTime, "C10");
 
-        // Checking whether execution is performed by `_positionsOwner` or `_positionsOwner` allowed third party executions on it's behalf
+        // Checking whether execution is performed by `_positionsOwner` or `_positionsOwner` allowed third party executions on its behalf
         require(
             _positionOwner == msg.sender ||
                 IDerivativeLogic(opiumPositionTokenParams.derivative.syntheticId).thirdpartyExecutionAllowed(
