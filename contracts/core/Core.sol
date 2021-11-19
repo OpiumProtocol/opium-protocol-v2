@@ -62,6 +62,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     // Key-value entity that maps a derivativeHash representing an existing derivative to its available balance (i.e: the amount of collateral that has not been claimed yet)
     mapping(bytes32 => uint256) private p2pVaults;
 
+    // Key-value entity that maps a derivativeHash representing an existing derivative to a boolean representing whether a given derivative has been cancelled
+    mapping(bytes32 => bool) private cancelledDerivatives;
+
     /// Key-value entity that maps a derivativeHash representing an existing derivative to its respective buyer's and seller's payouts.
     /// Both the buyer's and seller's are cached when a derivative's position is successfully executed for the first time
     /// derivativePayouts[derivativeHash][0] => buyer's payout
@@ -71,9 +74,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// Fees vault
     /// Key-value entity that maps an address representing a fee recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of fee recipients (i.e: derivative authors)
     mapping(address => mapping(address => uint256)) private feesVaults;
-
-    // Key-value entity that maps a derivativeHash representing an existing derivative to a boolean representing whether a given derivative has been cancelled
-    mapping(bytes32 => bool) private cancelled;
 
     modifier whenNotPaused() {
         require(registry.isPaused() == false, "U4");
@@ -118,7 +118,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice if it returns [0, 0] then the derivative has not been executed yet
     /// @param _derivativeHash bytes32 unique derivative identifier
     /// @return uint256[2] tuple containing LONG and SHORT payouts
-    function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2]) {
+    function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2] memory) {
         return derivativePayouts[_derivativeHash];
     }
 
@@ -131,9 +131,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice It checks whether a given derivative has been cancelled
     /// @param _derivativeHash bytes32 unique derivative identifier
-    /// @return uint256[2] tuple containing LONG and SHORT payouts
+    /// @return bool true if derivative has been cancelled, false if derivative has not been cancelled
     function isDerivativeCancelled(bytes32 _derivativeHash) external view returns (bool) {
-        return feesVaults[_derivativeHash];
+        return cancelledDerivatives[_derivativeHash];
     }
 
     // ***** SETTERS *****
@@ -316,7 +316,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
 
         // Check if ticker was canceled
-        require(!cancelled[derivativeHash], "C7");
+        require(!cancelledDerivatives[derivativeHash], "C7");
 
         // Validate input data against Derivative logic (`syntheticId`)
         require(IDerivativeLogic(_derivative.syntheticId).validateInput(_derivative), "C8");
@@ -394,7 +394,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
 
         // Check if ticker was canceled
-        require(!cancelled[longOpiumPositionTokenParams.derivativeHash], "C7");
+        require(!cancelledDerivatives[longOpiumPositionTokenParams.derivativeHash], "C7");
 
         uint256[2] memory margins;
         // Get cached margin required according to logic from Opium.SyntheticAggregator
@@ -504,7 +504,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         ).getPositionTokenData();
         _onlyOpiumFactoryTokens(_positionAddress, opiumPositionTokenParams);
         // Check if ticker was canceled
-        require(!cancelled[opiumPositionTokenParams.derivativeHash], "C7");
+        require(!cancelledDerivatives[opiumPositionTokenParams.derivativeHash], "C7");
         // Check if execution is performed at a timestamp greater than or equal to the maturity date of the derivative
         require(block.timestamp >= opiumPositionTokenParams.derivative.endTime, "C10");
 
@@ -546,7 +546,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _onlyOpiumFactoryTokens(_positionAddress, opiumPositionTokenParams);
 
         // It's sufficient to perform all the sanity checks only if a derivative has not yet been canceled
-        if (!cancelled[opiumPositionTokenParams.derivativeHash]) {
+        if (!cancelledDerivatives[opiumPositionTokenParams.derivativeHash]) {
             // Don't allow to cancel tickers with "dummy" oracleIds
             require(opiumPositionTokenParams.derivative.oracleId != address(0), "C6");
 
@@ -565,7 +565,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
                 ),
                 "C13"
             );
-            cancelled[opiumPositionTokenParams.derivativeHash] = true;
+            cancelledDerivatives[opiumPositionTokenParams.derivativeHash] = true;
             // Emit `LogDerivativeHashCancelled` event only once and mark ticker as canceled
             emit LogDerivativeHashCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
