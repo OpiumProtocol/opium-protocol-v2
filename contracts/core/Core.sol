@@ -33,6 +33,7 @@ import "../libs/LibCalculator.sol";
     - C13 = ERROR_CORE_CANCELLATION_IS_NOT_ALLOWED
     - C14 = ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS
     - C15 = ERROR_CORE_FEE_AMOUNT_GREATER_THAN_BALANCE
+    - C16 = ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
@@ -336,11 +337,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address[2] calldata _positionsOwners,
         string memory _derivativeAuthorCustomName
     ) private {
+        require(block.timestamp < _derivative.endTime, "C16");
         // Generate hash for derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
-
-        // Check if ticker was canceled
-        require(!cancelledDerivatives[derivativeHash], "C7");
 
         // Validate input data against Derivative logic (`syntheticId`)
         require(IDerivativeLogic(_derivative.syntheticId).validateInput(_derivative), "C8");
