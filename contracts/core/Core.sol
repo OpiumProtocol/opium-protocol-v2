@@ -160,6 +160,16 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
     }
 
+    /// @notice It allows a fee recipient to to withdraw the desired amount of accrued fees
+    /// @param _tokenAddress address of the ERC20 token to withdraw
+    /// @param _amount uint256 amount of fee to withdraw
+    function withdrawFee(address _tokenAddress, uint256 _amount) external nonReentrant whenNotPaused {
+        uint256 balance = feesVaults[msg.sender][_tokenAddress];
+        require(_amount <= balance, "C15");
+        feesVaults[msg.sender][_tokenAddress] -= _amount;
+        IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, _amount);
+    }
+
     /// @notice It deploys and mints the two erc20 contracts representing a derivative's LONG and SHORT positions { see Core._create for the business logic description }
     /// @param _derivative LibDerivative.Derivative Derivative definition
     /// @param _amount uint256 Amount of positions to create
