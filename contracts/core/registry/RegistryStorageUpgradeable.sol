@@ -12,6 +12,7 @@ import "../../libs/LibRoles.sol";
 contract RegistryStorageUpgradeable is AccessControlUpgradeable {
     RegistryEntities.ProtocolParametersArgs internal protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs internal protocolAddressesArgs;
+    RegistryEntities.ProtocolPausabilityArgs internal protocolPausabilityArgs;
     mapping(address => bool) internal coreSpenderWhitelist;
 
     /// @notice it ensures that the calling account has been granted the PROTOCOL_ADDRESSES_SETTER_ROLE
@@ -77,6 +78,55 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _;
     }
 
+    /// @notice it ensures that the calling account has been granted the PARTIAL_CREATE_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialCreatePauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, msg.sender), "R13");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_MINT_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialMintPauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, msg.sender), "R14");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_REDEEM_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialRedeemPauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, msg.sender), "R15");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_EXECUTE_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialExecutePauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE, msg.sender), "R16");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_CANCEL_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialCancelPauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_CANCEL_PAUSE_ROLE, msg.sender), "R17");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialClaimReservePauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, msg.sender), "R18");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PROTOCOL_UNPAUSER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolUnpauserSetter() {
+        require(hasRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, msg.sender), "R19");
+        _;
+    }
+
     /// @notice internal init function that it is called only once upon deployment of the Opium.Registry contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address
     /// @notice it sets the default ProtocolParametersArgs protocol parameters
     /// @dev internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters
@@ -95,12 +145,19 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _setupRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, _governor);
         _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
 
+        _setupRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_CANCEL_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, _governor);
+
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,
             derivativeAuthorExecutionFeeCap: 10000,
             derivativeAuthorRedemptionFee: 100,
-            protocolCommissionPart: 1,
-            paused: false
+            protocolCommissionPart: 1
         });
     }
 }

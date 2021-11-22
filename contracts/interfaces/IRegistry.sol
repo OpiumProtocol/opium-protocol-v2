@@ -40,7 +40,7 @@ interface IRegistry {
 
     function getCore() external view returns (address);
 
-    function isPaused() external view returns (bool);
-
     function isCoreSpenderWhitelisted(address _address) external view returns (bool);
+
+    function isProtocolPaused() external view returns (bool);
 }

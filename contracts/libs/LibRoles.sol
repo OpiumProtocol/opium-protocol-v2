@@ -18,7 +18,7 @@ library LibRoles {
     /// @dev { See RegistryEntities.sol for a detailed description of the ProtocolParametersArgs parameters }
     bytes32 internal constant NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE = keccak256("RL5");
 
-    /// @notice Role responsible for managing (pausing and unpausing) the OpiumProtocol's emergency mechanism
+    /// @notice Role responsible for globally pausing the protocol
     bytes32 internal constant GUARDIAN_ROLE = keccak256("RL6");
 
     /// @notice Role responsible for managing (adding and removing accounts) the whitelist
@@ -34,4 +34,19 @@ library LibRoles {
     /// @dev It is the only role whose associated setter does not reside in the Registry itself but in a module inherited by its consumer contracts. The registry's sole responsibility is to keep track of the accounts that have been assigned to the REGISTRY_MANAGER_ROLE role
     /// @dev { See RegistryManager.sol for further details }
     bytes32 internal constant REGISTRY_MANAGER_ROLE = keccak256("RL10");
+
+    /// @notice Role responsible for pausing Core.create
+    bytes32 internal constant PARTIAL_CREATE_PAUSE_ROLE = keccak256("RL11");
+    /// @notice Role responsible for pausing Core.mint
+    bytes32 internal constant PARTIAL_MINT_PAUSE_ROLE = keccak256("RL12");
+    /// @notice Role responsible for pausing Core.redeem
+    bytes32 internal constant PARTIAL_REDEEM_PAUSE_ROLE = keccak256("RL13");
+    /// @notice Role responsible for pausing Core.execute
+    bytes32 internal constant PARTIAL_EXECUTE_PAUSE_ROLE = keccak256("RL14");
+    /// @notice Role responsible for pausing Core.cancel
+    bytes32 internal constant PARTIAL_CANCEL_PAUSE_ROLE = keccak256("RL15");
+    /// @notice Role responsible for pausing Core.claimReserve
+    bytes32 internal constant PARTIAL_CLAIM_RESERVE_PAUSE_ROLE = keccak256("RL16");
+    /// @notice Role responsible for globally unpausing the protocol
+    bytes32 internal constant PROTOCOL_UNPAUSER_ROLE = keccak256("RL17");
 }

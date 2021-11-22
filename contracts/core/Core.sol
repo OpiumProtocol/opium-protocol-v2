@@ -76,7 +76,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     mapping(address => mapping(address => uint256)) private feesVaults;
 
     modifier whenNotPaused() {
-        require(registry.isPaused() == false, "U4");
+        require(!registry.isProtocolPaused(), "U4");
         _;
     }
 
@@ -373,9 +373,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             totalMarginToE18
         );
 
-        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
-        _increaseP2PVault(derivativeHash, totalMarginToE18);
-
         // Mint LONG and SHORT positions tokens
         protocolAddressesArgs.opiumProxyFactory.create(
             _positionsOwners[0],
@@ -385,6 +382,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _derivative,
             _derivativeAuthorCustomName
         );
+
+        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
+        _increaseP2PVault(derivativeHash, totalMarginToE18);
 
         emit LogCreated(_positionsOwners[0], _positionsOwners[1], derivativeHash, _amount);
     }

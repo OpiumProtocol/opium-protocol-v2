@@ -100,11 +100,9 @@ contract OpiumProxyFactory is RegistryManager {
     }
 
     /// @notice it creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
-    /// @dev the ERC20 position token's address is calculated via create2 - if a contract already exists at the create2 address of either the LONG or SHORT position then the function reverts
+    /// @dev if LONG or SHORT position contracts have not been deployed yet at the provided addresses then it is expected to fail
     /// @param _buyer address of the recipient of the LONG position tokens
     /// @param _seller address of the recipient of the SHORT position tokens
-    /// @dev if LONG or SHORT position contracts already exist a then it is expected to fail
-
     /// @param _longPositionAddress address of the deployed LONG position token
     /// @param _shortPositionAddress address of the deployed SHORT position token
     /// @param _amount amount of position tokens to be minted to the _positionHolder
@@ -121,7 +119,7 @@ contract OpiumProxyFactory is RegistryManager {
 
     /// @notice it burns specified amount of a specific position tokens on behalf of a specified owner
     /// @notice it is consumed by Opium.Core to execute or cancel a specific position type
-    /// @dev the ERC20 position token's address is calculated via create2 - if a contract already exists at the create2 address of either the LONG or SHORT position then the entire function reverts
+    /// @dev if no position has been deployed at the provided address, it is expected to revert
     /// @param _positionOwner address of the owner of the specified position token
     /// @param _positionAddress address of the position token to be burnt
     /// @param _amount amount of position tokens to be minted to the _positionHolder

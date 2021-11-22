@@ -23,6 +23,14 @@ import "../../interfaces/ICore.sol";
     - R11 = ERROR_REGISTRY_NOT_PAUSED
     - R12 = ERROR_REGISTRY_NULL_ADDRESS
 
+    - R13 = ERROR_REGISTRY_PARTIAL_CREATE_PAUSE_ROLE
+    - R14 = ERROR_REGISTRY_PARTIAL_MINT_PAUSE_ROLE
+    - R15 = ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE
+    - R16 = ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE
+    - R17 = ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE
+    - R18 = ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE
+    - R19 = ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE
+
  */
 
 contract RegistryUpgradeable is RegistryStorageUpgradeable {
@@ -32,7 +40,8 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     event LogRedemptionFeeChange(address indexed _setter, uint32 indexed _redemptionFee);
     event LogOpiumCommissionChange(address indexed _setter, uint32 indexed _opiumCommission);
     event LogNoDataCancellationPeriodChange(address indexed _setter, uint256 indexed _noDataCancellationPeriod);
-    event LogProtocolPausableState(address indexed _setter, bool indexed _protocolState);
+    // emits the role to signal what type of pause has been committed, if any
+    event LogProtocolPausableState(address indexed _setter, bool indexed _protocolState, bytes32 indexed _role);
     event LogWhitelistAccountAdded(address indexed _setter, address indexed _whitelisted);
     event LogWhitelistAccountRemoved(address indexed _setter, address indexed _unlisted);
 
@@ -130,17 +139,65 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     /// @notice allows the GUARDIAN role to pause the Opium Protocol
     /// @dev it fails if the protocol is already paused
     function pause() external onlyGuardian {
-        require(!protocolParametersArgs.paused, "R10");
-        protocolParametersArgs.paused = true;
-        emit LogProtocolPausableState(msg.sender, true);
+        require(!protocolPausabilityArgs.protocolGlobal, "R10");
+        protocolPausabilityArgs.protocolGlobal = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.GUARDIAN_ROLE);
     }
 
-    /// @notice allows the GUARDIAN role to unpause the Opium Protocol
+    /// @notice allows the PROTOCOL_UNPAUSER_ROLE to unpause the Opium Protocol
     /// @dev it fails if the protocol is not paused
-    function unpause() external onlyGuardian {
-        require(protocolParametersArgs.paused, "R11");
-        protocolParametersArgs.paused = false;
-        emit LogProtocolPausableState(msg.sender, false);
+    function unpause() external onlyProtocolUnpauserSetter {
+        require(protocolPausabilityArgs.protocolGlobal, "R11");
+        delete protocolPausabilityArgs;
+        emit LogProtocolPausableState(msg.sender, false, LibRoles.PROTOCOL_UNPAUSER_ROLE);
+    }
+
+    /// @notice allows the PARTIAL_CREATE_PAUSE_ROLE role to pause the creation of position
+    /// @dev it fails if the protocol is not globally paused
+    function pauseProtocolPositionCreation() external onlyPartialCreatePauseSetter {
+        require(!protocolPausabilityArgs.protocolGlobal, "R11");
+        protocolPausabilityArgs.protocolPositionCreation = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.PARTIAL_CREATE_PAUSE_ROLE);
+    }
+
+    /// @notice allows the PARTIAL_MINT_PAUSE_ROLE role to pause the creation of position
+    /// @dev it fails if the protocol is not globally paused
+    function pauseProtocolPositionMint() external onlyPartialMintPauseSetter {
+        require(!protocolPausabilityArgs.protocolGlobal, "R11");
+        protocolPausabilityArgs.protocolPositionCreation = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.PARTIAL_MINT_PAUSE_ROLE);
+    }
+
+    /// @notice allows the PARTIAL_EXECUTE_PAUSE_ROLE role to pause the creation of position
+    /// @dev it fails if the protocol is not globally paused
+    function pauseProtocolPositionExecuted() external onlyPartialExecutePauseSetter {
+        require(!protocolPausabilityArgs.protocolGlobal, "R11");
+        protocolPausabilityArgs.protocolPositionMinting = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.PARTIAL_REDEEM_PAUSE_ROLE);
+    }
+
+    /// @notice allows the PARTIAL_REDEEM_PAUSE_ROLE role to pause the creation of position
+    /// @dev it fails if the protocol is not globally paused
+    function pauseProtocolPositionRedemption() external onlyPartialRedeemPauseSetter {
+        require(!protocolPausabilityArgs.protocolGlobal, "R11");
+        protocolPausabilityArgs.protocolPositionMinting = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.PARTIAL_REDEEM_PAUSE_ROLE);
+    }
+
+    /// @notice allows the PARTIAL_CANCEL_PAUSE_ROLE to unpause the Opium Protocol
+    /// @dev it fails if the protocol is not paused
+    function pauseProtocolPositionCancellation() external onlyGuardian {
+        require(!protocolPausabilityArgs.protocolGlobal, "R11");
+        protocolPausabilityArgs.protocolPositionCancellation = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.PARTIAL_CANCEL_PAUSE_ROLE);
+    }
+
+    /// @notice allows the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE to unpause the Opium Protocol
+    /// @dev it fails if the protocol is not paused
+    function pauseProtocolReserveClaim() external onlyPartialClaimReservePauseSetter {
+        require(!protocolPausabilityArgs.protocolGlobal, "R11");
+        protocolPausabilityArgs.protocolReserveClaim = true;
+        emit LogProtocolPausableState(msg.sender, true, LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE);
     }
 
     /// @notice It allows the WHITELISTER_ROLE to add an address to the whitelist
@@ -157,13 +214,11 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
 
     // ***** GETTERS *****
 
-    /// @notice Returns all the commission-related parameters of the Opium protocol contracts
-    ///@return RegistryEntities.getProtocolParameters struct that packs the protocol parameters {see RegistryEntities comments}
+    ///@return RegistryEntities.getProtocolParameters struct that packs the protocol lifecycle parameters {see RegistryEntities comments}
     function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
         return protocolParametersArgs;
     }
 
-    /// @notice Returns the interfaces of the Opium protocol contracts
     ///@return RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
         return protocolAddressesArgs;
@@ -176,18 +231,54 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
         return hasRole(LibRoles.REGISTRY_MANAGER_ROLE, _address);
     }
 
-    /// @notice It returns the address of Opium.Core
+    /// @return `Opium.Core`
     function getCore() external view returns (address) {
         return address(protocolAddressesArgs.core);
-    }
-
-    /// @notice It returns whether the Opium protocol is paused
-    function isPaused() external view returns (bool) {
-        return protocolParametersArgs.paused;
     }
 
     /// @notice It returns whether a given address is allowed to manage Opium.Core ERC20 balances
     function isCoreSpenderWhitelisted(address _address) external view returns (bool) {
         return coreSpenderWhitelist[_address];
+    }
+
+    /// @notice It returns true if the protocol is globally paused
+    function isProtocolPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal;
+    }
+
+    /// @notice It returns whether Core.create() is currently paused
+    /// @return true if protocol is globally paused or if protocolPositionCreation is paused
+    function isProtocolPositionCreationPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionCreation;
+    }
+
+    /// @notice It returns whether Core.mint() is currently paused
+    /// @return true if protocol is globally paused or if protocolPositionMinting is paused
+    function isProtocolPositionMintPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionMinting;
+    }
+
+    /// @notice It returns whether Core.redeem() is currently paused
+    /// @return true if protocol is globally paused or if protocolPositionRedemption is paused
+    function isProtocolPositionRedemptionPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionRedemption;
+    }
+
+    /// @notice It returns whether Core.execute() is currently paused
+    /// @return true if protocol is globally paused or if protocolPositionExecution is paused
+    function isProtocolPositionExecutionPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionExecution;
+    }
+
+    /// @notice It returns whether Core.cancel() is currently paused
+    /// @return true if protocol is globally paused or if protocolPositionCancellation is paused
+    function isProtocolPositionCancellationPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionCancellation;
+    }
+
+    /// @notice It returns whether Core.execute() is currently paused
+    /// @return true if protocol is globally paused or if protocolReserveClaim is paused
+    function isProtocolReserveClaimPaused() external view returns (bool) {
+        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolReserveClaim;
     }
 }
