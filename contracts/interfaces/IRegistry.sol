@@ -28,6 +28,18 @@ interface IRegistry {
 
     function unpause() external;
 
+    function pauseProtocolPositionCreation() external;
+
+    function pauseProtocolPositionMint() external;
+
+    function pauseProtocolPositionExecuted() external;
+
+    function pauseProtocolPositionRedemption() external;
+
+    function pauseProtocolPositionCancellation() external;
+
+    function pauseProtocolReserveClaim() external;
+
     function addToWhitelist(address _whitelisted) external;
 
     function removeFromWhitelist(address _whitelisted) external;
@@ -43,4 +55,16 @@ interface IRegistry {
     function isCoreSpenderWhitelisted(address _address) external view returns (bool);
 
     function isProtocolPaused() external view returns (bool);
+
+    function isProtocolPositionCreationPaused() external view returns (bool);
+
+    function isProtocolPositionMintPaused() external view returns (bool);
+
+    function isProtocolPositionRedemptionPaused() external view returns (bool);
+
+    function isProtocolPositionExecutionPaused() external view returns (bool);
+
+    function isProtocolPositionCancellationPaused() external view returns (bool);
+
+    function isProtocolReserveClaimPaused() external view returns (bool);
 }
