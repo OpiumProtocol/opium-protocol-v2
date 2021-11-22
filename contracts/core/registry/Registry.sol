@@ -11,14 +11,14 @@ import "../../interfaces/ICore.sol";
 /**
     Error codes:
     - R1 = ERROR_REGISTRY_PROTOCOL_ADDRESSES_SETTER_ROLE
-    - R2 = ERROR_REGISTRY_ONLY_EXECUTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE
-    - R3 = ERROR_REGISTRY_ONLY_REDEMPTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE
+    - R2 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
+    - R3 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
     - R4 = ERROR_REGISTRY_ONLY_OPIUM_FEE_SETTER_ROLE
     - R5 = ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE
     - R6 = ERROR_REGISTRY_ONLY_GUARDIAN_ROLE
     - R7 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE
     - R8 = ERROR_REGISTRY_ONLY_EXECUTION_FEE_CAP_SETTER_ROLE
-    - R9 = ERROR_REGISTRY_ONLY_REDEMPTION_FEE_SETTER_ROLE
+    - R9 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE
     - R10 = ERROR_REGISTRY_ALREADY_PAUSED
     - R11 = ERROR_REGISTRY_NOT_PAUSED
     - R12 = ERROR_REGISTRY_NULL_ADDRESS
@@ -34,11 +34,11 @@ import "../../interfaces/ICore.sol";
  */
 
 contract Registry is RegistryStorage {
-    event LogExecutionFeeReceiverChange(address indexed _setter, address indexed _newExecutionFeeReceiver);
-    event LogRedemptionFeeReceiverChange(address indexed _setter, address indexed _newRedemptionFeeReceiver);
-    event LogExecutionFeeCapChange(address indexed _setter, uint32 indexed _executionFeeCap);
-    event LogRedemptionFeeChange(address indexed _setter, uint32 indexed _redemptionFee);
-    event LogOpiumCommissionChange(address indexed _setter, uint32 indexed _opiumCommission);
+    event LogExecutionReserveReceiverChange(address indexed _setter, address indexed _newExecutionFeeReceiver);
+    event LogRedemptionReserveReceiverChange(address indexed _setter, address indexed _newRedemptionFeeReceiver);
+    event LogExecutionReservePartCapChange(address indexed _setter, uint32 indexed _executionFeeCap);
+    event LogRedemptionReservePartChange(address indexed _setter, uint32 indexed _redemptionFee);
+    event LogOpiumReservePartChange(address indexed _setter, uint32 indexed _opiumCommission);
     event LogNoDataCancellationPeriodChange(address indexed _setter, uint256 indexed _noDataCancellationPeriod);
     // emits the role to signal what type of pause has been committed, if any
     event LogProtocolPausableState(address indexed _setter, bool indexed _protocolState, bytes32 indexed _role);
@@ -86,48 +86,63 @@ contract Registry is RegistryStorage {
         protocolAddressesArgs.oracleAggregator = IOracleAggregator(_oracleAggregator);
     }
 
-    /// @notice allows the EXECUTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE role to change the address that receives the fees originated from the successful execution of a profitable derivative's position
+    /// @notice allows the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address that receives the fees originated from the successful execution of a profitable derivative's position
     /// @dev It must be called as part of the protocol's deployment setup after the core addresses have been deployed
-    /// @param _executionFeeRecipient address that will replace the current `protocolExecutionFeeReceiver = _executionFeeRecipient`
+    /// @param _executionFeeRecipient address that will replace the current `protocolExecutionReserveClaimer = _executionFeeRecipient`
     /// @dev it must be a non-null address
     function setProtocolExecutionFeeReceiver(address _executionFeeRecipient)
         external
-        onlyProtocolExecutionFeeAddressSetter
+        onlyProtocolExecutionReserveClaimerAddressSetter
     {
         require(_executionFeeRecipient != address(0), "R12");
-        protocolAddressesArgs.protocolExecutionFeeReceiver = _executionFeeRecipient;
-        emit LogExecutionFeeReceiverChange(msg.sender, _executionFeeRecipient);
+        protocolAddressesArgs.protocolExecutionReserveClaimer = _executionFeeRecipient;
+        emit LogExecutionReserveReceiverChange(msg.sender, _executionFeeRecipient);
     }
 
-    /// @notice allows the REDEMPTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE role to change the address that receives the fees originated from the redemption of a market-neutral position
+    /// @notice allows the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address that receives the fees originated from the redemption of a market-neutral position
     /// @dev It must be called as part of the protocol's deployment setup after the core addresses have been deployed
-    /// @param _redemptionFeeRecipient address that will replace the current `protocolAddressesArgs.protocolRedemptionFeeReceiver`
+    /// @param _redemptionFeeRecipient address that will replace the current `protocolAddressesArgs.protocolRedemptionReserveClaimer`
     /// @dev it must be a non-null address
     function setProtocolRedemptionFeeReceiver(address _redemptionFeeRecipient)
         external
-        onlyProtocolRedemptionAddressFeeSetter
+        onlyProtocolRedemptionReserveClaimerAddressSetter
     {
         require(_redemptionFeeRecipient != address(0), "R12");
-        protocolAddressesArgs.protocolRedemptionFeeReceiver = _redemptionFeeRecipient;
-        emit LogRedemptionFeeReceiverChange(msg.sender, _redemptionFeeRecipient);
+        protocolAddressesArgs.protocolRedemptionReserveClaimer = _redemptionFeeRecipient;
+        emit LogRedemptionReserveReceiverChange(msg.sender, _redemptionFeeRecipient);
     }
 
     /// @notice allows the EXECUTION_FEE_CAP_SETTER_ROLE role to change maximum fee that a derivative author can receive for the profitable execution of a position of a derivative they created
-    function setDerivativeAuthorExecutionFeeCap(uint32 _executionFeeCap) external onlyExecutionFeeCapSetter {
-        protocolParametersArgs.derivativeAuthorExecutionFeeCap = _executionFeeCap;
-        emit LogExecutionFeeCapChange(msg.sender, _executionFeeCap);
+    function setDerivativeAuthorExecutionReservePartCap(uint32 _reservePartCap)
+        external
+        onlyExecutionReservePartSetter
+    {
+        protocolParametersArgs.derivativeAuthorExecutionReservePartCap = _reservePartCap;
+        emit LogExecutionReservePartCapChange(msg.sender, _reservePartCap);
     }
 
-    /// @notice allows the REDEMPTION_FEE_SETTER_ROLE role to change the fixed fee that a derivative author can receive for the successful redemption of a market-neutral positions pair of a derivative they created
-    function setDerivativeAuthorRedemptionFee(uint32 _redemptionFee) external onlyExecutionFeeCapSetter {
-        protocolParametersArgs.derivativeAuthorRedemptionFee = _redemptionFee;
-        emit LogRedemptionFeeChange(msg.sender, _redemptionFee);
+    /// @notice allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change the fixed fee that a derivative author can receive for the successful redemption of a market-neutral positions pair of a derivative they created
+    /// @param _redemptionFee uint32 is hardcapped at 100
+    function setDerivativeAuthorRedemptionReservePart(uint32 _redemptionFee) external onlyRedemptionReservePartSetter {
+        require(_redemptionFee <= 100, "R20");
+        protocolParametersArgs.derivativeAuthorRedemptionReservePart = _redemptionFee;
+        emit LogRedemptionReservePartChange(msg.sender, _redemptionFee);
     }
 
-    /// @notice It allows the OPIUM_FEE_SETTER_ROLE role to change the portion of the fee that is distributed to the protocol's recipients
-    function setProtocolFeePart(uint32 _protocolCommissionPart) external onlyOpiumFeeSetter {
-        protocolParametersArgs.protocolCommissionPart = _protocolCommissionPart;
-        emit LogOpiumCommissionChange(msg.sender, _protocolCommissionPart);
+    /// @notice It allows the OPIUM_FEE_SETTER_ROLE role to change the portion of the reserve that is distributed to the protocol governance's recipients for the successful execution of derivatives
+    /// @param _protocolRedemptionReservePart must be greater than 1 otherwise the protocol's reward would be equal to the derivative author's reward
+    function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart) external onlyOpiumFeeSetter {
+        require(_protocolRedemptionReservePart > 1, "");
+        protocolParametersArgs.protocolExecutionReservePart = _protocolRedemptionReservePart;
+        emit LogOpiumReservePartChange(msg.sender, _protocolRedemptionReservePart);
+    }
+
+    /// @notice It allows the OPIUM_FEE_SETTER_ROLE role to change the portion of the reserve that is distributed to the protocol governance's recipients for the successful redemption of market neutral positions
+    /// @param _protocolExecutionReservePart must be greater than 1 otherwise the protocol's reward would be equal to the derivative author's reward
+    function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart) external onlyOpiumFeeSetter {
+        require(_protocolExecutionReservePart > 1, "");
+        protocolParametersArgs.protocolExecutionReservePart = _protocolExecutionReservePart;
+        emit LogOpiumReservePartChange(msg.sender, _protocolExecutionReservePart);
     }
 
     /// @notice It allows the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)
@@ -185,7 +200,7 @@ contract Registry is RegistryStorage {
     }
 
     /// @notice allows the PARTIAL_CANCEL_PAUSE_ROLE to unpause the Opium Protocol
-    /// @dev it fails if the protocol is not paused
+    /// @dev it fails if the protocol is not globally paused
     function pauseProtocolPositionCancellation() external onlyGuardian {
         require(!protocolPausabilityArgs.protocolGlobal, "R11");
         protocolPausabilityArgs.protocolPositionCancellation = true;
@@ -193,7 +208,7 @@ contract Registry is RegistryStorage {
     }
 
     /// @notice allows the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE to unpause the Opium Protocol
-    /// @dev it fails if the protocol is not paused
+    /// @dev it fails if the protocol is not globally paused
     function pauseProtocolReserveClaim() external onlyPartialClaimReservePauseSetter {
         require(!protocolPausabilityArgs.protocolGlobal, "R11");
         protocolPausabilityArgs.protocolReserveClaim = true;

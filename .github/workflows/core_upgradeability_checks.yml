@@ -53,25 +53,6 @@ jobs:
         shell: bash
         run: |
           sudo echo Report > ./report.txt
-          sudo slither-check-upgradeability . >> ./report.txt 2>&1 || true
-          sudo cat report.json
+          sudo slither-check-upgradeability . Core >> ./report.txt 2>&1 || true
+          sudo cat report.txt
         continue-on-error: true
-      - name: Parse Slither result
-        id: slither_result
-        run: |
-          high_detectors=$(sudo cat ./report.json | grep -o '"impact": "High"' | wc -l)
-          medium_detectors=$(sudo cat ./report.json | grep -o '"impact": "Medium"' | wc -l)
-          sudo echo $high_detectors
-          sudo echo $medium_detectors
-      - name: Check medium warnings
-        if: ${{steps.slither_result.outputs.medium_detectors > 15}}
-        uses: actions/github-script@v3
-        with:
-          script: |
-            core.setFailed('More than 15 medium detectors')
-      - name: Check high warnings
-        if: ${{steps.slither_result.outputs.high_detectors > 1}}
-        uses: actions/github-script@v3
-        with:
-          script: |
-            core.setFailed('More than 5 high detectors')

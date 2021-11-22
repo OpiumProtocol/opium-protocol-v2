@@ -10,15 +10,15 @@ library RegistryEntities {
     struct ProtocolParametersArgs {
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
         uint32 noDataCancellationPeriod;
-        // Max fee that derivative author can set
+        // Max reward that derivative author can set
         //it works as an upper bound for when the derivative authors set their synthetic's fee
-        uint32 derivativeAuthorExecutionFeeCap;
-        // Fixed fee that the derivative author receives for each redemption of market neutral positions
+        uint32 derivativeAuthorExecutionReservePartCap;
+        // Fixed reward that the derivative author receives for each redemption of market neutral positions
         // It is not set by the derivative authors themselves
-        uint32 derivativeAuthorRedemptionFee;
+        uint32 derivativeAuthorRedemptionReservePart;
         // Represents which part of `syntheticId` author reserves originated from derivative executions go to the protocol
-        uint32 protocolCommissionPart;
-        // Represents which part of `syntheticId` author reserves  originated from derivative redemption go to the protocol
+        uint32 protocolExecutionReservePart;
+        // Represents which part of `syntheticId` author reserves originated from derivative redemption go to the protocol
         uint32 protocolRedemptionReservePart;
     }
 
@@ -34,9 +34,9 @@ library RegistryEntities {
         // Address of Opium.TokenSpender contract
         ITokenSpender tokenSpender;
         // Address of the recipient of Opium Protocol's fees originated from the profitable execution of a derivative's position
-        address protocolExecutionFeeReceiver;
+        address protocolExecutionReserveClaimer;
         // Address of the recipient of Opium Protocol's fees originated from the successful redemption of a market neutral position
-        address protocolRedemptionFeeReceiver;
+        address protocolRedemptionReserveClaimer;
     }
 
     struct ProtocolPausabilityArgs {

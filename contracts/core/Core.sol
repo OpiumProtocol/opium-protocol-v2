@@ -499,8 +499,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 reserves = _getReserves(
             syntheticCache.authorAddress,
             shortOpiumPositionTokenParams.derivative.token,
-            protocolAddressesArgs.protocolRedemptionFeeReceiver,
-            protocolParametersArgs.derivativeAuthorRedemptionFee,
+            protocolAddressesArgs.protocolRedemptionReserveClaimer,
+            protocolParametersArgs.derivativeAuthorRedemptionReservePart,
+            protocolParametersArgs.protocolRedemptionReservePart,
             totalMargin
         );
 
@@ -709,8 +710,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
                     _getReserves(
                         syntheticCache.authorAddress,
                         _opiumPositionTokenParams.derivative.token,
-                        protocolAddressesArgs.protocolExecutionFeeReceiver,
+                        protocolAddressesArgs.protocolExecutionReserveClaimer,
                         syntheticCache.authorCommission,
+                        protocolParametersArgs.protocolExecutionReservePart,
                         payout - positionMargin
                     )
                 );
@@ -729,31 +731,26 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address _tokenAddress,
         address _protocolFeeReceiver,
         uint256 _derivativeAuthorFeeRatio,
+        uint256 _protocolReserveRatio,
         uint256 _profit
     ) private returns (uint256 reserve) {
         // Calculate fee
-        // fee = profit * commission / COMMISSION_BASE
-        reserve = (_profit * _derivativeAuthorFeeRatio).scaleBasisPointToAuthorBase();
+        // fee = profit * _derivativeAuthorFeeRatio / 10000
+        reserve = (_profit * _derivativeAuthorFeeRatio) / 10000;
         // If commission is zero, finish
         if (reserve == 0) {
             return 0;
         }
-
-        // Calculate protocolReserve = fee * OPIUM_COMMISSION_PART / OPIUM_COMMISSION_BASE
-        uint256 protocolReserve = (reserve * protocolParametersArgs.protocolCommissionPart)
-            .scaleBasisPointToProtocolBase();
-
-        // Calculate author fee
-        // authorFee = fee - protocolReserve
-        uint256 authorFee = reserve - protocolReserve;
-
+        uint256 protocolReserve = reserve / _protocolReserveRatio;
         // Update feeVault for Opium team
+        // protocolReserve = reserve / _protocolReserveRatio
         // feesVault[protocolFeeReceiver][token] += protocolFee
         reservesVault[_protocolFeeReceiver][_tokenAddress] += protocolReserve;
 
-        // Update feeVault for `syntheticId` author
-        // feeVault[author][token] += authorFee
-        reservesVault[_derivativeAuthorAddress][_tokenAddress] += authorFee;
+        // Update reservesVault for `syntheticId` author
+        // authorReserve = reserve - protocolReserve
+        // reservesVault[author][token] += authorReserve
+        reservesVault[_derivativeAuthorAddress][_tokenAddress] += reserve - protocolReserve;
     }
 
     /// @notice It increases the balance associated to a given derivative stored in the p2pVaults mapping
