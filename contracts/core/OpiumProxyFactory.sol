@@ -1,6 +1,6 @@
 pragma solidity 0.8.5;
-import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
+import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./OpiumPositionToken.sol";
 import "./base/RegistryManager.sol";
 import "../libs/LibDerivative.sol";
@@ -33,22 +33,26 @@ contract OpiumProxyFactory is RegistryManager {
 
     // ****************** EXTERNAL FUNCTIONS ******************
 
-    /// @notice it is called only once upon deployment of the contract
-    /// @dev it sets the the address of the implementation of the OpiumPositionToken contract which will be used for the factory-deployment of erc20 positions via the minimal proxy contract
+    // ***** GETTERS *****
+
+    /// @notice It retrieves the information about the underlying derivative
+    /// @return _opiumPositionTokenParams OpiumPositionTokenParams struct which contains `LibDerivative.Derivative` schema of the derivative, the ` LibDerivative.PositionType` of the present ERC20 token and the bytes32 hash `derivativeHash` of the `LibDerivative.Derivative` derivative
+    function getImplementationAddress() external view returns (address) {
+        return opiumPositionTokenImplementation;
+    }
+
+    // ***** SETTERS *****
+
+    /// @notice It is called only once upon deployment of the contract
+    /// @dev It sets the the address of the implementation of the OpiumPositionToken contract which will be used for the factory-deployment of erc20 positions via the minimal proxy contract
     /// @param _registry address of Opium.Registry
     function initialize(address _registry) external initializer {
         __RegistryManager__init(_registry);
         opiumPositionTokenImplementation = address(new OpiumPositionToken());
     }
 
-    /// @notice read-only getter to retrieve the information about the underlying derivative
-    /// @return _opiumPositionTokenParams OpiumPositionTokenParams struct which contains `LibDerivative.Derivative` schema of the derivative, the ` LibDerivative.PositionType` of the present ERC20 token and the bytes32 hash `derivativeHash` of the `LibDerivative.Derivative` derivative
-    function getImplementationAddress() external view returns (address) {
-        return opiumPositionTokenImplementation;
-    }
-
-    /// @notice it creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
-    /// @dev the ERC20 position token's address is calculated via create2 - if a contract already exists at the create2 address of either the LONG or SHORT position then the entire function reverts
+    /// @notice It creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
+    /// @dev if either of the LONG or SHORT position contracts already exists then it is expected to fail
     /// @param _buyer address of the recipient of the LONG position tokens
     /// @param _seller address of the recipient of the SHORT position tokens
     /// @param _amount amount of position tokens to be minted to the _positionHolder
@@ -99,6 +103,8 @@ contract OpiumProxyFactory is RegistryManager {
     /// @dev the ERC20 position token's address is calculated via create2 - if a contract already exists at the create2 address of either the LONG or SHORT position then the function reverts
     /// @param _buyer address of the recipient of the LONG position tokens
     /// @param _seller address of the recipient of the SHORT position tokens
+    /// @dev if LONG or SHORT position contracts already exist a then it is expected to fail
+
     /// @param _longPositionAddress address of the deployed LONG position token
     /// @param _shortPositionAddress address of the deployed SHORT position token
     /// @param _amount amount of position tokens to be minted to the _positionHolder
@@ -127,8 +133,8 @@ contract OpiumProxyFactory is RegistryManager {
         IOpiumPositionToken(_positionAddress).burn(_positionOwner, _amount);
     }
 
-    /// @notice it burns specified amount of LONG/SHORT position tokens on behalf of a specified owner
-    /// @notice it is consumed by Opium.Core to redeem market neutral position pairs
+    /// @notice It burns the specified amount of LONG/SHORT position tokens on behalf of a specified owner
+    /// @notice It is consumed by Opium.Core to redeem market neutral position pairs
     /// @param _positionOwner address of the owner of the LONG/SHORT position tokens
     /// @param _longPositionAddress address of the deployed LONG position token
     /// @param _shortPositionAddress address of the deployed SHORT position token
@@ -144,6 +150,8 @@ contract OpiumProxyFactory is RegistryManager {
     }
 
     // ****************** PRIVATE FUNCTIONS ******************
+
+    // ***** SETTERS *****
 
     /// @notice It is used to obtain a slice of derivativeHash and convert it to a string to be used as part of an Opium position token's name
     /// @param _data bytes32 representing a derivativeHash

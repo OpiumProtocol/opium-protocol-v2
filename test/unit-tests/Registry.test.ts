@@ -3,17 +3,10 @@ import { ethers } from "hardhat";
 // utils
 import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
-// types
-import { TNamedSigners } from "../../types";
 import { pickError } from "../../utils/misc";
-import {
-  semanticErrors,
-  SECONDS_2_WEEKS,
-  DEFAULT_ADMIN_ROLE,
-  protocolRegisterRole,
-  guardianRole,
-  parameterSetterRole,
-} from "../../utils/constants";
+// types and constants
+import { TNamedSigners } from "../../types";
+import { semanticErrors, SECONDS_2_WEEKS, governanceRoles, zeroAddress, SECONDS_3_WEEKS } from "../../utils/constants";
 
 describe("Registry", () => {
   let namedSigners: TNamedSigners;
@@ -22,18 +15,54 @@ describe("Registry", () => {
     namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
   });
 
-  it("should ensure the initial roles are as expected", async () => {
+  it("should ensure the Registry roles are assigned as expected", async () => {
     const { registry } = await setup();
     const { deployer, governor, notAllowed } = await ethers.getNamedSigners();
 
-    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, governor.address), "not admin").to.be.true;
-    expect(await registry.hasRole(guardianRole, governor.address), "not guardianRole").to.be.true;
-    expect(await registry.hasRole(parameterSetterRole, governor.address), "not parameterSetterRole").to.be.true;
-    expect(await registry.hasRole(protocolRegisterRole, governor.address), "not protocolRegisterRole").to.be.true;
-    expect(await registry.hasRole(DEFAULT_ADMIN_ROLE, deployer.address), "wrong admin").to.be.false;
-    expect(await registry.hasRole(guardianRole, deployer.address), "wrong guardianRole").to.be.false;
-    expect(await registry.hasRole(parameterSetterRole, notAllowed.address), "wrong parameterSetterRole").to.be.false;
-    expect(await registry.hasRole(protocolRegisterRole, notAllowed.address), "wrong protocolRegisterRole").to.be.false;
+    expect(await registry.hasRole(governanceRoles.defaultAdminRole, governor.address), "not admin").to.be.true;
+    expect(
+      await registry.hasRole(governanceRoles.protocolAddressesSetterRole, governor.address),
+      "not protocolAddressesSetterRole",
+    ).to.be.true;
+    expect(
+      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, governor.address),
+      "not executionFeeRecipientSetterRole",
+    ).to.be.true;
+    expect(
+      await registry.hasRole(governanceRoles.redemptionFeeRecipientSetterRole, governor.address),
+      "not protocolAddressesSetterRole",
+    ).to.be.true;
+    expect(await registry.hasRole(governanceRoles.opiumFeeSetterRole, governor.address), "not opiumFeeSetterRole").to.be
+      .true;
+    expect(
+      await registry.hasRole(governanceRoles.noDataCancellationPeriodSetterRole, governor.address),
+      "not noDataCancellationPeriodSetterRole",
+    ).to.be.true;
+    expect(await registry.hasRole(governanceRoles.guardianRole, governor.address), "not protocolAddressesSetterRole").to
+      .be.true;
+    expect(await registry.hasRole(governanceRoles.guardianRole, governor.address), "not guardianRole").to.be.true;
+    expect(await registry.hasRole(governanceRoles.whitelisterRole, governor.address), "not whitelisterRole").to.be.true;
+    expect(
+      await registry.hasRole(governanceRoles.redemptionFeeSetterRole, governor.address),
+      "not redemptionFeeSetterRole",
+    ).to.be.true;
+    expect(
+      await registry.hasRole(governanceRoles.executionFeeCapSetterRole, governor.address),
+      "not executionFeeCapSetterRole",
+    ).to.be.true;
+    expect(await registry.hasRole(governanceRoles.registryManagerRole, governor.address), "not registryManagerRole").to
+      .be.true;
+
+    expect(await registry.hasRole(governanceRoles.defaultAdminRole, deployer.address), "wrong admin").to.be.false;
+    expect(await registry.hasRole(governanceRoles.guardianRole, deployer.address), "wrong guardianRole").to.be.false;
+    expect(
+      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, notAllowed.address),
+      "wrong executionFeeRecipientSetterRole",
+    ).to.be.false;
+    expect(
+      await registry.hasRole(governanceRoles.protocolAddressesSetterRole, notAllowed.address),
+      "wrong protocolAddressesSetterRole",
+    ).to.be.false;
   });
 
   it("should ensure the initial protocol parameters are as expected", async () => {
@@ -41,9 +70,23 @@ describe("Registry", () => {
 
     const protocolParams = await registry.getProtocolParameters();
 
-    expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
-    expect(await registry.isPaused(), "it's paused").to.be.false;
+    expect(protocolParams.derivativeAuthorExecutionFeeCap, "wrong derivativeAuthorExecutionFeeCap").to.be.eq(10000);
+    expect(protocolParams.derivativeAuthorRedemptionFee, "wrong derivativeAuthorRedemptionFee").to.be.eq(100);
+    expect(protocolParams.protocolCommissionPart, "wrong protocol commission part").to.be.eq(1);
+    expect(protocolParams.paused, "wrong paused").to.be.eq(false);
+  });
+
+  it("should ensure that the Registry getters return the correct data", async () => {
+    const { registry, core, oracleIdMock } = await setup();
+    const { deployer, governor } = await ethers.getNamedSigners();
+
+    expect(await registry.isRegistryManager(governor.address), "wrong registryManager").to.be.eq(true);
+    expect(await registry.isRegistryManager(deployer.address), "wrong registryManager").to.be.eq(false);
+    expect(await registry.getCore(), "wrong core address").to.be.eq(core.address);
+    expect(await registry.isPaused(), "wrong paused").to.be.false;
+    expect(await registry.isCoreSpenderWhitelisted(core.address), "wrong coreSpenderWhitelist").to.be.eq(true);
+    expect(await registry.isCoreSpenderWhitelisted(oracleIdMock.address), "wrong coreSpenderWhitelist").to.be.eq(false);
   });
 
   it("should ensure the protocol addresses are as expected", async () => {
@@ -55,6 +98,43 @@ describe("Registry", () => {
     expect(protocolAddresses.oracleAggregator).to.be.eq(oracleAggregator.address);
     expect(protocolAddresses.core).to.be.equal(core.address);
     expect(protocolAddresses.tokenSpender).to.be.equal(tokenSpender.address);
+  });
+
+  it("should revert if a null address is provided as a protocol address argument", async () => {
+    const { registry, opiumProxyFactory, syntheticAggregator, core, tokenSpender } = await setup();
+    const { governor } = await ethers.getNamedSigners();
+
+    await expect(
+      registry
+        .connect(governor)
+        .setProtocolAddresses(
+          opiumProxyFactory.address,
+          core.address,
+          zeroAddress,
+          syntheticAggregator.address,
+          tokenSpender.address,
+        ),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS));
+
+    await expect(
+      registry
+        .connect(governor)
+        .setProtocolAddresses(
+          opiumProxyFactory.address,
+          core.address,
+          zeroAddress,
+          syntheticAggregator.address,
+          tokenSpender.address,
+        ),
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS));
+
+    await expect(registry.connect(governor).setProtocolExecutionFeeReceiver(zeroAddress)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS),
+    );
+
+    await expect(registry.connect(governor).setProtocolRedemptionFeeReceiver(zeroAddress)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS),
+    );
   });
 
   it("should ensure the internal ACL is applied correctly", async () => {
@@ -70,10 +150,8 @@ describe("Registry", () => {
           oracleAggregator.address,
           syntheticAggregator.address,
           tokenSpender.address,
-          notAllowed.address,
-          notAllowed.address,
         ),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_REGISTER_ROLE));
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_PROTOCOL_ADDRESSES_SETTER_ROLE));
 
     await expect(registry.connect(notAllowed).addToWhitelist(notAllowed.address)).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
@@ -83,12 +161,12 @@ describe("Registry", () => {
       pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
     );
 
-    await expect(registry.connect(notAllowed).setOpiumCommissionPart(4)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARAMETER_SETTER_ROLE),
+    await expect(registry.connect(notAllowed).setProtocolFeePart(4)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_OPIUM_FEE_SETTER_ROLE),
     );
 
     await expect(registry.connect(notAllowed).pause()).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_GUARDIAN),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_GUARDIAN_ROLE),
     );
   });
 
@@ -96,33 +174,55 @@ describe("Registry", () => {
     const { registry } = await setup();
     const { authorized, governor } = namedSigners;
 
-    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
-    await registry.connect(governor).addToWhitelist(authorized.address);
-    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.true;
+    // test setDerivativeAuthorExecutionFeeCap setter
+    await registry.connect(governor).setDerivativeAuthorExecutionFeeCap(12);
+    expect(
+      (await registry.getProtocolParameters()).derivativeAuthorExecutionFeeCap,
+      "wrong derivativeAuthorExecutionFeeCap",
+    ).to.be.eq(12);
 
-    await registry.connect(governor).removeFromWhitelist(authorized.address);
+    // test setDerivativeAuthorRedemptionFee setter
+    await registry.connect(governor).setDerivativeAuthorRedemptionFee(7);
+    expect(
+      (await registry.getProtocolParameters()).derivativeAuthorRedemptionFee,
+      "wrong derivativeAuthorRedemptionFee",
+    ).to.be.eq(7);
 
-    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
+    // test setNoDataCancellationPeriod setter
+    await registry.connect(governor).setNoDataCancellationPeriod(SECONDS_3_WEEKS);
+    expect(
+      (await registry.getProtocolParameters()).noDataCancellationPeriod,
+      "wrong noDataCancellationPeriod",
+    ).to.be.eq(SECONDS_3_WEEKS);
 
-    await registry.connect(governor).setOpiumCommissionPart(4);
+    // test setProtocolFeePart setter
+    await registry.connect(governor).setProtocolFeePart(2);
+    expect((await registry.getProtocolParameters()).protocolCommissionPart, "wrong protocolCommissionPart").to.be.eq(2);
 
-    const commissionParams = await registry.getProtocolParameters();
-    expect(commissionParams.protocolCommissionPart).to.be.eq(4);
-  });
-
-  it("should allow the guardian to toggle the paused state variable", async () => {
-    const { registry } = await setup();
-    const { governor } = namedSigners;
-    expect(await registry.isPaused(), "it's paused").to.be.false;
+    // test `pause` and `unpause` setters
+    expect(await registry.isPaused(), "wrong paused").to.be.false;
     await registry.connect(governor).pause();
-    expect(await registry.isPaused(), "it's paused").to.be.true;
-
-    // should throw a failure if "paused" is set to true
+    expect(await registry.isPaused(), "wrong paused").to.be.true;
     await expect(registry.connect(governor).pause()).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_ALREADY_PAUSED),
     );
-
     await registry.connect(governor).unpause();
-    expect(await registry.isPaused(), "it's unpaused").to.be.false;
+    expect(await registry.isPaused(), "wrong unpaused").to.be.false;
+    await expect(registry.connect(governor).unpause()).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_REGISTRY_NOT_PAUSED),
+    );
+
+    // test `addToWhitelist` and `removeFromWhitelist` setters
+    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
+    await registry.connect(governor).addToWhitelist(authorized.address);
+    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.true;
+    await registry.connect(governor).removeFromWhitelist(authorized.address);
+    expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
+
+    // test setProtocolFeePart after granting `OPIUM_FEE_SETTER_ROLE` role to another account
+    await expect(registry.connect(authorized).setProtocolFeePart(4)).to.revertedWith("R4");
+    await registry.connect(governor).grantRole(governanceRoles.opiumFeeSetterRole, authorized.address);
+    await registry.connect(authorized).setProtocolFeePart(7);
+    expect((await registry.getProtocolParameters()).protocolCommissionPart, "wrong protocolCommissionPart").to.be.eq(7);
   });
 });

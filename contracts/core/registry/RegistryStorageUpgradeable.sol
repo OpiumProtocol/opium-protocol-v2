@@ -21,52 +21,59 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         _;
     }
 
-    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyGuardian() {
-        require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), "R2");
-        _;
-    }
-
-    /// @notice it ensures that the calling account has been granted the WHITELISTER_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyWhitelister() {
-        require(hasRole(LibRoles.WHITELISTER_ROLE, msg.sender), "R3");
-        _;
-    }
-
-    /// @notice it ensures that the calling account has been granted the PARAMETER_SETTER_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyParameterSetter() {
-        require(hasRole(LibRoles.PARAMETER_SETTER_ROLE, msg.sender), "R4");
-        _;
-    }
-
-    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_RECIPIENT_SETTER_ROLE
+    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyProtocolExecutionFeeAddressSetter() {
-        require(hasRole(LibRoles.EXECUTION_FEE_RECIPIENT_SETTER_ROLE, msg.sender), "R8");
+        require(hasRole(LibRoles.EXECUTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE, msg.sender), "R2");
         _;
     }
 
     /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_RECIPIENT_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyProtocolRedemptionAddressFeeSetter() {
-        require(hasRole(LibRoles.REDEMPTION_FEE_RECIPIENT_SETTER_ROLE, msg.sender), "R9");
+        require(hasRole(LibRoles.REDEMPTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE, msg.sender), "R3");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the OPIUM_FEE_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyOpiumFeeSetter() {
+        require(hasRole(LibRoles.OPIUM_FEE_SETTER_ROLE, msg.sender), "R4");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyNoDataCancellationPeriodSetter() {
+        require(hasRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, msg.sender), "R5");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyGuardian() {
+        require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), "R6");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the WHITELISTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyWhitelister() {
+        require(hasRole(LibRoles.WHITELISTER_ROLE, msg.sender), "R7");
         _;
     }
 
     /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_CAP_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyExecutionFeeCapSetter() {
-        require(hasRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), "R10");
+        require(hasRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), "R8");
         _;
     }
 
     /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyRedemptionFeeSetter() {
-        require(hasRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, msg.sender), "R10");
+        require(hasRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, msg.sender), "R9");
         _;
     }
 
@@ -78,14 +85,15 @@ contract RegistryStorageUpgradeable is AccessControlUpgradeable {
         __AccessControl_init();
         _setupRole(DEFAULT_ADMIN_ROLE, _governor);
         _setupRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.EXECUTION_FEE_RECIPIENT_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.REDEMPTION_FEE_RECIPIENT_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.EXECUTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_FEE_RECIPIENT_ADDRESS_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.OPIUM_FEE_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, _governor);
         _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
-        _setupRole(LibRoles.PARAMETER_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
-        _setupRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, _governor);
         _setupRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_FEE_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
 
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,

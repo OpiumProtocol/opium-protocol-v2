@@ -4,7 +4,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "./TokenSpender.sol";
 import "./registry/RegistryEntities.sol";
 import "./base/RegistryManager.sol";
 import "../interfaces/IOpiumProxyFactory.sol";
@@ -16,11 +15,10 @@ import "../interfaces/IRegistry.sol";
 import "../libs/LibDerivative.sol";
 import "../libs/LibPosition.sol";
 import "../libs/LibCalculator.sol";
-import "hardhat/console.sol";
 
 /**
     Error codes:
-    - C1 = ERROR_CORE_ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH
+    - C1 = ERROR_CORE_POSITION_ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH
     - C2 = ERROR_CORE_WRONG_HASH
     - C3 = ERROR_CORE_WRONG_POSITION_TYPE
     - C4 = ERROR_CORE_NOT_ENOUGH_POSITIONS
@@ -34,6 +32,7 @@ import "hardhat/console.sol";
     - C12 = ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE
     - C13 = ERROR_CORE_CANCELLATION_IS_NOT_ALLOWED
     - C14 = ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS
+    - C15 = ERROR_CORE_FEE_AMOUNT_GREATER_THAN_BALANCE
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
@@ -152,7 +151,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
-    /// @notice It allows a fee recipient to to withdraw their fees
+    /// @notice It allows a fee recipient to to withdraw their entire accrued fees
     /// @param _tokenAddress address of the ERC20 token to withdraw
     function withdrawFee(address _tokenAddress) external nonReentrant whenNotPaused {
         uint256 balance = feesVaults[msg.sender][_tokenAddress];
@@ -462,8 +461,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// [1] SHORT position
     /// @param _amount uint256 amount of the LONG and SHORT positions to be redeemed
     function _redeem(address[2] memory _positionsAddresses, uint256 _amount) private whenNotPaused {
-        uint256 longBalance = IERC20Upgradeable(_positionsAddresses[0]).balanceOf(msg.sender);
-        uint256 shortBalance = IERC20Upgradeable(_positionsAddresses[1]).balanceOf(msg.sender);
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionsAddresses[0]
         ).getPositionTokenData();

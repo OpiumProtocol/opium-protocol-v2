@@ -5,7 +5,6 @@ import "./base/RegistryManager.sol";
 import "../interfaces/IDerivativeLogic.sol";
 import "../interfaces/IRegistry.sol";
 import "../libs/LibDerivative.sol";
-import "../libs/LibCalculator.sol";
 
 /**
     Error codes:
@@ -38,7 +37,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
     }
 
     /// @notice Initializes ticker, if was not initialized and returns buyer and seller margin from cache
-    /// @param _derivativeHash bytes32 Hash of derivative
+    /// @param _derivativeHash bytes32 hash of derivative
     /// @param _derivative Derivative Derivative itself
     /// @return buyerMargin uint256 Margin of buyer
     /// @return sellerMargin uint256 Margin of seller
@@ -47,9 +46,10 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         returns (uint256 buyerMargin, uint256 sellerMargin)
     {
         // Initialize derivative if wasn't initialized before
-        _initDerivative(_derivativeHash, _derivative);
-        SyntheticCache memory syntheticCache = syntheticCaches[_derivativeHash];
-        return (syntheticCache.buyerMargin, syntheticCache.sellerMargin);
+        if (!syntheticCaches[_derivativeHash].init) {
+            _initDerivative(_derivativeHash, _derivative);
+        }
+        return (syntheticCaches[_derivativeHash].buyerMargin, syntheticCaches[_derivativeHash].sellerMargin);
     }
 
     /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author address from cache
@@ -57,6 +57,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         external
         returns (SyntheticCache memory)
     {
+        // Initialize derivative if wasn't initialized before
         if (!syntheticCaches[_derivativeHash].init) {
             _initDerivative(_derivativeHash, _derivative);
         }
@@ -84,8 +85,8 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         // AUTHOR COMMISSION
         // Get commission from syntheticId
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
-        // Check if commission is not set > 100%
         RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolParameters();
+        // Check if commission is not greater than the max cap set in the Registry by the governance
         require(authorCommission <= protocolParametersArgs.derivativeAuthorExecutionFeeCap, "S3");
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({
@@ -96,7 +97,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
             init: true
         });
 
-        // If we are here, this basically means this ticker was not used before, so we emit an event for Dapps developers about new ticker (derivative) and it's hash
+        // Emits an event upon initialization of a derivative recipe (so only once during its lifecycle)
         emit LogSyntheticInit(_derivative, derivativeHash);
     }
 }

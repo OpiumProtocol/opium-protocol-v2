@@ -1,4 +1,5 @@
 pragma solidity 0.8.5;
+
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../../interfaces/IRegistry.sol";
 
@@ -12,7 +13,7 @@ contract RegistryManager is Initializable {
     IRegistry internal registry;
 
     modifier onlyRegistryManager() {
-        require(registry.getRegistryManager(msg.sender), "M1");
+        require(registry.isRegistryManager(msg.sender), "M1");
         _;
     }
 
@@ -26,7 +27,7 @@ contract RegistryManager is Initializable {
         emit LogRegistryChange(msg.sender, _registry);
     }
 
-    function getRegistry(address _registry) external returns (address) {
+    function getRegistry() external view returns (address) {
         return address(registry);
     }
 }

@@ -1,6 +1,5 @@
 pragma solidity 0.8.5;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./base/RegistryManager.sol";
@@ -12,7 +11,7 @@ import "../interfaces/IRegistry.sol";
  */
 
 /// @title Opium.TokenSpender contract holds users ERC20 allowances and allows whitelisted contracts to use ERC20 tokens
-contract TokenSpender is Initializable, RegistryManager {
+contract TokenSpender is RegistryManager {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     modifier onlyCoreSpenders() {
@@ -27,16 +26,16 @@ contract TokenSpender is Initializable, RegistryManager {
     }
 
     /// @notice Using this function whitelisted contracts could call ERC20 transfers
-    /// @param token IERC20 Instance of token
-    /// @param from address Address from which tokens are transferred
-    /// @param to address Address of tokens receiver
-    /// @param amount uint256 Amount of tokens to be transferred
+    /// @param _token IERC20 Instance of token
+    /// @param _from address Address from which tokens are transferred
+    /// @param _to address Address of tokens receiver
+    /// @param _amount uint256 Amount of tokens to be transferred
     function claimTokens(
-        IERC20Upgradeable token,
-        address from,
-        address to,
-        uint256 amount
+        IERC20Upgradeable _token,
+        address _from,
+        address _to,
+        uint256 _amount
     ) external onlyCoreSpenders {
-        token.safeTransferFrom(from, to, amount);
+        _token.safeTransferFrom(_from, _to, _amount);
     }
 }

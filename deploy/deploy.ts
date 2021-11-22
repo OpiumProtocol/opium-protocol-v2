@@ -97,10 +97,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       oracleAggregator.address,
       syntheticAggregator.address,
       tokenSpender.address,
-      deployer.address,
-      deployer.address,
     );
-
+  await registryInstance.connect(governor).setProtocolExecutionFeeReceiver(deployer.address);
+  await registryInstance.connect(governor).setProtocolRedemptionFeeReceiver(deployer.address);
   await registryInstance.connect(governor).addToWhitelist(core.address);
 
   const coreInstance = <Core>await ethers.getContract("Core");

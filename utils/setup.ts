@@ -81,9 +81,9 @@ const setup = async (): Promise<TContracts> => {
       oracleAggregator.address,
       syntheticAggregator.address,
       tokenSpender.address,
-      deployer.address,
-      deployer.address,
     );
+  await registry.connect(governor).setProtocolExecutionFeeReceiver(deployer.address);
+  await registry.connect(governor).setProtocolRedemptionFeeReceiver(deployer.address);
 
   await registry.connect(governor).addToWhitelist(core.address);
   await core.connect(governor).updateProtocolAddresses();
