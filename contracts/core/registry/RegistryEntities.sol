@@ -10,12 +10,16 @@ library RegistryEntities {
     struct ProtocolParametersArgs {
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
         uint32 noDataCancellationPeriod;
-        // max fee that derivative author can set
+        // Max fee that derivative author can set
+        //it works as an upper bound for when the derivative authors set their synthetic's fee
         uint32 derivativeAuthorExecutionFeeCap;
-        // fixed fee that the derivative author receives for each redemption of market neutral positions
+        // Fixed fee that the derivative author receives for each redemption of market neutral positions
+        // It is not set by the derivative authors themselves
         uint32 derivativeAuthorRedemptionFee;
-        // Represents which part of `syntheticId` author commissions goes to opium
+        // Represents which part of `syntheticId` author reserves originated from derivative executions go to the protocol
         uint32 protocolCommissionPart;
+        // Represents which part of `syntheticId` author reserves  originated from derivative redemption go to the protocol
+        uint32 protocolRedemptionReservePart;
     }
 
     struct ProtocolAddressesArgs {

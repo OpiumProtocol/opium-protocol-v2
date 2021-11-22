@@ -1,6 +1,6 @@
 pragma solidity 0.8.5;
 
-import "./RegistryStorageUpgradeable.sol";
+import "./RegistryStorage.sol";
 import "../../libs/LibRoles.sol";
 import "../../interfaces/IOpiumProxyFactory.sol";
 import "../../interfaces/ISyntheticAggregator.sol";
@@ -33,7 +33,7 @@ import "../../interfaces/ICore.sol";
 
  */
 
-contract RegistryUpgradeable is RegistryStorageUpgradeable {
+contract Registry is RegistryStorage {
     event LogExecutionFeeReceiverChange(address indexed _setter, address indexed _newExecutionFeeReceiver);
     event LogRedemptionFeeReceiverChange(address indexed _setter, address indexed _newRedemptionFeeReceiver);
     event LogExecutionFeeCapChange(address indexed _setter, uint32 indexed _executionFeeCap);
@@ -50,7 +50,7 @@ contract RegistryUpgradeable is RegistryStorageUpgradeable {
     // ***** SETTERS *****
 
     /// @notice it is called only once upon deployment of the contract. It initializes the registry storage with the given governor address as the admin role.
-    /// @dev Calls RegistryStorageUpgradeable.__RegistryStorage__init
+    /// @dev Calls RegistryStorage.__RegistryStorage__init
     /// @param _governor address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE
     function initialize(address _governor) external initializer {
         __RegistryStorage__init(_governor);
