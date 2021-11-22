@@ -1,0 +1,77 @@
+name: Upgradeability-static-analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  main_job:
+    name: core-upgradeability
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [12]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1
+        with:
+          envkey_DEBUG: false
+          envkey_ETHERSCAN_KEY: "abc"
+          envkey_BSCSCAN_API_KEY: "abc"
+          envkey_BSC_MAINNET_ENDPOINT: "abc"
+          envkey_POLYGON_MAINNET_ENDPOINT: "abc"
+          envkey_INFURA_API_KEY: "abc"
+          envkey_MNEMONIC: "test test test test test test test test test test test junk"
+          directory: .
+          file_name: .env
+
+      - name: Set up node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install node dependencies
+        run: sudo npm install
+
+      - name: Install pip3
+        run: |
+          sudo python -m pip install --upgrade pip
+      - name: Install slither
+        run: |
+          sudo pip3 install slither-analyzer
+      - name: Run slither and append
+        shell: bash
+        run: |
+          sudo echo Report > ./report.txt
+          sudo slither-check-upgradeability . >> ./report.txt 2>&1 || true
+          sudo cat report.json
+        continue-on-error: true
+      - name: Parse Slither result
+        id: slither_result
+        run: |
+          high_detectors=$(sudo cat ./report.json | grep -o '"impact": "High"' | wc -l)
+          medium_detectors=$(sudo cat ./report.json | grep -o '"impact": "Medium"' | wc -l)
+          sudo echo $high_detectors
+          sudo echo $medium_detectors
+      - name: Check medium warnings
+        if: ${{steps.slither_result.outputs.medium_detectors > 15}}
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('More than 15 medium detectors')
+      - name: Check high warnings
+        if: ${{steps.slither_result.outputs.high_detectors > 1}}
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('More than 5 high detectors')
