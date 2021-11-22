@@ -22,9 +22,9 @@ interface ICore {
 
     function updateProtocolAddresses() external;
 
-    function withdrawFee(address _tokenAddress) external;
+    function claimReserves(address _tokenAddress) external;
 
-    function withdrawFee(address _tokenAddress, uint256 _amount) external;
+    function claimReserves(address _tokenAddress, uint256 _amount) external;
 
     function create(
         LibDerivative.Derivative calldata _derivative,

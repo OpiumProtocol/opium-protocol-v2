@@ -79,7 +79,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// Fees vault
     /// Key-value entity that maps an address representing a fee recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of fee recipients (i.e: derivative authors)
-    mapping(address => mapping(address => uint256)) private feesVaults;
+    mapping(address => mapping(address => uint256)) private reservesVault;
 
     /// @notice It is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
@@ -111,7 +111,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _token address of a token used as a fee compensation
     /// @return uint256 amount of the accrued fees denominated in the provided token
     function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256) {
-        return feesVaults[_feeRecipient][_token];
+        return reservesVault[_feeRecipient][_token];
     }
 
     /// @notice It queries the buyer's and seller's payouts for a given derivative
@@ -154,23 +154,23 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
-    /// @notice It allows a fee recipient to to withdraw their entire accrued fees
+    /// @notice It allows a fee recipient to claim their entire accrued reserves
     /// @param _tokenAddress address of the ERC20 token to withdraw
-    function withdrawFee(address _tokenAddress) external nonReentrant {
+    function claimReserves(address _tokenAddress) external nonReentrant {
         require(!registry.isProtocolReserveClaimPaused(), "C22");
-        uint256 balance = feesVaults[msg.sender][_tokenAddress];
-        feesVaults[msg.sender][_tokenAddress] = 0;
+        uint256 balance = reservesVault[msg.sender][_tokenAddress];
+        reservesVault[msg.sender][_tokenAddress] = 0;
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
     }
 
-    /// @notice It allows a fee recipient to to withdraw the desired amount of accrued fees
+    /// @notice It allows a reserves recipient to to claim the desired amount of accrued reserves
     /// @param _tokenAddress address of the ERC20 token to withdraw
-    /// @param _amount uint256 amount of fee to withdraw
-    function withdrawFee(address _tokenAddress, uint256 _amount) external nonReentrant {
+    /// @param _amount uint256 amount of reserves to withdraw
+    function claimReserves(address _tokenAddress, uint256 _amount) external nonReentrant {
         require(!registry.isProtocolReserveClaimPaused(), "C22");
-        uint256 balance = feesVaults[msg.sender][_tokenAddress];
+        uint256 balance = reservesVault[msg.sender][_tokenAddress];
         require(balance >= _amount, "C15");
-        feesVaults[msg.sender][_tokenAddress] -= _amount;
+        reservesVault[msg.sender][_tokenAddress] -= _amount;
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
 
@@ -496,7 +496,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 totalMargin = (syntheticCache.buyerMargin + syntheticCache.sellerMargin).mulWithPrecisionFactor(
             _amount
         );
-        uint256 fees = _getFees(
+        uint256 reserves = _getReserves(
             syntheticCache.authorAddress,
             shortOpiumPositionTokenParams.derivative.token,
             protocolAddressesArgs.protocolRedemptionFeeReceiver,
@@ -511,7 +511,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount
         );
 
-        IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, totalMargin - fees);
+        IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(
+            msg.sender,
+            totalMargin - reserves
+        );
 
         _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
 
@@ -638,7 +641,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _amount uint256 amount of positions of the same type (either LONG or SHORT) whose payout is being calculated
     /// @param _syntheticAggregator interface/address of `Opium SyntheticAggregator.sol`
     /// @param _oracleAggregator interface/address of `Opium OracleAggregator.sol`
-    /// @return payout uint256 representing the net payout (gross payout - fees) of the executed amount of positions
+    /// @return payout uint256 representing the net payout (gross payout - reserves) of the executed amount of positions
     function _getPayout(
         IOpiumPositionToken.OpiumPositionTokenParams memory _opiumPositionTokenParams,
         uint256 _amount,
@@ -698,12 +701,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         _decreaseP2PVault(_opiumPositionTokenParams.derivativeHash, payout);
 
-        // The fees are deducted only from profitable positions: payout > positionMargin * amount
+        // The reserves are deducted only from profitable positions: payout > positionMargin * amount
         if (payout > positionMargin) {
             payout =
                 payout -
                 (
-                    _getFees(
+                    _getReserves(
                         syntheticCache.authorAddress,
                         _opiumPositionTokenParams.derivative.token,
                         protocolAddressesArgs.protocolExecutionFeeReceiver,
@@ -714,43 +717,43 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         }
     }
 
-    /// @notice It computes the total fee to be distributed to the recipients provided as arguments
-    /// @param _derivativeAuthorAddress address of the derivative author that receives a portion of the fees being calculated
-    /// @param _tokenAddress address of the token being used to distribute the fees
-    /// @param _protocolFeeReceiver  address of the designated governance recipient that receives a portion of the fees being calculated
-    /// @param _derivativeAuthorFeeRatio uint256 portion of the fees that the derivative author set as a compensation for themselves
-    /// @param _profit uint256 the gross profit from which the fees will be detracted
-    /// @return fee uint256 total fee being calculated which corresponds to the sum of the fees distributed to the derivative author and the fees distributed to the designated governance recipient
-    function _getFees(
+    /// @notice It computes the total reserve to be distributed to the recipients provided as arguments
+    /// @param _derivativeAuthorAddress address of the derivative author that receives a portion of the reserves being calculated
+    /// @param _tokenAddress address of the token being used to distribute the reserves
+    /// @param _protocolFeeReceiver  address of the designated governance recipient that receives a portion of the reserves being calculated
+    /// @param _derivativeAuthorFeeRatio uint256 portion of the reserves that the derivative author set as a compensation for themselves
+    /// @param _profit uint256 the gross profit from which the reserves will be detracted
+    /// @return reserve uint256 total fee being calculated which corresponds to the sum of the reserves distributed to the derivative author and the fees distributed to the designated governance recipient
+    function _getReserves(
         address _derivativeAuthorAddress,
         address _tokenAddress,
         address _protocolFeeReceiver,
         uint256 _derivativeAuthorFeeRatio,
         uint256 _profit
-    ) private returns (uint256 fee) {
+    ) private returns (uint256 reserve) {
         // Calculate fee
         // fee = profit * commission / COMMISSION_BASE
-        fee = (_profit * _derivativeAuthorFeeRatio).scaleBasisPointToAuthorBase();
+        reserve = (_profit * _derivativeAuthorFeeRatio).scaleBasisPointToAuthorBase();
         // If commission is zero, finish
-        if (fee == 0) {
+        if (reserve == 0) {
             return 0;
         }
 
-        // Calculate opium fee
-        // opiumFee = fee * OPIUM_COMMISSION_PART / OPIUM_COMMISSION_BASE
-        uint256 opiumFee = (fee * protocolParametersArgs.protocolCommissionPart).scaleBasisPointToProtocolBase();
+        // Calculate protocolReserve = fee * OPIUM_COMMISSION_PART / OPIUM_COMMISSION_BASE
+        uint256 protocolReserve = (reserve * protocolParametersArgs.protocolCommissionPart)
+            .scaleBasisPointToProtocolBase();
 
         // Calculate author fee
-        // authorFee = fee - opiumFee
-        uint256 authorFee = fee - opiumFee;
+        // authorFee = fee - protocolReserve
+        uint256 authorFee = reserve - protocolReserve;
 
         // Update feeVault for Opium team
         // feesVault[protocolFeeReceiver][token] += protocolFee
-        feesVaults[_protocolFeeReceiver][_tokenAddress] += opiumFee;
+        reservesVault[_protocolFeeReceiver][_tokenAddress] += protocolReserve;
 
         // Update feeVault for `syntheticId` author
         // feeVault[author][token] += authorFee
-        feesVaults[_derivativeAuthorAddress][_tokenAddress] += authorFee;
+        reservesVault[_derivativeAuthorAddress][_tokenAddress] += authorFee;
     }
 
     /// @notice It increases the balance associated to a given derivative stored in the p2pVaults mapping

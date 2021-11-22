@@ -50,7 +50,7 @@ contract Registry is RegistryStorage {
     // ***** SETTERS *****
 
     /// @notice it is called only once upon deployment of the contract. It initializes the registry storage with the given governor address as the admin role.
-    /// @dev Calls RegistryStorage.__RegistryStorage__init
+    /// @dev Initializes the base RegistryStorage state
     /// @param _governor address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE
     function initialize(address _governor) external initializer {
         __RegistryStorage__init(_governor);
