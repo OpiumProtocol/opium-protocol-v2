@@ -8,8 +8,9 @@ interface ISyntheticAggregator {
         uint256 authorCommission;
         address authorAddress;
         bool init;
-        // SyntheticTypes typeByHash;
     }
+
+    function initialize(address _registry) external;
 
     function getSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
         external

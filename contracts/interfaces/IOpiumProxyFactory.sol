@@ -4,6 +4,8 @@ import "../libs/LibDerivative.sol";
 interface IOpiumProxyFactory {
     function getImplementationAddress() external view returns (address);
 
+    function initialize(address _registry) external;
+
     function create(
         address _buyer,
         address _seller,
@@ -21,16 +23,16 @@ interface IOpiumProxyFactory {
         uint256 _amount
     ) external;
 
-    function burnPair(
-        address _tokenOwner,
-        address _longToken,
-        address _shortToken,
+    function burn(
+        address _positionOwner,
+        address _positionAddress,
         uint256 _amount
     ) external;
 
-    function burn(
-        address _tokenOwner,
-        address _token,
+    function burnPair(
+        address _positionOwner,
+        address _longPositionAddress,
+        address _shortPositionAddress,
         uint256 _amount
     ) external;
 }

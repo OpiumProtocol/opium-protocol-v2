@@ -1,19 +1,48 @@
 pragma solidity 0.8.5;
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+
+import "../core/registry/RegistryEntities.sol";
 import "../libs/LibDerivative.sol";
 
 interface ICore {
+    function initialize(address _governor) external;
+
+    function getProtocolParametersArgs() external view returns (RegistryEntities.ProtocolParametersArgs memory);
+
+    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
+
+    function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256);
+
+    function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2] memory);
+
+    function getP2pDerivativeVaultFunds(bytes32 _derivativeHash) external view returns (uint256);
+
+    function isDerivativeCancelled(bytes32 _derivativeHash) external view returns (bool);
+
+    function updateProtocolParametersArgs() external;
+
+    function updateProtocolAddresses() external;
+
     function withdrawFee(address _tokenAddress) external;
+
+    function withdrawFee(address _tokenAddress, uint256 _amount) external;
 
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _addresses
+        address[2] calldata _positionsOwners,
+        string calldata _derivativeAuthorCustomName
+    ) external;
+
+    function createAndMint(
+        LibDerivative.Derivative calldata _derivative,
+        uint256 _amount,
+        address[2] calldata _positionsOwners,
+        string calldata _derivativeAuthorCustomName
     ) external;
 
     function mint(
         uint256 _amount,
-        address[2] calldata _positionAddresses,
+        address[2] calldata _positionsAddresses,
         address[2] calldata _positionsOwners
     ) external;
 
@@ -33,7 +62,7 @@ interface ICore {
         uint256[] calldata _amounts
     ) external;
 
-    function redeem(address[2] calldata _positionAddresses, uint256 _amount) external;
+    function redeem(address[2] calldata _positionsAddresses, uint256 _amount) external;
 
     function redeem(address[2][] calldata _positionsAddresses, uint256[] calldata _amounts) external;
 
