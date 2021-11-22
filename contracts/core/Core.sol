@@ -34,6 +34,12 @@ import "../libs/LibCalculator.sol";
     - C14 = ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS
     - C15 = ERROR_CORE_FEE_AMOUNT_GREATER_THAN_BALANCE
     - C16 = ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST
+    - C17 = ERROR_CORE_PROTOCOL_POSITION_CREATION_PAUSED
+    - C18 = ERROR_CORE_PROTOCOL_POSITION_MINT_PAUSED
+    - C19 = ERROR_CORE_PROTOCOL_POSITION_REDEMPTION_PAUSED
+    - C20 = ERROR_CORE_PROTOCOL_POSITION_EXECUTION_PAUSED
+    - C21 = ERROR_CORE_PROTOCOL_POSITION_CANCELLATION_PAUSED
+    - C22 = ERROR_CORE_PROTOCOL_RESERVE_CLAIM_PAUSED
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
@@ -74,11 +80,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// Fees vault
     /// Key-value entity that maps an address representing a fee recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of fee recipients (i.e: derivative authors)
     mapping(address => mapping(address => uint256)) private feesVaults;
-
-    modifier whenNotPaused() {
-        require(!registry.isProtocolPaused(), "U4");
-        _;
-    }
 
     /// @notice It is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
     function initialize(address _registry) external initializer {
@@ -155,7 +156,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice It allows a fee recipient to to withdraw their entire accrued fees
     /// @param _tokenAddress address of the ERC20 token to withdraw
-    function withdrawFee(address _tokenAddress) external nonReentrant whenNotPaused {
+    function withdrawFee(address _tokenAddress) external nonReentrant {
+        require(!registry.isProtocolReserveClaimPaused(), "C22");
         uint256 balance = feesVaults[msg.sender][_tokenAddress];
         feesVaults[msg.sender][_tokenAddress] = 0;
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, balance);
@@ -164,9 +166,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice It allows a fee recipient to to withdraw the desired amount of accrued fees
     /// @param _tokenAddress address of the ERC20 token to withdraw
     /// @param _amount uint256 amount of fee to withdraw
-    function withdrawFee(address _tokenAddress, uint256 _amount) external nonReentrant whenNotPaused {
+    function withdrawFee(address _tokenAddress, uint256 _amount) external nonReentrant {
+        require(!registry.isProtocolReserveClaimPaused(), "C22");
         uint256 balance = feesVaults[msg.sender][_tokenAddress];
-        require(_amount <= balance, "C15");
+        require(balance >= _amount, "C15");
         feesVaults[msg.sender][_tokenAddress] -= _amount;
         IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, _amount);
     }
@@ -183,7 +186,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _amount,
         address[2] calldata _positionsOwners,
         string calldata _derivativeAuthorCustomName
-    ) external whenNotPaused nonReentrant {
+    ) external nonReentrant {
         _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
     }
 
@@ -202,7 +205,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _amount,
         address[2] calldata _positionsOwners,
         string calldata _derivativeAuthorCustomName
-    ) external whenNotPaused nonReentrant {
+    ) external nonReentrant {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
         address implementationAddress = protocolAddressesArgs.opiumProxyFactory.getImplementationAddress();
         (address longPositionTokenAddress, bool isLongDeployed) = derivativeHash.predictAndCheckDeterministicAddress(
@@ -236,7 +239,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _amount,
         address[2] calldata _positionsAddresses,
         address[2] calldata _positionsOwners
-    ) external whenNotPaused nonReentrant {
+    ) external nonReentrant {
         _mint(_amount, _positionsAddresses, _positionsOwners);
     }
 
@@ -338,6 +341,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         string memory _derivativeAuthorCustomName
     ) private {
         require(block.timestamp < _derivative.endTime, "C16");
+        require(!registry.isProtocolPositionCreationPaused(), "C17");
         // Generate hash for derivative
         bytes32 derivativeHash = _derivative.getDerivativeHash();
 
@@ -404,6 +408,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address[2] memory _positionsAddresses,
         address[2] memory _positionsOwners
     ) private {
+        require(!registry.isProtocolPositionMintPaused(), "C18");
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionsAddresses[0]
         ).getPositionTokenData();
@@ -470,7 +475,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// [0] LONG position
     /// [1] SHORT position
     /// @param _amount uint256 amount of the LONG and SHORT positions to be redeemed
-    function _redeem(address[2] memory _positionsAddresses, uint256 _amount) private whenNotPaused {
+    function _redeem(address[2] memory _positionsAddresses, uint256 _amount) private {
+        require(!registry.isProtocolPositionRedemptionPaused(), "C19");
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionsAddresses[0]
         ).getPositionTokenData();
@@ -505,8 +511,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount
         );
 
-        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
         IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, totalMargin - fees);
+
+        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
 
         emit LogRedeem(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
@@ -519,7 +526,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address _positionOwner,
         address _positionAddress,
         uint256 _amount
-    ) private whenNotPaused {
+    ) private {
+        require(!registry.isProtocolPositionRedemptionPaused(), "C20");
         IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
             _positionAddress
         ).getPositionTokenData();
@@ -560,7 +568,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice Cancels tickers, burns positions and returns margins to the position owner in case no data were provided within `protocolParametersArgs.noDataCancellationPeriod`
     /// @param _positionAddress PositionTypes of positions to be canceled
     /// @param _amount uint256[] Amount of positions to cancel for each `positionAddress`
-    function _cancel(address _positionAddress, uint256 _amount) private whenNotPaused {
+    function _cancel(address _positionAddress, uint256 _amount) private {
+        require(!registry.isProtocolPositionCancellationPaused(), "C20");
         IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
             _positionAddress
         ).getPositionTokenData();
