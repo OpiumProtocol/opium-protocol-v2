@@ -14,25 +14,20 @@ import {
   calculateTotalGrossProfit,
 } from "../utils/derivatives";
 // types
-import {
-  Core,
-  OpiumPositionToken,
-  OpiumProxyFactory,
-  RegistryUpgradeable,
-  TestToken,
-  TokenSpender,
-} from "../typechain";
+import { Core, OpiumPositionToken, OpiumProxyFactory, Registry, TestToken, TokenSpender } from "../typechain";
 import { timeTravel } from "../utils/evm";
 import { TDerivativeOrder } from "../types";
 import { toBN } from "../utils/bn";
-import { customDerivativeName } from "../utils/constants";
+import { customDerivativeName, executeOne } from "../utils/constants";
 
-const executeOne = "execute(address,uint256)";
+export enum EPositionCreation {
+  CREATE = "CREATE",
+  CREATE_AND_MINT = "CREATE_AND_MINT",
+}
 
-// seller, buyer, option
 export const shouldBehaveLikeCore = async (
   core: Core,
-  registry: RegistryUpgradeable,
+  registry: Registry,
   testToken: TestToken,
   tokenSpender: TokenSpender,
   opiumProxyFactory: OpiumProxyFactory,
@@ -41,6 +36,7 @@ export const shouldBehaveLikeCore = async (
   seller: SignerWithAddress,
   buyer: SignerWithAddress,
   optionOrder: TDerivativeOrder,
+  operationType: EPositionCreation,
 ): Promise<void> => {
   const { derivative, amount } = optionOrder;
   await testToken.mint(seller.address, derivative.margin.mul(2).mul(amount).div("1"));
@@ -50,9 +46,12 @@ export const shouldBehaveLikeCore = async (
   const marginBalanceBefore = await testToken.balanceOf(seller.address);
 
   await testToken.connect(seller).approve(tokenSpender.address, derivative.margin.mul(amount).div(toBN("1")));
-  const tx = await core
-    .connect(seller)
-    .create(derivative, amount, [buyer.address, seller.address], customDerivativeName);
+  const tx =
+    operationType === EPositionCreation.CREATE
+      ? await core.connect(seller).create(derivative, amount, [buyer.address, seller.address], customDerivativeName)
+      : await core
+          .connect(seller)
+          .createAndMint(derivative, amount, [buyer.address, seller.address], customDerivativeName);
   const receipt = await tx.wait();
 
   const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -92,7 +91,7 @@ export const shouldBehaveLikeCore = async (
   const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
   const sellerBalanceBefore = await testToken.balanceOf(seller.address);
   const opiumFeesBefore = await core.getFeeVaultsBalance(
-    protocolAddresses.protocolExecutionFeeReceiver,
+    protocolAddresses.protocolExecutionReserveClaimer,
     testToken.address,
   );
   const authorFeesBefore = await core.getFeeVaultsBalance(derivativeAuthorAddress, testToken.address);
@@ -110,17 +109,17 @@ export const shouldBehaveLikeCore = async (
   const { buyerMargin, sellerMargin } = await syntheticContract.getMargin(optionOrder.derivative);
   const authorFeeCommission = await syntheticContract.getAuthorCommission();
 
-  const { protocolCommissionPart } = await registry.getProtocolParameters();
+  const { protocolExecutionReservePart } = await registry.getProtocolParameters();
 
   const sellerFees = computeFees(
     calculateTotalGrossProfit(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.SELLER),
     authorFeeCommission,
-    protocolCommissionPart,
+    protocolExecutionReservePart,
   );
   const buyerFees = computeFees(
     calculateTotalGrossProfit(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.BUYER),
     authorFeeCommission,
-    protocolCommissionPart,
+    protocolExecutionReservePart,
   );
 
   const buyerNetPayout = calculateTotalNetPayout(
@@ -151,10 +150,12 @@ export const shouldBehaveLikeCore = async (
   );
 
   const opiumFeesAfter = await core.getFeeVaultsBalance(
-    protocolAddresses.protocolExecutionFeeReceiver,
+    protocolAddresses.protocolExecutionReserveClaimer,
     testToken.address,
   );
   const authorFeesAfter = await core.getFeeVaultsBalance(derivativeAuthorAddress, testToken.address);
+  console.log(`authorFee: ${authorFeesAfter.toString()}`);
+  console.log(`#opiumFeesAfter: ${opiumFeesAfter.toString()}`);
 
   expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(
     opiumFeesBefore.add(buyerFees.protocolFee).add(sellerFees.protocolFee),

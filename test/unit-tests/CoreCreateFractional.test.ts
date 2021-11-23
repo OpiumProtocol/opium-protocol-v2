@@ -12,7 +12,7 @@ import {
   EPayout,
   calculateTotalNetPayout,
 } from "../../utils/derivatives";
-import setup from "./../__fixtures__";
+import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";
 import {
   Core,
@@ -20,29 +20,26 @@ import {
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
   OracleAggregator,
-  RegistryUpgradeable,
+  Registry,
   TestToken,
   TokenSpender,
 } from "../../typechain";
 import { timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
-import { customDerivativeName, SECONDS_40_MINS } from "../../utils/constants";
+import { customDerivativeName, executeOne, SECONDS_40_MINS } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
-
-const executeOne = "execute(address,uint256)";
 
 describe("Core with fractional quantities", () => {
   const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
-  let fullMarginOption: ICreatedDerivativeOrder;
-
-  let testToken: TestToken,
+  let fullMarginOption: ICreatedDerivativeOrder,
+    testToken: TestToken,
     testTokenSixDecimals: TestToken,
     core: Core,
     optionCallMock: OptionCallSyntheticIdMock,
     oracleAggregator: OracleAggregator,
     tokenSpender: TokenSpender,
     opiumProxyFactory: OpiumProxyFactory,
-    registry: RegistryUpgradeable;
+    registry: Registry;
 
   let namedSigners: TNamedSigners;
 
@@ -169,7 +166,7 @@ describe("Core with fractional quantities", () => {
 
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
-    const { protocolCommissionPart } = await registry.getProtocolParameters();
+    const { protocolExecutionReservePart } = await registry.getProtocolParameters();
 
     const buyerFees = computeFees(
       calculateTotalGrossPayout(
@@ -181,7 +178,7 @@ describe("Core with fractional quantities", () => {
         EPayout.BUYER,
       ),
       authorFeeCommission,
-      protocolCommissionPart,
+      protocolExecutionReservePart,
     );
     const sellerFees = computeFees(
       calculateTotalGrossPayout(
@@ -193,7 +190,7 @@ describe("Core with fractional quantities", () => {
         EPayout.SELLER,
       ),
       authorFeeCommission,
-      protocolCommissionPart,
+      protocolExecutionReservePart,
     );
 
     const buyerNetPayout = calculateTotalNetPayout(

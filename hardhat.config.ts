@@ -173,6 +173,12 @@ const config: HardhatUserConfig = {
     derivativeAuthor: {
       default: 17,
     },
+    createPositionPauser: {
+      default: 18,
+    },
+    coreCancelPositionPauser: {
+      default: 18,
+    },
   },
   typechain: {
     outDir: "typechain",

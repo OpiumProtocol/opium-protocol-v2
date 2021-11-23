@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { Core, RegistryUpgradeable } from "../typechain";
+import { Core, Registry } from "../typechain";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, ethers } = hre;
@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { deployer, governor } = await ethers.getNamedSigners();
 
-  const registry = await deploy("RegistryUpgradeable", {
+  const registry = await deploy("Registry", {
     from: deployer.address,
     log: true,
     proxy: {
@@ -87,7 +87,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
   });
 
-  const registryInstance = <RegistryUpgradeable>await ethers.getContract("RegistryUpgradeable");
+  const registryInstance = <Registry>await ethers.getContract("Registry");
 
   await registryInstance
     .connect(governor)

@@ -13,7 +13,7 @@ import "../../interfaces/ICore.sol";
     - R1 = ERROR_REGISTRY_PROTOCOL_ADDRESSES_SETTER_ROLE
     - R2 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
     - R3 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
-    - R4 = ERROR_REGISTRY_ONLY_OPIUM_FEE_SETTER_ROLE
+    - R4 = ERROR_REGISTRY_ONLY_OPIUM_RESERVE_SETTER_ROLE
     - R5 = ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE
     - R6 = ERROR_REGISTRY_ONLY_GUARDIAN_ROLE
     - R7 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE
@@ -30,6 +30,7 @@ import "../../interfaces/ICore.sol";
     - R17 = ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE
     - R18 = ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE
     - R19 = ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE
+    - R20 = ERROR_REGISTRY_PROTOCOL_RATIO_NOT_GREATER_THAN_ONE
 
  */
 
@@ -129,18 +130,18 @@ contract Registry is RegistryStorage {
         emit LogRedemptionReservePartChange(msg.sender, _redemptionFee);
     }
 
-    /// @notice It allows the OPIUM_FEE_SETTER_ROLE role to change the portion of the reserve that is distributed to the protocol governance's recipients for the successful execution of derivatives
+    /// @notice It allows the OPIUM_RESERVE_SETTER_ROLE role to change the portion of the reserve that is distributed to the protocol governance's recipients for the successful execution of derivatives
     /// @param _protocolRedemptionReservePart must be greater than 1 otherwise the protocol's reward would be equal to the derivative author's reward
     function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart) external onlyOpiumFeeSetter {
-        require(_protocolRedemptionReservePart > 1, "");
+        require(_protocolRedemptionReservePart > 1, "R20");
         protocolParametersArgs.protocolExecutionReservePart = _protocolRedemptionReservePart;
         emit LogOpiumReservePartChange(msg.sender, _protocolRedemptionReservePart);
     }
 
-    /// @notice It allows the OPIUM_FEE_SETTER_ROLE role to change the portion of the reserve that is distributed to the protocol governance's recipients for the successful redemption of market neutral positions
+    /// @notice It allows the OPIUM_RESERVE_SETTER_ROLE role to change the portion of the reserve that is distributed to the protocol governance's recipients for the successful redemption of market neutral positions
     /// @param _protocolExecutionReservePart must be greater than 1 otherwise the protocol's reward would be equal to the derivative author's reward
     function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart) external onlyOpiumFeeSetter {
-        require(_protocolExecutionReservePart > 1, "");
+        require(_protocolExecutionReservePart > 1, "R20");
         protocolParametersArgs.protocolExecutionReservePart = _protocolExecutionReservePart;
         emit LogOpiumReservePartChange(msg.sender, _protocolExecutionReservePart);
     }

@@ -14,7 +14,7 @@ import {
   TestTokenSpenderUpgrade,
   TestCoreUpgrade,
 } from "../../typechain";
-import { shouldBehaveLikeCore } from "../Core.behavior";
+import { EPositionCreation, shouldBehaveLikeCore } from "../Core.behavior";
 import { generateRandomDerivativeSetup } from "../../utils/testCaseGenerator";
 
 describe("Upgradeability", () => {
@@ -188,6 +188,7 @@ describe("Upgradeability", () => {
       seller,
       buyer,
       derivativeOrder,
+      EPositionCreation.CREATE,
     );
   });
 });

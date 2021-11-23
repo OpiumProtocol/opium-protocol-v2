@@ -12,7 +12,7 @@ library LibRoles {
     bytes32 internal constant REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE = keccak256("RL3");
 
     /// @notice Role responsible for updating the fixed reserve that that is set as a reserve ratio to calculate the commission originated from  the redemption of market neutral positions
-    bytes32 internal constant OPIUM_FEE_SETTER_ROLE = keccak256("RL4");
+    bytes32 internal constant OPIUM_RESERVE_SETTER_ROLE = keccak256("RL4");
 
     /// @notice Role responsible for updating the RegistryEntities.ProtocolParametersArgs.noDataCancellationPeriod
     /// @dev { See RegistryEntities.sol for a detailed description of the ProtocolParametersArgs parameters }

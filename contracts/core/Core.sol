@@ -15,6 +15,7 @@ import "../interfaces/IRegistry.sol";
 import "../libs/LibDerivative.sol";
 import "../libs/LibPosition.sol";
 import "../libs/LibCalculator.sol";
+import "hardhat/console.sol";
 
 /**
     Error codes:
@@ -40,6 +41,7 @@ import "../libs/LibCalculator.sol";
     - C20 = ERROR_CORE_PROTOCOL_POSITION_EXECUTION_PAUSED
     - C21 = ERROR_CORE_PROTOCOL_POSITION_CANCELLATION_PAUSED
     - C22 = ERROR_CORE_PROTOCOL_RESERVE_CLAIM_PAUSED
+    - C23 = ERROR_CORE_MISMATCHING_DERIVATIVES
  */
 
 /// @title Opium.Core contract creates positions, holds and distributes margin at the maturity
@@ -218,8 +220,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             implementationAddress,
             address(protocolAddressesArgs.opiumProxyFactory)
         );
-        require(isLongDeployed == isShortDeployed);
-        if (isLongDeployed) {
+        // both erc20 positions have not been deployed
+        require(isLongDeployed == isShortDeployed, "C23");
+        if (!isLongDeployed) {
             _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
@@ -531,7 +534,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address _positionAddress,
         uint256 _amount
     ) private {
-        require(!registry.isProtocolPositionRedemptionPaused(), "C20");
+        require(!registry.isProtocolPositionExecutionPaused(), "C20");
         IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
             _positionAddress
         ).getPositionTokenData();

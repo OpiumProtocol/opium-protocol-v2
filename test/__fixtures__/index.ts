@@ -6,14 +6,14 @@ import {
   OptionCallSyntheticIdMock,
   OracleAggregator,
   OracleIdMock,
-  RegistryUpgradeable,
   SyntheticAggregator,
   TestToken,
   TokenSpender,
 } from "../../typechain";
+import { Registry } from "../../typechain/Registry";
 
 export type TContracts = {
-  registry: RegistryUpgradeable;
+  registry: Registry;
   opiumProxyFactory: OpiumProxyFactory;
   tokenSpender: TokenSpender;
   core: Core;
@@ -32,7 +32,7 @@ const setup = deployments.createFixture(async (): Promise<TContracts> => {
   /*******************
    * PROTOCOL
    ********************/
-  const registry = <RegistryUpgradeable>await ethers.getContract("RegistryUpgradeable");
+  const registry = <Registry>await ethers.getContract("Registry");
   const opiumProxyFactory = <OpiumProxyFactory>await ethers.getContract("OpiumProxyFactory");
   const core = <Core>await ethers.getContract("Core");
   const oracleAggregator = <OracleAggregator>await ethers.getContract("OracleAggregator");

@@ -23,6 +23,8 @@ export type TNamedSigners = {
   goodGuy: SignerWithAddress;
   authorized: SignerWithAddress;
   impersonator: SignerWithAddress;
+  createPositionPauser: SignerWithAddress;
+  coreCancelPositionPauser: SignerWithAddress;
 };
 
 export type TDerivative = {

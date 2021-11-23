@@ -70,7 +70,7 @@ describe("CoreCreation", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     await expect(
       core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_SYNTHETIC_VALIDATION_ERROR));
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST));
   });
 
   it(`should revert create OptionCall derivative with 'CORE:NOT_ENOUGH_TOKEN_ALLOWANCE`, async () => {
@@ -320,6 +320,87 @@ describe("CoreCreation", () => {
         [deployer.address, deployer.address],
       ),
     ).to.be.revertedWith("Transaction reverted: function call to a non-contract account");
+  });
+
+  it("should successfully create (only the first time) and mint (all the subsequent times) a derivative's positions repeatedly by calling Core.createAndMint", async () => {
+    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
+    const { deployer, buyer, seller } = namedSigners;
+
+    const creationAmount = 0;
+    const mintAmount = toBN("3");
+    const optionCall = derivativeFactory({
+      margin: toBN("30"),
+      endTime: await createValidDerivativeExpiry(10),
+      params: [
+        toBN("20000"), // Strike Price 200.00$
+      ],
+      token: testToken.address,
+      syntheticId: optionCallMock.address,
+    });
+
+    const expectedDerivativeHash = getDerivativeHash(optionCall);
+    const marginBalanceBefore = await testToken.balanceOf(deployer.address);
+
+    const tx = await core.createAndMint(
+      optionCall,
+      creationAmount,
+      [buyer.address, seller.address],
+      customDerivativeName,
+    );
+    const receipt = await tx.wait();
+
+    /**
+     * emits _buyer, _seller, _derivativeHash, _amount
+     */
+    const [coreCreateEvent] = decodeEvents<Core>(core, "LogCreated", receipt.events);
+    expect(coreCreateEvent[0]).to.equal(buyer.address);
+    expect(coreCreateEvent[1]).to.equal(seller.address);
+    expect(coreCreateEvent[2]).to.equal(expectedDerivativeHash);
+    expect(coreCreateEvent[3]).to.equal(creationAmount);
+
+    const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
+
+    const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
+    const shortPositionERC20 = <OpiumPositionToken>(
+      await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
+    );
+
+    const marginBalanceAfter = await testToken.balanceOf(deployer.address);
+    expect(marginBalanceAfter).to.equal(marginBalanceBefore);
+
+    const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
+    const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
+    expect(buyerPositionsLongBalance).to.equal(creationAmount);
+    expect(buyerPositionsShortBalance).to.equal(0);
+
+    const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
+    const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address);
+
+    expect(sellerPositionsLongBalance).to.equal(0);
+    expect(sellerPositionsShortBalance).to.equal(creationAmount);
+
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(mintAmount));
+    await core.mint(
+      mintAmount,
+      [longPositionERC20.address, shortPositionERC20.address],
+      [buyer.address, seller.address],
+    );
+
+    const marginBalanceAfterMint = await testToken.balanceOf(deployer.address);
+    expect(marginBalanceAfterMint).to.equal(
+      marginBalanceBefore.sub(computeTotalGrossPayout(optionCall.margin, mintAmount)),
+    );
+
+    const buyerPositionsLongBalanceAfterMint = await longPositionERC20.balanceOf(buyer.address);
+    const buyerPositionsShortBalanceAfterMint = await shortPositionERC20.balanceOf(buyer.address);
+    expect(buyerPositionsLongBalanceAfterMint, "wrong buyer mint amount").to.equal(mintAmount);
+    expect(buyerPositionsShortBalanceAfterMint, "wrong buyer mint amount").to.equal(0);
+
+    const sellerPositionsLongBalanceAfterMint = await longPositionERC20.balanceOf(seller.address);
+    const sellerPositionsShortBalanceAfterMint = await shortPositionERC20.balanceOf(seller.address);
+
+    expect(sellerPositionsLongBalanceAfterMint, "wrong seller mint amount").to.equal(0);
+    expect(sellerPositionsShortBalanceAfterMint, "wrong seller mint amount").to.equal(mintAmount);
   });
 
   after(async () => {

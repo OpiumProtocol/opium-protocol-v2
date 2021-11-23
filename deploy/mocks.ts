@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { deployer, author } = await ethers.getNamedSigners();
 
-  const registry = await get("RegistryUpgradeable");
+  const registry = await get("Registry");
 
   await deploy("OptionCallSyntheticIdMock", {
     from: author.address,

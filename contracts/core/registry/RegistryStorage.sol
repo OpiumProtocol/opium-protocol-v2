@@ -36,10 +36,10 @@ contract RegistryStorage is AccessControlUpgradeable {
         _;
     }
 
-    /// @notice it ensures that the calling account has been granted the OPIUM_FEE_SETTER_ROLE
+    /// @notice it ensures that the calling account has been granted the OPIUM_RESERVE_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyOpiumFeeSetter() {
-        require(hasRole(LibRoles.OPIUM_FEE_SETTER_ROLE, msg.sender), "R4");
+        require(hasRole(LibRoles.OPIUM_RESERVE_SETTER_ROLE, msg.sender), "R4");
         _;
     }
 
@@ -137,7 +137,7 @@ contract RegistryStorage is AccessControlUpgradeable {
         _setupRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, _governor);
         _setupRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
         _setupRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.OPIUM_FEE_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.OPIUM_RESERVE_SETTER_ROLE, _governor);
         _setupRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, _governor);
         _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
