@@ -56,13 +56,13 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     // Emitted when Core mints an amount of LONG/SHORT positions
     event LogMinted(address indexed _buyer, address indexed _seller, bytes32 indexed _derivativeHash, uint256 _amount);
     // Emitted when Core executes positions
-    event LogExecuted(address indexed _positionsOwner, address indexed _positionAddress, uint256 indexed _amount);
+    event LogExecuted(address indexed _positionsOwner, address indexed _positionAddress, uint256 _amount);
     // Emitted when Core cancels ticker for the first time
-    event LogDerivativeHashCancelled(address indexed _positionOwner, bytes32 _derivativeHash);
+    event LogDerivativeHashCancelled(address indexed _positionOwner, bytes32 indexed _derivativeHash);
     // Emitted when Core cancels a position of a previously cancelled Derivative.derivativeHash
-    event LogPositionCancelled(address indexed _positionOwner, bytes32 _derivativeHash);
+    event LogCancelled(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 _amount);
     // Emitted when Core redeems an amount of market neutral positions
-    event LogRedeem(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 indexed _amount);
+    event LogRedeemed(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 _amount);
 
     RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
@@ -424,8 +424,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
         require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
 
-        // Check if ticker was canceled
-        require(!cancelledDerivatives[longOpiumPositionTokenParams.derivativeHash], "C7");
+        require(block.timestamp < longOpiumPositionTokenParams.derivative.endTime, "C16");
 
         uint256[2] memory margins;
         // Get cached margin required according to logic from Opium.SyntheticAggregator
@@ -489,8 +488,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _onlyOpiumFactoryTokens(_positionsAddresses[0], longOpiumPositionTokenParams);
         _onlyOpiumFactoryTokens(_positionsAddresses[1], shortOpiumPositionTokenParams);
         require(shortOpiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
-        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
+        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
 
         ISyntheticAggregator.SyntheticCache memory syntheticCache = protocolAddressesArgs
             .syntheticAggregator
@@ -515,14 +514,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount
         );
 
+        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
+
         IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(
             msg.sender,
             totalMargin - reserves
         );
 
-        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
-
-        emit LogRedeem(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
+        emit LogRedeemed(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed positions being burned regardless of their profitability
@@ -553,6 +552,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             "C11"
         );
 
+        // Burn executed position tokens
+        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
+
         // Returns payout for all positions
         uint256 payout = _getPayout(
             opiumPositionTokenParams,
@@ -560,9 +562,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             protocolAddressesArgs.syntheticAggregator,
             protocolAddressesArgs.oracleAggregator
         );
-
-        // Burn executed position tokens
-        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
 
         // Transfer payout
         if (payout > 0) {
@@ -631,13 +630,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Burn cancelled position tokens
         protocolAddressesArgs.opiumProxyFactory.burn(msg.sender, _positionAddress, _amount);
 
+        _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
+
         // Transfer payout * _amounts[i]
         if (payout > 0) {
             IERC20Upgradeable(opiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, payout);
         }
 
-        _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
-        emit LogPositionCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
+        emit LogCancelled(msg.sender, opiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice Helper function consumed by `Core._execute` to calculate the execution's payout of a settled derivative's position
