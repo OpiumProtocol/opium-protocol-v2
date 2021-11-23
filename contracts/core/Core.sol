@@ -33,7 +33,7 @@ import "hardhat/console.sol";
     - C12 = ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE
     - C13 = ERROR_CORE_CANCELLATION_IS_NOT_ALLOWED
     - C14 = ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS
-    - C15 = ERROR_CORE_FEE_AMOUNT_GREATER_THAN_BALANCE
+    - C15 = ERROR_CORE_RESERVE_AMOUNT_GREATER_THAN_BALANCE
     - C16 = ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST
     - C17 = ERROR_CORE_PROTOCOL_POSITION_CREATION_PAUSED
     - C18 = ERROR_CORE_PROTOCOL_POSITION_MINT_PAUSED
@@ -79,8 +79,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// derivativePayouts[derivativeHash][1] => seller's payout
     mapping(bytes32 => uint256[2]) private derivativePayouts;
 
-    /// Fees vault
-    /// Key-value entity that maps an address representing a fee recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of fee recipients (i.e: derivative authors)
+    /// Reseves vault
+    /// Key-value entity that maps an address representing a reserve recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of reserve recipients (i.e: derivative authors)
     mapping(address => mapping(address => uint256)) private reservesVault;
 
     /// @notice It is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
@@ -103,17 +103,17 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice It returns Opium.Core's internal state of the protocol contracts' and recipients' addresses fetched from the Opium.Registry
     /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
-    /// @return ProtocolAddressesArgs struct including the protocol's main addresses - contracts and fees recipients
+    /// @return ProtocolAddressesArgs struct including the protocol's main addresses - contracts and reseves recipients
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
         return registry.getProtocolAddresses();
     }
 
-    /// @notice It returns the accrued fees of a given address denominated in a specified token
-    /// @param _feeRecipient address of the fee recipient
-    /// @param _token address of a token used as a fee compensation
-    /// @return uint256 amount of the accrued fees denominated in the provided token
-    function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256) {
-        return reservesVault[_feeRecipient][_token];
+    /// @notice It returns the accrued reseves of a given address denominated in a specified token
+    /// @param _reseveRecipient address of the reseve recipient
+    /// @param _token address of a token used as a reseve compensation
+    /// @return uint256 amount of the accrued reseves denominated in the provided token
+    function getReservesVaultBalance(address _reseveRecipient, address _token) external view returns (uint256) {
+        return reservesVault[_reseveRecipient][_token];
     }
 
     /// @notice It queries the buyer's and seller's payouts for a given derivative
@@ -156,7 +156,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
-    /// @notice It allows a fee recipient to claim their entire accrued reserves
+    /// @notice It allows a reseve recipient to claim their entire accrued reserves
     /// @param _tokenAddress address of the ERC20 token to withdraw
     function claimReserves(address _tokenAddress) external nonReentrant {
         require(!registry.isProtocolReserveClaimPaused(), "C22");
@@ -411,7 +411,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address[2] memory _positionsAddresses,
         address[2] memory _positionsOwners
     ) private {
-        require(!registry.isProtocolPositionMintPaused(), "C18");
+        require(!registry.isProtocolPositionMintingPaused(), "C18");
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionsAddresses[0]
         ).getPositionTokenData();
@@ -525,7 +525,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         emit LogRedeem(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
-    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related fees if the position is profitable and in the executed positions being burned regardless of their profitability
+    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed positions being burned regardless of their profitability
     /// @param _positionOwner address Address of the owner of positions
     /// @param _positionAddress address[] `positionAddresses` of positions that needs to be executed
     /// @param _amount uint256 Amount of positions to execute for each `positionAddress`
@@ -725,35 +725,33 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice It computes the total reserve to be distributed to the recipients provided as arguments
     /// @param _derivativeAuthorAddress address of the derivative author that receives a portion of the reserves being calculated
     /// @param _tokenAddress address of the token being used to distribute the reserves
-    /// @param _protocolFeeReceiver  address of the designated governance recipient that receives a portion of the reserves being calculated
-    /// @param _derivativeAuthorFeeRatio uint256 portion of the reserves that the derivative author set as a compensation for themselves
-    /// @param _profit uint256 the gross profit from which the reserves will be detracted
-    /// @return reserve uint256 total fee being calculated which corresponds to the sum of the reserves distributed to the derivative author and the fees distributed to the designated governance recipient
+    /// @param _protocolReserveReceiver  address of the designated recipient that receives a portion of the reserves being calculated
+    /// @param _reservePercentage uint256 portion of the reserves that is being distributed from initial amount
+    /// @param _protocolReservePercentage uint256 portion of the reserves that is being distributed to `_protocolReserveReceiver`
+    /// @param _initialAmount uint256 the amount from which the reserves will be detracted
+    /// @return totalReserve uint256 total reserves being calculated which corresponds to the sum of the reserves distributed to the derivative author and the designated recipient
     function _getReserves(
         address _derivativeAuthorAddress,
         address _tokenAddress,
-        address _protocolFeeReceiver,
-        uint256 _derivativeAuthorFeeRatio,
-        uint256 _protocolReserveRatio,
-        uint256 _profit
-    ) private returns (uint256 reserve) {
-        // Calculate fee
-        // fee = profit * _derivativeAuthorFeeRatio / 10000
-        reserve = (_profit * _derivativeAuthorFeeRatio) / 10000;
-        // If commission is zero, finish
-        if (reserve == 0) {
+        address _protocolReserveReceiver,
+        uint256 _reservePercentage,
+        uint256 _protocolReservePercentage,
+        uint256 _initialAmount
+    ) private returns (uint256 totalReserve) {
+        totalReserve = _initialAmount * _reservePercentage / LibCalculator.PERCENTAGE_BASE;
+
+        // If totalReserve is zero, finish
+        if (totalReserve == 0) {
             return 0;
         }
-        uint256 protocolReserve = reserve / _protocolReserveRatio;
-        // Update feeVault for Opium team
-        // protocolReserve = reserve / _protocolReserveRatio
-        // feesVault[protocolFeeReceiver][token] += protocolFee
-        reservesVault[_protocolFeeReceiver][_tokenAddress] += protocolReserve;
+
+        uint256 protocolReserve = totalReserve * _protocolReservePercentage / LibCalculator.PERCENTAGE_BASE;
+        
+        // Update reservesVault for _protocolReserveReceiver
+        reservesVault[_protocolReserveReceiver][_tokenAddress] += protocolReserve;
 
         // Update reservesVault for `syntheticId` author
-        // authorReserve = reserve - protocolReserve
-        // reservesVault[author][token] += authorReserve
-        reservesVault[_derivativeAuthorAddress][_tokenAddress] += reserve - protocolReserve;
+        reservesVault[_derivativeAuthorAddress][_tokenAddress] += totalReserve - protocolReserve;
     }
 
     /// @notice It increases the balance associated to a given derivative stored in the p2pVaults mapping

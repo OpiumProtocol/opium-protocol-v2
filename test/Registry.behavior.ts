@@ -30,7 +30,7 @@ export type TShouldBehaveLikeRegistry = {
   ) => Promise<void>;
   toHaveCorrectProtocolParameters: (
     noDataCancellationPeriod: number,
-    derivativeAuthorExecutionReservePartCap: number,
+    derivativeAuthorExecutionFeeCap: number,
     derivativeAuthorRedemptionReservePart: number,
     protocolExecutionReservePart: number,
     paused: boolean,
@@ -102,7 +102,7 @@ export const shouldBehaveLikeRegistry = (registry: Registry): TShouldBehaveLikeR
   },
   toHaveCorrectProtocolParameters: async (
     noDataCancellationPeriod: number,
-    derivativeAuthorExecutionReservePartCap: number,
+    derivativeAuthorExecutionFeeCap: number,
     derivativeAuthorRedemptionReservePart: number,
     protocolExecutionReservePart: number,
     paused: boolean,
@@ -114,9 +114,9 @@ export const shouldBehaveLikeRegistry = (registry: Registry): TShouldBehaveLikeR
       noDataCancellationPeriod,
     );
     expect(
-      protocolParams.derivativeAuthorExecutionReservePartCap,
-      "wrong derivativeAuthorExecutionReservePartCap",
-    ).to.be.eq(derivativeAuthorExecutionReservePartCap);
+      protocolParams.derivativeAuthorExecutionFeeCap,
+      "wrong derivativeAuthorExecutionFeeCap",
+    ).to.be.eq(derivativeAuthorExecutionFeeCap);
     expect(
       protocolParams.derivativeAuthorRedemptionReservePart,
       "wrong derivativeAuthorRedemptionReservePart",

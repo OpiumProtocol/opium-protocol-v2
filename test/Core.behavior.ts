@@ -90,11 +90,11 @@ export const shouldBehaveLikeCore = async (
 
   const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
   const sellerBalanceBefore = await testToken.balanceOf(seller.address);
-  const opiumFeesBefore = await core.getFeeVaultsBalance(
+  const opiumFeesBefore = await core.getReservesVaultBalance(
     protocolAddresses.protocolExecutionReserveClaimer,
     testToken.address,
   );
-  const authorFeesBefore = await core.getFeeVaultsBalance(derivativeAuthorAddress, testToken.address);
+  const authorFeesBefore = await core.getReservesVaultBalance(derivativeAuthorAddress, testToken.address);
 
   await core.connect(buyer)[executeOne](longPositionAddress, amount);
   await core.connect(seller)[executeOne](shortPositionAddress, amount);
@@ -149,11 +149,11 @@ export const shouldBehaveLikeCore = async (
     sellerBalanceBefore.add(sellerNetPayout),
   );
 
-  const opiumFeesAfter = await core.getFeeVaultsBalance(
+  const opiumFeesAfter = await core.getReservesVaultBalance(
     protocolAddresses.protocolExecutionReserveClaimer,
     testToken.address,
   );
-  const authorFeesAfter = await core.getFeeVaultsBalance(derivativeAuthorAddress, testToken.address);
+  const authorFeesAfter = await core.getReservesVaultBalance(derivativeAuthorAddress, testToken.address);
   console.log(`authorFee: ${authorFeesAfter.toString()}`);
   console.log(`#opiumFeesAfter: ${opiumFeesAfter.toString()}`);
 

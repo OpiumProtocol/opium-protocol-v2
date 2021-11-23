@@ -10,7 +10,7 @@ interface ICore {
 
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
 
-    function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256);
+    function getReservesVaultBalance(address _reseveRecipient, address _token) external view returns (uint256);
 
     function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2] memory);
 

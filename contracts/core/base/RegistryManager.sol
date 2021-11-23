@@ -8,7 +8,7 @@ import "../../interfaces/IRegistry.sol";
     - M1 = ERROR_REGISTRY_MANAGER_ONLY_REGISTRY_MANAGER_ROLE
  */
 contract RegistryManager is Initializable {
-    event LogRegistryChange(address indexed _changer, address indexed _newRegistryAddress);
+    event LogRegistryChanged(address indexed _changer, address indexed _newRegistryAddress);
 
     IRegistry internal registry;
 
@@ -20,11 +20,12 @@ contract RegistryManager is Initializable {
     function __RegistryManager__init(address _registry) internal initializer {
         require(_registry != address(0));
         registry = IRegistry(_registry);
+        emit LogRegistryChanged(msg.sender, _registry);
     }
 
     function setRegistry(address _registry) external onlyRegistryManager {
         registry = IRegistry(_registry);
-        emit LogRegistryChange(msg.sender, _registry);
+        emit LogRegistryChanged(msg.sender, _registry);
     }
 
     function getRegistry() external view returns (address) {

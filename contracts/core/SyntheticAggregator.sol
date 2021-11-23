@@ -87,7 +87,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolParameters();
         // Check if commission is not greater than the max cap set in the Registry by the governance
-        require(authorCommission <= protocolParametersArgs.derivativeAuthorExecutionReservePartCap, "S3");
+        require(authorCommission <= protocolParametersArgs.derivativeAuthorExecutionFeeCap, "S3");
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({
             buyerMargin: buyerMargin,

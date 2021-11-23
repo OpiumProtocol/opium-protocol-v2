@@ -15,31 +15,12 @@ contract RegistryStorage is AccessControlUpgradeable {
     RegistryEntities.ProtocolPausabilityArgs internal protocolPausabilityArgs;
     mapping(address => bool) internal coreSpenderWhitelist;
 
+    // ***** SETUP *****
+
     /// @notice it ensures that the calling account has been granted the PROTOCOL_ADDRESSES_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
-    modifier onlyProtocolRegister() {
+    modifier onlyProtocolAdressesSetter() {
         require(hasRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, msg.sender), "R1");
-        _;
-    }
-
-    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyProtocolExecutionReserveClaimerAddressSetter() {
-        require(hasRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), "R2");
-        _;
-    }
-
-    /// @notice it ensures that the calling account has been granted the REDEMPTION_FEE_RECIPIENT_SETTER_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyProtocolRedemptionReserveClaimerAddressSetter() {
-        require(hasRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), "R3");
-        _;
-    }
-
-    /// @notice it ensures that the calling account has been granted the OPIUM_RESERVE_SETTER_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyOpiumFeeSetter() {
-        require(hasRole(LibRoles.OPIUM_RESERVE_SETTER_ROLE, msg.sender), "R4");
         _;
     }
 
@@ -50,13 +31,6 @@ contract RegistryStorage is AccessControlUpgradeable {
         _;
     }
 
-    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE
-    /// @dev by default, it is granted to the `governor` account
-    modifier onlyGuardian() {
-        require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), "R6");
-        _;
-    }
-
     /// @notice it ensures that the calling account has been granted the WHITELISTER_ROLE
     /// @dev by default, it is granted to the `governor` account
     modifier onlyWhitelister() {
@@ -64,17 +38,49 @@ contract RegistryStorage is AccessControlUpgradeable {
         _;
     }
 
-    /// @notice it ensures that the calling account has been granted the EXECUTION_FEE_CAP_SETTER_ROLE
+    // ***** RESERVE *****
+
+    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
-    modifier onlyExecutionReservePartSetter() {
-        require(hasRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), "R8");
+    modifier onlyProtocolExecutionReserveClaimerAddressSetter() {
+        require(hasRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), "R2");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolRedemptionReserveClaimerAddressSetter() {
+        require(hasRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), "R3");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_PART_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolExecutionReservePartSetter() {
+        require(hasRole(LibRoles.EXECUTION_RESERVE_PART_SETTER_ROLE, msg.sender), "R4");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyDerivativeAuthorExecutionFeeCapSetter() {
+        require(hasRole(LibRoles.DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), "R8");
         _;
     }
 
     /// @notice it ensures that the calling account has been granted the REDEMPTION_RESERVE_PART_SETTER_ROLE
     /// @dev by default, it is granted to the `governor` account
-    modifier onlyRedemptionReservePartSetter() {
+    modifier onlyProtocolRedemptionReservePartSetter() {
         require(hasRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, msg.sender), "R9");
+        _;
+    }
+
+    // ***** EMERGENCY *****
+
+    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyGuardian() {
+        require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), "R6");
         _;
     }
 
@@ -133,18 +139,23 @@ contract RegistryStorage is AccessControlUpgradeable {
     /// @param _governor address of the governance account which will be assigned the initial admin role
     function __RegistryStorage__init(address _governor) internal initializer {
         __AccessControl_init();
+
+        // Setup
         _setupRole(DEFAULT_ADMIN_ROLE, _governor);
         _setupRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.OPIUM_RESERVE_SETTER_ROLE, _governor);
         _setupRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
-        _setupRole(LibRoles.EXECUTION_FEE_CAP_SETTER_ROLE, _governor);
-        _setupRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, _governor);
         _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
 
+        // Reserve
+        _setupRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.EXECUTION_RESERVE_PART_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, _governor);
+
+        // Emergency
+        _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
         _setupRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, _governor);
         _setupRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, _governor);
         _setupRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, _governor);
@@ -153,12 +164,13 @@ contract RegistryStorage is AccessControlUpgradeable {
         _setupRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, _governor);
         _setupRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, _governor);
 
+        // Default protocol parameters
         protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
             noDataCancellationPeriod: 2 weeks,
-            derivativeAuthorExecutionReservePartCap: 10000,
-            derivativeAuthorRedemptionReservePart: 100,
-            protocolExecutionReservePart: 10,
-            protocolRedemptionReservePart: 10
+            derivativeAuthorExecutionFeeCap: 1000, // 10%
+            derivativeAuthorRedemptionReservePart: 10, // 0.1%
+            protocolExecutionReservePart: 1000, // 10%
+            protocolRedemptionReservePart: 1000 // 10%
         });
     }
 }

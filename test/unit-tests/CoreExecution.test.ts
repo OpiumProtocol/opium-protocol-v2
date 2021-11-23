@@ -358,8 +358,8 @@ describe("CoreExecution", () => {
     await timeTravel(SECONDS_40_MINS + 10);
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
-    const opiumFeesBefore = await core.getFeeVaultsBalance(deployer.address, testToken.address);
-    const authorFeesBefore = await core.getFeeVaultsBalance(author.address, testToken.address);
+    const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
     const amount = fullMarginOption.amount.sub(toBN("1"));
     await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, amount);
     await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, amount);
@@ -409,9 +409,9 @@ describe("CoreExecution", () => {
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     expect(sellerBalanceAfter, "wrong seller").to.be.equal(sellerBalanceBefore.add(sellerNetPayout));
 
-    const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
-    const authorFeesAfter = await core.getFeeVaultsBalance(author.address, testToken.address);
+    const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
     //precision issues, fix it
     // expect(authorFeesAfter, 'wrong author fee').to.be.equal(authorFeesBefore.add(fees.authorFee));
   });
@@ -434,8 +434,8 @@ describe("CoreExecution", () => {
     await optionCallMock.connect(buyer).allowThirdpartyExecution(true);
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
-    const opiumFeesBefore = await core.getFeeVaultsBalance(deployer.address, testToken.address);
-    const authorFeesBefore = await core.getFeeVaultsBalance(author.address, testToken.address);
+    const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
     const amount = toBN("1");
     await core.connect(thirdParty)[executeOneWithAddress](buyer.address, fullMarginOption.longPositionAddress, amount);
 
@@ -454,9 +454,9 @@ describe("CoreExecution", () => {
     // const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     // expect(sellerBalanceAfter).to.be.equal(sellerBalanceBefore.add(sellerPayout));
 
-    const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(fees.protocolFee));
-    const authorFeesAfter = await core.getFeeVaultsBalance(author.address, testToken.address);
+    const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
     expect(authorFeesAfter, "wrong author fee").to.be.equal(authorFeesBefore.add(fees.authorFee));
   });
 
@@ -479,8 +479,8 @@ describe("CoreExecution", () => {
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
-    const authorFeesBefore = await core.getFeeVaultsBalance(author.address, testToken.address);
-    const opiumFeesBefore = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
+    const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
 
     const longPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", overMarginOption.longPositionAddress)
@@ -552,9 +552,9 @@ describe("CoreExecution", () => {
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     expect(sellerBalanceAfter).to.be.equal(sellerBalanceBefore.add(sellerNetPayout));
 
-    const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
-    const authorFeesAfter = await core.getFeeVaultsBalance(author.address, testToken.address);
+    const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
     // expect(authorFeesAfter, 'wrong author fee').to.be.equal(authorFeesBefore.add(fees.authorFee));
   });
 
@@ -562,7 +562,7 @@ describe("CoreExecution", () => {
     const { deployer, buyer, seller } = namedSigners;
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
-    const opiumFeesBefore = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
 
     await core.connect(buyer)[executeOne](underMarginOption.longPositionAddress, underMarginOption.amount);
 
@@ -623,7 +623,7 @@ describe("CoreExecution", () => {
       EPayout.SELLER,
     );
 
-    const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
 
     expect(buyerBalanceAfter, "wrong buyer balance").to.be.equal(buyerBalanceBefore.add(buyerNetPayout));
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
@@ -636,7 +636,7 @@ describe("CoreExecution", () => {
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
-    const opiumFeesBefore = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
 
     await core.connect(buyer)[executeOne](nonProfitOption.longPositionAddress, nonProfitOption.amount);
     await core.connect(seller)[executeOne](nonProfitOption.shortPositionAddress, nonProfitOption.amount);
@@ -653,7 +653,7 @@ describe("CoreExecution", () => {
 
     const fees = computeFees(buyerPayout, authorFeeCommission, protocolExecutionReservePart);
 
-    const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testToken.address);
+    const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     const buyerNetPayout = computeTotalNetPayout(buyerPayout, nonProfitOption.amount, fees.totalFee);
     const sellerNetPayout = computeTotalGrossPayout(sellerPayout, underMarginOption.amount);
 
@@ -744,8 +744,8 @@ describe("CoreExecution", () => {
     const ownerBalanceBefore = await testToken.balanceOf(deployer.address);
     const authorBalanceBefore = await testToken.balanceOf(author.address);
 
-    const opiumFees = await core.getFeeVaultsBalance(deployer.address, testToken.address);
-    const authorFees = await core.getFeeVaultsBalance(author.address, testToken.address);
+    const opiumFees = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    const authorFees = await core.getReservesVaultBalance(author.address, testToken.address);
 
     await core["claimReserves(address)"](testToken.address);
     await core.connect(author)["claimReserves(address)"](testToken.address);
