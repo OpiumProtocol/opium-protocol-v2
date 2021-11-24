@@ -51,10 +51,12 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
         if (_positionType == LibDerivative.PositionType.LONG) {
             string memory longPositionName = string(abi.encodePacked(_baseCustomName, "-LONG"));
             __ERC20_init(longPositionName, string(abi.encodePacked(_baseCustomSymbol, "_L")));
+            __EIP712_init_unchained(longPositionName, "1");
             __ERC20Permit_init_unchained(longPositionName);
         } else {
             string memory shortPositionName = string(abi.encodePacked(_baseCustomName, "-SHORT"));
             __ERC20_init(shortPositionName, string(abi.encodePacked(_baseCustomSymbol, "_S")));
+            __EIP712_init_unchained(shortPositionName, "1");
             __ERC20Permit_init_unchained(shortPositionName);
         }
         factory = msg.sender;
