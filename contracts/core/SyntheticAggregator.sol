@@ -11,7 +11,6 @@ import "../libs/LibDerivative.sol";
     - S1 = ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH
     - S2 = ERROR_SYNTHETIC_AGGREGATOR_WRONG_MARGIN
     - S3 = ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG
-    - S4 = ERROR_SYNTHETIC_AGGREGATOR_CUSTOM_POSITION_TOKEN_NAME_TOO_LONG
  */
 
 /// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data
@@ -26,7 +25,6 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 sellerMargin;
         uint256 authorCommission;
         address authorAddress;
-        string customDerivativeName;
         bool init;
     }
     mapping(bytes32 => SyntheticCache) private syntheticCaches;
@@ -84,10 +82,6 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         // We are not allowing both margins to be equal to 0
         require(buyerMargin != 0 || sellerMargin != 0, "S2");
 
-        string memory customDerivativeName = IDerivativeLogic(_derivative.syntheticId).getSyntheticIdCustomName();
-        require(bytes(customDerivativeName).length < 30, "S4");
-
-
         // AUTHOR COMMISSION
         // Get commission from syntheticId
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
@@ -100,7 +94,6 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
             sellerMargin: sellerMargin,
             authorCommission: authorCommission,
             authorAddress: IDerivativeLogic(_derivative.syntheticId).getAuthorAddress(),
-            customDerivativeName: customDerivativeName,
             init: true
         });
 

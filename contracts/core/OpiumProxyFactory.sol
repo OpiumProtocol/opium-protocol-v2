@@ -13,6 +13,7 @@ import "hardhat/console.sol";
 /**
     Error codes:
     - F1 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
+    - F2 = ERROR_OPIUM_PROXY_CUSTOM_POSITION_TOKEN_NAME_TOO_LONG
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
@@ -66,6 +67,7 @@ contract OpiumProxyFactory is RegistryManager {
         LibDerivative.Derivative calldata _derivative,
         string calldata _derivativeAuthorCustomName
     ) external onlyCore {
+        require(bytes(_derivativeAuthorCustomName).length < 30, "F2");
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
         address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
 
@@ -73,6 +75,7 @@ contract OpiumProxyFactory is RegistryManager {
         bytes memory endTimeDate = _toDerivativeEndTimeIdentifier(_derivative.endTime);
 
         bytes memory baseCustomName = abi.encodePacked(
+            "Opium Position:",
             endTimeDate,
             "-",
             _derivativeAuthorCustomName,
@@ -82,6 +85,8 @@ contract OpiumProxyFactory is RegistryManager {
 
         bytes memory customSymbol = abi.encodePacked(
             "OPIUM",
+            "_",
+            endTimeDate,
             "_",
             _derivativeAuthorCustomName,
             "_",
@@ -204,15 +209,13 @@ contract OpiumProxyFactory is RegistryManager {
 
         return
             abi.encodePacked(
-                day < 10
-                    ? abi.encodePacked("0", StringsUpgradeable.toString(day))
-                    : bytes(StringsUpgradeable.toString(day)),
-                "/",
+                StringsUpgradeable.toString(year),
                 month < 10
                     ? abi.encodePacked("0", StringsUpgradeable.toString(month))
                     : bytes(StringsUpgradeable.toString(month)),
-                "/",
-                StringsUpgradeable.toString(year)
+                day < 10
+                    ? abi.encodePacked("0", StringsUpgradeable.toString(day))
+                    : bytes(StringsUpgradeable.toString(day))
             );
     }
 

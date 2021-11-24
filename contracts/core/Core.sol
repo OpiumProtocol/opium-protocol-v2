@@ -349,12 +349,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Get cached margin required according to logic from Opium.SyntheticAggregator
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
-        ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getSyntheticCache(
+        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
             derivativeHash,
             _derivative
         );
-         
-        uint256 totalMargin =  syntheticCache.buyerMargin + syntheticCache.sellerMargin;
+
+        uint256 totalMargin = margins[0] + margins[1];   
         require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
         uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
 
@@ -381,7 +381,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount,
             derivativeHash,
             _derivative,
-            syntheticCache.customDerivativeName
+            IDerivativeLogic(_derivative.syntheticId).getSyntheticIdName()
         );
 
         // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
