@@ -13,7 +13,7 @@ interface IDerivativeLogic {
     function validateInput(LibDerivative.Derivative memory _derivative) external view returns (bool);
 
     /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions
-    function getSyntheticIdName() external view returns(string memory);
+    function getSyntheticIdName() external view returns (string memory);
 
     /// @notice Calculates margin required for derivative creation
     /// @param _derivative Derivative Instance of derivative

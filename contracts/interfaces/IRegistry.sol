@@ -27,7 +27,7 @@ interface IRegistry {
     function setDerivativeAuthorExecutionFeeCap(uint32 _derivativeAuthorExecutionFeeCap) external;
 
     function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart) external;
-    
+
     function setDerivativeAuthorRedemptionReservePart(uint32 _derivativeAuthorRedemptionReservePart) external;
 
     function pause() external;

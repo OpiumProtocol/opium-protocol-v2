@@ -39,12 +39,27 @@ contract Registry is RegistryStorage {
     event LogWhitelistAccountAdded(address indexed _setter, address indexed _whitelisted);
     event LogWhitelistAccountRemoved(address indexed _setter, address indexed _unlisted);
     // Reserve
-    event LogProtocolExecutionReserveClaimerChanged(address indexed _setter, address indexed _protocolExecutionReserveClaimer);
-    event LogProtocolRedemptionReserveClaimerChanged(address indexed _setter, address indexed _protocolRedemptionReserveClaimer);
+    event LogProtocolExecutionReserveClaimerChanged(
+        address indexed _setter,
+        address indexed _protocolExecutionReserveClaimer
+    );
+    event LogProtocolRedemptionReserveClaimerChanged(
+        address indexed _setter,
+        address indexed _protocolRedemptionReserveClaimer
+    );
     event LogProtocolExecutionReservePartChanged(address indexed _setter, uint32 indexed _protocolExecutionReservePart);
-    event LogDerivativeAuthorExecutionFeeCapChanged(address indexed _setter, uint32 indexed _derivativeAuthorExecutionFeeCap);
-    event LogProtocolRedemptionReservePartChanged(address indexed _setter, uint32 indexed _protocolRedemptionReservePart);
-    event LogDerivativeAuthorRedemptionReservePartChanged(address indexed _setter, uint32 indexed _derivativeAuthorRedemptionReservePart);
+    event LogDerivativeAuthorExecutionFeeCapChanged(
+        address indexed _setter,
+        uint32 indexed _derivativeAuthorExecutionFeeCap
+    );
+    event LogProtocolRedemptionReservePartChanged(
+        address indexed _setter,
+        uint32 indexed _protocolRedemptionReservePart
+    );
+    event LogDerivativeAuthorRedemptionReservePartChanged(
+        address indexed _setter,
+        uint32 indexed _derivativeAuthorRedemptionReservePart
+    );
     // Emergency
     // emits the role to signal what type of pause has been committed, if any
     event LogProtocolPausableStateChanged(address indexed _setter, bool indexed _state, bytes32 indexed _role);
@@ -142,7 +157,10 @@ contract Registry is RegistryStorage {
 
     /// @notice It allows the EXECUTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from derivative executions go to the protocol reserves
     /// @param _protocolExecutionReservePart must be less than 100%
-    function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart) external onlyProtocolExecutionReservePartSetter {
+    function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart)
+        external
+        onlyProtocolExecutionReservePartSetter
+    {
         require(_protocolExecutionReservePart < LibCalculator.PERCENTAGE_BASE, "R20");
         protocolParametersArgs.protocolExecutionReservePart = _protocolExecutionReservePart;
         emit LogProtocolExecutionReservePartChanged(msg.sender, _protocolExecutionReservePart);
@@ -161,7 +179,10 @@ contract Registry is RegistryStorage {
 
     /// @notice It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves
     /// @param _protocolRedemptionReservePart must be less than 100%
-    function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart) external onlyProtocolRedemptionReservePartSetter {
+    function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart)
+        external
+        onlyProtocolRedemptionReservePartSetter
+    {
         require(_protocolRedemptionReservePart < LibCalculator.PERCENTAGE_BASE, "R20");
         protocolParametersArgs.protocolRedemptionReservePart = _protocolRedemptionReservePart;
         emit LogProtocolRedemptionReservePartChanged(msg.sender, _protocolRedemptionReservePart);
@@ -169,12 +190,15 @@ contract Registry is RegistryStorage {
 
     /// @notice It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change the fixed part (percentage) that the derivative author receives for each redemption of market neutral positions
     /// @param _derivativeAuthorRedemptionReservePart must be less than 1%
-    function setDerivativeAuthorRedemptionReservePart(uint32 _derivativeAuthorRedemptionReservePart) external onlyProtocolRedemptionReservePartSetter {
+    function setDerivativeAuthorRedemptionReservePart(uint32 _derivativeAuthorRedemptionReservePart)
+        external
+        onlyProtocolRedemptionReservePartSetter
+    {
         require(_derivativeAuthorRedemptionReservePart <= LibCalculator.MAX_REDEMPTION_PART, "R20");
         protocolParametersArgs.derivativeAuthorRedemptionReservePart = _derivativeAuthorRedemptionReservePart;
         emit LogDerivativeAuthorRedemptionReservePartChanged(msg.sender, _derivativeAuthorRedemptionReservePart);
     }
-    
+
     // * Emergency *
 
     /// @notice It allows the GUARDIAN role to pause the entire Opium Protocol

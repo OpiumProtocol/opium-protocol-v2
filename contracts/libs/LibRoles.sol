@@ -19,10 +19,9 @@ library LibRoles {
     /// @dev The registry's sole responsibility is to keep track of the accounts that have been assigned to the REGISTRY_MANAGER_ROLE role
     /// @dev { See RegistryManager.sol for further details }
     bytes32 internal constant REGISTRY_MANAGER_ROLE = keccak256("RL10");
-    
+
     /// @notice Role responsible for updating (applying) new core configuration if it was changed in the registry
     bytes32 internal constant CORE_CONFIGURATION_UPDATER_ROLE = keccak256("RL18");
-
 
     // ***** RESERVE *****
 
@@ -41,7 +40,6 @@ library LibRoles {
     /// @notice Role responsible for updating the fixed part (percentage) of the initial margin that will be deducted to the reserves during redemption of market neutral positions
     /// @notice Also sets fixed part (percentage) of this redemption reserves that goes to the protocol redemption reserve
     bytes32 internal constant REDEMPTION_RESERVE_PART_SETTER_ROLE = keccak256("RL9");
-
 
     // ***** EMERGENCY *****
 

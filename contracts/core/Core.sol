@@ -354,7 +354,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _derivative
         );
 
-        uint256 totalMargin = margins[0] + margins[1];   
+        uint256 totalMargin = margins[0] + margins[1];
         require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
         uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
 
@@ -732,15 +732,15 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _protocolReservePercentage,
         uint256 _initialAmount
     ) private returns (uint256 totalReserve) {
-        totalReserve = _initialAmount * _reservePercentage / LibCalculator.PERCENTAGE_BASE;
+        totalReserve = (_initialAmount * _reservePercentage) / LibCalculator.PERCENTAGE_BASE;
 
         // If totalReserve is zero, finish
         if (totalReserve == 0) {
             return 0;
         }
 
-        uint256 protocolReserve = totalReserve * _protocolReservePercentage / LibCalculator.PERCENTAGE_BASE;
-        
+        uint256 protocolReserve = (totalReserve * _protocolReservePercentage) / LibCalculator.PERCENTAGE_BASE;
+
         // Update reservesVault for _protocolReserveReceiver
         reservesVault[_protocolReserveReceiver][_tokenAddress] += protocolReserve;
 
