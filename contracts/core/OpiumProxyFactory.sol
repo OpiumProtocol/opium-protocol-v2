@@ -75,7 +75,7 @@ contract OpiumProxyFactory is RegistryManager {
         bytes memory endTimeDate = _toDerivativeEndTimeIdentifier(_derivative.endTime);
 
         bytes memory baseCustomName = abi.encodePacked(
-            "Opium Position:",
+            "Opium:",
             endTimeDate,
             "-",
             _derivativeAuthorCustomName,
