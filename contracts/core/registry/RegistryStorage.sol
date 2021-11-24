@@ -167,10 +167,10 @@ contract RegistryStorage is AccessControlUpgradeable {
 
         // Default protocol parameters
         protocolParametersArgs.noDataCancellationPeriod = 2 weeks;
-        protocolParametersArgs.derivativeAuthorExecutionFeeCap = 1000;
-        protocolParametersArgs.derivativeAuthorRedemptionReservePart = 10;
-        protocolParametersArgs.protocolExecutionReservePart = 1000;
-        protocolParametersArgs.protocolRedemptionReservePart = 1000;
+        protocolParametersArgs.derivativeAuthorExecutionFeeCap = 1000; // 10%
+        protocolParametersArgs.derivativeAuthorRedemptionReservePart = 10; // 0.1%
+        protocolParametersArgs.protocolExecutionReservePart = 1000; // 10%
+        protocolParametersArgs.protocolRedemptionReservePart = 1000; // 10%
     }
 
     // Reserved storage space to allow for layout changes in the future.
