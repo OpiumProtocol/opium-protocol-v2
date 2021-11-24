@@ -182,14 +182,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string calldata _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) external nonReentrant {
-        _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
+        _create(_derivative, _amount, _positionsOwners);
     }
 
     /// @notice It can either 1) deploy AND mint 2) only mint.
@@ -201,12 +199,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// _positionsOwners[0] - buyer address -> receives LONG position
     /// _positionsOwners[1] - seller address -> receives SHORT position
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function createAndMint(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string calldata _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) external nonReentrant {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
         address implementationAddress = protocolAddressesArgs.opiumProxyFactory.getImplementationAddress();
@@ -223,7 +219,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // both erc20 positions have not been deployed
         require(isLongDeployed == isShortDeployed, "C23");
         if (!isLongDeployed) {
-            _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
+            _create(_derivative, _amount, _positionsOwners);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
             _mint(_amount, _positionsAddress, _positionsOwners);
@@ -336,12 +332,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address -> receives LONG position
     /// [1] - seller address -> receives SHORT position
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function _create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string memory _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) private {
         require(block.timestamp < _derivative.endTime, "C16");
         require(!registry.isProtocolPositionCreationPaused(), "C17");
@@ -355,12 +349,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Get cached margin required according to logic from Opium.SyntheticAggregator
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
-        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
+        ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getSyntheticCache(
             derivativeHash,
             _derivative
         );
-
-        uint256 totalMargin = margins[0] + margins[1];
+         
+        uint256 totalMargin =  syntheticCache.buyerMargin + syntheticCache.sellerMargin;
         require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
         uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
 
@@ -387,7 +381,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount,
             derivativeHash,
             _derivative,
-            _derivativeAuthorCustomName
+            syntheticCache.customDerivativeName
         );
 
         // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount

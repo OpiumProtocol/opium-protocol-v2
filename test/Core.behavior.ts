@@ -18,7 +18,7 @@ import { Core, OpiumPositionToken, OpiumProxyFactory, Registry, TestToken, Token
 import { timeTravel } from "../utils/evm";
 import { TDerivativeOrder } from "../types";
 import { toBN } from "../utils/bn";
-import { customDerivativeName, executeOne } from "../utils/constants";
+import { executeOne } from "../utils/constants";
 
 export enum EPositionCreation {
   CREATE = "CREATE",
@@ -48,10 +48,10 @@ export const shouldBehaveLikeCore = async (
   await testToken.connect(seller).approve(tokenSpender.address, derivative.margin.mul(amount).div(toBN("1")));
   const tx =
     operationType === EPositionCreation.CREATE
-      ? await core.connect(seller).create(derivative, amount, [buyer.address, seller.address], customDerivativeName)
+      ? await core.connect(seller).create(derivative, amount, [buyer.address, seller.address])
       : await core
           .connect(seller)
-          .createAndMint(derivative, amount, [buyer.address, seller.address], customDerivativeName);
+          .createAndMint(derivative, amount, [buyer.address, seller.address]);
   const receipt = await tx.wait();
 
   const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);

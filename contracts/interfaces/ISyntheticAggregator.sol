@@ -7,6 +7,7 @@ interface ISyntheticAggregator {
         uint256 sellerMargin;
         uint256 authorCommission;
         address authorAddress;
+        string customDerivativeName;
         bool init;
     }
 

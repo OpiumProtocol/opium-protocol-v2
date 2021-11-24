@@ -13,7 +13,6 @@ import "hardhat/console.sol";
 /**
     Error codes:
     - F1 = ERROR_OPIUM_PROXY_FACTORY_NOT_CORE
-    - F2 = ERROR_OPIUM_PROXY_CUSTOM_POSITION_TOKEN_NAME_TOO_LONG
  */
 
 /// @title Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
@@ -67,29 +66,41 @@ contract OpiumProxyFactory is RegistryManager {
         LibDerivative.Derivative calldata _derivative,
         string calldata _derivativeAuthorCustomName
     ) external onlyCore {
-        require(bytes(_derivativeAuthorCustomName).length < 30, "F2");
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
         address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
 
+        string memory derivativeHashSlice = _toDerivativeHashStringIdentifier(_derivativeHash);
+        bytes memory endTimeDate = _toDerivativeEndTimeIdentifier(_derivative.endTime);
+
         bytes memory baseCustomName = abi.encodePacked(
-            _toDerivativeEndTimeIdentifier(_derivative.endTime),
+            endTimeDate,
             "-",
             _derivativeAuthorCustomName,
             "-",
-            _toDerivativeHashStringIdentifier(_derivativeHash)
+            derivativeHashSlice
+        );
+
+        bytes memory customSymbol = abi.encodePacked(
+            "OPIUM",
+            "_",
+            _derivativeAuthorCustomName,
+            "_",
+            derivativeHashSlice
         );
 
         IOpiumPositionToken(longPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.LONG,
             _derivative,
-            baseCustomName
+            baseCustomName,
+            customSymbol
         );
         IOpiumPositionToken(shortPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.SHORT,
             _derivative,
-            baseCustomName
+            baseCustomName,
+            customSymbol
         );
         emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
         emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
