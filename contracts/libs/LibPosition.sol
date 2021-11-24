@@ -1,6 +1,6 @@
 pragma solidity ^0.8.5;
 
-import "openzeppelin-solidity/contracts/proxy/Clones.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
 
 library LibPosition {
     function predictDeterministicAddress(
@@ -34,7 +34,7 @@ library LibPosition {
         address _positionImplementationAddress
     ) internal returns (address) {
         bytes32 salt = keccak256(abi.encodePacked(_derivativeHash, _isLong ? "L" : "S"));
-        return Clones.cloneDeterministic(_positionImplementationAddress, salt);
+        return ClonesUpgradeable.cloneDeterministic(_positionImplementationAddress, salt);
     }
 
     function _predictDeterministicAddress(
@@ -44,7 +44,7 @@ library LibPosition {
         address _factoryAddress
     ) private pure returns (address) {
         bytes32 salt = keccak256(abi.encodePacked(_derivativeHash, _isLong ? "L" : "S"));
-        return Clones.predictDeterministicAddress(_positionImplementationAddress, salt, _factoryAddress);
+        return ClonesUpgradeable.predictDeterministicAddress(_positionImplementationAddress, salt, _factoryAddress);
     }
 
     /// @notice checks whether a contract has already been deployed at a specific address
