@@ -26,7 +26,7 @@ import {
 } from "../../typechain";
 import { timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
-import { customDerivativeName, executeOne, SECONDS_40_MINS } from "../../utils/constants";
+import {  executeOne, SECONDS_40_MINS } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 
 describe("Core with fractional quantities", () => {
@@ -90,8 +90,7 @@ describe("Core with fractional quantities", () => {
     const tx = await core.create(
       fullMarginOptionPayload.derivative,
       fullMarginOptionPayload.amount,
-      [buyer.address, seller.address],
-      customDerivativeName,
+      [buyer.address, seller.address],      
     );
     const receipt = await tx.wait();
 
@@ -118,7 +117,7 @@ describe("Core with fractional quantities", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);

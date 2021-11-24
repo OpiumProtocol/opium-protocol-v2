@@ -21,6 +21,11 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
         );
     }
 
+    /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions
+    function getSyntheticIdName() external view override returns(string memory) {
+        return "Riccardo's derivative shop";
+    }
+
     /// @notice Getter for syntheticId author address
     /// @return address syntheticId author address
     function getAuthorAddress() public view virtual override(IDerivativeLogic, HasCommission) returns (address) {

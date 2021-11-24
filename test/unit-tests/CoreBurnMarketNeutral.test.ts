@@ -51,7 +51,6 @@ describe("Core: burn market neutral positions", () => {
       optionCall,
       amount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -126,7 +125,6 @@ describe("Core: burn market neutral positions", () => {
       optionCall,
       amount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -198,7 +196,6 @@ describe("Core: burn market neutral positions", () => {
       optionCall,
       amount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -222,7 +219,6 @@ describe("Core: burn market neutral positions", () => {
       secondOptionCall,
       secondAmount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt2 = await tx2.wait();
     const [secondLongPositionAddress, secondShortPositionAddress] = retrievePositionTokensAddresses(

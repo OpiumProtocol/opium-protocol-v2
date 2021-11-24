@@ -34,8 +34,7 @@ import {
   SECONDS_40_MINS,
   SECONDS_50_MINS,
   SECONDS_3_WEEKS,
-  semanticErrors,
-  customDerivativeName,
+  semanticErrors,  
   executeOne,
   executeOneWithAddress,
   executeMany,
@@ -214,7 +213,7 @@ describe("CoreExecution", () => {
       noDataOptionPayload.derivative,
       noDataOptionPayload.amount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt = await tx.wait();
 
@@ -230,7 +229,7 @@ describe("CoreExecution", () => {
       fullMarginOptionPayload.derivative,
       fullMarginOptionPayload.amount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt2 = await tx2.wait();
 
@@ -247,7 +246,7 @@ describe("CoreExecution", () => {
       overMarginOptionPayload.derivative,
       overMarginOptionPayload.amount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt3 = await tx3.wait();
     overMarginOption = addPositionTokens(
@@ -263,7 +262,7 @@ describe("CoreExecution", () => {
       underMarginOptionPayload.derivative,
       underMarginOptionPayload.amount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt4 = await tx4.wait();
     underMarginOption = addPositionTokens(
@@ -279,7 +278,7 @@ describe("CoreExecution", () => {
       nonProfitOptionPayload.derivative,
       nonProfitOptionPayload.amount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt5 = await tx5.wait();
     nonProfitOption = addPositionTokens(
@@ -295,7 +294,7 @@ describe("CoreExecution", () => {
       delayedDataOptionPayload.derivative,
       delayedDataOptionPayload.amount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt6 = await tx6.wait();
 

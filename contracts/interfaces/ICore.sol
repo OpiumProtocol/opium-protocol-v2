@@ -29,8 +29,7 @@ interface ICore {
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string calldata _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) external;
 
     function createAndMint(
