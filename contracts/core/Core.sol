@@ -98,14 +98,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
     /// @return ProtocolParametersArgs struct including the protocol's main parameters
     function getProtocolParametersArgs() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
-        return registry.getProtocolParameters();
+        return protocolParametersArgs;
     }
 
     /// @notice It returns Opium.Core's internal state of the protocol contracts' and recipients' addresses fetched from the Opium.Registry
     /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
     /// @return ProtocolAddressesArgs struct including the protocol's main addresses - contracts and reseves recipients
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
-        return registry.getProtocolAddresses();
+        return protocolAddressesArgs;
     }
 
     /// @notice It returns the accrued reseves of a given address denominated in a specified token
@@ -575,7 +575,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionAddress PositionTypes of positions to be canceled
     /// @param _amount uint256[] Amount of positions to cancel for each `positionAddress`
     function _cancel(address _positionAddress, uint256 _amount) private {
-        require(!registry.isProtocolPositionCancellationPaused(), "C20");
+        require(!registry.isProtocolPositionCancellationPaused(), "C21");
         IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
             _positionAddress
         ).getPositionTokenData();
