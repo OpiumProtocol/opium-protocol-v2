@@ -315,4 +315,7 @@ contract Registry is RegistryStorage {
     function isProtocolReserveClaimPaused() external view returns (bool) {
         return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolReserveClaim;
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

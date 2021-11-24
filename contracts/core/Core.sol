@@ -786,4 +786,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
         require(_tokenAddress == predicted, "C14");
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

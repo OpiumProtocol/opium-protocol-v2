@@ -166,12 +166,13 @@ contract RegistryStorage is AccessControlUpgradeable {
         _setupRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, _governor);
 
         // Default protocol parameters
-        protocolParametersArgs = RegistryEntities.ProtocolParametersArgs({
-            noDataCancellationPeriod: 2 weeks,
-            derivativeAuthorExecutionFeeCap: 1000, // 10%
-            derivativeAuthorRedemptionReservePart: 10, // 0.1%
-            protocolExecutionReservePart: 1000, // 10%
-            protocolRedemptionReservePart: 1000 // 10%
-        });
+        protocolParametersArgs.noDataCancellationPeriod = 2 weeks;
+        protocolParametersArgs.derivativeAuthorExecutionFeeCap = 1000;
+        protocolParametersArgs.derivativeAuthorRedemptionReservePart = 10;
+        protocolParametersArgs.protocolExecutionReservePart = 1000;
+        protocolParametersArgs.protocolRedemptionReservePart = 1000;
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

@@ -38,4 +38,7 @@ contract TokenSpender is RegistryManager {
     ) external onlyCoreSpenders {
         _token.safeTransferFrom(_from, _to, _amount);
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

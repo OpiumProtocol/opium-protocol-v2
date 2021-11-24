@@ -204,4 +204,7 @@ contract OpiumProxyFactory is RegistryManager {
                 StringsUpgradeable.toString(year)
             );
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

@@ -100,4 +100,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         // Emits an event upon initialization of a derivative recipe (so only once during its lifecycle)
         emit LogSyntheticInit(_derivative, derivativeHash);
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

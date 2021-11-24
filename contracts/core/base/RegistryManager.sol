@@ -37,4 +37,7 @@ contract RegistryManager is Initializable {
     function getRegistry() external view returns (address) {
         return address(registry);
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

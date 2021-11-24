@@ -56,4 +56,7 @@ contract OracleAggregator {
     function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {
         return dataExist[oracleId][timestamp];
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

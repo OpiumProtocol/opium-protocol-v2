@@ -92,4 +92,8 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     function getPositionTokenData() external view returns (OpiumPositionTokenParams memory _opiumPositionTokenParams) {
         return opiumPositionTokenParams;
     }
+
+   // Reserved storage space to allow for layout changes in the future.
+   // The gaps left for the `OpiumPositionToken` are less than the slots allocated for the other upgradeable contracts in the protocol because the OpiumPositionToken is the only contract that is programmatically deployed (frequently), hence we want to minimize the gas cost
+   uint256[30] private __gap;
 }
