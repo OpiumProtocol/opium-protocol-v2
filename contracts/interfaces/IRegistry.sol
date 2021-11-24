@@ -12,43 +12,47 @@ interface IRegistry {
         address _tokenSpender
     ) external;
 
-    function setProtocolExecutionFeeReceiver(address _executionFeeRecipient) external;
-
-    function setProtocolRedemptionFeeReceiver(address _redemptionFeeRecipient) external;
-
-    function setDerivativeAuthorExecutionFeeCap(uint32 _executionFeeCap) external;
-
-    function setDerivativeAuthorRedemptionFee(uint32 _redemptionFee) external;
-
-    function setProtocolFeePart(uint32 _protocolFeePart) external;
-
     function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external;
+
+    function addToWhitelist(address _whitelisted) external;
+
+    function removeFromWhitelist(address _whitelisted) external;
+
+    function setProtocolExecutionReserveClaimer(address _protocolExecutionReserveClaimer) external;
+
+    function setProtocolRedemptionReserveClaimer(address _protocolRedemptionReserveClaimer) external;
+
+    function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart) external;
+
+    function setDerivativeAuthorExecutionFeeCap(uint32 _derivativeAuthorExecutionFeeCap) external;
+
+    function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart) external;
+    
+    function setDerivativeAuthorRedemptionReservePart(uint32 _derivativeAuthorRedemptionReservePart) external;
 
     function pause() external;
 
-    function unpause() external;
-
     function pauseProtocolPositionCreation() external;
 
-    function pauseProtocolPositionMint() external;
-
-    function pauseProtocolPositionExecuted() external;
+    function pauseProtocolPositionMinting() external;
 
     function pauseProtocolPositionRedemption() external;
+
+    function pauseProtocolPositionExecution() external;
 
     function pauseProtocolPositionCancellation() external;
 
     function pauseProtocolReserveClaim() external;
 
-    function addToWhitelist(address _whitelisted) external;
-
-    function removeFromWhitelist(address _whitelisted) external;
+    function unpause() external;
 
     function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory);
 
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
 
     function isRegistryManager(address _address) external view returns (bool);
+
+    function isCoreConfigurationUpdater(address _address) external view returns (bool);
 
     function getCore() external view returns (address);
 
@@ -58,7 +62,7 @@ interface IRegistry {
 
     function isProtocolPositionCreationPaused() external view returns (bool);
 
-    function isProtocolPositionMintPaused() external view returns (bool);
+    function isProtocolPositionMintingPaused() external view returns (bool);
 
     function isProtocolPositionRedemptionPaused() external view returns (bool);
 

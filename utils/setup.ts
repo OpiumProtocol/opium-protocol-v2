@@ -80,8 +80,8 @@ const setup = async (): Promise<TContracts> => {
       syntheticAggregator.address,
       tokenSpender.address,
     );
-  await registry.connect(governor).setProtocolExecutionFeeReceiver(deployer.address);
-  await registry.connect(governor).setProtocolRedemptionFeeReceiver(deployer.address);
+  await registry.connect(governor).setProtocolExecutionReserveClaimer(deployer.address);
+  await registry.connect(governor).setProtocolRedemptionReserveClaimer(deployer.address);
 
   await registry.connect(governor).addToWhitelist(core.address);
   await core.connect(governor).updateProtocolAddresses();

@@ -98,8 +98,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       syntheticAggregator.address,
       tokenSpender.address,
     );
-  await registryInstance.connect(governor).setProtocolExecutionFeeReceiver(deployer.address);
-  await registryInstance.connect(governor).setProtocolRedemptionFeeReceiver(deployer.address);
+  await registryInstance.connect(governor).setProtocolExecutionReserveClaimer(deployer.address);
+  await registryInstance.connect(governor).setProtocolRedemptionReserveClaimer(deployer.address);
   await registryInstance.connect(governor).addToWhitelist(core.address);
 
   const coreInstance = <Core>await ethers.getContract("Core");

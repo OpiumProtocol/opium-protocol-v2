@@ -51,7 +51,6 @@ describe("Core: burn market neutral positions", () => {
       optionCall,
       amount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -72,7 +71,7 @@ describe("Core: burn market neutral positions", () => {
     const tx2 = await core["redeem(address[2],uint256)"]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
 
-    const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
+    const [log] = await decodeEvents<Core>(core, "LogRedeemed", receipt2.events);
 
     /**
      * checks the emitted event arguments
@@ -126,7 +125,6 @@ describe("Core: burn market neutral positions", () => {
       optionCall,
       amount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -146,7 +144,7 @@ describe("Core: burn market neutral positions", () => {
 
     const tx2 = await core[redeemOne]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
-    const [log] = await decodeEvents<Core>(core, "LogRedeem", receipt2.events);
+    const [log] = await decodeEvents<Core>(core, "LogRedeemed", receipt2.events);
     /**
      * checks the emitted event arguments
      */
@@ -198,7 +196,6 @@ describe("Core: burn market neutral positions", () => {
       optionCall,
       amount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -222,7 +219,6 @@ describe("Core: burn market neutral positions", () => {
       secondOptionCall,
       secondAmount,
       [marketNeutralParty.address, marketNeutralParty.address],
-      customDerivativeName,
     );
     const receipt2 = await tx2.wait();
     const [secondLongPositionAddress, secondShortPositionAddress] = retrievePositionTokensAddresses(
@@ -264,7 +260,7 @@ describe("Core: burn market neutral positions", () => {
       [redeemAmount, secondRedeemAmount],
     );
     const receipt3 = await tx3.wait();
-    const [log1, log2] = await decodeEvents<Core>(core, "LogRedeem", receipt3.events);
+    const [log1, log2] = await decodeEvents<Core>(core, "LogRedeemed", receipt3.events);
     /**
      * checks the emitted event arguments
      */

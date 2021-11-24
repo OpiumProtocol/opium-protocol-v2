@@ -16,7 +16,7 @@ import setup from "./../__fixtures__";
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
 import { pickError } from "../../utils/misc";
-import { customDerivativeName, semanticErrors } from "../../utils/constants";
+import { semanticErrors } from "../../utils/constants";
 
 describe("CoreCreation", () => {
   let namedSigners: TNamedSigners;
@@ -41,7 +41,7 @@ describe("CoreCreation", () => {
       });
       const amount = toBN("3");
       await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-      await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
+      await core.create(optionCall, amount, [buyer.address, seller.address]);
     } catch (error) {
       const { message } = error as Error;
       expect(message).to.satisfy(() => {
@@ -69,7 +69,7 @@ describe("CoreCreation", () => {
     const amount = toBN("3");
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     await expect(
-      core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
+      core.create(optionCall, amount, [buyer.address, seller.address]),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST));
   });
 
@@ -88,7 +88,7 @@ describe("CoreCreation", () => {
     });
     const amount = 3;
     await expect(
-      core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
+      core.create(optionCall, amount, [buyer.address, seller.address]),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE));
   });
 
@@ -112,7 +112,7 @@ describe("CoreCreation", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -164,7 +164,7 @@ describe("CoreCreation", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     const [shortPositionAddress, longPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -215,10 +215,10 @@ describe("CoreCreation", () => {
     });
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     await tx.wait();
     await expect(
-      core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName),
+      core.create(optionCall, amount, [buyer.address, seller.address]),
     ).to.be.revertedWith("ERC1167: create2 failed");
   });
 
@@ -241,7 +241,7 @@ describe("CoreCreation", () => {
     const expectedDerivativeHash = getDerivativeHash(optionCall);
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
-    const tx = await core.create(optionCall, creationAmount, [buyer.address, seller.address], customDerivativeName);
+    const tx = await core.create(optionCall, creationAmount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     /**
@@ -345,7 +345,7 @@ describe("CoreCreation", () => {
       optionCall,
       creationAmount,
       [buyer.address, seller.address],
-      customDerivativeName,
+      
     );
     const receipt = await tx.wait();
 

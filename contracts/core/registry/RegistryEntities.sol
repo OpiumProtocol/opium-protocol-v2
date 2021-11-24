@@ -10,15 +10,15 @@ library RegistryEntities {
     struct ProtocolParametersArgs {
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
         uint32 noDataCancellationPeriod;
-        // Max reward that derivative author can set
-        //it works as an upper bound for when the derivative authors set their synthetic's fee
-        uint32 derivativeAuthorExecutionReservePartCap;
-        // Fixed reward that the derivative author receives for each redemption of market neutral positions
+        // Max fee that derivative author can set
+        // it works as an upper bound for when the derivative authors set their synthetic's fee
+        uint32 derivativeAuthorExecutionFeeCap;
+        // Fixed part (percentage) that the derivative author receives for each redemption of market neutral positions
         // It is not set by the derivative authors themselves
         uint32 derivativeAuthorRedemptionReservePart;
-        // Represents which part of `syntheticId` author reserves originated from derivative executions go to the protocol
+        // Represents which part of derivative author reserves originated from derivative executions go to the protocol reserves
         uint32 protocolExecutionReservePart;
-        // Represents which part of `syntheticId` author reserves originated from derivative redemption go to the protocol
+        // Represents which part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves
         uint32 protocolRedemptionReservePart;
     }
 
@@ -33,9 +33,9 @@ library RegistryEntities {
         ISyntheticAggregator syntheticAggregator;
         // Address of Opium.TokenSpender contract
         ITokenSpender tokenSpender;
-        // Address of the recipient of Opium Protocol's fees originated from the profitable execution of a derivative's position
+        // Address of the recipient of execution protocol reserves
         address protocolExecutionReserveClaimer;
-        // Address of the recipient of Opium Protocol's fees originated from the successful redemption of a market neutral position
+        // Address of the recipient of redemption protocol reserves
         address protocolRedemptionReserveClaimer;
     }
 
@@ -46,13 +46,13 @@ library RegistryEntities {
         bool protocolPositionCreation;
         // if true, no new positions can be minted
         bool protocolPositionMinting;
-        // if true,no new positions can be redeemed
+        // if true, no new positions can be redeemed
         bool protocolPositionRedemption;
         // if true, no new positions can be executed
         bool protocolPositionExecution;
         // if true, no new positions can be cancelled
         bool protocolPositionCancellation;
-        // if true, no accrued reserves can be claimed
+        // if true, no reserves can be claimed
         bool protocolReserveClaim;
     }
 }

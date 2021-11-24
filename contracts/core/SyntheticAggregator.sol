@@ -87,7 +87,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 authorCommission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();
         RegistryEntities.ProtocolParametersArgs memory protocolParametersArgs = registry.getProtocolParameters();
         // Check if commission is not greater than the max cap set in the Registry by the governance
-        require(authorCommission <= protocolParametersArgs.derivativeAuthorExecutionReservePartCap, "S3");
+        require(authorCommission <= protocolParametersArgs.derivativeAuthorExecutionFeeCap, "S3");
         // Cache values by derivative hash
         syntheticCaches[derivativeHash] = SyntheticCache({
             buyerMargin: buyerMargin,
@@ -100,4 +100,7 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         // Emits an event upon initialization of a derivative recipe (so only once during its lifecycle)
         emit LogSyntheticInit(_derivative, derivativeHash);
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

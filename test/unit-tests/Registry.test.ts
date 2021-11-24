@@ -73,20 +73,20 @@ describe("Registry", () => {
 
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
     expect(
-      protocolParams.derivativeAuthorExecutionReservePartCap,
-      "wrong derivativeAuthorExecutionReservePartCap",
-    ).to.be.eq(10000);
+      protocolParams.derivativeAuthorExecutionFeeCap,
+      "wrong derivativeAuthorExecutionFeeCap",
+    ).to.be.eq(1000);
     expect(
       protocolParams.derivativeAuthorRedemptionReservePart,
       "wrong derivativeAuthorRedemptionReservePart",
-    ).to.be.eq(100);
-    expect(protocolParams.protocolExecutionReservePart, "wrong protocol commission part").to.be.eq(10);
-    expect(protocolParams.protocolRedemptionReservePart, "wrong protocol commission part").to.be.eq(10);
+    ).to.be.eq(10);
+    expect(protocolParams.protocolExecutionReservePart, "wrong protocol commission part").to.be.eq(1000);
+    expect(protocolParams.protocolRedemptionReservePart, "wrong protocol commission part").to.be.eq(1000);
   });
 
   it("behavior2 ", async () => {
     const { registry } = await setup();
-    await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 10000, 100, 10, false);
+    await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 1000, 10, 1000, false);
   });
 
   it("should ensure that the Registry getters return the correct data", async () => {
@@ -140,11 +140,11 @@ describe("Registry", () => {
         ),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS));
 
-    await expect(registry.connect(governor).setProtocolExecutionFeeReceiver(zeroAddress)).to.be.revertedWith(
+    await expect(registry.connect(governor).setProtocolExecutionReserveClaimer(zeroAddress)).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS),
     );
 
-    await expect(registry.connect(governor).setProtocolRedemptionFeeReceiver(zeroAddress)).to.be.revertedWith(
+    await expect(registry.connect(governor).setProtocolRedemptionReserveClaimer(zeroAddress)).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_NULL_ADDRESS),
     );
   });
@@ -163,7 +163,7 @@ describe("Registry", () => {
           syntheticAggregator.address,
           tokenSpender.address,
         ),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_PROTOCOL_ADDRESSES_SETTER_ROLE));
+    ).to.be.revertedWith(pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_ADDRESSES_SETTER_ROLE));
 
     await expect(registry.connect(notAllowed).addToWhitelist(notAllowed.address)).to.be.revertedWith(
       pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
@@ -174,7 +174,7 @@ describe("Registry", () => {
     );
 
     await expect(registry.connect(notAllowed).setProtocolExecutionReservePart(4)).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_ONLY_OPIUM_RESERVE_SETTER_ROLE),
+      pickError(semanticErrors.ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_PART_SETTER_ROLE),
     );
 
     await expect(registry.connect(notAllowed).pause()).to.be.revertedWith(
@@ -187,10 +187,10 @@ describe("Registry", () => {
     const { authorized, governor } = namedSigners;
 
     // test setDerivativeAuthorExecutionReservePartCap setter
-    await registry.connect(governor).setDerivativeAuthorExecutionReservePartCap(12);
+    await registry.connect(governor).setDerivativeAuthorExecutionFeeCap(12);
     expect(
-      (await registry.getProtocolParameters()).derivativeAuthorExecutionReservePartCap,
-      "wrong derivativeAuthorExecutionReservePartCap",
+      (await registry.getProtocolParameters()).derivativeAuthorExecutionFeeCap,
+      "wrong derivativeAuthorExecutionFeeCap",
     ).to.be.eq(12);
 
     // test setDerivativeAuthorRedemptionFee setter
@@ -223,9 +223,6 @@ describe("Registry", () => {
     );
     await registry.connect(governor).unpause();
     expect(await registry.isProtocolPaused(), "wrong unpaused").to.be.false;
-    await expect(registry.connect(governor).unpause()).to.be.revertedWith(
-      pickError(semanticErrors.ERROR_REGISTRY_NOT_PAUSED),
-    );
 
     // test `addToWhitelist` and `removeFromWhitelist` setters
     expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
@@ -234,7 +231,7 @@ describe("Registry", () => {
     await registry.connect(governor).removeFromWhitelist(authorized.address);
     expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
 
-    // test setProtocolExecutionReservePart after granting `OPIUM_RESERVE_SETTER_ROLE` role to another account
+    // test setProtocolExecutionReservePart after granting `EXECUTION_RESERVE_PART_SETTER_ROLE` role to another account
     await expect(registry.connect(authorized).setProtocolExecutionReservePart(4)).to.revertedWith("R4");
     await registry.connect(governor).grantRole(governanceRoles.opiumFeeSetterRole, authorized.address);
     await registry.connect(authorized).setProtocolExecutionReservePart(7);

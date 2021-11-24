@@ -10,7 +10,7 @@ interface ICore {
 
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);
 
-    function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256);
+    function getReservesVaultBalance(address _reseveRecipient, address _token) external view returns (uint256);
 
     function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2] memory);
 
@@ -29,8 +29,7 @@ interface ICore {
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string calldata _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) external;
 
     function createAndMint(

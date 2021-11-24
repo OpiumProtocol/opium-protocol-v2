@@ -26,7 +26,7 @@ import {
 } from "../../typechain";
 import { timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
-import { customDerivativeName, executeOne, SECONDS_40_MINS } from "../../utils/constants";
+import {  executeOne, SECONDS_40_MINS } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 
 describe("Core with fractional quantities", () => {
@@ -90,8 +90,7 @@ describe("Core with fractional quantities", () => {
     const tx = await core.create(
       fullMarginOptionPayload.derivative,
       fullMarginOptionPayload.amount,
-      [buyer.address, seller.address],
-      customDerivativeName,
+      [buyer.address, seller.address],      
     );
     const receipt = await tx.wait();
 
@@ -118,7 +117,7 @@ describe("Core with fractional quantities", () => {
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    const tx = await core.create(optionCall, amount, [buyer.address, seller.address], customDerivativeName);
+    const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -151,8 +150,8 @@ describe("Core with fractional quantities", () => {
     const buyerBalanceBefore = await testTokenSixDecimals.balanceOf(buyer.address);
 
     const sellerBalanceBefore = await testTokenSixDecimals.balanceOf(seller.address);
-    const opiumFeesBefore = await core.getFeeVaultsBalance(deployer.address, testTokenSixDecimals.address);
-    const authorFeesBefore = await core.getFeeVaultsBalance(author.address, testTokenSixDecimals.address);
+    const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testTokenSixDecimals.address);
+    const authorFeesBefore = await core.getReservesVaultBalance(author.address, testTokenSixDecimals.address);
 
     await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, fullMarginOption.amount);
     await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, fullMarginOption.amount);
@@ -218,12 +217,12 @@ describe("Core with fractional quantities", () => {
     const sellerBalanceAfter = await testTokenSixDecimals.balanceOf(seller.address);
     expect(sellerBalanceAfter, "wrong seller balance").to.be.equal(sellerBalanceBefore.add(sellerNetPayout));
 
-    const opiumFeesAfter = await core.getFeeVaultsBalance(deployer.address, testTokenSixDecimals.address);
+    const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testTokenSixDecimals.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(
       opiumFeesBefore.add(buyerFees.protocolFee).add(sellerFees.protocolFee),
     );
 
-    const authorFeesAfter = await core.getFeeVaultsBalance(author.address, testTokenSixDecimals.address);
+    const authorFeesAfter = await core.getReservesVaultBalance(author.address, testTokenSixDecimals.address);
     expect(authorFeesAfter, "wrong author fee").to.be.equal(
       authorFeesBefore.add(buyerFees.authorFee).add(sellerFees.authorFee),
     );

@@ -8,7 +8,7 @@ pragma solidity 0.8.5;
 
 /// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution
 contract OracleAggregator {
-    event LogDataProvision(address indexed _oracleId, uint256 indexed _timestamp, uint256 indexed _data);
+    event LogDataProvided(address indexed _oracleId, uint256 indexed _timestamp, uint256 indexed _data);
     // Storage for the `oracleId` results
     // dataCache[oracleId][timestamp] => data
     mapping(address => mapping(uint256 => uint256)) private dataCache;
@@ -32,7 +32,7 @@ contract OracleAggregator {
         // Flagging that data were received
         dataExist[msg.sender][timestamp] = true;
 
-        emit LogDataProvision(msg.sender, timestamp, data);
+        emit LogDataProvided(msg.sender, timestamp, data);
     }
 
     // VIEW FUNCTIONS
@@ -56,4 +56,7 @@ contract OracleAggregator {
     function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {
         return dataExist[oracleId][timestamp];
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }

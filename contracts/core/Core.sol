@@ -33,7 +33,7 @@ import "hardhat/console.sol";
     - C12 = ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE
     - C13 = ERROR_CORE_CANCELLATION_IS_NOT_ALLOWED
     - C14 = ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS
-    - C15 = ERROR_CORE_FEE_AMOUNT_GREATER_THAN_BALANCE
+    - C15 = ERROR_CORE_RESERVE_AMOUNT_GREATER_THAN_BALANCE
     - C16 = ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST
     - C17 = ERROR_CORE_PROTOCOL_POSITION_CREATION_PAUSED
     - C18 = ERROR_CORE_PROTOCOL_POSITION_MINT_PAUSED
@@ -56,13 +56,13 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     // Emitted when Core mints an amount of LONG/SHORT positions
     event LogMinted(address indexed _buyer, address indexed _seller, bytes32 indexed _derivativeHash, uint256 _amount);
     // Emitted when Core executes positions
-    event LogExecuted(address indexed _positionsOwner, address indexed _positionAddress, uint256 indexed _amount);
+    event LogExecuted(address indexed _positionsOwner, address indexed _positionAddress, uint256 _amount);
     // Emitted when Core cancels ticker for the first time
-    event LogDerivativeHashCancelled(address indexed _positionOwner, bytes32 _derivativeHash);
+    event LogDerivativeHashCancelled(address indexed _positionOwner, bytes32 indexed _derivativeHash);
     // Emitted when Core cancels a position of a previously cancelled Derivative.derivativeHash
-    event LogPositionCancelled(address indexed _positionOwner, bytes32 _derivativeHash);
+    event LogCancelled(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 _amount);
     // Emitted when Core redeems an amount of market neutral positions
-    event LogRedeem(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 indexed _amount);
+    event LogRedeemed(address indexed _positionOwner, bytes32 indexed _derivativeHash, uint256 _amount);
 
     RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
@@ -79,8 +79,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// derivativePayouts[derivativeHash][1] => seller's payout
     mapping(bytes32 => uint256[2]) private derivativePayouts;
 
-    /// Fees vault
-    /// Key-value entity that maps an address representing a fee recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of fee recipients (i.e: derivative authors)
+    /// Reseves vault
+    /// Key-value entity that maps an address representing a reserve recipient to a token address and the balance associated to the token address. It keeps tracks of the balances of reserve recipients (i.e: derivative authors)
     mapping(address => mapping(address => uint256)) private reservesVault;
 
     /// @notice It is called only once upon deployment of the contract. It sets the current Opium.Registry address and assigns the current protocol parameters stored in the Opium.Registry to the Core.protocolParametersArgs private variable {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
@@ -98,22 +98,22 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
     /// @return ProtocolParametersArgs struct including the protocol's main parameters
     function getProtocolParametersArgs() external view returns (RegistryEntities.ProtocolParametersArgs memory) {
-        return registry.getProtocolParameters();
+        return protocolParametersArgs;
     }
 
     /// @notice It returns Opium.Core's internal state of the protocol contracts' and recipients' addresses fetched from the Opium.Registry
     /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
-    /// @return ProtocolAddressesArgs struct including the protocol's main addresses - contracts and fees recipients
+    /// @return ProtocolAddressesArgs struct including the protocol's main addresses - contracts and reseves recipients
     function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {
-        return registry.getProtocolAddresses();
+        return protocolAddressesArgs;
     }
 
-    /// @notice It returns the accrued fees of a given address denominated in a specified token
-    /// @param _feeRecipient address of the fee recipient
-    /// @param _token address of a token used as a fee compensation
-    /// @return uint256 amount of the accrued fees denominated in the provided token
-    function getFeeVaultsBalance(address _feeRecipient, address _token) external view returns (uint256) {
-        return reservesVault[_feeRecipient][_token];
+    /// @notice It returns the accrued reseves of a given address denominated in a specified token
+    /// @param _reseveRecipient address of the reseve recipient
+    /// @param _token address of a token used as a reseve compensation
+    /// @return uint256 amount of the accrued reseves denominated in the provided token
+    function getReservesVaultBalance(address _reseveRecipient, address _token) external view returns (uint256) {
+        return reservesVault[_reseveRecipient][_token];
     }
 
     /// @notice It queries the buyer's and seller's payouts for a given derivative
@@ -143,20 +143,20 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice It allows to update the Opium Protocol parameters according to the current state of the Opium.Registry
     /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
     /// @dev should be called immediately after the deployment of the contract
-    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
-    function updateProtocolParametersArgs() external onlyRegistryManager {
+    /// @dev only accounts who have been assigned the CORE_CONFIGURATION_UPDATER_ROLE { See LibRoles.sol } should be able to call the function
+    function updateProtocolParametersArgs() external onlyCoreConfigurationUpdater {
         protocolParametersArgs = registry.getProtocolParameters();
     }
 
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
     /// @dev should be called immediately after the deployment of the contract
-    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
-    function updateProtocolAddresses() external onlyRegistryManager {
+    /// @dev only accounts who have been assigned the CORE_CONFIGURATION_UPDATER_ROLE { See LibRoles.sol } should be able to call the function
+    function updateProtocolAddresses() external onlyCoreConfigurationUpdater {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 
-    /// @notice It allows a fee recipient to claim their entire accrued reserves
+    /// @notice It allows a reseve recipient to claim their entire accrued reserves
     /// @param _tokenAddress address of the ERC20 token to withdraw
     function claimReserves(address _tokenAddress) external nonReentrant {
         require(!registry.isProtocolReserveClaimPaused(), "C22");
@@ -182,14 +182,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address
     /// [1] - seller address
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string calldata _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) external nonReentrant {
-        _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
+        _create(_derivative, _amount, _positionsOwners);
     }
 
     /// @notice It can either 1) deploy AND mint 2) only mint.
@@ -201,12 +199,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// _positionsOwners[0] - buyer address -> receives LONG position
     /// _positionsOwners[1] - seller address -> receives SHORT position
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function createAndMint(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string calldata _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) external nonReentrant {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
         address implementationAddress = protocolAddressesArgs.opiumProxyFactory.getImplementationAddress();
@@ -223,7 +219,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // both erc20 positions have not been deployed
         require(isLongDeployed == isShortDeployed, "C23");
         if (!isLongDeployed) {
-            _create(_derivative, _amount, _positionsOwners, _derivativeAuthorCustomName);
+            _create(_derivative, _amount, _positionsOwners);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
             _mint(_amount, _positionsAddress, _positionsOwners);
@@ -336,12 +332,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address -> receives LONG position
     /// [1] - seller address -> receives SHORT position
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function _create(
         LibDerivative.Derivative calldata _derivative,
         uint256 _amount,
-        address[2] calldata _positionsOwners,
-        string memory _derivativeAuthorCustomName
+        address[2] calldata _positionsOwners
     ) private {
         require(block.timestamp < _derivative.endTime, "C16");
         require(!registry.isProtocolPositionCreationPaused(), "C17");
@@ -360,7 +354,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _derivative
         );
 
-        uint256 totalMargin = margins[0] + margins[1];
+        uint256 totalMargin = margins[0] + margins[1];   
         require((totalMargin * _amount).modWithPrecisionFactor() == 0, "C5");
         uint256 totalMarginToE18 = totalMargin.mulWithPrecisionFactor(_amount);
 
@@ -387,7 +381,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount,
             derivativeHash,
             _derivative,
-            _derivativeAuthorCustomName
+            IDerivativeLogic(_derivative.syntheticId).getSyntheticIdName()
         );
 
         // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
@@ -411,7 +405,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address[2] memory _positionsAddresses,
         address[2] memory _positionsOwners
     ) private {
-        require(!registry.isProtocolPositionMintPaused(), "C18");
+        require(!registry.isProtocolPositionMintingPaused(), "C18");
         IOpiumPositionToken.OpiumPositionTokenParams memory longOpiumPositionTokenParams = IOpiumPositionToken(
             _positionsAddresses[0]
         ).getPositionTokenData();
@@ -424,8 +418,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
         require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
 
-        // Check if ticker was canceled
-        require(!cancelledDerivatives[longOpiumPositionTokenParams.derivativeHash], "C7");
+        require(block.timestamp < longOpiumPositionTokenParams.derivative.endTime, "C16");
 
         uint256[2] memory margins;
         // Get cached margin required according to logic from Opium.SyntheticAggregator
@@ -489,8 +482,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _onlyOpiumFactoryTokens(_positionsAddresses[0], longOpiumPositionTokenParams);
         _onlyOpiumFactoryTokens(_positionsAddresses[1], shortOpiumPositionTokenParams);
         require(shortOpiumPositionTokenParams.derivativeHash == longOpiumPositionTokenParams.derivativeHash, "C2");
-        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
+        require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
 
         ISyntheticAggregator.SyntheticCache memory syntheticCache = protocolAddressesArgs
             .syntheticAggregator
@@ -515,17 +508,17 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _amount
         );
 
+        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
+
         IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(
             msg.sender,
             totalMargin - reserves
         );
 
-        _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
-
-        emit LogRedeem(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
+        emit LogRedeemed(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
-    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related fees if the position is profitable and in the executed positions being burned regardless of their profitability
+    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed positions being burned regardless of their profitability
     /// @param _positionOwner address Address of the owner of positions
     /// @param _positionAddress address[] `positionAddresses` of positions that needs to be executed
     /// @param _amount uint256 Amount of positions to execute for each `positionAddress`
@@ -553,6 +546,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             "C11"
         );
 
+        // Burn executed position tokens
+        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
+
         // Returns payout for all positions
         uint256 payout = _getPayout(
             opiumPositionTokenParams,
@@ -560,9 +556,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             protocolAddressesArgs.syntheticAggregator,
             protocolAddressesArgs.oracleAggregator
         );
-
-        // Burn executed position tokens
-        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
 
         // Transfer payout
         if (payout > 0) {
@@ -576,7 +569,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _positionAddress PositionTypes of positions to be canceled
     /// @param _amount uint256[] Amount of positions to cancel for each `positionAddress`
     function _cancel(address _positionAddress, uint256 _amount) private {
-        require(!registry.isProtocolPositionCancellationPaused(), "C20");
+        require(!registry.isProtocolPositionCancellationPaused(), "C21");
         IOpiumPositionToken.OpiumPositionTokenParams memory opiumPositionTokenParams = IOpiumPositionToken(
             _positionAddress
         ).getPositionTokenData();
@@ -631,13 +624,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Burn cancelled position tokens
         protocolAddressesArgs.opiumProxyFactory.burn(msg.sender, _positionAddress, _amount);
 
+        _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
+
         // Transfer payout * _amounts[i]
         if (payout > 0) {
             IERC20Upgradeable(opiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, payout);
         }
 
-        _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
-        emit LogPositionCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
+        emit LogCancelled(msg.sender, opiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice Helper function consumed by `Core._execute` to calculate the execution's payout of a settled derivative's position
@@ -725,35 +719,33 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice It computes the total reserve to be distributed to the recipients provided as arguments
     /// @param _derivativeAuthorAddress address of the derivative author that receives a portion of the reserves being calculated
     /// @param _tokenAddress address of the token being used to distribute the reserves
-    /// @param _protocolFeeReceiver  address of the designated governance recipient that receives a portion of the reserves being calculated
-    /// @param _derivativeAuthorFeeRatio uint256 portion of the reserves that the derivative author set as a compensation for themselves
-    /// @param _profit uint256 the gross profit from which the reserves will be detracted
-    /// @return reserve uint256 total fee being calculated which corresponds to the sum of the reserves distributed to the derivative author and the fees distributed to the designated governance recipient
+    /// @param _protocolReserveReceiver  address of the designated recipient that receives a portion of the reserves being calculated
+    /// @param _reservePercentage uint256 portion of the reserves that is being distributed from initial amount
+    /// @param _protocolReservePercentage uint256 portion of the reserves that is being distributed to `_protocolReserveReceiver`
+    /// @param _initialAmount uint256 the amount from which the reserves will be detracted
+    /// @return totalReserve uint256 total reserves being calculated which corresponds to the sum of the reserves distributed to the derivative author and the designated recipient
     function _getReserves(
         address _derivativeAuthorAddress,
         address _tokenAddress,
-        address _protocolFeeReceiver,
-        uint256 _derivativeAuthorFeeRatio,
-        uint256 _protocolReserveRatio,
-        uint256 _profit
-    ) private returns (uint256 reserve) {
-        // Calculate fee
-        // fee = profit * _derivativeAuthorFeeRatio / 10000
-        reserve = (_profit * _derivativeAuthorFeeRatio) / 10000;
-        // If commission is zero, finish
-        if (reserve == 0) {
+        address _protocolReserveReceiver,
+        uint256 _reservePercentage,
+        uint256 _protocolReservePercentage,
+        uint256 _initialAmount
+    ) private returns (uint256 totalReserve) {
+        totalReserve = _initialAmount * _reservePercentage / LibCalculator.PERCENTAGE_BASE;
+
+        // If totalReserve is zero, finish
+        if (totalReserve == 0) {
             return 0;
         }
-        uint256 protocolReserve = reserve / _protocolReserveRatio;
-        // Update feeVault for Opium team
-        // protocolReserve = reserve / _protocolReserveRatio
-        // feesVault[protocolFeeReceiver][token] += protocolFee
-        reservesVault[_protocolFeeReceiver][_tokenAddress] += protocolReserve;
+
+        uint256 protocolReserve = totalReserve * _protocolReservePercentage / LibCalculator.PERCENTAGE_BASE;
+        
+        // Update reservesVault for _protocolReserveReceiver
+        reservesVault[_protocolReserveReceiver][_tokenAddress] += protocolReserve;
 
         // Update reservesVault for `syntheticId` author
-        // authorReserve = reserve - protocolReserve
-        // reservesVault[author][token] += authorReserve
-        reservesVault[_derivativeAuthorAddress][_tokenAddress] += reserve - protocolReserve;
+        reservesVault[_derivativeAuthorAddress][_tokenAddress] += totalReserve - protocolReserve;
     }
 
     /// @notice It increases the balance associated to a given derivative stored in the p2pVaults mapping
@@ -788,4 +780,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
         require(_tokenAddress == predicted, "C14");
     }
+
+    // Reserved storage space to allow for layout changes in the future.
+    uint256[50] private __gap;
 }
