@@ -52,6 +52,8 @@ interface IRegistry {
 
     function isRegistryManager(address _address) external view returns (bool);
 
+    function isCoreConfigurationUpdater(address _address) external view returns (bool);
+
     function getCore() external view returns (address);
 
     function isCoreSpenderWhitelisted(address _address) external view returns (bool);

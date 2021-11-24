@@ -146,6 +146,7 @@ contract RegistryStorage is AccessControlUpgradeable {
         _setupRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, _governor);
         _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
         _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
+        _setupRole(LibRoles.CORE_CONFIGURATION_UPDATER_ROLE, _governor);
 
         // Reserve
         _setupRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);

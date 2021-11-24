@@ -143,16 +143,16 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @notice It allows to update the Opium Protocol parameters according to the current state of the Opium.Registry
     /// @dev {see RegistryEntities.sol for a description of the ProtocolParametersArgs struct}
     /// @dev should be called immediately after the deployment of the contract
-    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
-    function updateProtocolParametersArgs() external onlyRegistryManager {
+    /// @dev only accounts who have been assigned the CORE_CONFIGURATION_UPDATER_ROLE { See LibRoles.sol } should be able to call the function
+    function updateProtocolParametersArgs() external onlyCoreConfigurationUpdater {
         protocolParametersArgs = registry.getProtocolParameters();
     }
 
     /// @notice Allows to sync the Core protocol's addresses with the Registry protocol's addresses in case the registry updates at least one of them
     /// @dev {see RegistryEntities.sol for a description of the protocolAddressesArgs struct}
     /// @dev should be called immediately after the deployment of the contract
-    /// @dev only accounts who have been assigned the REGISTRY_MANAGER_ROLE { See LibRoles.sol } should be able to call the function
-    function updateProtocolAddresses() external onlyRegistryManager {
+    /// @dev only accounts who have been assigned the CORE_CONFIGURATION_UPDATER_ROLE { See LibRoles.sol } should be able to call the function
+    function updateProtocolAddresses() external onlyCoreConfigurationUpdater {
         protocolAddressesArgs = registry.getProtocolAddresses();
     }
 

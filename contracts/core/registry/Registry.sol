@@ -258,6 +258,13 @@ contract Registry is RegistryStorage {
         return hasRole(LibRoles.REGISTRY_MANAGER_ROLE, _address);
     }
 
+    /// @notice Returns true if msg.sender has been assigned the CORE_CONFIGURATION_UPDATER_ROLE role
+    /// @dev it is meant to be consumed by the RegistryManager module
+    /// @param _address address to be checked
+    function isCoreConfigurationUpdater(address _address) external view returns (bool) {
+        return hasRole(LibRoles.CORE_CONFIGURATION_UPDATER_ROLE, _address);
+    }
+
     /// @return `Opium.Core`
     function getCore() external view returns (address) {
         return address(protocolAddressesArgs.core);

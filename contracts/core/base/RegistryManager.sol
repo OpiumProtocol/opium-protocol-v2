@@ -6,6 +6,7 @@ import "../../interfaces/IRegistry.sol";
 /**
     Error codes:
     - M1 = ERROR_REGISTRY_MANAGER_ONLY_REGISTRY_MANAGER_ROLE
+    - M2 = ERROR_REGISTRY_MANAGER_ONLY_CORE_CONFIGURATION_UPDATER_ROLE
  */
 contract RegistryManager is Initializable {
     event LogRegistryChanged(address indexed _changer, address indexed _newRegistryAddress);
@@ -14,6 +15,11 @@ contract RegistryManager is Initializable {
 
     modifier onlyRegistryManager() {
         require(registry.isRegistryManager(msg.sender), "M1");
+        _;
+    }
+
+    modifier onlyCoreConfigurationUpdater() {
+        require(registry.isCoreConfigurationUpdater(msg.sender), "M2");
         _;
     }
 
