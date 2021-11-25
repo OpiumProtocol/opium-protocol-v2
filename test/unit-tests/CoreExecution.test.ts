@@ -61,13 +61,14 @@ describe("CoreExecution", () => {
     opiumProxyFactory: OpiumProxyFactory,
     registry: Registry;
 
-  let namedSigners: TNamedSigners;
+  let users: TNamedSigners;
 
   before(async () => {
-    ({ core, testToken, tokenSpender, testToken, oracleAggregator, opiumProxyFactory, registry } = await setup());
-
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-    const { buyer, seller, oracle, author } = namedSigners;
+    ({
+      contracts: { core, testToken, tokenSpender, testToken, oracleAggregator, opiumProxyFactory, registry },
+      users,
+    } = await setup());
+    const { buyer, seller, oracle, author } = users;
 
     const OptionCallMock = await ethers.getContractFactory("OptionCallSyntheticIdMock", author);
 
@@ -293,7 +294,7 @@ describe("CoreExecution", () => {
   });
 
   it("should revert execution with CORE:ADDRESSES_AND_AMOUNTS_DO_NOT_MATCH", async () => {
-    const { seller } = namedSigners;
+    const { seller } = users;
     await expect(
       core
         .connect(seller)
@@ -306,7 +307,7 @@ describe("CoreExecution", () => {
   });
 
   it("should revert execution before endTime with CORE:EXECUTION_BEFORE_MATURITY_NOT_ALLOWED", async () => {
-    const { buyer, seller } = namedSigners;
+    const { buyer, seller } = users;
 
     await expect(core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, 1)).to.be.revertedWith(
       pickError(semanticErrors.ERROR_CORE_EXECUTION_BEFORE_MATURITY_NOT_ALLOWED),
@@ -340,7 +341,7 @@ describe("CoreExecution", () => {
   });
 
   it("should execute full margin option minus 1 position", async () => {
-    const { deployer, buyer, seller, author } = namedSigners;
+    const { deployer, buyer, seller, author } = users;
 
     await timeTravel(SECONDS_40_MINS + 10);
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
@@ -404,7 +405,7 @@ describe("CoreExecution", () => {
   });
 
   it("should revert execution before endTime with CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED", async () => {
-    const { buyer, seller, thirdParty } = namedSigners;
+    const { buyer, seller, thirdParty } = users;
 
     await expect(
       core.connect(thirdParty)[executeOneWithAddress](buyer.address, fullMarginOption.longPositionAddress, 1),
@@ -416,7 +417,7 @@ describe("CoreExecution", () => {
   });
 
   it("should allow execution for third parties", async () => {
-    const { deployer, buyer, author, thirdParty } = namedSigners;
+    const { deployer, buyer, author, thirdParty } = users;
 
     await optionCallMock.connect(buyer).allowThirdpartyExecution(true);
 
@@ -449,7 +450,7 @@ describe("CoreExecution", () => {
 
   // it("should revert execution of invalid tokenId with Transaction reverted: function was called with incorrect parameters", async () => {
   //   // TODO: error does not exist, needs to be changed
-  //   const { buyer } = namedSigners;
+  //   const { buyer } = users;
   // USE UNKNOWN ADDRESS!
   // CHECK THAT IT IS AN ADDRESS FROM OPIUM PROXY FACTORY !
   //   try {
@@ -462,7 +463,7 @@ describe("CoreExecution", () => {
   // });
 
   it("should execute over margin option", async () => {
-    const { deployer, buyer, seller, author } = namedSigners;
+    const { deployer, buyer, seller, author } = users;
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
@@ -546,7 +547,7 @@ describe("CoreExecution", () => {
   });
 
   it("should execute under margin option", async () => {
-    const { deployer, buyer, seller } = namedSigners;
+    const { deployer, buyer, seller } = users;
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
@@ -619,7 +620,7 @@ describe("CoreExecution", () => {
   });
 
   it("should execute non profit option", async () => {
-    const { deployer, buyer, seller } = namedSigners;
+    const { deployer, buyer, seller } = users;
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
@@ -653,7 +654,7 @@ describe("CoreExecution", () => {
   });
 
   // it("should revert cancellation with CORE:CANCELLATION_IS_NOT_ALLOWED", async () => {
-  //   const { buyer } = namedSigners;
+  //   const { buyer } = users;
 
   //   try {
   //     await core.connect(buyer)[cancelOne](1, noDataOption.amount, noDataOption.derivative);
@@ -664,7 +665,7 @@ describe("CoreExecution", () => {
   // });
 
   it("should revert execution with ORACLE_AGGREGATOR:DATA_DOESNT_EXIST", async () => {
-    const { buyer } = namedSigners;
+    const { buyer } = users;
     await timeTravel(SECONDS_3_WEEKS);
     await expect(
       core.connect(buyer)[executeOne](noDataOption.longPositionAddress, noDataOption.amount),
@@ -672,7 +673,7 @@ describe("CoreExecution", () => {
   });
 
   it("should successfully cancel position after 2 weeks with no data", async () => {
-    const { buyer, seller } = namedSigners;
+    const { buyer, seller } = users;
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
@@ -692,7 +693,7 @@ describe("CoreExecution", () => {
   });
 
   it("should successfully cancel the buyer's position, then a day later the OracleAggregator should receive the required data from the OracleId and lastly it should successfully let the seller cancel their position", async () => {
-    const { buyer, seller, oracle } = namedSigners;
+    const { buyer, seller, oracle } = users;
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
@@ -716,7 +717,7 @@ describe("CoreExecution", () => {
   });
 
   it("should revert execution with CORE:TICKER_WAS_CANCELLED", async () => {
-    const { buyer, oracle } = namedSigners;
+    const { buyer, oracle } = users;
 
     // Data occasionally appeared
     await oracleAggregator.connect(oracle).__callback(noDataOption.derivative.endTime, noDataOption.price);
@@ -726,7 +727,7 @@ describe("CoreExecution", () => {
   });
 
   it("should successfully withdraw the accrued fees", async () => {
-    const { deployer, author } = namedSigners;
+    const { deployer, author } = users;
 
     const ownerBalanceBefore = await testToken.balanceOf(deployer.address);
     const authorBalanceBefore = await testToken.balanceOf(author.address);

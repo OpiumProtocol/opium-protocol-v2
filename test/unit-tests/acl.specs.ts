@@ -1,20 +1,14 @@
 // theirs
-import { ethers } from "hardhat";
-// utils
 import { expect } from "../chai-setup";
-import setup from "../__fixtures__";
+import async from "async";
+// utils
+import setup, { getNamedSigners } from "../__fixtures__";
 import { pickError } from "../../utils/misc";
 // types and constants
 import { TNamedSigners } from "../../types";
 import { semanticErrors, governanceRoles, SECONDS_3_WEEKS } from "../../utils/constants";
 import { Registry } from "../../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
-import async from "async";
-
-const getNamedSigners = async (): Promise<TNamedSigners> => {
-  const namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  return namedSigners;
-};
 
 type TProtectedFunctions = {
   [key: string]: (registry: Registry, account: SignerWithAddress) => Promise<void>;
@@ -307,19 +301,20 @@ const protectedFunctions: TProtectedFunctions = {
 };
 
 describe("Acl", () => {
-  let namedSigners: TNamedSigners;
+  let users: TNamedSigners;
   let registry: Registry;
 
   before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-    const contracts = await setup();
-    registry = contracts.registry;
+    ({
+      contracts: { registry },
+      users,
+    } = await setup());
   });
 
   context("should test expected failures", async () => {
     await async.forEach(Object.keys(protectedFunctions), async (protectedFunction: keyof typeof protectedFunctions) => {
       it(`${protectedFunction} should succeed`, done => {
-        protectedFunctions[protectedFunction](registry, namedSigners.governor)
+        protectedFunctions[protectedFunction](registry, users.governor)
           .then(() => {
             done();
           })
@@ -333,7 +328,7 @@ describe("Acl", () => {
   context("should test expected successful calls", async () => {
     await async.forEach(Object.keys(protectedFunctions), async (protectedFunction: keyof typeof protectedFunctions) => {
       it(`${protectedFunction} should succeed`, done => {
-        protectedFunctions[protectedFunction](registry, namedSigners.governor)
+        protectedFunctions[protectedFunction](registry, users.governor)
           .then(() => {
             done();
           })

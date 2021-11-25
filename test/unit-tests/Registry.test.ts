@@ -10,15 +10,11 @@ import { semanticErrors, SECONDS_2_WEEKS, governanceRoles, zeroAddress, SECONDS_
 import { shouldBehaveLikeRegistry } from "../Registry.behavior";
 
 describe("Registry", () => {
-  let namedSigners: TNamedSigners;
-
-  before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  });
-
   it("should ensure the Registry roles are assigned as expected", async () => {
-    const { registry } = await setup();
-    const { deployer, governor, notAllowed } = await ethers.getNamedSigners();
+    const {
+      contracts: { registry },
+      users: { deployer, governor, notAllowed },
+    } = await setup();
 
     expect(await registry.hasRole(governanceRoles.defaultAdminRole, governor.address), "not admin").to.be.true;
     expect(
@@ -65,8 +61,9 @@ describe("Registry", () => {
   });
 
   it("should ensure the initial protocol parameters are as expected", async () => {
-    const { registry } = await setup();
-
+    const {
+      contracts: { registry },
+    } = await setup();
     const protocolParams = await registry.getProtocolParameters();
 
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
@@ -80,8 +77,10 @@ describe("Registry", () => {
   });
 
   it("should ensure that the Registry getters return the correct data", async () => {
-    const { registry, core, oracleIdMock } = await setup();
-    const { deployer, governor } = await ethers.getNamedSigners();
+    const {
+      contracts: { registry, core, oracleIdMock },
+      users: { deployer, governor },
+    } = await setup();
 
     expect(await registry.isRegistryManager(governor.address), "wrong registryManager").to.be.eq(true);
     expect(await registry.isRegistryManager(deployer.address), "wrong registryManager").to.be.eq(false);
@@ -92,7 +91,9 @@ describe("Registry", () => {
   });
 
   it("should ensure the protocol addresses are as expected", async () => {
-    const { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender } = await setup();
+    const {
+      contracts: { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender },
+    } = await setup();
 
     const protocolAddresses = await registry.getProtocolAddresses();
     expect(protocolAddresses.opiumProxyFactory).to.be.eq(opiumProxyFactory.address);
@@ -103,8 +104,10 @@ describe("Registry", () => {
   });
 
   it("should revert if a null address is provided as a protocol address argument", async () => {
-    const { registry, opiumProxyFactory, syntheticAggregator, core, tokenSpender } = await setup();
-    const { governor } = await ethers.getNamedSigners();
+    const {
+      contracts: { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender },
+      users: { governor },
+    } = await setup();
 
     await expect(
       registry
@@ -140,8 +143,10 @@ describe("Registry", () => {
   });
 
   it("should ensure the internal ACL is applied correctly", async () => {
-    const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-    const { notAllowed } = namedSigners;
+    const {
+      contracts: { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender },
+      users: { notAllowed },
+    } = await setup();
 
     await expect(
       registry
@@ -173,8 +178,10 @@ describe("Registry", () => {
   });
 
   it(`should allow the authorized roles to change the protocol's parameters`, async () => {
-    const { registry } = await setup();
-    const { authorized, governor } = namedSigners;
+    const {
+      contracts: { registry },
+      users: { governor, authorized },
+    } = await setup();
 
     // test setderivativeAuthorExecutionFeeCap setter
     await registry.connect(governor).setDerivativeAuthorExecutionFeeCap(12);

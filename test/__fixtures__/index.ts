@@ -11,22 +11,32 @@ import {
   TokenSpender,
 } from "../../typechain";
 import { Registry } from "../../typechain/Registry";
+import { TNamedSigners } from "../../types";
 
 export type TContracts = {
-  registry: Registry;
-  opiumProxyFactory: OpiumProxyFactory;
-  tokenSpender: TokenSpender;
-  core: Core;
-  testToken: TestToken;
-  optionCallMock: OptionCallSyntheticIdMock;
-  oracleAggregator: OracleAggregator;
-  syntheticAggregator: SyntheticAggregator;
-  oracleIdMock: OracleIdMock;
-  testTokenSixDecimals: TestToken;
-  mockRelayer: MockRelayer;
+  contracts: {
+    registry: Registry;
+    opiumProxyFactory: OpiumProxyFactory;
+    tokenSpender: TokenSpender;
+    core: Core;
+    testToken: TestToken;
+    optionCallMock: OptionCallSyntheticIdMock;
+    oracleAggregator: OracleAggregator;
+    syntheticAggregator: SyntheticAggregator;
+    oracleIdMock: OracleIdMock;
+    testTokenSixDecimals: TestToken;
+    mockRelayer: MockRelayer;
+  };
+  users: TNamedSigners;
+};
+
+export const getNamedSigners = async (): Promise<TNamedSigners> => {
+  const namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
+  return namedSigners;
 };
 
 const setup = deployments.createFixture(async (): Promise<TContracts> => {
+  const users = await getNamedSigners();
   await deployments.fixture(["Protocol", "Mocks"]);
 
   /*******************
@@ -51,17 +61,20 @@ const setup = deployments.createFixture(async (): Promise<TContracts> => {
   const mockRelayer = <MockRelayer>await ethers.getContract("MockRelayer");
 
   return {
-    registry,
-    opiumProxyFactory,
-    tokenSpender,
-    core,
-    testToken,
-    optionCallMock,
-    oracleAggregator,
-    syntheticAggregator,
-    oracleIdMock,
-    testTokenSixDecimals,
-    mockRelayer,
+    contracts: {
+      registry,
+      opiumProxyFactory,
+      tokenSpender,
+      core,
+      testToken,
+      optionCallMock,
+      oracleAggregator,
+      syntheticAggregator,
+      oracleIdMock,
+      testTokenSixDecimals,
+      mockRelayer,
+    },
+    users,
   };
 });
 

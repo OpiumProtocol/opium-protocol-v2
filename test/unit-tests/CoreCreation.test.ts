@@ -19,16 +19,12 @@ import { pickError } from "../../utils/misc";
 import { semanticErrors } from "../../utils/constants";
 
 describe("CoreCreation", () => {
-  let namedSigners: TNamedSigners;
-
-  before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  });
-
   it(`should revert create OptionCall derivative with SYNTHETIC_AGGREGATOR:WRONG_MARGIN`, async () => {
     try {
-      const { buyer, seller } = namedSigners;
-      const { core, testToken, optionCallMock, tokenSpender } = await setup();
+      const {
+        contracts: { core, testToken, optionCallMock, tokenSpender },
+        users: { buyer, seller },
+      } = await setup();
 
       const optionCall = derivativeFactory({
         margin: toBN("0"),
@@ -54,8 +50,10 @@ describe("CoreCreation", () => {
   });
 
   it(`should revert create OptionCall derivative with CORE:SYNTHETIC_VALIDATION_ERROR`, async () => {
-    const { buyer, seller } = namedSigners;
-    const { core, testToken, optionCallMock, tokenSpender } = await setup();
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender },
+      users: { buyer, seller },
+    } = await setup();
 
     const optionCall = derivativeFactory({
       margin: toBN("30"),
@@ -68,14 +66,16 @@ describe("CoreCreation", () => {
     });
     const amount = toBN("3");
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
-    await expect(
-      core.create(optionCall, amount, [buyer.address, seller.address]),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST));
+    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_NO_DERIVATIVE_CREATION_IN_THE_PAST),
+    );
   });
 
   it(`should revert create OptionCall derivative with 'CORE:NOT_ENOUGH_TOKEN_ALLOWANCE`, async () => {
-    const { core, testToken, optionCallMock } = await setup();
-    const { buyer, seller } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock },
+      users: { buyer, seller },
+    } = await setup();
 
     const optionCall = derivativeFactory({
       margin: toBN("3"),
@@ -87,14 +87,16 @@ describe("CoreCreation", () => {
       syntheticId: optionCallMock.address,
     });
     const amount = 3;
-    await expect(
-      core.create(optionCall, amount, [buyer.address, seller.address]),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE));
+    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_CORE_NOT_ENOUGH_TOKEN_ALLOWANCE),
+    );
   });
 
   it(`should create OptionCall derivative`, async () => {
-    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
-    const { deployer, buyer, seller, oracle } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory },
+      users: { buyer, seller, oracle, deployer },
+    } = await setup();
 
     const amount = toBN("3");
     const optionCall = derivativeFactory({
@@ -146,8 +148,10 @@ describe("CoreCreation", () => {
   });
 
   it(`should deploy a LONG/SHORT erc20 position pair for a given option position without minting any position amount`, async () => {
-    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
-    const { deployer, buyer, seller } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory },
+      users: { buyer, seller, oracle, deployer },
+    } = await setup();
 
     const amount = 0;
     const optionCall = derivativeFactory({
@@ -200,8 +204,10 @@ describe("CoreCreation", () => {
   });
 
   it("should not be able to deploy twice the same derivative's LONG/SHORT erc20 position pair", async () => {
-    const { core, testToken, optionCallMock, tokenSpender } = await setup();
-    const { deployer, buyer, seller } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory },
+      users: { buyer, seller, oracle, deployer },
+    } = await setup();
 
     const amount = toBN("3");
     const optionCall = derivativeFactory({
@@ -217,14 +223,16 @@ describe("CoreCreation", () => {
     await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
     const tx = await core.create(optionCall, amount, [buyer.address, seller.address]);
     await tx.wait();
-    await expect(
-      core.create(optionCall, amount, [buyer.address, seller.address]),
-    ).to.be.revertedWith("ERC1167: create2 failed");
+    await expect(core.create(optionCall, amount, [buyer.address, seller.address])).to.be.revertedWith(
+      "ERC1167: create2 failed",
+    );
   });
 
   it("should first create a LONG/SHORT position with 0 amount and then mint a specified amount for the previously deployed position pair", async () => {
-    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
-    const { deployer, buyer, seller } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory },
+      users: { buyer, seller, oracle, deployer },
+    } = await setup();
 
     const creationAmount = 0;
     const mintAmount = toBN("3");
@@ -299,8 +307,11 @@ describe("CoreCreation", () => {
   });
 
   it("should not be able to mint positions for a non-existent LONG/SHORT position pair", async () => {
-    const { core, testToken, optionCallMock, tokenSpender } = await setup();
-    const { deployer } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory },
+      users: { buyer, seller, oracle, deployer },
+    } = await setup();
+
     const amount = toBN("3");
     const optionCall = derivativeFactory({
       margin: toBN("30"),
@@ -323,8 +334,10 @@ describe("CoreCreation", () => {
   });
 
   it("should successfully create (only the first time) and mint (all the subsequent times) a derivative's positions repeatedly by calling Core.createAndMint", async () => {
-    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory } = await setup();
-    const { deployer, buyer, seller } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory },
+      users: { buyer, seller, oracle, deployer },
+    } = await setup();
 
     const creationAmount = 0;
     const mintAmount = toBN("3");
@@ -341,12 +354,7 @@ describe("CoreCreation", () => {
     const expectedDerivativeHash = getDerivativeHash(optionCall);
     const marginBalanceBefore = await testToken.balanceOf(deployer.address);
 
-    const tx = await core.createAndMint(
-      optionCall,
-      creationAmount,
-      [buyer.address, seller.address],
-      
-    );
+    const tx = await core.createAndMint(optionCall, creationAmount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     /**

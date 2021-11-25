@@ -41,22 +41,24 @@ describe("Core with fractional quantities", () => {
     opiumProxyFactory: OpiumProxyFactory,
     registry: Registry;
 
-  let namedSigners: TNamedSigners;
+  let users: TNamedSigners;
 
   before(async () => {
     ({
-      core,
-      testTokenSixDecimals,
-      tokenSpender,
-      oracleAggregator,
-      opiumProxyFactory,
-      optionCallMock,
-      registry,
-      testToken,
+      contracts: {
+        core,
+        testTokenSixDecimals,
+        tokenSpender,
+        oracleAggregator,
+        opiumProxyFactory,
+        optionCallMock,
+        registry,
+        testToken,
+      },
+      users,
     } = await setup());
 
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-    const { buyer, seller, oracle } = namedSigners;
+    const { buyer, seller, oracle } = users;
 
     // Full margin option
     const fullMarginOptionDerivative = derivativeFactory({
@@ -99,7 +101,7 @@ describe("Core with fractional quantities", () => {
   });
 
   it(`should create OptionCall derivative`, async () => {
-    const { deployer, buyer, seller } = namedSigners;
+    const { deployer, buyer, seller } = users;
 
     const amount = toBN("0.2");
     const optionCall = derivativeFactory({
@@ -142,7 +144,7 @@ describe("Core with fractional quantities", () => {
   });
 
   it("should execute full margin option", async () => {
-    const { deployer, buyer, seller, author } = namedSigners;
+    const { deployer, buyer, seller, author } = users;
 
     await timeTravel(SECONDS_40_MINS);
     const buyerBalanceBefore = await testTokenSixDecimals.balanceOf(buyer.address);
