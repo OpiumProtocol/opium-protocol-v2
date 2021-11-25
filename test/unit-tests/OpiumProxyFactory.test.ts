@@ -75,7 +75,7 @@ describe("OpiumProxyFactory", () => {
       opiumProxyFactory,
       receipt,
     );
-    console.log(shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress);
+
     const longOpiumPositionToken = await (<OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", longOpiumPositionTokenAddress)
     ));

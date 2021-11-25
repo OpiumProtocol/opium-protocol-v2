@@ -25,7 +25,6 @@ describe("Randomized Core.create() test cases", () => {
         testToken.address,
         optionCallMock.address,
       );
-      console.log("derivativeOrder ", derivativeOrder);
 
       const oracleCallback = async () => {
         await oracleIdMock.triggerCallback(derivativeOrder.derivative.endTime, derivativeOrder.price);

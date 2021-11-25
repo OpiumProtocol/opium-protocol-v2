@@ -26,15 +26,13 @@ describe("Registry", () => {
       "not protocolAddressesSetterRole",
     ).to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, governor.address),
-      "not executionFeeRecipientSetterRole",
+      await registry.hasRole(governanceRoles.executionReservePartSetterRole, governor.address),
+      "not executionReservePartSetterRole",
     ).to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.redemptionFeeRecipientSetterRole, governor.address),
+      await registry.hasRole(governanceRoles.redemptionReservePartSetterRole, governor.address),
       "not protocolAddressesSetterRole",
     ).to.be.true;
-    expect(await registry.hasRole(governanceRoles.opiumFeeSetterRole, governor.address), "not opiumFeeSetterRole").to.be
-      .true;
     expect(
       await registry.hasRole(governanceRoles.noDataCancellationPeriodSetterRole, governor.address),
       "not noDataCancellationPeriodSetterRole",
@@ -44,8 +42,8 @@ describe("Registry", () => {
     expect(await registry.hasRole(governanceRoles.guardianRole, governor.address), "not guardianRole").to.be.true;
     expect(await registry.hasRole(governanceRoles.whitelisterRole, governor.address), "not whitelisterRole").to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.redemptionFeeSetterRole, governor.address),
-      "not redemptionFeeSetterRole",
+      await registry.hasRole(governanceRoles.redemptionReservePartSetterRole, governor.address),
+      "not redemptionReservePartSetterRole",
     ).to.be.true;
     expect(
       await registry.hasRole(governanceRoles.executionFeeCapSetterRole, governor.address),
@@ -57,8 +55,8 @@ describe("Registry", () => {
     expect(await registry.hasRole(governanceRoles.defaultAdminRole, deployer.address), "wrong admin").to.be.false;
     expect(await registry.hasRole(governanceRoles.guardianRole, deployer.address), "wrong guardianRole").to.be.false;
     expect(
-      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, notAllowed.address),
-      "wrong executionFeeRecipientSetterRole",
+      await registry.hasRole(governanceRoles.executionReservePartSetterRole, notAllowed.address),
+      "wrong executionReservePartSetterRole",
     ).to.be.false;
     expect(
       await registry.hasRole(governanceRoles.protocolAddressesSetterRole, notAllowed.address),
@@ -72,21 +70,13 @@ describe("Registry", () => {
     const protocolParams = await registry.getProtocolParameters();
 
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
-    expect(
-      protocolParams.derivativeAuthorExecutionFeeCap,
-      "wrong derivativeAuthorExecutionFeeCap",
-    ).to.be.eq(1000);
+    expect(protocolParams.derivativeAuthorExecutionFeeCap, "wrong derivativeAuthorExecutionFeeCap").to.be.eq(1000);
     expect(
       protocolParams.derivativeAuthorRedemptionReservePart,
       "wrong derivativeAuthorRedemptionReservePart",
     ).to.be.eq(10);
-    expect(protocolParams.protocolExecutionReservePart, "wrong protocol commission part").to.be.eq(1000);
-    expect(protocolParams.protocolRedemptionReservePart, "wrong protocol commission part").to.be.eq(1000);
-  });
-
-  it("behavior2 ", async () => {
-    const { registry } = await setup();
-    await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 1000, 10, 1000, false);
+    expect(protocolParams.protocolExecutionReservePart, "wrong protocolExecutionReservePart").to.be.eq(1000);
+    expect(protocolParams.protocolRedemptionReservePart, "wrong protocolRedemptionReservePart").to.be.eq(1000);
   });
 
   it("should ensure that the Registry getters return the correct data", async () => {
@@ -186,7 +176,7 @@ describe("Registry", () => {
     const { registry } = await setup();
     const { authorized, governor } = namedSigners;
 
-    // test setDerivativeAuthorExecutionReservePartCap setter
+    // test setderivativeAuthorExecutionFeeCap setter
     await registry.connect(governor).setDerivativeAuthorExecutionFeeCap(12);
     expect(
       (await registry.getProtocolParameters()).derivativeAuthorExecutionFeeCap,
@@ -231,9 +221,9 @@ describe("Registry", () => {
     await registry.connect(governor).removeFromWhitelist(authorized.address);
     expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
 
-    // test setProtocolExecutionReservePart after granting `EXECUTION_RESERVE_PART_SETTER_ROLE` role to another account
+    // test setProtocolExecutionReservePart after granting `OPIUM_RESERVE_SETTER_ROLE` role to another account
     await expect(registry.connect(authorized).setProtocolExecutionReservePart(4)).to.revertedWith("R4");
-    await registry.connect(governor).grantRole(governanceRoles.opiumFeeSetterRole, authorized.address);
+    await registry.connect(governor).grantRole(governanceRoles.executionReservePartSetterRole, authorized.address);
     await registry.connect(authorized).setProtocolExecutionReservePart(7);
     expect(
       (await registry.getProtocolParameters()).protocolExecutionReservePart,
