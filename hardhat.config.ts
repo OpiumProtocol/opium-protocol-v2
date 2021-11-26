@@ -5,6 +5,9 @@ import "hardhat-deploy";
 import "hardhat-dependency-compiler";
 import "hardhat-gas-reporter";
 import "hardhat-contract-sizer";
+import "hardhat-docgen";
+import "@hardhat-docgen/core";
+import "@hardhat-docgen/markdown";
 import "@openzeppelin/hardhat-upgrades";
 import "solidity-coverage";
 
@@ -196,6 +199,11 @@ const config: HardhatUserConfig = {
     disambiguatePaths: false,
     runOnCompile: true,
     strict: true,
+  },
+  docgen: {
+    path: "./docs/contracts/specs",
+    clear: true,
+    runOnCompile: true,
   },
 };
 
