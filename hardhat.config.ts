@@ -2,9 +2,10 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-deploy";
-import "@openzeppelin/hardhat-upgrades";
 import "hardhat-dependency-compiler";
 import "hardhat-gas-reporter";
+import "hardhat-contract-sizer";
+import "@openzeppelin/hardhat-upgrades";
 import "solidity-coverage";
 
 import { config as dotenvConfig } from "dotenv";
@@ -189,6 +190,12 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 40000,
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
   },
 };
 

@@ -11,14 +11,33 @@ export const generateExpectedOpiumPositionTokenName = (
   isLong: boolean,
 ): string => {
   const formattedTime = moment(timestamp * 1000)
-    .format("DD-MM-YYYY h:mm:ss")
+    .format("YYYY-MM-DD h:mm:ss")
     .slice(0, 10)
     .split("-")
-    .join("/");
-  return formattedTime
+    .join("");
+  return "Opium:"
+    .concat(formattedTime)
     .concat(`-${derivativeAuthorCustomName}-`)
     .concat(derivativeHash.slice(0, 2).concat(derivativeHash.slice(2, 6).toUpperCase()))
     .concat(isLong ? "-LONG" : "-SHORT");
+};
+
+export const generateExpectedOpiumPositionTokenSymbol = (
+  timestamp: number,
+  derivativeAuthorCustomName: string,
+  derivativeHash: string,
+  isLong: boolean,
+): string => {
+  const formattedTime = moment(timestamp * 1000)
+    .format("YYYY-MM-DD h:mm:ss")
+    .slice(0, 10)
+    .split("-")
+    .join("");
+  return "OPIUM_"
+    .concat(formattedTime)
+    .concat(`_${derivativeAuthorCustomName}_`)
+    .concat(derivativeHash.slice(0, 2).concat(derivativeHash.slice(2, 6).toUpperCase()))
+    .concat(isLong ? "_L" : "_S");
 };
 
 const generateRandomMarginOrStrike = (): BigNumber => {
