@@ -203,7 +203,7 @@ const config: HardhatUserConfig = {
   docgen: {
     path: "./docs/contracts/specs",
     clear: true,
-    runOnCompile: true,
+    runOnCompile: false,
   },
 };
 
