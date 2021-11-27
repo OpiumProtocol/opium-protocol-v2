@@ -52,7 +52,7 @@ const generateRandomAmount = (): BigNumber => {
 
 export const createRandomDerivativeExpiry = async (): Promise<number> => {
   const elapsedSeconds = await getEVMElapsedSeconds();
-  return ~~(Date.now() / 1000) + +elapsedSeconds + 60 * 60 * 24 * Math.ceil(Math.random() * 40);
+  return ~~(Date.now() / 1000) + +elapsedSeconds + 60 * 60 * 24 * Math.ceil(Math.random() * 1000);
 };
 
 export const generateRandomDerivative = async (

@@ -2,13 +2,17 @@
 import { expect } from "../chai-setup";
 import async from "async";
 // utils
-import setup, { getNamedSigners } from "../__fixtures__";
+import setup, { getNamedSigners, TContracts } from "../__fixtures__";
 import { pickError } from "../../utils/misc";
 // types and constants
-import { TNamedSigners } from "../../types";
+import { TDerivative, TNamedSigners } from "../../types";
 import { semanticErrors, governanceRoles, SECONDS_3_WEEKS } from "../../utils/constants";
 import { Registry } from "../../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
+import { shouldBehaveLikeCore } from "../Core.behavior";
+import { createValidDerivativeExpiry, derivativeFactory } from "../../utils/derivatives";
+import { cast, toBN } from "../../utils/bn";
+import { retrievePositionTokensAddresses } from "../../utils/events";
 
 type TProtectedFunctions = {
   [key: string]: (registry: Registry, account: SignerWithAddress) => Promise<void>;
@@ -27,7 +31,7 @@ const protectedFunctions: TProtectedFunctions = {
         arg.address,
       );
     } else {
-      await expect(registry.connect(account).setProtocolExecutionReserveClaimer(arg.address)).to.revertedWith(
+      await expect(registry.connect(account).setProtocolExecutionReserveClaimer(arg.address)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE),
       );
     }
@@ -47,7 +51,7 @@ const protectedFunctions: TProtectedFunctions = {
       );
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).setProtocolRedemptionReserveClaimer(arg.address)).to.revertedWith(
+      await expect(registry.connect(account).setProtocolRedemptionReserveClaimer(arg.address)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE),
       );
     }
@@ -63,7 +67,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(protocolParameters.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_3_WEEKS);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).setNoDataCancellationPeriod(SECONDS_3_WEEKS)).to.revertedWith(
+      await expect(registry.connect(account).setNoDataCancellationPeriod(SECONDS_3_WEEKS)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE),
       );
     }
@@ -80,7 +84,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isWhitelisted, "wrong isWhitelisted").to.be.true;
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).addToWhitelist(arg.address)).to.revertedWith(
+      await expect(registry.connect(account).addToWhitelist(arg.address)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
       );
     }
@@ -97,7 +101,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isWhitelisted, "wrong isWhitelisted").to.be.false;
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).removeFromWhitelist(arg.address)).to.revertedWith(
+      await expect(registry.connect(account).removeFromWhitelist(arg.address)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_WHITELISTER_ROLE),
       );
     }
@@ -114,7 +118,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(protocolParameters.protocolExecutionReservePart, "wrong noDataCancellationPeriod").to.be.eq(arg);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).setProtocolExecutionReservePart(arg)).to.revertedWith(
+      await expect(registry.connect(account).setProtocolExecutionReservePart(arg)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_PART_SETTER_ROLE),
       );
     }
@@ -131,7 +135,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(protocolParameters.protocolExecutionReservePart, "wrong noDataCancellationPeriod").to.be.eq(arg);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).setDerivativeAuthorExecutionFeeCap(arg)).to.revertedWith(
+      await expect(registry.connect(account).setDerivativeAuthorExecutionFeeCap(arg)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE),
       );
     }
@@ -148,7 +152,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(protocolParameters.protocolRedemptionReservePart, "wrong noDataCancellationPeriod").to.be.eq(arg);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).setProtocolRedemptionReservePart(arg)).to.revertedWith(
+      await expect(registry.connect(account).setProtocolRedemptionReservePart(arg)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE),
       );
     }
@@ -165,7 +169,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(protocolParameters.derivativeAuthorRedemptionReservePart, "wrong noDataCancellationPeriod").to.be.eq(arg);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).setDerivativeAuthorRedemptionReservePart(arg)).to.revertedWith(
+      await expect(registry.connect(account).setDerivativeAuthorRedemptionReservePart(arg)).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE),
       );
     }
@@ -181,7 +185,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong global pause value").to.be.true;
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pause()).to.revertedWith(
+      await expect(registry.connect(account).pause()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_GUARDIAN_ROLE),
       );
     }
@@ -191,13 +195,19 @@ const protectedFunctions: TProtectedFunctions = {
     const setterRole = governanceRoles.partialGlobalUnpauserRole;
     // ensures that the role is as expected
     if (await registry.hasRole(setterRole, account.address)) {
-      console.log(`account ${account.address} has ${setterRole} role`);
       await registry.connect(account).unpause();
       const isPaused = await registry.isProtocolPaused();
       expect(isPaused, "wrong global pause value").to.be.eq(false);
+      console.log("inside unpauser test --- start AFTER PAUSING:::::::::");
+      const isMintingPaused = await registry.isProtocolPositionCreationPaused();
+      expect(isMintingPaused).to.be.false;
+      const isRedemptionPaused = await registry.isProtocolPositionCreationPaused();
+      expect(isRedemptionPaused).to.be.false;
+      const isCancellationPaused = await registry.isProtocolPositionCreationPaused();
+      expect(isCancellationPaused).to.be.false;
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).unpause()).to.revertedWith(
+      await expect(registry.connect(account).unpause()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE),
       );
     }
@@ -213,7 +223,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong isProtocolPositionCreationPaused").to.be.true;
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pauseProtocolPositionCreation()).to.revertedWith(
+      await expect(registry.connect(account).pauseProtocolPositionCreation()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE),
       );
     }
@@ -229,7 +239,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong isProtocolPositionMintingPaused").to.be.eq(true);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pauseProtocolPositionMinting()).to.revertedWith(
+      await expect(registry.connect(account).pauseProtocolPositionMinting()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE),
       );
     }
@@ -245,7 +255,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong isProtocolPositionRedemptionPaused").to.be.eq(true);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pauseProtocolPositionRedemption()).to.revertedWith(
+      await expect(registry.connect(account).pauseProtocolPositionRedemption()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE),
       );
     }
@@ -261,7 +271,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong isProtocolPositionExecutionPaused").to.be.eq(true);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pauseProtocolPositionExecution()).to.revertedWith(
+      await expect(registry.connect(account).pauseProtocolPositionExecution()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE),
       );
     }
@@ -277,7 +287,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong isProtocolPositionCancellationPaused").to.be.eq(true);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pauseProtocolPositionCancellation()).to.revertedWith(
+      await expect(registry.connect(account).pauseProtocolPositionCancellation()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE),
       );
     }
@@ -293,7 +303,7 @@ const protectedFunctions: TProtectedFunctions = {
       expect(isPaused, "wrong isProtocolReserveClaimPaused").to.be.eq(true);
     } else {
       console.log(`account ${account.address} does not have ${setterRole} role`);
-      await expect(registry.connect(account).pauseProtocolReserveClaim()).to.revertedWith(
+      await expect(registry.connect(account).pauseProtocolReserveClaim()).to.be.revertedWith(
         pickError(semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE),
       );
     }
@@ -302,19 +312,33 @@ const protectedFunctions: TProtectedFunctions = {
 
 describe("Acl", () => {
   let users: TNamedSigners;
-  let registry: Registry;
+  let contracts: TContracts;
+  let derivative: TDerivative;
+  let positionsAddress: string[];
 
   before(async () => {
-    ({
-      contracts: { registry },
-      users,
-    } = await setup());
+    ({ contracts, users } = await setup());
+    // setup
+    derivative = derivativeFactory({
+      margin: toBN("1"),
+      endTime: await createValidDerivativeExpiry(3),
+      params: [
+        toBN("20000"), // Strike Price 200.00$
+      ],
+      token: contracts.testToken.address,
+      syntheticId: contracts.optionCallMock.address,
+    });
+    const amount = cast(0);
+    await contracts.testToken.approve(contracts.tokenSpender.address, toBN("1000"));
+    const tx = await contracts.core.create(derivative, amount, [users.deployer.address, users.deployer.address]);
+    const receipt = await tx.wait();
+    positionsAddress = retrievePositionTokensAddresses(contracts.opiumProxyFactory, receipt);
   });
 
   context("should test expected failures", async () => {
     await async.forEach(Object.keys(protectedFunctions), async (protectedFunction: keyof typeof protectedFunctions) => {
       it(`${protectedFunction} should succeed`, done => {
-        protectedFunctions[protectedFunction](registry, users.governor)
+        protectedFunctions[protectedFunction](contracts.registry, users.notAllowed)
           .then(() => {
             done();
           })
@@ -328,12 +352,28 @@ describe("Acl", () => {
   context("should test expected successful calls", async () => {
     await async.forEach(Object.keys(protectedFunctions), async (protectedFunction: keyof typeof protectedFunctions) => {
       it(`${protectedFunction} should succeed`, done => {
-        protectedFunctions[protectedFunction](registry, users.governor)
+        protectedFunctions[protectedFunction](contracts.registry, users.governor)
           .then(() => {
-            done();
+            shouldBehaveLikeCore(contracts.core)
+              .toComplyWithPausability(
+                contracts.registry,
+                derivative,
+                positionsAddress[0],
+                positionsAddress[1],
+                users.deployer,
+              )
+              .then(() => {
+                done();
+              })
+              .catch(error => {
+                done(error);
+              });
+          })
+          .then(() => {
+            console.log("completed successfully");
           })
           .catch(error => {
-            done(error);
+            console.log(`error: ${protectedFunction}`);
           });
       });
     });

@@ -18,7 +18,8 @@ export const executeOneWithAddress = "execute(address,address,uint256)";
 export const executeMany = "execute(address[],uint256[])";
 export const executeManyWithAddress = "execute(address,address[],uint256[])";
 export const cancelOne = "cancel(address,uint256)";
-export const cancelMany = "cancel(uint8[],uint256[],(uint256,uint256,uint256[],address,address,address)[])";
+export const cancelMany = "cancel(address[],uint256[])";
+export const redeemOne = "redeem(address[2],uint256)";
 
 export const governanceRoles = Object.freeze({
   defaultAdminRole: "0x0000000000000000000000000000000000000000000000000000000000000000",

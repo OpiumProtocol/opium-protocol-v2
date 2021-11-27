@@ -177,8 +177,7 @@ describe("Upgradeability", () => {
       await oracleIdMock.triggerCallback(derivativeOrder.derivative.endTime, derivativeOrder.price);
     };
 
-    await shouldBehaveLikeCore(
-      upgraded,
+    await shouldBehaveLikeCore(upgraded).toCreateAndMintAndExecutePositions(
       registry,
       testToken,
       tokenSpender,

@@ -1,12 +1,9 @@
 // theirs
-import { ethers } from "hardhat";
 import async from "async";
 // utils
 import setup from "../__fixtures__";
 import { EPositionCreation, shouldBehaveLikeCore } from "../Core.behavior";
 import { generateRandomDerivativeSetup } from "../../utils/testCaseGenerator";
-// types and constants
-import { TNamedSigners } from "../../types";
 
 describe("Randomized Core.create() test cases", () => {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -27,8 +24,7 @@ describe("Randomized Core.create() test cases", () => {
         await oracleIdMock.triggerCallback(derivativeOrder.derivative.endTime, derivativeOrder.price);
       };
 
-      await shouldBehaveLikeCore(
-        core,
+      await shouldBehaveLikeCore(core).toCreateAndMintAndExecutePositions(
         registry,
         testToken,
         tokenSpender,
@@ -61,8 +57,7 @@ describe("Randomized Core.create() test cases", () => {
         await oracleIdMock.triggerCallback(derivativeOrder.derivative.endTime, derivativeOrder.price);
       };
 
-      await shouldBehaveLikeCore(
-        core,
+      await shouldBehaveLikeCore(core).toCreateAndMintAndExecutePositions(
         registry,
         testToken,
         tokenSpender,

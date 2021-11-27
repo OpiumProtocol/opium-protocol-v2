@@ -59,7 +59,7 @@ describe("Core: burn market neutral positions", () => {
     expect(marketNeutralPartyLongBalance).to.equal(amount);
     expect(marketNeutralPartysShortBalance).to.equal(amount);
 
-    const tx2 = await core["redeem(address[2],uint256)"]([longPositionAddress, shortPositionAddress], redeemAmount);
+    const tx2 = await core[redeemOne]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
 
     const [log] = await decodeEvents<Core>(core, "LogRedeemed", receipt2.events);

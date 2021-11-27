@@ -14,19 +14,21 @@ import { Registry } from "../../typechain/Registry";
 import { TNamedSigners } from "../../types";
 
 export type TContracts = {
-  contracts: {
-    registry: Registry;
-    opiumProxyFactory: OpiumProxyFactory;
-    tokenSpender: TokenSpender;
-    core: Core;
-    testToken: TestToken;
-    optionCallMock: OptionCallSyntheticIdMock;
-    oracleAggregator: OracleAggregator;
-    syntheticAggregator: SyntheticAggregator;
-    oracleIdMock: OracleIdMock;
-    testTokenSixDecimals: TestToken;
-    mockRelayer: MockRelayer;
-  };
+  registry: Registry;
+  opiumProxyFactory: OpiumProxyFactory;
+  tokenSpender: TokenSpender;
+  core: Core;
+  testToken: TestToken;
+  optionCallMock: OptionCallSyntheticIdMock;
+  oracleAggregator: OracleAggregator;
+  syntheticAggregator: SyntheticAggregator;
+  oracleIdMock: OracleIdMock;
+  testTokenSixDecimals: TestToken;
+  mockRelayer: MockRelayer;
+};
+
+export type TFixturesOutput = {
+  contracts: TContracts;
   users: TNamedSigners;
 };
 
@@ -35,7 +37,7 @@ export const getNamedSigners = async (): Promise<TNamedSigners> => {
   return namedSigners;
 };
 
-const setup = deployments.createFixture(async (): Promise<TContracts> => {
+const setup = deployments.createFixture(async (): Promise<TFixturesOutput> => {
   const users = await getNamedSigners();
   await deployments.fixture(["Protocol", "Mocks"]);
 
