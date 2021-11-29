@@ -20,6 +20,11 @@ library RegistryEntities {
         uint32 protocolExecutionReservePart;
         // Represents which part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves
         uint32 protocolRedemptionReservePart;
+        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability
+        uint32 __gapOne;
+        uint32 __gapTwo;
+        uint32 __gapThree;
+        uint32 __gapFour;
     }
 
     struct ProtocolAddressesArgs {
@@ -37,6 +42,9 @@ library RegistryEntities {
         address protocolExecutionReserveClaimer;
         // Address of the recipient of redemption protocol reserves
         address protocolRedemptionReserveClaimer;
+        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability
+        uint32 __gapOne;
+        uint32 __gapTwo;
     }
 
     struct ProtocolPausabilityArgs {
@@ -54,5 +62,10 @@ library RegistryEntities {
         bool protocolPositionCancellation;
         // if true, no reserves can be claimed
         bool protocolReserveClaim;
+        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability
+        bool __gapOne;
+        bool __gapTwo;
+        bool __gapThree;
+        bool __gapFour;
     }
 }
