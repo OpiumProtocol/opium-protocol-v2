@@ -8,7 +8,6 @@ import "../libs/LibPosition.sol";
 import "../libs/LibBokkyPooBahsDateTimeLibrary.sol";
 import "../interfaces/IOpiumPositionToken.sol";
 import "../interfaces/IRegistry.sol";
-import "hardhat/console.sol";
 
 /**
     Error codes:
@@ -20,8 +19,12 @@ import "hardhat/console.sol";
 contract OpiumProxyFactory is RegistryManager {
     using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
-    event LogShortPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
-    event LogLongPositionTokenAddress(bytes32 indexed _derivativeHash, address indexed _positionAddress);
+
+    event LogPositionTokenPair(
+        bytes32 indexed _derivativeHash,
+        address indexed _longPositionAddress,
+        address indexed _shortPositionAddress
+    );
 
     address private opiumPositionTokenImplementation;
 
@@ -71,44 +74,19 @@ contract OpiumProxyFactory is RegistryManager {
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
         address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
 
-        string memory derivativeHashSlice = _toDerivativeHashStringIdentifier(_derivativeHash);
-        bytes memory endTimeDate = _toDerivativeEndTimeIdentifier(_derivative.endTime);
-
-        bytes memory baseCustomName = abi.encodePacked(
-            "Opium:",
-            endTimeDate,
-            "-",
-            _derivativeAuthorCustomName,
-            "-",
-            derivativeHashSlice
-        );
-
-        bytes memory customSymbol = abi.encodePacked(
-            "OPIUM",
-            "_",
-            endTimeDate,
-            "_",
-            _derivativeAuthorCustomName,
-            "_",
-            derivativeHashSlice
-        );
-
         IOpiumPositionToken(longPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.LONG,
             _derivative,
-            baseCustomName,
-            customSymbol
+            _derivativeAuthorCustomName
         );
         IOpiumPositionToken(shortPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.SHORT,
             _derivative,
-            baseCustomName,
-            customSymbol
+            _derivativeAuthorCustomName
         );
-        emit LogLongPositionTokenAddress(_derivativeHash, longPositionAddress);
-        emit LogShortPositionTokenAddress(_derivativeHash, shortPositionAddress);
+        emit LogPositionTokenPair(_derivativeHash, longPositionAddress, shortPositionAddress);
         if (_amount > 0) {
             IOpiumPositionToken(longPositionAddress).mint(_buyer, _amount);
             IOpiumPositionToken(shortPositionAddress).mint(_seller, _amount);
@@ -161,62 +139,6 @@ contract OpiumProxyFactory is RegistryManager {
     ) external onlyCore {
         IOpiumPositionToken(_longPositionAddress).burn(_positionOwner, _amount);
         IOpiumPositionToken(_shortPositionAddress).burn(_positionOwner, _amount);
-    }
-
-    // ****************** PRIVATE FUNCTIONS ******************
-
-    // ***** SETTERS *****
-
-    /// @notice It is used to obtain a slice of derivativeHash and convert it to a string to be used as part of an Opium position token's name
-    /// @param _data bytes32 representing a derivativeHash
-    /// @return string representing the first 4 characters of a derivativeHash prefixed by "0x"
-    function _toDerivativeHashStringIdentifier(bytes32 _data) private pure returns (string memory) {
-        bytes4 result;
-        assembly {
-            result := or(
-                and(
-                    or(
-                        shr(4, and(_data, 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
-                        shr(8, and(_data, 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
-                    ),
-                    0xffff000000000000000000000000000000000000000000000000000000000000
-                ),
-                shr(
-                    16,
-                    or(
-                        shr(4, and(shl(8, _data), 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
-                        shr(8, and(shl(8, _data), 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
-                    )
-                )
-            )
-        }
-
-        return
-            string(
-                abi.encodePacked(
-                    "0x",
-                    bytes4(0x30303030 + uint32(result) + (((uint32(result) + 0x06060606) >> 4) & 0x0F0F0F0F) * 7)
-                )
-            );
-    }
-
-    /// @notice It is used to convert a derivative.endTime to a human-readable date to be used as part of an Opium position token's name
-    /// @dev { See the third-party library ./libs/LibBokkyPooBahsDateTimeLibrary.sol }
-    /// @param _derivativeEndTime uint256 representing the timestamp of a given derivative's maturity
-    /// @return bytes representing the encoding of the derivativeEndTime converted to day-month-year in the format DD/MM/YYYY
-    function _toDerivativeEndTimeIdentifier(uint256 _derivativeEndTime) private pure returns (bytes memory) {
-        (uint256 year, uint256 month, uint256 day) = BokkyPooBahsDateTimeLibrary.timestampToDate(_derivativeEndTime);
-
-        return
-            abi.encodePacked(
-                StringsUpgradeable.toString(year),
-                month < 10
-                    ? abi.encodePacked("0", StringsUpgradeable.toString(month))
-                    : bytes(StringsUpgradeable.toString(month)),
-                day < 10
-                    ? abi.encodePacked("0", StringsUpgradeable.toString(day))
-                    : bytes(StringsUpgradeable.toString(day))
-            );
     }
 
     // Reserved storage space to allow for layout changes in the future.
