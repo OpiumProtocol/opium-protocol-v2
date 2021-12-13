@@ -186,7 +186,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _amount,
         address[2] calldata _positionsOwners
     ) external nonReentrant {
-        _create(_derivative, _amount, _positionsOwners);
+        bytes32 derivativeHash = _derivative.getDerivativeHash();
+        _create(_derivative, derivativeHash, _amount, _positionsOwners);
     }
 
     /// @notice It can either 1) deploy AND mint 2) only mint.
@@ -218,7 +219,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // both erc20 positions have not been deployed
         require(isLongDeployed == isShortDeployed, "C23");
         if (!isLongDeployed) {
-            _create(_derivative, _amount, _positionsOwners);
+            _create(_derivative, derivativeHash, _amount, _positionsOwners);
         } else {
             address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
             _mint(_amount, _positionsAddress, _positionsOwners);
@@ -327,19 +328,19 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @dev it can only be called if the ERC20 contracts for the derivative's positions have not yet been deployed
     /// @dev the uint256 _amount of positions to be minted can be 0 - which results in the deployment of the position contracts without any circulating supply
     /// @param _derivative LibDerivative.Derivative Derivative definition
+    /// @param _derivativeHash unique identifier of a derivative which is used as a key in the p2pVaults mapping
     /// @param _amount uint256 Amount of positions to create
     /// @param _positionsOwners address[2] Addresses of buyer and seller
     /// [0] - buyer address -> receives LONG position
     /// [1] - seller address -> receives SHORT position
     function _create(
         LibDerivative.Derivative calldata _derivative,
+        bytes32 _derivativeHash,
         uint256 _amount,
         address[2] calldata _positionsOwners
     ) private {
         require(block.timestamp < _derivative.endTime, "C16");
         require(!registry.isProtocolPositionCreationPaused(), "C17");
-        // Generate hash for derivative
-        bytes32 derivativeHash = _derivative.getDerivativeHash();
 
         // Validate input data against Derivative logic (`syntheticId`)
         require(IDerivativeLogic(_derivative.syntheticId).validateInput(_derivative), "C8");
@@ -349,7 +350,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
         (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
-            derivativeHash,
+            _derivativeHash,
             _derivative
         );
 
@@ -378,15 +379,15 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _positionsOwners[0],
             _positionsOwners[1],
             _amount,
-            derivativeHash,
+            _derivativeHash,
             _derivative,
             IDerivativeLogic(_derivative.syntheticId).getSyntheticIdName()
         );
 
         // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
-        _increaseP2PVault(derivativeHash, totalMarginToE18);
+        _increaseP2PVault(_derivativeHash, totalMarginToE18);
 
-        emit LogCreated(_positionsOwners[0], _positionsOwners[1], derivativeHash, _amount);
+        emit LogCreated(_positionsOwners[0], _positionsOwners[1], _derivativeHash, _amount);
     }
 
     /// @notice It mints the provided amount of LONG and SHORT positions of a given derivative and it forwards them to the provided positions' owners
