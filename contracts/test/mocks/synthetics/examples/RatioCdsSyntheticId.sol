@@ -28,7 +28,7 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
   }
 
   /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions
-  function getSyntheticIdName() external view override returns (string memory) {
+  function getSyntheticIdName() external pure override returns (string memory) {
     return "CDS";
   }
 
@@ -53,7 +53,7 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
     sellerMargin = nominal;
   }
 
-  function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result) external view override returns (uint256 buyerPayout, uint256 sellerPayout) {
+  function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result) external pure override returns (uint256 buyerPayout, uint256 sellerPayout) {
     uint256 trigger = _derivative.params[0];
     uint256 fixedPremium = _derivative.params[1];
     uint256 nominal = _derivative.margin;

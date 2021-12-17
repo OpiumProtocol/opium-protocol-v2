@@ -1,7 +1,6 @@
 import { deployments, ethers } from "hardhat";
 import {
   Core,
-  MockRelayer,
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
   OracleAggregator,
@@ -24,7 +23,6 @@ export type TContracts = {
   syntheticAggregator: SyntheticAggregator;
   oracleIdMock: OracleIdMock;
   testTokenSixDecimals: TestToken;
-  mockRelayer: MockRelayer;
 };
 
 export type TFixturesOutput = {
@@ -60,7 +58,6 @@ const setup = deployments.createFixture(async (): Promise<TFixturesOutput> => {
 
   const testToken = <TestToken>await ethers.getContract("TestToken");
   const testTokenSixDecimals = <TestToken>await ethers.getContract("SixDecimalsTestToken");
-  const mockRelayer = <MockRelayer>await ethers.getContract("MockRelayer");
 
   return {
     contracts: {
@@ -74,7 +71,6 @@ const setup = deployments.createFixture(async (): Promise<TFixturesOutput> => {
       syntheticAggregator,
       oracleIdMock,
       testTokenSixDecimals,
-      mockRelayer,
     },
     users,
   };

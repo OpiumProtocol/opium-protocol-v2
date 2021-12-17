@@ -58,7 +58,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
 
     function getMargin(LibDerivative.Derivative calldata _derivative)
         external
-        view
+        pure
         override
         returns (uint256 buyerMargin, uint256 sellerMargin)
     {
@@ -68,7 +68,7 @@ contract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, 
 
     function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result)
         external
-        view
+        pure
         override
         returns (uint256 buyerPayout, uint256 sellerPayout)
     {
