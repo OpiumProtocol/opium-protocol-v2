@@ -8,7 +8,7 @@ contract OptionCallDeliverySyntheticId is IDerivativeLogic, Ownable {
   address private author;
   uint256 private commission;
 
-  constructor(address _author, uint256 _commission) public {
+  constructor(address _author, uint256 _commission) {
     /*
     {
       "author": "Opium.Team",

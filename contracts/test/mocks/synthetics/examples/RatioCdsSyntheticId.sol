@@ -10,7 +10,8 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
 
   uint256 constant public TRIGGER_BASE = 1e18;
 
-  constructor(address _author, uint256 _commission) public {
+
+  constructor(address _author, uint256 _commission) {
     /*
     {
       "author": "Opium.Team",
