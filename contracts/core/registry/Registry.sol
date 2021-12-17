@@ -63,6 +63,7 @@ contract Registry is AccessControlUpgradeable {
     // Emergency
     // emits the role to signal what type of pause has been committed, if any
     event LogProtocolPausableStateChanged(address indexed _setter, bool indexed _state, bytes32 indexed _role);
+
     RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
     RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
     RegistryEntities.ProtocolPausabilityArgs private protocolPausabilityArgs;

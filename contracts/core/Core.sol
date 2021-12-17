@@ -374,6 +374,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             totalMarginToE18
         );
 
+        emit LogCreated(_positionsOwners[0], _positionsOwners[1], _derivativeHash, _amount);
+
         // Mint LONG and SHORT positions tokens
         protocolAddressesArgs.opiumProxyFactory.create(
             _positionsOwners[0],
@@ -386,8 +388,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
         _increaseP2PVault(_derivativeHash, totalMarginToE18);
-
-        emit LogCreated(_positionsOwners[0], _positionsOwners[1], _derivativeHash, _amount);
     }
 
     /// @notice It mints the provided amount of LONG and SHORT positions of a given derivative and it forwards them to the provided positions' owners
@@ -451,6 +451,11 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             totalMarginToE18
         );
 
+        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
+        _increaseP2PVault(longOpiumPositionTokenParams.derivativeHash, totalMarginToE18);
+
+        emit LogMinted(_positionsOwners[0], _positionsOwners[1], longOpiumPositionTokenParams.derivativeHash, _amount);
+
         // Mint LONG and SHORT positions tokens
         protocolAddressesArgs.opiumProxyFactory.mintPair(
             _positionsOwners[0],
@@ -459,11 +464,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _positionsAddresses[1],
             _amount
         );
-
-        // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount
-        _increaseP2PVault(longOpiumPositionTokenParams.derivativeHash, totalMarginToE18);
-
-        emit LogMinted(_positionsOwners[0], _positionsOwners[1], longOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice It redeems the provided amount of a derivative's market neutral position pair (LONG/SHORT) owned by the msg.sender - redeeming a market neutral position pair results in an equal amount of LONG and SHORT positions being burned in exchange for their original collateral
@@ -510,12 +510,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
 
+        emit LogRedeemed(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
+
         IERC20Upgradeable(shortOpiumPositionTokenParams.derivative.token).safeTransfer(
             msg.sender,
             totalMargin - reserves
         );
-
-        emit LogRedeemed(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed positions being burned regardless of their profitability
@@ -557,12 +557,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             protocolAddressesArgs.oracleAggregator
         );
 
+        emit LogExecuted(_positionOwner, _positionAddress, _amount);
+
         // Transfer payout
         if (payout > 0) {
             IERC20Upgradeable(opiumPositionTokenParams.derivative.token).safeTransfer(_positionOwner, payout);
         }
-
-        emit LogExecuted(_positionOwner, _positionAddress, _amount);
     }
 
     /// @notice Cancels tickers, burns positions and returns margins to the position owner in case no data were provided within `protocolParametersArgs.noDataCancellationPeriod`
@@ -621,6 +621,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             payout = margins[1].mulWithPrecisionFactor(_amount);
         }
 
+        emit LogCancelled(msg.sender, opiumPositionTokenParams.derivativeHash, _amount);
+
         // Burn cancelled position tokens
         protocolAddressesArgs.opiumProxyFactory.burn(msg.sender, _positionAddress, _amount);
 
@@ -630,8 +632,6 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (payout > 0) {
             IERC20Upgradeable(opiumPositionTokenParams.derivative.token).safeTransfer(msg.sender, payout);
         }
-
-        emit LogCancelled(msg.sender, opiumPositionTokenParams.derivativeHash, _amount);
     }
 
     /// @notice Helper function consumed by `Core._execute` to calculate the execution's payout of a settled derivative's position

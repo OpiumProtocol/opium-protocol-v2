@@ -22,7 +22,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     }
 
     address private factory;
-    string derivativeAuthorCustomName;
+    string private derivativeAuthorCustomName;
     OpiumPositionTokenParams private opiumPositionTokenParams;
 
     /// @notice It is applied to all the stateful functions in OpiumPositionToken as they are meant to be consumed only via the OpiumProxyFactory
