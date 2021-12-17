@@ -1,6 +1,6 @@
 pragma solidity 0.8.5;
 
-import "./RegistryStorage.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "../../libs/LibRoles.sol";
 import "../../libs/LibCalculator.sol";
 import "../../interfaces/IOpiumProxyFactory.sol";
@@ -33,7 +33,7 @@ import "../../interfaces/ICore.sol";
     - R20 = ERROR_REGISTRY_INVALID_VALUE
  */
 
-contract Registry is RegistryStorage {
+contract Registry is AccessControlUpgradeable {
     // Setup
     event LogNoDataCancellationPeriodChanged(address indexed _setter, uint256 indexed _noDataCancellationPeriod);
     event LogWhitelistAccountAdded(address indexed _setter, address indexed _whitelisted);
@@ -63,16 +63,171 @@ contract Registry is RegistryStorage {
     // Emergency
     // emits the role to signal what type of pause has been committed, if any
     event LogProtocolPausableStateChanged(address indexed _setter, bool indexed _state, bytes32 indexed _role);
+    RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;
+    RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;
+    RegistryEntities.ProtocolPausabilityArgs private protocolPausabilityArgs;
+    mapping(address => bool) private coreSpenderWhitelist;
+
+    // ***** SETUP *****
+
+    /// @notice it ensures that the calling account has been granted the PROTOCOL_ADDRESSES_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolAdressesSetter() {
+        require(hasRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, msg.sender), "R1");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyNoDataCancellationPeriodSetter() {
+        require(hasRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, msg.sender), "R5");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the WHITELISTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyWhitelister() {
+        require(hasRole(LibRoles.WHITELISTER_ROLE, msg.sender), "R7");
+        _;
+    }
+
+    // ***** RESERVE *****
+
+    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolExecutionReserveClaimerAddressSetter() {
+        require(hasRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), "R2");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolRedemptionReserveClaimerAddressSetter() {
+        require(hasRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), "R3");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_PART_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolExecutionReservePartSetter() {
+        require(hasRole(LibRoles.EXECUTION_RESERVE_PART_SETTER_ROLE, msg.sender), "R4");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyDerivativeAuthorExecutionFeeCapSetter() {
+        require(hasRole(LibRoles.DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), "R8");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the REDEMPTION_RESERVE_PART_SETTER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolRedemptionReservePartSetter() {
+        require(hasRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, msg.sender), "R9");
+        _;
+    }
+
+    // ***** EMERGENCY *****
+
+    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyGuardian() {
+        require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), "R6");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_CREATE_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialCreatePauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, msg.sender), "R13");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_MINT_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialMintPauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, msg.sender), "R14");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_REDEEM_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialRedeemPauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, msg.sender), "R15");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_EXECUTE_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialExecutePauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE, msg.sender), "R16");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_CANCEL_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialCancelPauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_CANCEL_PAUSE_ROLE, msg.sender), "R17");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyPartialClaimReservePauseSetter() {
+        require(hasRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, msg.sender), "R18");
+        _;
+    }
+
+    /// @notice it ensures that the calling account has been granted the PROTOCOL_UNPAUSER_ROLE
+    /// @dev by default, it is granted to the `governor` account
+    modifier onlyProtocolUnpauserSetter() {
+        require(hasRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, msg.sender), "R19");
+        _;
+    }
 
     // ****************** EXTERNAL FUNCTIONS ******************
 
     // ***** SETTERS *****
 
-    /// @notice it is called only once upon deployment of the contract. It initializes the registry storage with the given governor address as the admin role.
-    /// @dev Initializes the base RegistryStorage state
+    /// @notice it is called only once upon deployment of the contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address.
+    /// @notice it sets the default ProtocolParametersArgs protocol parameters
+    /// @dev internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters
     /// @param _governor address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE
     function initialize(address _governor) external initializer {
-        __RegistryStorage__init(_governor);
+        __AccessControl_init();
+
+        // Setup
+        _setupRole(DEFAULT_ADMIN_ROLE, _governor);
+        _setupRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.WHITELISTER_ROLE, _governor);
+        _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);
+        _setupRole(LibRoles.CORE_CONFIGURATION_UPDATER_ROLE, _governor);
+
+        // Reserve
+        _setupRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.EXECUTION_RESERVE_PART_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE, _governor);
+        _setupRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, _governor);
+
+        // Emergency
+        _setupRole(LibRoles.GUARDIAN_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_CANCEL_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, _governor);
+        _setupRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, _governor);
+
+        // Default protocol parameters
+        protocolParametersArgs.noDataCancellationPeriod = 2 weeks;
+        protocolParametersArgs.derivativeAuthorExecutionFeeCap = 1000; // 10%
+        protocolParametersArgs.derivativeAuthorRedemptionReservePart = 10; // 0.1%
+        protocolParametersArgs.protocolExecutionReservePart = 1000; // 10%
+        protocolParametersArgs.protocolRedemptionReservePart = 1000; // 10%
     }
 
     // ** ROLE-RESTRICTED FUNCTIONS **
