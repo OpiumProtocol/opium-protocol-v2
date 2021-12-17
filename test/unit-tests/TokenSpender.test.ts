@@ -1,12 +1,9 @@
-// theirs
-import { ethers } from "hardhat";
 // utils
 import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 // types
-import { TNamedSigners } from "../../types";
 import { pickError } from "../../utils/misc";
 import { semanticErrors } from "../../utils/constants";
 

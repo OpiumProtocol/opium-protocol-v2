@@ -12,7 +12,6 @@ import {
   calculateTotalNetPayout,
   EPayout,
   calculateTotalGrossProfit,
-  derivativeFactory,
   createValidDerivativeExpiry,
 } from "../utils/derivatives";
 // types
@@ -20,7 +19,6 @@ import {
   Core,
   OpiumPositionToken,
   OpiumProxyFactory,
-  OptionCallSyntheticIdMock,
   Registry,
   TestToken,
   TokenSpender,
@@ -28,7 +26,7 @@ import {
 import { timeTravel } from "../utils/evm";
 import { TDerivative, TDerivativeOrder } from "../types";
 import { cast, toBN } from "../utils/bn";
-import { cancelOne, executeOne, redeemOne, semanticErrors, zeroAddress } from "../utils/constants";
+import { cancelOne, executeOne, redeemOne, semanticErrors } from "../utils/constants";
 import { pickError } from "../utils/misc";
 
 export enum EPositionCreation {
@@ -209,7 +207,7 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
     );
     const authorFeesAfter = await core.getReservesVaultBalance(derivativeAuthorAddress, testToken.address);
     console.log(`authorFee: ${authorFeesAfter.toString()}`);
-    console.log(`#opiumFeesAfter: ${opiumFeesAfter.toString()}`);
+    console.log(`opiumFeesAfter: ${opiumFeesAfter.toString()}`);
 
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(
       opiumFeesBefore.add(buyerFees.protocolFee).add(sellerFees.protocolFee),

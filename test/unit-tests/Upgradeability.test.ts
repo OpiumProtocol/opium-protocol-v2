@@ -1,14 +1,13 @@
 // theirs
-import { ethers, upgrades } from "hardhat";
+import hre from "hardhat";
+// import { ethers, upgrades } from "hardhat";
 // utils
 import { expect } from "../chai-setup";
-import setup from "../../utils/setup";
+// import setup from "../../utils/setup";
+import setup from "../__fixtures__";
 import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
 import { toBN } from "../../utils/bn";
-// types and constants
-import { TNamedSigners } from "../../types";
 import {
-  TestOracleAggregatorUpgrade,
   TestRegistryUpgrade,
   TestSyntheticAggregatorUpgrade,
   TestTokenSpenderUpgrade,
@@ -18,48 +17,85 @@ import { EPositionCreation, shouldBehaveLikeCore } from "../Core.behavior";
 import { generateRandomDerivativeSetup } from "../../utils/testCaseGenerator";
 
 describe("Upgradeability", () => {
-  let namedSigners: TNamedSigners;
-
-  before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  });
-
   it("should upgrade TokenSpender", async () => {
-    const { registry, tokenSpender } = await setup();
+    const {
+      contracts: { registry, tokenSpender },
+      users: { deployer },
+    } = await setup();
+    const { deployments, ethers } = hre;
+    const { deploy } = deployments;
 
     const tokenSpenderRegistryAddressBefore = (await registry.getProtocolAddresses()).tokenSpender;
-    const tokenSpenderImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
-      tokenSpender.address,
-    );
-    const TestTokenSpenderUpgrade = await ethers.getContractFactory("TestTokenSpenderUpgrade");
-    const upgraded = <TestTokenSpenderUpgrade>(
-      await upgrades.upgradeProxy(tokenSpender.address, TestTokenSpenderUpgrade)
-    );
-    const tokenSpenderImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
-      tokenSpender.address,
-    );
-    const upgradeImplementationAddress = await upgrades.erc1967.getImplementationAddress(tokenSpender.address);
-    const tokenSpenderRegistryAddresAfter = (await registry.getProtocolAddresses()).tokenSpender;
+    const tokenSpenderImplementationAddressBefore = (
+      await deployments.getDeploymentsFromAddress(tokenSpenderRegistryAddressBefore)
+    )[1].implementation;
 
-    expect(upgraded.address).to.be.eq(tokenSpender.address);
-    expect(tokenSpenderImplementationAddressBefore).to.not.be.eq(tokenSpenderImplementationAddressAfter);
-    expect(tokenSpenderImplementationAddressAfter).to.be.eq(upgradeImplementationAddress);
+    const deployed = await deploy("TokenSpender", {
+      contract: "TestTokenSpenderUpgrade",
+      from: deployer.address,
+      log: true,
+      proxy: {
+        owner: deployer.address,
+        proxyContract: "OpenZeppelinTransparentProxy",
+        execute: {
+          init: {
+            methodName: "initialize",
+            args: [registry.address],
+          },
+        },
+      },
+    });
+    const tokenSpenderImplementationAddressAfter = deployed.implementation;
+    const upgraded = <TestTokenSpenderUpgrade>await ethers.getContractAt("TestTokenSpenderUpgrade", deployed.address);
+
+    const tokenSpenderRegistryAddresAfter = (await registry.getProtocolAddresses()).tokenSpender;
+    expect(
+      upgraded.address,
+      "new implementation's proxy address is different from the previous implementation's proxy address",
+    ).to.be.eq(tokenSpender.address);
+    expect(
+      tokenSpenderImplementationAddressBefore,
+      "new implementation's address is not different from the previous implementation's address",
+    ).to.not.be.eq(tokenSpenderImplementationAddressAfter);
     expect(tokenSpenderRegistryAddressBefore).to.be.eq(tokenSpenderRegistryAddresAfter);
+    expect(await upgraded.placeholder()).to.be.eq("upgraded");
   });
 
   it("should upgrade Registry", async () => {
-    const { registry } = await setup();
+    const {
+      contracts: { registry },
+      users: { deployer, governor },
+    } = await setup();
+    const { deployments, ethers } = hre;
+    const { deploy } = deployments;
 
     const [protocolAddressesBefore, protocolCommissionsBefore] = await Promise.all([
       registry.getProtocolAddresses(),
       registry.getProtocolParameters(),
     ]);
-    const registryImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(registry.address);
+    const registryImplementationAddressBefore = (await deployments.getDeploymentsFromAddress(registry.address))[1]
+      .implementation;
 
-    const Registry = await ethers.getContractFactory("TestRegistryUpgrade");
-    const upgraded = <TestRegistryUpgrade>await upgrades.upgradeProxy(registry.address, Registry);
-    const registryImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(registry.address);
-    const upgradedImplementationAddress = await upgrades.erc1967.getImplementationAddress(upgraded.address);
+    const deployed = await deploy("Registry", {
+      contract: "TestRegistryUpgrade",
+      from: deployer.address,
+      log: true,
+      proxy: {
+        owner: deployer.address,
+        proxyContract: "OpenZeppelinTransparentProxy",
+        execute: {
+          init: {
+            methodName: "initialize",
+            args: [governor.address],
+          },
+        },
+      },
+    });
+
+    const upgraded = <TestRegistryUpgrade>await ethers.getContractAt("TestRegistryUpgrade", deployed.address);
+    const registryImplementationAddressAfter = (await deployments.getDeploymentsFromAddress(registry.address))[1]
+      .implementation;
+    const upgradedImplementationAddress = deployed.implementation;
 
     expect(upgraded.address).to.be.eq(registry.address);
     expect(registryImplementationAddressBefore).to.not.be.eq(registryImplementationAddressAfter);
@@ -67,31 +103,52 @@ describe("Upgradeability", () => {
 
     expect(protocolAddressesBefore).to.be.deep.eq(await upgraded.getProtocolAddresses());
     expect(protocolCommissionsBefore).to.be.deep.eq(await upgraded.getProtocolParameters());
+    expect(await upgraded.placeholder()).to.be.eq("upgraded");
   });
 
   it("should upgrade SyntheticAggregator", async () => {
-    const { syntheticAggregator, optionCallMock, registry } = await setup();
+    const {
+      contracts: { syntheticAggregator, optionCallMock, registry },
+      users: { deployer, governor },
+    } = await setup();
+    const { deployments, ethers } = hre;
+    const { deploy } = deployments;
+    const { syntheticAggregator: syntheticAggregatorAddressBefore } = await registry.getProtocolAddresses();
 
-    const { syntheticAggregator: syntheticAggregatorAddress } = await registry.getProtocolAddresses();
-    const syntheticAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
-      syntheticAggregator.address,
-    );
+    const syntheticAggregatorImplementationAddressBefore = (
+      await deployments.getDeploymentsFromAddress(syntheticAggregator.address)
+    )[1].implementation;
 
-    const SyntheticAggregatorUpgrade = await ethers.getContractFactory("TestSyntheticAggregatorUpgrade");
+    const deployed = await deploy("SyntheticAggregator", {
+      contract: "TestSyntheticAggregatorUpgrade",
+      from: deployer.address,
+      log: true,
+      proxy: {
+        owner: deployer.address,
+        proxyContract: "OpenZeppelinTransparentProxy",
+        execute: {
+          init: {
+            methodName: "initialize",
+            args: [governor.address],
+          },
+        },
+      },
+    });
+
     const upgraded = <TestSyntheticAggregatorUpgrade>(
-      await upgrades.upgradeProxy(syntheticAggregator.address, SyntheticAggregatorUpgrade)
+      await ethers.getContractAt("TestSyntheticAggregatorUpgrade", deployed.address)
     );
-    const syntheticAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
-      syntheticAggregator.address,
-    );
-    const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
+    const syntheticAggregatorImplementationAddressAfter = (
+      await deployments.getDeploymentsFromAddress(syntheticAggregator.address)
+    )[1].implementation;
+    const upgradedImplementationAddress = deployed.implementation;
 
     const { syntheticAggregator: syntheticAggregatorAddressAfter } = await registry.getProtocolAddresses();
 
     expect(upgraded.address).to.be.eq(syntheticAggregator.address);
     expect(syntheticAggregatorImplementationAddressBefore).to.not.be.eq(syntheticAggregatorImplementationAddressAfter);
-    expect(syntheticAggregatorAddress).to.be.eq(syntheticAggregatorAddressAfter);
-    expect(syntheticAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
+    expect(syntheticAggregatorAddressBefore).to.be.eq(syntheticAggregatorAddressAfter);
+    expect(syntheticAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
 
     const derivative = derivativeFactory({
       margin: toBN("30"),
@@ -108,64 +165,58 @@ describe("Upgradeability", () => {
     expect(margin.sellerMargin).to.be.equal(derivative.margin);
   });
 
-  it("should upgrade OracleAggregator", async () => {
-    const { oracleAggregator, registry } = await setup();
-    const { oracle } = namedSigners;
-
-    const oracleAggregatorAddressBefore = (await registry.getProtocolAddresses()).oracleAggregator;
-    const oracleAggregatorImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(
-      oracleAggregator.address,
-    );
-
-    const OracleAggregatorUpgrade = await ethers.getContractFactory("TestOracleAggregatorUpgrade");
-    const upgraded = <TestOracleAggregatorUpgrade>(
-      await upgrades.upgradeProxy(oracleAggregator.address, OracleAggregatorUpgrade)
-    );
-    const oracleAggregatorImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(
-      oracleAggregator.address,
-    );
-    const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
-    const oracleAggregatorAddressAfter = (await registry.getProtocolAddresses()).oracleAggregator;
-
-    expect(upgraded.address).to.be.eq(oracleAggregator.address);
-    expect(oracleAggregatorImplementationAddressBefore).to.not.be.eq(oracleAggregatorImplementationAddressAfter);
-    expect(oracleAggregatorAddressBefore).to.be.eq(oracleAggregatorAddressAfter);
-    expect(oracleAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
-
-    /**
-     * repeats the OracleAggregator `should accept data from oracle` test with the upgraded core contract
-     * TODO:
-     * remove code duplication and set up test suites to keep it DRY
-     */
-    const timestamp = Math.floor(Date.now() / 1000);
-    const data = 123456789;
-    await upgraded.connect(oracle).__callback(timestamp, data);
-    const result = await upgraded.getData(oracle.address, timestamp);
-
-    expect(result).to.be.equal(data);
-  });
-
   it("should upgrade Core", async () => {
-    const { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry, oracleIdMock } = await setup();
-    const { buyer, seller, governor } = namedSigners;
+    const {
+      contracts: { core, testToken, optionCallMock, tokenSpender, opiumProxyFactory, registry, oracleIdMock },
+      users: { buyer, seller, governor, deployer },
+    } = await setup();
+    const { deployments, ethers } = hre;
+    const { deploy } = deployments;
 
     const coreAddressBefore = await registry.getCore();
-    const coreImplementationAddressBefore = await upgrades.erc1967.getImplementationAddress(core.address);
+    const coreImplementationAddressBefore = (await deployments.getDeploymentsFromAddress(core.address))[1]
+      .implementation;
 
-    const CoreUpgraded = await ethers.getContractFactory("TestCoreUpgrade");
-    const upgraded = <TestCoreUpgrade>await upgrades.upgradeProxy(core.address, CoreUpgraded);
-    const coreImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(core.address);
-    const upgradedImplementationAddressAfter = await upgrades.erc1967.getImplementationAddress(upgraded.address);
+    const [coreRegistryAddressesBefore, protocolCommissionsBefore] = await Promise.all([
+      core.getProtocolAddresses(),
+      core.getProtocolParametersArgs(),
+    ]);
 
+    const deployed = await deploy("Core", {
+      contract: "TestCoreUpgrade",
+      from: deployer.address,
+      log: true,
+      proxy: {
+        owner: deployer.address,
+        proxyContract: "OpenZeppelinTransparentProxy",
+        execute: {
+          init: {
+            methodName: "initialize",
+            args: [registry.address],
+          },
+        },
+      },
+    });
+
+    const upgraded = <TestCoreUpgrade>await ethers.getContractAt("TestCoreUpgrade", deployed.address);
+    const coreImplementationAddressAfter = (await deployments.getDeploymentsFromAddress(core.address))[1]
+      .implementation;
+    const upgradedImplementationAddressAfter = (await deployments.getDeploymentsFromAddress(upgraded.address))[1]
+      .implementation;
     const coreAddressAfter = await registry.getCore();
+
+    const [coreRegistryAddressesAfter, protocolCommissionsBeforeAfter] = await Promise.all([
+      upgraded.getProtocolAddresses(),
+      upgraded.getProtocolParametersArgs(),
+    ]);
 
     expect(upgraded.address).to.be.eq(core.address);
     expect(coreImplementationAddressBefore).to.not.be.eq(coreImplementationAddressAfter);
     expect(coreAddressBefore).to.be.eq(coreAddressAfter);
     expect(coreImplementationAddressAfter).to.be.eq(upgradedImplementationAddressAfter);
-
-    await upgraded.connect(governor).updateProtocolAddresses();
-    await upgraded.connect(governor).updateProtocolParametersArgs();
+    expect(coreRegistryAddressesBefore, "different protocol's addresses").to.be.deep.eq(coreRegistryAddressesAfter);
+    expect(protocolCommissionsBefore, "different protocol's commissions").to.be.deep.eq(protocolCommissionsBeforeAfter);
+    expect(await upgraded.placeholder()).to.be.eq("upgraded");
 
     const derivativeOrder = await generateRandomDerivativeSetup(
       oracleIdMock.address,

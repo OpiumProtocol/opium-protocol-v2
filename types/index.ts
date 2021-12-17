@@ -1,10 +1,6 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { BigNumber } from "ethers";
 
-export interface Signers {
-  admin: SignerWithAddress;
-}
-
 export type TNamedSigners = {
   deployer: SignerWithAddress;
   governor: SignerWithAddress;
@@ -25,6 +21,7 @@ export type TNamedSigners = {
   impersonator: SignerWithAddress;
   createPositionPauser: SignerWithAddress;
   coreCancelPositionPauser: SignerWithAddress;
+  redemptionReserveClaimer: SignerWithAddress;
 };
 
 export type TDerivative = {

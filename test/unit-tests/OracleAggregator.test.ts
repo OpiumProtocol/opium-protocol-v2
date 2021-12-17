@@ -1,7 +1,5 @@
-import { ethers } from "hardhat";
 import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
-import { TNamedSigners } from "../../types";
 import { pickError } from "../../utils/misc";
 import { semanticErrors } from "../../utils/constants";
 

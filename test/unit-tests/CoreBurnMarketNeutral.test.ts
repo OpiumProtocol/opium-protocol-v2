@@ -12,18 +12,15 @@ import setup from "../__fixtures__";
 import { decodeEvents, retrievePositionTokensAddresses } from "../../utils/events";
 import { cast, toBN } from "../../utils/bn";
 // types and constants
-import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken } from "../../typechain";
 import { resetNetwork } from "../../utils/evm";
-
-const redeemOne = "redeem(address[2],uint256)";
-const redeemMany = "redeem(address[2][],uint256[])";
+import { redeemMany, redeemOne } from "../../utils/constants";
 
 describe("Core: burn market neutral positions", () => {
   it(`should redeem an entire market neutral position and return the entire initial margin`, async () => {
     const {
-      contracts: { core, testToken, tokenSpender, oracleAggregator, opiumProxyFactory, registry, optionCallMock },
-      users: { deployer },
+      contracts: { core, testToken, tokenSpender, opiumProxyFactory, registry, optionCallMock },
+      users: { deployer, redemptionReserveClaimer, author },
     } = await setup();
     const marketNeutralParty = deployer;
 
@@ -40,8 +37,13 @@ describe("Core: burn market neutral positions", () => {
     });
 
     const marketNeutralPartyInitialBalance = await testToken.balanceOf(marketNeutralParty.address);
+    const derivativeAuthorBalanceBefore = await core.getReservesVaultBalance(author.address, testToken.address);
+    const protocolReserveClaimerBalanceBefore = await core.getReservesVaultBalance(
+      redemptionReserveClaimer.address,
+      testToken.address,
+    );
 
-    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount));
+    await testToken.approve(tokenSpender.address, optionCall.margin.mul(amount).div(toBN("1")));
     const tx = await core.create(optionCall, amount, [marketNeutralParty.address, marketNeutralParty.address]);
     const receipt = await tx.wait();
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -56,8 +58,8 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyLongBalance = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalance = await shortPositionERC20.balanceOf(marketNeutralParty.address);
 
-    expect(marketNeutralPartyLongBalance).to.equal(amount);
-    expect(marketNeutralPartysShortBalance).to.equal(amount);
+    expect(marketNeutralPartyLongBalance).to.be.equal(amount);
+    expect(marketNeutralPartysShortBalance).to.be.equal(amount);
 
     const tx2 = await core[redeemOne]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
@@ -76,27 +78,46 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
     // author fee (includes opium fee)
-    const { derivativeAuthorRedemptionReservePart, protocolExecutionReservePart } =
+    const { derivativeAuthorRedemptionReservePart, protocolRedemptionReservePart } =
       await registry.getProtocolParameters();
-    const authorFeeCommission = await optionCallMock.getAuthorCommission();
+    const marketNeutralPartyBalanceAfter = await testToken.balanceOf(marketNeutralParty.address);
+    const derivativeAuthorBalanceAfter = await core.getReservesVaultBalance(author.address, testToken.address);
+    const protocolReserveClaimerBalanceAfter = await core.getReservesVaultBalance(
+      redemptionReserveClaimer.address,
+      testToken.address,
+    );
 
     const marketNeutralFees = computeFees(
       optionCall.margin.mul(redeemAmount).div(toBN("1")),
-      cast(derivativeAuthorRedemptionReservePart),
-      protocolExecutionReservePart,
+      derivativeAuthorRedemptionReservePart,
+      protocolRedemptionReservePart,
     );
-    expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.equal(
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.be.equal(
       marketNeutralBalanceAfterCreation.add(
         optionCall.margin.mul(redeemAmount).div(toBN("1")).sub(marketNeutralFees.totalFee),
       ),
     );
-    expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.equal(amount.sub(redeemAmount));
-    expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.equal(amount.sub(redeemAmount));
+
+    expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.be.equal(amount.sub(redeemAmount));
+    expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.be.equal(amount.sub(redeemAmount));
+    expect(derivativeAuthorBalanceAfter, "wrong derivative author's redemption fee").to.be.equal(
+      derivativeAuthorBalanceBefore.add(marketNeutralFees.authorFee),
+    );
+    expect(protocolReserveClaimerBalanceAfter, "wrong protocolReserveClaimerBalanceAfter's redemption fee").to.be.equal(
+      protocolReserveClaimerBalanceBefore.add(marketNeutralFees.protocolFee),
+    );
+    console.log("marketNeutralPartyBalanceAfter ", marketNeutralPartyBalanceAfter.toString());
+    console.log("marketNeutralPartyInitialBalance ", marketNeutralPartyInitialBalance.toString());
+    console.log("marketNeutralFees ", marketNeutralFees.totalFee.toString());
+    expect(
+      marketNeutralPartyBalanceAfter,
+      "wrong market neutral party's balance after successful redemption",
+    ).to.be.equal(marketNeutralPartyInitialBalance.sub(marketNeutralFees.totalFee));
   });
 
   it(`should redeem a third of the initial position's margin and burn the corresponding SHORT/LONG tokens`, async () => {
     const {
-      contracts: { core, testToken, tokenSpender, oracleAggregator, opiumProxyFactory, registry, optionCallMock },
+      contracts: { core, testToken, tokenSpender, opiumProxyFactory, registry, optionCallMock },
       users: { deployer },
     } = await setup();
     const marketNeutralParty = deployer;
@@ -128,8 +149,8 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyLongBalance = await longPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartysShortBalance = await shortPositionERC20.balanceOf(marketNeutralParty.address);
 
-    expect(marketNeutralPartyLongBalance).to.equal(amount);
-    expect(marketNeutralPartysShortBalance).to.equal(amount);
+    expect(marketNeutralPartyLongBalance).to.be.equal(amount);
+    expect(marketNeutralPartysShortBalance).to.be.equal(amount);
 
     const tx2 = await core[redeemOne]([longPositionAddress, shortPositionAddress], redeemAmount);
     const receipt2 = await tx2.wait();
@@ -144,26 +165,26 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartysShortBalanceAfter = await shortPositionERC20.balanceOf(marketNeutralParty.address);
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
-    const { derivativeAuthorRedemptionReservePart, protocolExecutionReservePart } =
+    const { derivativeAuthorRedemptionReservePart, protocolRedemptionReservePart } =
       await registry.getProtocolParameters();
 
     const marketNeutralFees = computeFees(
       optionCall.margin.mul(redeemAmount).div(toBN("1")),
       cast(derivativeAuthorRedemptionReservePart),
-      protocolExecutionReservePart,
+      protocolRedemptionReservePart,
     );
-    expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.equal(
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.be.equal(
       marketNeutralBalanceAfterCreation.add(
         optionCall.margin.mul(redeemAmount).div(toBN("1")).sub(marketNeutralFees.totalFee),
       ),
     );
-    expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.equal(amount.sub(redeemAmount));
-    expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.equal(amount.sub(redeemAmount));
+    expect(marketNeutralPartyLongBalanceAfter, "wrong long positions balance").to.be.equal(amount.sub(redeemAmount));
+    expect(marketNeutralPartysShortBalanceAfter, "wrong short positions balance").to.be.equal(amount.sub(redeemAmount));
   });
 
   it(`should redeem many market neutral positions at once`, async () => {
     const {
-      contracts: { core, testToken, tokenSpender, oracleAggregator, opiumProxyFactory, registry, optionCallMock },
+      contracts: { core, testToken, tokenSpender, opiumProxyFactory, registry, optionCallMock },
       users: { deployer },
     } = await setup();
 
@@ -233,10 +254,10 @@ describe("Core: burn market neutral positions", () => {
     /**
      * expects the amount of minted LONG/SHORT after creation positions is as expected
      */
-    expect(marketNeutralPartyLongBalance).to.equal(amount);
-    expect(marketNeutralPartyShortBalance).to.equal(amount);
-    expect(marketNeutralPartySecondLongBalance).to.equal(secondAmount);
-    expect(marketNeutralPartySecondShortBalance).to.equal(secondAmount);
+    expect(marketNeutralPartyLongBalance).to.be.equal(amount);
+    expect(marketNeutralPartyShortBalance).to.be.equal(amount);
+    expect(marketNeutralPartySecondLongBalance).to.be.equal(secondAmount);
+    expect(marketNeutralPartySecondShortBalance).to.be.equal(secondAmount);
 
     const tx3 = await core[redeemMany](
       [
@@ -266,26 +287,26 @@ describe("Core: burn market neutral positions", () => {
     const marketNeutralPartyBalanceAfterRedeem = await testToken.balanceOf(marketNeutralParty.address);
 
     // author fee (includes opium fee)
-    const { derivativeAuthorRedemptionReservePart, protocolExecutionReservePart } =
+    const { derivativeAuthorRedemptionReservePart, protocolRedemptionReservePart } =
       await registry.getProtocolParameters();
 
     const firstOptionFees = computeFees(
       optionCall.margin.mul(redeemAmount).div(toBN("1")),
       cast(derivativeAuthorRedemptionReservePart),
-      protocolExecutionReservePart,
+      protocolRedemptionReservePart,
     );
 
     const secondOptionFees = computeFees(
       secondOptionCall.margin.mul(secondRedeemAmount).div(toBN("1")),
       cast(derivativeAuthorRedemptionReservePart),
-      protocolExecutionReservePart,
+      protocolRedemptionReservePart,
     );
 
     /**
      * expects the account's ERC20 balance after redeem is equal to the
      * ERC20 balance after creating the last redeemed position + all the redeemed collateral
      */
-    expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.equal(
+    expect(marketNeutralPartyBalanceAfterRedeem, "wrong redeemer balance").to.be.equal(
       marketNeutralPartyBalanceAfterSecondCreation
         .add(optionCall.margin.mul(redeemAmount).div(toBN("1")).sub(firstOptionFees.totalFee))
         .add(secondOptionCall.margin.mul(secondRedeemAmount).div(toBN("1")).sub(secondOptionFees.totalFee)),
@@ -293,14 +314,16 @@ describe("Core: burn market neutral positions", () => {
     /**
      * expects the amount of LONG/SHORT positions to be equal to the created amount - redeemed amount
      */
-    expect(marketNeutralPartyLongBalanceAfter, "wrong first long position balance").to.equal(amount.sub(redeemAmount));
-    expect(marketNeutralPartysShortBalanceAfter, "wrong first short position balance").to.equal(
+    expect(marketNeutralPartyLongBalanceAfter, "wrong first long position balance").to.be.equal(
       amount.sub(redeemAmount),
     );
-    expect(marketNeutralPartySecondLongBalanceAfter, "wrong second long position balance").to.equal(
+    expect(marketNeutralPartysShortBalanceAfter, "wrong first short position balance").to.be.equal(
+      amount.sub(redeemAmount),
+    );
+    expect(marketNeutralPartySecondLongBalanceAfter, "wrong second long position balance").to.be.equal(
       secondAmount.sub(secondRedeemAmount),
     );
-    expect(marketNeutralPartySecondShortBalanceAfter, "wrong second long position balance").to.equal(
+    expect(marketNeutralPartySecondShortBalanceAfter, "wrong second long position balance").to.be.equal(
       secondAmount.sub(secondRedeemAmount),
     );
   });

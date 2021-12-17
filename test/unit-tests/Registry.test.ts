@@ -5,9 +5,7 @@ import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
 import { pickError } from "../../utils/misc";
 // types and constants
-import { TNamedSigners } from "../../types";
 import { semanticErrors, SECONDS_2_WEEKS, governanceRoles, zeroAddress, SECONDS_3_WEEKS } from "../../utils/constants";
-import { shouldBehaveLikeRegistry } from "../Registry.behavior";
 
 describe("Registry", () => {
   it("should ensure the Registry roles are assigned as expected", async () => {

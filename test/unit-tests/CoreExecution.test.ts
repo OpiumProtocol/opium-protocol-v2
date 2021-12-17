@@ -363,7 +363,7 @@ describe("CoreExecution", () => {
     const authorFeeCommission = await optionCallMock.getAuthorCommission();
 
     const { protocolExecutionReservePart } = await registry.getProtocolParameters();
-    console.log("protocolExecutionReservePart", protocolExecutionReservePart.toString());
+
     const buyerFees = computeFees(
       calculateTotalGrossPayout(buyerMargin, sellerMargin, buyerPayoutRatio, sellerPayoutRatio, amount, EPayout.BUYER),
       authorFeeCommission,

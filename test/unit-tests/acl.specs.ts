@@ -198,7 +198,6 @@ const protectedFunctions: TProtectedFunctions = {
       await registry.connect(account).unpause();
       const isPaused = await registry.isProtocolPaused();
       expect(isPaused, "wrong global pause value").to.be.eq(false);
-      console.log("inside unpauser test --- start AFTER PAUSING:::::::::");
       const isMintingPaused = await registry.isProtocolPositionCreationPaused();
       expect(isMintingPaused).to.be.false;
       const isRedemptionPaused = await registry.isProtocolPositionCreationPaused();
@@ -335,9 +334,9 @@ describe("Acl", () => {
     positionsAddress = retrievePositionTokensAddresses(contracts.opiumProxyFactory, receipt);
   });
 
-  context("should test expected failures", async () => {
+  context("should fail all function calls", async () => {
     await async.forEach(Object.keys(protectedFunctions), async (protectedFunction: keyof typeof protectedFunctions) => {
-      it(`${protectedFunction} should succeed`, done => {
+      it(`${protectedFunction} should fail`, done => {
         protectedFunctions[protectedFunction](contracts.registry, users.notAllowed)
           .then(() => {
             done();
@@ -349,7 +348,7 @@ describe("Acl", () => {
     });
   });
 
-  context("should test expected successful calls", async () => {
+  context("should perform successful function calls", async () => {
     await async.forEach(Object.keys(protectedFunctions), async (protectedFunction: keyof typeof protectedFunctions) => {
       it(`${protectedFunction} should succeed`, done => {
         protectedFunctions[protectedFunction](contracts.registry, users.governor)
@@ -373,7 +372,7 @@ describe("Acl", () => {
             console.log("completed successfully");
           })
           .catch(error => {
-            console.log(`error: ${protectedFunction}`);
+            console.log(error);
           });
       });
     });

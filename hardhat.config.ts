@@ -156,32 +156,32 @@ const config: HardhatUserConfig = {
     author: {
       default: 10,
     },
-    thirdParty: {
+    notAllowed: {
       default: 11,
     },
-    notAllowed: {
+    hacker: {
       default: 12,
     },
-    hacker: {
+    goodGuy: {
       default: 13,
     },
-    goodGuy: {
+    authorized: {
       default: 14,
     },
-    authorized: {
+    impersonator: {
       default: 15,
     },
-    impersonator: {
+    thirdParty: {
       default: 16,
     },
-    derivativeAuthor: {
-      default: 17,
-    },
     createPositionPauser: {
-      default: 18,
+      default: 17,
     },
     coreCancelPositionPauser: {
       default: 18,
+    },
+    redemptionReserveClaimer: {
+      default: 19,
     },
   },
   typechain: {

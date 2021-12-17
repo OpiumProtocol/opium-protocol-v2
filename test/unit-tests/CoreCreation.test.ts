@@ -1,6 +1,7 @@
 // theirs
 import { ethers } from "hardhat";
 // utils
+import setup from "./../__fixtures__";
 import { expect } from "../chai-setup";
 import { decodeEvents, retrievePositionTokensAddresses } from "../../utils/events";
 import { toBN } from "../../utils/bn";
@@ -11,12 +12,10 @@ import {
   getDerivativeHash,
 } from "../../utils/derivatives";
 import { resetNetwork } from "../../utils/evm";
-import setup from "./../__fixtures__";
-// types
-import { TNamedSigners } from "../../types";
-import { Core, OpiumPositionToken } from "../../typechain";
 import { pickError } from "../../utils/misc";
 import { semanticErrors } from "../../utils/constants";
+// types
+import { Core, OpiumPositionToken } from "../../typechain";
 
 describe("CoreCreation", () => {
   it(`should revert create OptionCall derivative with SYNTHETIC_AGGREGATOR:WRONG_MARGIN`, async () => {

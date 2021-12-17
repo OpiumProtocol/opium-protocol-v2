@@ -69,12 +69,11 @@ type TFees = {
 
 export const computeFees = (
   payout: BigNumber,
-  derivativeFeeCommissionPercentage: BigNumber,
+  derivativeFeeCommissionPercentage: BigNumber | number,
   protocolCommissionPercentage: number,
 ): TFees => {
   const totalFee = payout.mul(derivativeFeeCommissionPercentage).div(10000);
-  const protocolFee = totalFee.div(10);
-
+  const protocolFee = totalFee.mul(protocolCommissionPercentage).div(10000);
   const authorFee = totalFee.sub(protocolFee);
   console.log(`totalFee: ${totalFee.toString()}`);
   console.log(`authorFee ${authorFee.toString()}`);
