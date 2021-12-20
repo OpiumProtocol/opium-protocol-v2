@@ -4,16 +4,17 @@ contracts/core/OpiumProxyFactory.sol
 
 > Title: Opium.OpiumProxyFactory contract manages the deployment of ERC20 LONG/SHORT positions for a given `LibDerivative.Derivative` structure and it's responsible for minting and burning positions according to the parameters supplied by `Opium.Core`
 
-## *event* LogLongPositionTokenAddress
+## *event* LogPositionTokenPair
 
-***OpiumProxyFactory.LogLongPositionTokenAddress(_derivativeHash, _positionAddress) ***
+***OpiumProxyFactory.LogPositionTokenPair(_derivativeHash, _longPositionAddress, _shortPositionAddress) ***
 
 Arguments
 
 | **name** | **type** | **description** |
 |-|-|-|
 | _derivativeHash | bytes32 | indexed |
-| _positionAddress | address | indexed |
+| _longPositionAddress | address | indexed |
+| _shortPositionAddress | address | indexed |
 
 
 
@@ -27,19 +28,6 @@ Arguments
 |-|-|-|
 | _changer | address | indexed |
 | _newRegistryAddress | address | indexed |
-
-
-
-## *event* LogShortPositionTokenAddress
-
-***OpiumProxyFactory.LogShortPositionTokenAddress(_derivativeHash, _positionAddress) ***
-
-Arguments
-
-| **name** | **type** | **description** |
-|-|-|-|
-| _derivativeHash | bytes32 | indexed |
-| _positionAddress | address | indexed |
 
 
 
@@ -80,7 +68,7 @@ Arguments
 
 ## *function* create
 
-***OpiumProxyFactory.create(_buyer, _seller, _amount, _derivativeHash, _derivative, _derivativeAuthorCustomName) ***
+***OpiumProxyFactory.create(_buyer, _seller, _amount, _derivativeHash, _derivative) ***
 
 > Notice: It creates a specified amount of LONG/SHORT position tokens on behalf of the buyer(LONG) and seller(SHORT) - the specified amount can be 0 in which case the ERC20 contract of the position tokens will only be deployed
 
@@ -95,7 +83,6 @@ Arguments
 | _amount | uint256 | amount of position tokens to be minted to the _positionHolder |
 | _derivativeHash | bytes32 | bytes32 hash of `LibDerivative.Derivative` |
 | _derivative | tuple | LibDerivative.Derivative Derivative definition |
-| _derivativeAuthorCustomName | string | derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name |
 
 
 

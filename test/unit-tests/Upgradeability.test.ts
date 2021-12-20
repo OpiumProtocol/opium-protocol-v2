@@ -1,6 +1,5 @@
 // theirs
 import hre from "hardhat";
-// import { ethers, upgrades } from "hardhat";
 // utils
 import { expect } from "../chai-setup";
 // import setup from "../../utils/setup";
@@ -15,6 +14,7 @@ import {
 } from "../../typechain";
 import { EPositionCreation, shouldBehaveLikeCore } from "../Core.behavior";
 import { generateRandomDerivativeSetup } from "../../utils/testCaseGenerator";
+import { TestOracleAggregatorUpgrade } from "../../typechain/TestOracleAggregatorUpgrade";
 
 describe("Upgradeability", () => {
   it("should upgrade TokenSpender", async () => {
@@ -163,6 +163,63 @@ describe("Upgradeability", () => {
 
     expect(margin.buyerMargin).to.be.equal(0);
     expect(margin.sellerMargin).to.be.equal(derivative.margin);
+  });
+
+  it("should upgrade OracleAggregator", async () => {
+    const {
+      contracts: { oracleAggregator, registry },
+      users: { deployer },
+    } = await setup();
+    const { deployments, ethers } = hre;
+    const { deploy } = deployments;
+    const { oracleAggregator: oracleAggregatorAddressBefore } = await registry.getProtocolAddresses();
+
+    await oracleAggregator.__callback(1, 10)
+
+    const oracleAggregatorImplementationAddressBefore = (
+      await deployments.getDeploymentsFromAddress(oracleAggregator.address)
+    )[1].implementation;
+
+    const deployed = await deploy("OracleAggregator", {
+      contract: "TestOracleAggregatorUpgrade",
+      from: deployer.address,
+      log: true,
+      proxy: {
+        owner: deployer.address,
+        proxyContract: "OpenZeppelinTransparentProxy"
+      },
+    });
+
+    const upgraded = <TestOracleAggregatorUpgrade>(
+      await ethers.getContractAt("TestOracleAggregatorUpgrade", deployed.address)
+    );
+    const oracleAggregatorImplementationAddressAfter = (
+      await deployments.getDeploymentsFromAddress(upgraded.address)
+    )[1].implementation;
+    const upgradedImplementationAddress = deployed.implementation;
+
+    const { oracleAggregator: oracleAggregatorAddressAfter } = await registry.getProtocolAddresses();
+
+    await upgraded.__callback(2, 20)
+
+    const oracleAggregatorTestData = await oracleAggregator.getData(deployer.address, 1)
+    const upgradedOracleAggregatorTestData = await upgraded.getData(deployer.address, 1);
+    const oracleAggregatorTestDataAfterUpgrade = await oracleAggregator.getData(deployer.address, 2);
+    const upgradedOracleAggregatorTestDataAfterUpgrade = await upgraded.getData(deployer.address, 2);
+
+    expect(await upgraded.placeholder(), "Unexpected value for placeholder function").to.be.eq('upgraded');
+    expect(Object.keys(upgraded.functions).indexOf("placeholder") > -1, "Upgraded has unexpected function signature")
+      .to.be.true;
+    expect(Object.keys(oracleAggregator.functions).indexOf("placeholder") > -1, 'OracleAggregator has unexpected function signature').to.be.false;
+    expect(oracleAggregatorTestData).to.be.eq(10);
+    expect(upgradedOracleAggregatorTestData).to.be.eq(10);
+    expect(upgradedOracleAggregatorTestDataAfterUpgrade).to.be.eq(20);
+    expect(oracleAggregatorTestDataAfterUpgrade).to.be.eq(20);
+    expect(upgraded.address).to.be.eq(oracleAggregator.address);
+    expect(oracleAggregatorImplementationAddressBefore).to.not.be.eq(oracleAggregatorImplementationAddressAfter);
+    expect(oracleAggregatorAddressBefore).to.be.eq(oracleAggregatorAddressAfter);
+    expect(oracleAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
+
   });
 
   it("should upgrade Core", async () => {

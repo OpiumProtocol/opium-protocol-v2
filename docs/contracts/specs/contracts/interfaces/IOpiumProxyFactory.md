@@ -33,7 +33,7 @@ Arguments
 
 ## *function* create
 
-***IOpiumProxyFactory.create(_buyer, _seller, _amount, _derivativeHash, _derivative, _derivativeAuthorCustomName) ***
+***IOpiumProxyFactory.create(_buyer, _seller, _amount, _derivativeHash, _derivative) ***
 
 Arguments
 
@@ -44,7 +44,6 @@ Arguments
 | _amount | uint256 |  |
 | _derivativeHash | bytes32 |  |
 | _derivative | tuple |  |
-| _derivativeAuthorCustomName | string |  |
 
 
 

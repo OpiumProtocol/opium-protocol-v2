@@ -62,7 +62,7 @@ Outputs
 
 ## *function* getExecutionPayout
 
-***DummySyntheticIdMock.getExecutionPayout(_derivative, _result) view***
+***DummySyntheticIdMock.getExecutionPayout(_derivative, _result) ***
 
 > Notice: Calculates payout for derivative execution
 
@@ -84,7 +84,7 @@ Outputs
 
 ## *function* getMargin
 
-***DummySyntheticIdMock.getMargin(_derivative) view***
+***DummySyntheticIdMock.getMargin(_derivative) ***
 
 > Notice: Calculates margin required for derivative creation
 
@@ -105,7 +105,7 @@ Outputs
 
 ## *function* getSyntheticIdName
 
-***DummySyntheticIdMock.getSyntheticIdName() view***
+***DummySyntheticIdMock.getSyntheticIdName() ***
 
 Outputs
 
@@ -135,7 +135,7 @@ Outputs
 
 ## *function* validateInput
 
-***DummySyntheticIdMock.validateInput(_derivative) view***
+***DummySyntheticIdMock.validateInput(_derivative) ***
 
 > Notice: Validates ticker
 

@@ -211,7 +211,7 @@ Outputs
 
 ## *function* initialize
 
-***OpiumPositionToken.initialize(_derivativeHash, _positionType, _derivative, _baseCustomName, _baseCustomSymbol) ***
+***OpiumPositionToken.initialize(_derivativeHash, _positionType, _derivative) ***
 
 > Notice: `it is called only once upon deployment of the contract
 
@@ -224,8 +224,6 @@ Arguments
 | _derivativeHash | bytes32 | bytes32 hash of `LibDerivative.Derivative` |
 | _positionType | uint8 | LibDerivative.PositionType _positionType describes whether the present ERC20 token is LONG or SHORT |
 | _derivative | tuple | LibDerivative.Derivative Derivative definition |
-| _baseCustomName | bytes | bytes representing the base to be used as the erc20 name after suffixing the position type of the token |
-| _baseCustomSymbol | bytes | bytes representing the base to be used as the erc20 name after suffixing the position type of the token |
 
 
 
@@ -250,7 +248,7 @@ Arguments
 
 ***OpiumPositionToken.name() view***
 
-> Details: Returns the name of the token.
+> Notice: It overrides the OpenZeppelin name() getter and returns a custom erc20 name which is derived from the endTime of the erc20 token's associated derivative's maturity, the custom derivative name chosen by the derivative author and the derivative hash
 
 Outputs
 
@@ -304,7 +302,7 @@ Arguments
 
 ***OpiumPositionToken.symbol() view***
 
-> Details: Returns the symbol of the token, usually a shorter version of the name.
+> Notice: It overrides the OpenZeppelin symbol() getter and returns a custom erc20 symbol which is derived from the endTime of the erc20 token's associated derivative's maturity, the custom derivative name chosen by the derivative author and the derivative hash
 
 Outputs
 

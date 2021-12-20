@@ -299,9 +299,9 @@ Outputs
 
 ***Registry.initialize(_governor) ***
 
-> Notice: it is called only once upon deployment of the contract. It initializes the registry storage with the given governor address as the admin role.
+> Notice: it is called only once upon deployment of the contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address.it sets the default ProtocolParametersArgs protocol parameters
 
-> Details: Initializes the base RegistryStorage state
+> Details: internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters
 
 Arguments
 

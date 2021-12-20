@@ -145,7 +145,7 @@ Outputs
 
 ## *function* initialize
 
-***IOpiumPositionToken.initialize(_derivativeHash, _positionType, _derivative, _baseCustomName, _baseCustomSymbol) ***
+***IOpiumPositionToken.initialize(_derivativeHash, _positionType, _derivative) ***
 
 Arguments
 
@@ -154,8 +154,6 @@ Arguments
 | _derivativeHash | bytes32 |  |
 | _positionType | uint8 |  |
 | _derivative | tuple |  |
-| _baseCustomName | bytes |  |
-| _baseCustomSymbol | bytes |  |
 
 
 
