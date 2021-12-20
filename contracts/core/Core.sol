@@ -383,8 +383,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             _positionsOwners[1],
             _amount,
             _derivativeHash,
-            _derivative,
-            IDerivativeLogic(_derivative.syntheticId).getSyntheticIdName()
+            _derivative
         );
 
         // Increment p2p positions balance by collected margin: vault += (margins[0] + margins[1]) * _amount

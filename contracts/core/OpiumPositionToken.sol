@@ -3,6 +3,7 @@ pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
+import "../interfaces/IDerivativeLogic.sol";
 import "../libs/LibDerivative.sol";
 import "../libs/LibBokkyPooBahsDateTimeLibrary.sol";
 
@@ -23,7 +24,6 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     }
 
     address private factory;
-    string private derivativeAuthorCustomName;
     OpiumPositionTokenParams private opiumPositionTokenParams;
 
     /// @notice It is applied to all the stateful functions in OpiumPositionToken as they are meant to be consumed only via the OpiumProxyFactory
@@ -41,18 +41,15 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
     /// @param _derivativeHash bytes32 hash of `LibDerivative.Derivative`
     /// @param _positionType  LibDerivative.PositionType _positionType describes whether the present ERC20 token is LONG or SHORT
     /// @param _derivative LibDerivative.Derivative Derivative definition
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function initialize(
         bytes32 _derivativeHash,
         LibDerivative.PositionType _positionType,
-        LibDerivative.Derivative calldata _derivative,
-        string calldata _derivativeAuthorCustomName
+        LibDerivative.Derivative calldata _derivative
     ) external initializer {
         __ERC20_init("", "");
         __EIP712_init_unchained("", "1");
         __ERC20Permit_init_unchained("");
         factory = msg.sender;
-        derivativeAuthorCustomName = _derivativeAuthorCustomName;
         opiumPositionTokenParams = OpiumPositionTokenParams({
             derivative: _derivative,
             positionType: _positionType,
@@ -84,12 +81,6 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
         return factory;
     }
 
-    /// @notice It retrieves the custom derivative name submitted by the derivative author and used to generate the name and the symbol of the LONG/SHORT position tokens
-    /// @return string derivativeAuthorCustomName
-    function getDerivativeAuthorCustomName() external view returns (string memory) {
-        return derivativeAuthorCustomName;
-    }
-
     /// @notice It retrieves all the stored information about the underlying derivative
     /// @return _opiumPositionTokenParams OpiumPositionTokenParams struct which contains `LibDerivative.Derivative` schema of the derivative, the `LibDerivative.PositionType` of the present ERC20 token and the bytes32 hash `derivativeHash` of the `LibDerivative.Derivative` derivative
     function getPositionTokenData() external view returns (OpiumPositionTokenParams memory _opiumPositionTokenParams) {
@@ -102,6 +93,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
      * @notice It overrides the OpenZeppelin name() getter and returns a custom erc20 name which is derived from the endTime of the erc20 token's associated derivative's maturity, the custom derivative name chosen by the derivative author and the derivative hash
      */
     function name() public view override returns (string memory) {
+        string memory derivativeAuthorCustomName = IDerivativeLogic(opiumPositionTokenParams.derivative.syntheticId).getSyntheticIdName();
         string memory derivativeHashSlice = _toDerivativeHashStringIdentifier(opiumPositionTokenParams.derivativeHash);
         bytes memory endTimeDate = _toDerivativeEndTimeIdentifier(opiumPositionTokenParams.derivative.endTime);
         bytes memory baseCustomName = abi.encodePacked(
@@ -125,6 +117,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
      * @notice It overrides the OpenZeppelin symbol() getter and returns a custom erc20 symbol which is derived from the endTime of the erc20 token's associated derivative's maturity, the custom derivative name chosen by the derivative author and the derivative hash
      */
     function symbol() public view override returns (string memory) {
+        string memory derivativeAuthorCustomName = IDerivativeLogic(opiumPositionTokenParams.derivative.syntheticId).getSyntheticIdName();
         string memory derivativeHashSlice = _toDerivativeHashStringIdentifier(opiumPositionTokenParams.derivativeHash);
         bytes memory endTimeDate = _toDerivativeEndTimeIdentifier(opiumPositionTokenParams.derivative.endTime);
         bytes memory customSymbol = abi.encodePacked(

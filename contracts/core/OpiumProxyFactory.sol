@@ -62,30 +62,25 @@ contract OpiumProxyFactory is RegistryManager {
     /// @param _amount amount of position tokens to be minted to the _positionHolder
     /// @param _derivativeHash bytes32 hash of `LibDerivative.Derivative`
     /// @param _derivative LibDerivative.Derivative Derivative definition
-    /// @param _derivativeAuthorCustomName derivative author's custom derivative position name to be used as a part of the OpiumPositionToken erc20 name
     function create(
         address _buyer,
         address _seller,
         uint256 _amount,
         bytes32 _derivativeHash,
-        LibDerivative.Derivative calldata _derivative,
-        string calldata _derivativeAuthorCustomName
+        LibDerivative.Derivative calldata _derivative
     ) external onlyCore {
-        require(bytes(_derivativeAuthorCustomName).length < 30, "F2");
         address longPositionAddress = _derivativeHash.deployOpiumPosition(true, opiumPositionTokenImplementation);
         address shortPositionAddress = _derivativeHash.deployOpiumPosition(false, opiumPositionTokenImplementation);
 
         IOpiumPositionToken(longPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.LONG,
-            _derivative,
-            _derivativeAuthorCustomName
+            _derivative
         );
         IOpiumPositionToken(shortPositionAddress).initialize(
             _derivativeHash,
             LibDerivative.PositionType.SHORT,
-            _derivative,
-            _derivativeAuthorCustomName
+            _derivative
         );
         emit LogPositionTokenPair(_derivativeHash, longPositionAddress, shortPositionAddress);
         if (_amount > 0) {

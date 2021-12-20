@@ -62,7 +62,7 @@ describe("OpiumProxyFactory", () => {
 
     const hash = getDerivativeHash(derivative);
     await expect(
-      opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative, customDerivativeName),
+      opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE));
   });
 
@@ -73,7 +73,7 @@ describe("OpiumProxyFactory", () => {
     const hash = getDerivativeHash(derivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .create(buyer.address, seller.address, amount, hash, derivative, customDerivativeName);
+      .create(buyer.address, seller.address, amount, hash, derivative);
     const receipt = await tx.wait();
 
     const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
@@ -155,7 +155,7 @@ describe("OpiumProxyFactory", () => {
     const hash = getDerivativeHash(secondDerivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .create(buyer.address, seller.address, amount, hash, secondDerivative, customDerivativeName);
+      .create(buyer.address, seller.address, amount, hash, secondDerivative);
     const receipt = await tx.wait();
 
     const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
