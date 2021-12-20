@@ -14,10 +14,13 @@ import { retrievePositionTokensAddresses } from "../../utils/events";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 import { pickError } from "../../utils/misc";
 import { customDerivativeName, semanticErrors } from "../../utils/constants";
-import { generateExpectedOpiumPositionTokenName } from "../../utils/testCaseGenerator";
+import {
+  generateExpectedOpiumPositionTokenName,
+  generateExpectedOpiumPositionTokenSymbol,
+} from "../../utils/testCaseGenerator";
 
 describe("OpiumProxyFactory", () => {
-  let namedSigners: TNamedSigners;
+  let users: TNamedSigners;
   let coreImpersonator: SignerWithAddress;
   let opiumProxyFactory: OpiumProxyFactory;
   let optionCallMock: OptionCallSyntheticIdMock;
@@ -26,8 +29,10 @@ describe("OpiumProxyFactory", () => {
   let secondDerivative: TDerivative;
 
   before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-    ({ optionCallMock, opiumProxyFactory, core } = await setup());
+    ({
+      contracts: { optionCallMock, opiumProxyFactory, core },
+      users,
+    } = await setup());
 
     derivative = derivativeFactory({
       margin: toBN("30"),
@@ -51,31 +56,31 @@ describe("OpiumProxyFactory", () => {
   });
 
   it("expects to revert if caller is not core", async () => {
-    const { buyer, seller } = namedSigners;
+    const { buyer, seller } = users;
     await impersonateAccount(core.address);
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
     await expect(
-      opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative, customDerivativeName),
+      opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE));
   });
 
   it("expects to mint the correct number of erc20 long/short positions", async () => {
-    const { buyer, seller } = namedSigners;
+    const { buyer, seller } = users;
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .create(buyer.address, seller.address, amount, hash, derivative, customDerivativeName);
+      .create(buyer.address, seller.address, amount, hash, derivative);
     const receipt = await tx.wait();
 
     const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(
       opiumProxyFactory,
       receipt,
     );
-    console.log(shortOpiumPositionTokenAddress, longOpiumPositionTokenAddress);
+
     const longOpiumPositionToken = await (<OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", longOpiumPositionTokenAddress)
     ));
@@ -123,20 +128,34 @@ describe("OpiumProxyFactory", () => {
         false,
       ),
     );
-    expect(longTokenSymbol).to.be.eq("OPLN");
-    expect(shortTokenSymbol).to.be.eq("OPSH");
+    expect(longTokenSymbol).to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        shortTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        hash,
+        true,
+      ),
+    );
+    expect(shortTokenSymbol).to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        shortTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        hash,
+        false,
+      ),
+    );
     expect(longTokenSupply).to.be.eq(amount);
     expect(shortTokenSupply).to.be.eq(amount);
   });
 
   it("expects to burn the correct number of erc20 long/short positions with amount set to 2", async () => {
-    const { buyer, seller } = namedSigners;
+    const { buyer, seller } = users;
     const amount = 2;
 
     const hash = getDerivativeHash(secondDerivative);
     const tx = await opiumProxyFactory
       .connect(coreImpersonator)
-      .create(buyer.address, seller.address, amount, hash, secondDerivative, customDerivativeName);
+      .create(buyer.address, seller.address, amount, hash, secondDerivative);
     const receipt = await tx.wait();
 
     const [longOpiumPositionTokenAddress, shortOpiumPositionTokenAddress] = retrievePositionTokensAddresses(

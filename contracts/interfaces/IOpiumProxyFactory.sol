@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.5;
 import "../libs/LibDerivative.sol";
 
@@ -11,8 +12,7 @@ interface IOpiumProxyFactory {
         address _seller,
         uint256 _amount,
         bytes32 _derivativeHash,
-        LibDerivative.Derivative calldata _derivative,
-        string calldata _derivativeAuthorCustomName
+        LibDerivative.Derivative calldata _derivative
     ) external;
 
     function mintPair(

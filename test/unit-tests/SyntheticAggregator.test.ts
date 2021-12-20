@@ -9,14 +9,10 @@ import { toBN } from "../../utils/bn";
 import { TNamedSigners } from "../../types";
 
 describe("SyntheticAggregator", () => {
-  let namedSigners: TNamedSigners;
-
-  before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  });
-
   it("should successfully return getMargin", async () => {
-    const { syntheticAggregator, optionCallMock } = await setup();
+    const {
+      contracts: { syntheticAggregator, optionCallMock },
+    } = await setup();
 
     const derivative = derivativeFactory({
       margin: toBN("30"),
@@ -34,8 +30,10 @@ describe("SyntheticAggregator", () => {
   });
 
   it("should successfully return syntheticCache", async () => {
-    const { syntheticAggregator, optionCallMock } = await setup();
-    const { author } = namedSigners;
+    const {
+      contracts: { syntheticAggregator, optionCallMock },
+      users: { author },
+    } = await setup();
 
     const derivative = derivativeFactory({
       margin: toBN("30"),

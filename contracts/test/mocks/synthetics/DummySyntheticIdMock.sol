@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.5;
 
 import "../../../interfaces/IDerivativeLogic.sol";
@@ -20,7 +21,7 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
     }
 
     /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions
-    function getSyntheticIdName() external view override returns (string memory) {
+    function getSyntheticIdName() external pure override returns (string memory) {
         return "Riccardo's derivative shop";
     }
 
@@ -36,14 +37,14 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
         return HasCommission.getAuthorCommission();
     }
 
-    function validateInput(LibDerivative.Derivative memory _derivative) external view override returns (bool) {
+    function validateInput(LibDerivative.Derivative memory _derivative) external pure override returns (bool) {
         _derivative;
         return true;
     }
 
     function getMargin(LibDerivative.Derivative memory _derivative)
         external
-        view
+        pure
         override
         returns (uint256 buyerMargin, uint256 sellerMargin)
     {
@@ -53,7 +54,7 @@ contract DummySyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCo
 
     function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)
         external
-        view
+        pure
         override
         returns (uint256 buyerPayout, uint256 sellerPayout)
     {

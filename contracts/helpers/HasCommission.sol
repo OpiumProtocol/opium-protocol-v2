@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.5;
 
 /// @title Opium.Helpers.HasCommission contract helps to syntheticId development and responsible for commission and author address

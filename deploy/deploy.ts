@@ -6,7 +6,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, ethers } = hre;
   const { deploy } = deployments;
 
-  const { deployer, governor } = await ethers.getNamedSigners();
+  const { deployer, governor, redemptionReserveClaimer } = await ethers.getNamedSigners();
 
   const registry = await deploy("Registry", {
     from: deployer.address,
@@ -37,6 +37,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   const tokenSpender = await deploy("TokenSpender", {
+    contract: "TokenSpender",
     from: deployer.address,
     args: [],
     log: true,
@@ -99,7 +100,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       tokenSpender.address,
     );
   await registryInstance.connect(governor).setProtocolExecutionReserveClaimer(deployer.address);
-  await registryInstance.connect(governor).setProtocolRedemptionReserveClaimer(deployer.address);
+  await registryInstance.connect(governor).setProtocolRedemptionReserveClaimer(redemptionReserveClaimer.address);
   await registryInstance.connect(governor).addToWhitelist(core.address);
 
   const coreInstance = <Core>await ethers.getContract("Core");

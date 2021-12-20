@@ -1,24 +1,8 @@
 // theirs
-import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
-import { Contract } from "@ethersproject/contracts";
 import { expect } from "./chai-setup";
-// utils
-import { decodeEvents, retrievePositionTokensAddresses } from "../utils/events";
-import {
-  computeDerivativeMargin,
-  computeFees,
-  getDerivativeHash,
-  calculateTotalNetPayout,
-  EPayout,
-  calculateTotalGrossProfit,
-} from "../utils/derivatives";
 // types
-import { Core, OpiumPositionToken, OpiumProxyFactory, Registry, TestToken, TokenSpender } from "../typechain";
-import { timeTravel } from "../utils/evm";
-import { TDerivativeOrder, TNamedSigners } from "../types";
-import { toBN } from "../utils/bn";
-import { shouldBehaveLikeCore } from "./Core.behavior";
+import { Registry } from "../typechain";
 import { governanceRoles, semanticErrors } from "../utils/constants";
 import { pickError } from "../utils/misc";
 
@@ -58,15 +42,13 @@ export const shouldBehaveLikeRegistry = (registry: Registry): TShouldBehaveLikeR
       "not protocolAddressesSetterRole",
     ).to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, authorized.address),
-      "not executionFeeRecipientSetterRole",
+      await registry.hasRole(governanceRoles.executionReservePartSetterRole, authorized.address),
+      "not executionReservePartSetterRole",
     ).to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.redemptionFeeRecipientSetterRole, authorized.address),
+      await registry.hasRole(governanceRoles.redemptionReservePartSetterRole, authorized.address),
       "not protocolAddressesSetterRole",
     ).to.be.true;
-    expect(await registry.hasRole(governanceRoles.opiumFeeSetterRole, authorized.address), "not opiumFeeSetterRole").to
-      .be.true;
     expect(
       await registry.hasRole(governanceRoles.noDataCancellationPeriodSetterRole, authorized.address),
       "not noDataCancellationPeriodSetterRole",
@@ -77,8 +59,8 @@ export const shouldBehaveLikeRegistry = (registry: Registry): TShouldBehaveLikeR
     expect(await registry.hasRole(governanceRoles.whitelisterRole, authorized.address), "not whitelisterRole").to.be
       .true;
     expect(
-      await registry.hasRole(governanceRoles.redemptionFeeSetterRole, authorized.address),
-      "not redemptionFeeSetterRole",
+      await registry.hasRole(governanceRoles.redemptionReservePartSetterRole, authorized.address),
+      "not redemptionReservePartSetterRole",
     ).to.be.true;
     expect(
       await registry.hasRole(governanceRoles.executionFeeCapSetterRole, authorized.address),
@@ -92,8 +74,8 @@ export const shouldBehaveLikeRegistry = (registry: Registry): TShouldBehaveLikeR
     expect(await registry.hasRole(governanceRoles.guardianRole, notAuthorizedOne.address), "wrong guardianRole").to.be
       .false;
     expect(
-      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, notAuthorizedTwo.address),
-      "wrong executionFeeRecipientSetterRole",
+      await registry.hasRole(governanceRoles.executionReservePartSetterRole, notAuthorizedTwo.address),
+      "wrong executionReservePartSetterRole",
     ).to.be.false;
     expect(
       await registry.hasRole(governanceRoles.protocolAddressesSetterRole, notAuthorizedTwo.address),
@@ -113,10 +95,9 @@ export const shouldBehaveLikeRegistry = (registry: Registry): TShouldBehaveLikeR
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(
       noDataCancellationPeriod,
     );
-    expect(
-      protocolParams.derivativeAuthorExecutionFeeCap,
-      "wrong derivativeAuthorExecutionFeeCap",
-    ).to.be.eq(derivativeAuthorExecutionFeeCap);
+    expect(protocolParams.derivativeAuthorExecutionFeeCap, "wrong derivativeAuthorExecutionFeeCap").to.be.eq(
+      derivativeAuthorExecutionFeeCap,
+    );
     expect(
       protocolParams.derivativeAuthorRedemptionReservePart,
       "wrong derivativeAuthorRedemptionReservePart",

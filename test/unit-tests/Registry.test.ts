@@ -5,20 +5,14 @@ import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
 import { pickError } from "../../utils/misc";
 // types and constants
-import { TNamedSigners } from "../../types";
 import { semanticErrors, SECONDS_2_WEEKS, governanceRoles, zeroAddress, SECONDS_3_WEEKS } from "../../utils/constants";
-import { shouldBehaveLikeRegistry } from "../Registry.behavior";
 
 describe("Registry", () => {
-  let namedSigners: TNamedSigners;
-
-  before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  });
-
   it("should ensure the Registry roles are assigned as expected", async () => {
-    const { registry } = await setup();
-    const { deployer, governor, notAllowed } = await ethers.getNamedSigners();
+    const {
+      contracts: { registry },
+      users: { deployer, governor, notAllowed },
+    } = await setup();
 
     expect(await registry.hasRole(governanceRoles.defaultAdminRole, governor.address), "not admin").to.be.true;
     expect(
@@ -26,15 +20,13 @@ describe("Registry", () => {
       "not protocolAddressesSetterRole",
     ).to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, governor.address),
-      "not executionFeeRecipientSetterRole",
+      await registry.hasRole(governanceRoles.executionReservePartSetterRole, governor.address),
+      "not executionReservePartSetterRole",
     ).to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.redemptionFeeRecipientSetterRole, governor.address),
+      await registry.hasRole(governanceRoles.redemptionReservePartSetterRole, governor.address),
       "not protocolAddressesSetterRole",
     ).to.be.true;
-    expect(await registry.hasRole(governanceRoles.opiumFeeSetterRole, governor.address), "not opiumFeeSetterRole").to.be
-      .true;
     expect(
       await registry.hasRole(governanceRoles.noDataCancellationPeriodSetterRole, governor.address),
       "not noDataCancellationPeriodSetterRole",
@@ -44,8 +36,8 @@ describe("Registry", () => {
     expect(await registry.hasRole(governanceRoles.guardianRole, governor.address), "not guardianRole").to.be.true;
     expect(await registry.hasRole(governanceRoles.whitelisterRole, governor.address), "not whitelisterRole").to.be.true;
     expect(
-      await registry.hasRole(governanceRoles.redemptionFeeSetterRole, governor.address),
-      "not redemptionFeeSetterRole",
+      await registry.hasRole(governanceRoles.redemptionReservePartSetterRole, governor.address),
+      "not redemptionReservePartSetterRole",
     ).to.be.true;
     expect(
       await registry.hasRole(governanceRoles.executionFeeCapSetterRole, governor.address),
@@ -57,8 +49,8 @@ describe("Registry", () => {
     expect(await registry.hasRole(governanceRoles.defaultAdminRole, deployer.address), "wrong admin").to.be.false;
     expect(await registry.hasRole(governanceRoles.guardianRole, deployer.address), "wrong guardianRole").to.be.false;
     expect(
-      await registry.hasRole(governanceRoles.executionFeeRecipientSetterRole, notAllowed.address),
-      "wrong executionFeeRecipientSetterRole",
+      await registry.hasRole(governanceRoles.executionReservePartSetterRole, notAllowed.address),
+      "wrong executionReservePartSetterRole",
     ).to.be.false;
     expect(
       await registry.hasRole(governanceRoles.protocolAddressesSetterRole, notAllowed.address),
@@ -67,31 +59,26 @@ describe("Registry", () => {
   });
 
   it("should ensure the initial protocol parameters are as expected", async () => {
-    const { registry } = await setup();
-
+    const {
+      contracts: { registry },
+    } = await setup();
     const protocolParams = await registry.getProtocolParameters();
 
     expect(protocolParams.noDataCancellationPeriod, "wrong noDataCancellationPeriod").to.be.eq(SECONDS_2_WEEKS);
-    expect(
-      protocolParams.derivativeAuthorExecutionFeeCap,
-      "wrong derivativeAuthorExecutionFeeCap",
-    ).to.be.eq(1000);
+    expect(protocolParams.derivativeAuthorExecutionFeeCap, "wrong derivativeAuthorExecutionFeeCap").to.be.eq(1000);
     expect(
       protocolParams.derivativeAuthorRedemptionReservePart,
       "wrong derivativeAuthorRedemptionReservePart",
     ).to.be.eq(10);
-    expect(protocolParams.protocolExecutionReservePart, "wrong protocol commission part").to.be.eq(1000);
-    expect(protocolParams.protocolRedemptionReservePart, "wrong protocol commission part").to.be.eq(1000);
-  });
-
-  it("behavior2 ", async () => {
-    const { registry } = await setup();
-    await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 1000, 10, 1000, false);
+    expect(protocolParams.protocolExecutionReservePart, "wrong protocolExecutionReservePart").to.be.eq(1000);
+    expect(protocolParams.protocolRedemptionReservePart, "wrong protocolRedemptionReservePart").to.be.eq(1000);
   });
 
   it("should ensure that the Registry getters return the correct data", async () => {
-    const { registry, core, oracleIdMock } = await setup();
-    const { deployer, governor } = await ethers.getNamedSigners();
+    const {
+      contracts: { registry, core, oracleIdMock },
+      users: { deployer, governor },
+    } = await setup();
 
     expect(await registry.isRegistryManager(governor.address), "wrong registryManager").to.be.eq(true);
     expect(await registry.isRegistryManager(deployer.address), "wrong registryManager").to.be.eq(false);
@@ -102,7 +89,9 @@ describe("Registry", () => {
   });
 
   it("should ensure the protocol addresses are as expected", async () => {
-    const { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender } = await setup();
+    const {
+      contracts: { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender },
+    } = await setup();
 
     const protocolAddresses = await registry.getProtocolAddresses();
     expect(protocolAddresses.opiumProxyFactory).to.be.eq(opiumProxyFactory.address);
@@ -113,8 +102,10 @@ describe("Registry", () => {
   });
 
   it("should revert if a null address is provided as a protocol address argument", async () => {
-    const { registry, opiumProxyFactory, syntheticAggregator, core, tokenSpender } = await setup();
-    const { governor } = await ethers.getNamedSigners();
+    const {
+      contracts: { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender },
+      users: { governor },
+    } = await setup();
 
     await expect(
       registry
@@ -150,8 +141,10 @@ describe("Registry", () => {
   });
 
   it("should ensure the internal ACL is applied correctly", async () => {
-    const { registry, opiumProxyFactory, core, oracleAggregator, syntheticAggregator, tokenSpender } = await setup();
-    const { notAllowed } = namedSigners;
+    const {
+      contracts: { registry, opiumProxyFactory, oracleAggregator, syntheticAggregator, core, tokenSpender },
+      users: { notAllowed },
+    } = await setup();
 
     await expect(
       registry
@@ -183,10 +176,12 @@ describe("Registry", () => {
   });
 
   it(`should allow the authorized roles to change the protocol's parameters`, async () => {
-    const { registry } = await setup();
-    const { authorized, governor } = namedSigners;
+    const {
+      contracts: { registry },
+      users: { governor, authorized },
+    } = await setup();
 
-    // test setDerivativeAuthorExecutionReservePartCap setter
+    // test setderivativeAuthorExecutionFeeCap setter
     await registry.connect(governor).setDerivativeAuthorExecutionFeeCap(12);
     expect(
       (await registry.getProtocolParameters()).derivativeAuthorExecutionFeeCap,
@@ -231,9 +226,9 @@ describe("Registry", () => {
     await registry.connect(governor).removeFromWhitelist(authorized.address);
     expect(await registry.isCoreSpenderWhitelisted(authorized.address)).to.be.false;
 
-    // test setProtocolExecutionReservePart after granting `EXECUTION_RESERVE_PART_SETTER_ROLE` role to another account
+    // test setProtocolExecutionReservePart after granting `OPIUM_RESERVE_SETTER_ROLE` role to another account
     await expect(registry.connect(authorized).setProtocolExecutionReservePart(4)).to.revertedWith("R4");
-    await registry.connect(governor).grantRole(governanceRoles.opiumFeeSetterRole, authorized.address);
+    await registry.connect(governor).grantRole(governanceRoles.executionReservePartSetterRole, authorized.address);
     await registry.connect(authorized).setProtocolExecutionReservePart(7);
     expect(
       (await registry.getProtocolParameters()).protocolExecutionReservePart,

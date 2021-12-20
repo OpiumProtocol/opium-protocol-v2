@@ -21,8 +21,7 @@ export const shouldBehaveLikeProtocol = async (
   optionOrder: TDerivativeOrder,
 ): Promise<void> => {
   await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 10000, 100, 1, false);
-  await shouldBehaveLikeCore(
-    core,
+  await shouldBehaveLikeCore(core).toCreateAndMintAndExecutePositions(
     registry,
     testToken,
     tokenSpender,
@@ -32,6 +31,6 @@ export const shouldBehaveLikeProtocol = async (
     seller,
     buyer,
     optionOrder,
-    EPositionCreation.CREATE,
+    EPositionCreation.CREATE_AND_MINT,
   );
 };

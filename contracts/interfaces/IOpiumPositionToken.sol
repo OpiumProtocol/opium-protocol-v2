@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.5;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol";
@@ -14,9 +15,7 @@ interface IOpiumPositionToken is IERC20PermitUpgradeable, IERC20Upgradeable {
     function initialize(
         bytes32 _derivativeHash,
         LibDerivative.PositionType _positionType,
-        LibDerivative.Derivative calldata _derivative,
-        bytes memory _baseCustomName,
-        bytes memory _baseCustomSymbol
+        LibDerivative.Derivative calldata _derivative
     ) external;
 
     function mint(address _positionOwner, uint256 _amount) external;

@@ -1,25 +1,18 @@
-// theirs
-import { ethers } from "hardhat";
 // utils
 import { expect } from "../chai-setup";
 import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";
 import { impersonateAccount, setBalance } from "../../utils/evm";
 // types
-import { TNamedSigners } from "../../types";
 import { pickError } from "../../utils/misc";
 import { semanticErrors } from "../../utils/constants";
 
 describe("TokenSpender", () => {
-  let namedSigners: TNamedSigners;
-
-  before(async () => {
-    namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
-  });
-
   it("should revert spending by non whitelisted address", async () => {
-    const { deployer, hacker } = namedSigners;
-    const { tokenSpender, testToken } = await setup();
+    const {
+      contracts: { tokenSpender, testToken },
+      users: { deployer, hacker },
+    } = await setup();
 
     await expect(
       tokenSpender.claimTokens(testToken.address, deployer.address, hacker.address, toBN("0.01")),
@@ -27,9 +20,10 @@ describe("TokenSpender", () => {
   });
 
   it("should successfully spend by core", async () => {
-    // Preps
-    const { testToken, tokenSpender, core } = await setup();
-    const { goodGuy, deployer } = namedSigners;
+    const {
+      contracts: { tokenSpender, testToken, core },
+      users: { goodGuy, deployer },
+    } = await setup();
 
     const coreImpersonator = await impersonateAccount(core.address);
     //fund impersonator

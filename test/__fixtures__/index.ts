@@ -1,7 +1,6 @@
 import { deployments, ethers } from "hardhat";
 import {
   Core,
-  MockRelayer,
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
   OracleAggregator,
@@ -11,6 +10,7 @@ import {
   TokenSpender,
 } from "../../typechain";
 import { Registry } from "../../typechain/Registry";
+import { TNamedSigners } from "../../types";
 
 export type TContracts = {
   registry: Registry;
@@ -23,10 +23,20 @@ export type TContracts = {
   syntheticAggregator: SyntheticAggregator;
   oracleIdMock: OracleIdMock;
   testTokenSixDecimals: TestToken;
-  mockRelayer: MockRelayer;
 };
 
-const setup = deployments.createFixture(async (): Promise<TContracts> => {
+export type TFixturesOutput = {
+  contracts: TContracts;
+  users: TNamedSigners;
+};
+
+export const getNamedSigners = async (): Promise<TNamedSigners> => {
+  const namedSigners = (await ethers.getNamedSigners()) as TNamedSigners;
+  return namedSigners;
+};
+
+const setup = deployments.createFixture(async (): Promise<TFixturesOutput> => {
+  const users = await getNamedSigners();
   await deployments.fixture(["Protocol", "Mocks"]);
 
   /*******************
@@ -48,20 +58,21 @@ const setup = deployments.createFixture(async (): Promise<TContracts> => {
 
   const testToken = <TestToken>await ethers.getContract("TestToken");
   const testTokenSixDecimals = <TestToken>await ethers.getContract("SixDecimalsTestToken");
-  const mockRelayer = <MockRelayer>await ethers.getContract("MockRelayer");
 
   return {
-    registry,
-    opiumProxyFactory,
-    tokenSpender,
-    core,
-    testToken,
-    optionCallMock,
-    oracleAggregator,
-    syntheticAggregator,
-    oracleIdMock,
-    testTokenSixDecimals,
-    mockRelayer,
+    contracts: {
+      registry,
+      opiumProxyFactory,
+      tokenSpender,
+      core,
+      testToken,
+      optionCallMock,
+      oracleAggregator,
+      syntheticAggregator,
+      oracleIdMock,
+      testTokenSixDecimals,
+    },
+    users,
   };
 });
 

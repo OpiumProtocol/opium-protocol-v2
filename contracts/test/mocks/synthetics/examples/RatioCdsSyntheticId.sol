@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.5;
 
 import "openzeppelin-solidity/contracts/access/Ownable.sol";
@@ -10,7 +11,8 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
 
   uint256 constant public TRIGGER_BASE = 1e18;
 
-  constructor(address _author, uint256 _commission) public {
+
+  constructor(address _author, uint256 _commission) {
     /*
     {
       "author": "Opium.Team",
@@ -26,13 +28,13 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
   }
 
   /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions
-  function getSyntheticIdName() external view override returns (string memory) {
+  function getSyntheticIdName() external pure override returns (string memory) {
     return "CDS";
   }
 
   // params[0] - Trigger
   // params[1] - Fixed Premium
-  function validateInput(LibDerivative.Derivative calldata _derivative) public view override returns (bool) {
+  function validateInput(LibDerivative.Derivative calldata _derivative) external view override returns (bool) {
     return (
       // Derivative
       _derivative.endTime > block.timestamp &&
@@ -44,14 +46,14 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
     );
   }
 
-  function getMargin(LibDerivative.Derivative calldata _derivative) public pure override returns (uint256 buyerMargin, uint256 sellerMargin) {
+  function getMargin(LibDerivative.Derivative calldata _derivative) external pure override returns (uint256 buyerMargin, uint256 sellerMargin) {
     uint256 fixedPremium = _derivative.params[1];
     uint256 nominal = _derivative.margin;
     buyerMargin = fixedPremium;
     sellerMargin = nominal;
   }
 
-  function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result) public view override returns (uint256 buyerPayout, uint256 sellerPayout) {
+  function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result) external pure override returns (uint256 buyerPayout, uint256 sellerPayout) {
     uint256 trigger = _derivative.params[0];
     uint256 fixedPremium = _derivative.params[1];
     uint256 nominal = _derivative.margin;
@@ -71,31 +73,31 @@ contract RatioCdsSyntheticId is IDerivativeLogic, Ownable {
   /** COMMISSION */
   /// @notice Getter for syntheticId author address
   /// @return address syntheticId author address
-  function getAuthorAddress() public view override returns (address) {
+  function getAuthorAddress() external view override returns (address) {
     return author;
   }
 
   /// @notice Getter for syntheticId author commission
   /// @return uint26 syntheticId author commission
-  function getAuthorCommission() public view override returns (uint256) {
+  function getAuthorCommission() external view override returns (uint256) {
     return commission;
   }
 
   /** THIRDPARTY EXECUTION */
-  function thirdpartyExecutionAllowed(address) public pure override returns (bool) {
+  function thirdpartyExecutionAllowed(address) external pure override returns (bool) {
     return true;
   }
 
-  function allowThirdpartyExecution(bool) public pure override {
+  function allowThirdpartyExecution(bool) external pure override {
   }
 
   /** GOVERNANCE */
-  function setAuthorAddress(address _author) public onlyOwner {
+  function setAuthorAddress(address _author) external onlyOwner {
     require(_author != address(0), "Can't set to zero address");
     author = _author;
   }
 
-  function setAuthorCommission(uint256 _commission) public onlyOwner {
+  function setAuthorCommission(uint256 _commission) external onlyOwner {
     commission = _commission;
   }
 }

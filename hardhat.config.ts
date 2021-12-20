@@ -2,9 +2,13 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-deploy";
-import "@openzeppelin/hardhat-upgrades";
 import "hardhat-dependency-compiler";
 import "hardhat-gas-reporter";
+import "hardhat-contract-sizer";
+import "hardhat-docgen";
+import "@hardhat-docgen/core";
+import "@hardhat-docgen/markdown";
+import "@openzeppelin/hardhat-upgrades";
 import "solidity-coverage";
 
 import { config as dotenvConfig } from "dotenv";
@@ -152,32 +156,32 @@ const config: HardhatUserConfig = {
     author: {
       default: 10,
     },
-    thirdParty: {
+    notAllowed: {
       default: 11,
     },
-    notAllowed: {
+    hacker: {
       default: 12,
     },
-    hacker: {
+    goodGuy: {
       default: 13,
     },
-    goodGuy: {
+    authorized: {
       default: 14,
     },
-    authorized: {
+    impersonator: {
       default: 15,
     },
-    impersonator: {
+    thirdParty: {
       default: 16,
     },
-    derivativeAuthor: {
-      default: 17,
-    },
     createPositionPauser: {
-      default: 18,
+      default: 17,
     },
     coreCancelPositionPauser: {
       default: 18,
+    },
+    redemptionReserveClaimer: {
+      default: 19,
     },
   },
   typechain: {
@@ -186,6 +190,20 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: ETHERSCAN_KEY,
+  },
+  mocha: {
+    timeout: 40000,
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
+  },
+  docgen: {
+    path: "./docs/contracts/specs",
+    clear: true,
+    runOnCompile: false,
   },
 };
 

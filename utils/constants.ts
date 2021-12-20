@@ -18,20 +18,32 @@ export const executeOneWithAddress = "execute(address,address,uint256)";
 export const executeMany = "execute(address[],uint256[])";
 export const executeManyWithAddress = "execute(address,address[],uint256[])";
 export const cancelOne = "cancel(address,uint256)";
-export const cancelMany = "cancel(uint8[],uint256[],(uint256,uint256,uint256[],address,address,address)[])";
+export const cancelMany = "cancel(address[],uint256[])";
+export const redeemOne = "redeem(address[2],uint256)";
+export const redeemMany = "redeem(address[2][],uint256[])";
 
 export const governanceRoles = Object.freeze({
   defaultAdminRole: "0x0000000000000000000000000000000000000000000000000000000000000000",
   protocolAddressesSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL1")),
-  executionFeeRecipientSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL2")),
-  redemptionFeeRecipientSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL3")),
-  opiumFeeSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL4")),
+  executionReserveClaimerAddressSetter: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL2")),
+  redemptionReserveClaimerAddressSetter: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL3")),
+  executionReservePartSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL4")),
   noDataCancellationPeriodSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL5")),
   guardianRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL6")),
   whitelisterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL7")),
   executionFeeCapSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL8")),
-  redemptionFeeSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL9")),
+  redemptionReservePartSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL9")),
   registryManagerRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL10")),
+  coreConfigurationUpdaterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL18")),
+  derivativeAuthorExecutionFeeCapSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL8")),
+  REDEMPTION_RESERVE_PART_SETTER_ROLE: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL9")),
+  partialCreatePauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL11")),
+  partialMintPauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL12")),
+  partialRedeemPauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL13")),
+  partialExecutionPauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL14")),
+  partialCancelPauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL15")),
+  partialClaimPauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL16")),
+  partialGlobalUnpauserRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL17")),
 });
 
 export const semanticErrors = {
@@ -73,7 +85,8 @@ export const semanticErrors = {
     "ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE",
   ERROR_REGISTRY_ONLY_GUARDIAN_ROLE: "ERROR_REGISTRY_ONLY_GUARDIAN_ROLE",
   ERROR_REGISTRY_ONLY_WHITELISTER_ROLE: "ERROR_REGISTRY_ONLY_WHITELISTER_ROLE",
-  ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE: "ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE",
+  ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE:
+    "ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE",
   ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE: "ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE",
   ERROR_REGISTRY_ALREADY_PAUSED: "ERROR_REGISTRY_ALREADY_PAUSED",
   ERROR_REGISTRY_NOT_PAUSED: "ERROR_REGISTRY_NOT_PAUSED",
@@ -87,6 +100,13 @@ export const semanticErrors = {
   ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS: "ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS",
   /// TOKEN SPENDER ERRORS
   ERROR_TOKEN_SPENDER_NOT_WHITELISTED: "ERROR_TOKEN_SPENDER_NOT_WHITELISTED",
+  ///
+  ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE: "ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE",
+  ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE: "ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE",
+  ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE: "ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE",
+  ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE: "ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE",
+  ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE: "ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE",
+  ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE: "ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE",
 };
 
 export const protocolErrors = {
@@ -132,6 +152,14 @@ export const protocolErrors = {
   [semanticErrors.ERROR_REGISTRY_ALREADY_PAUSED]: "R10",
   [semanticErrors.ERROR_REGISTRY_NOT_PAUSED]: "R11",
   [semanticErrors.ERROR_REGISTRY_NULL_ADDRESS]: "R12",
+  [semanticErrors.ERROR_REGISTRY_NULL_ADDRESS]: "R12",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE]: "R13",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE]: "R14",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE]: "R15",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE]: "R16",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE]: "R17",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE]: "R18",
+  [semanticErrors.ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE]: "R19",
   /// OPIUM POSITION TOKEN ERRORS
   [semanticErrors.ERROR_OPIUM_POSITION_TOKEN_NOT_FACTORY]: "P1",
   /// OPIUM PROXY FACTORY ERRORS
