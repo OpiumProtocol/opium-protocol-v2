@@ -47,7 +47,7 @@ contract OpiumPositionToken is ERC20PermitUpgradeable {
         LibDerivative.Derivative calldata _derivative
     ) external initializer {
         __ERC20_init("", "");
-        __EIP712_init_unchained("", "1");
+        __EIP712_init_unchained("Opium Position Token", "1");
         __ERC20Permit_init_unchained("");
         factory = msg.sender;
         opiumPositionTokenParams = OpiumPositionTokenParams({
