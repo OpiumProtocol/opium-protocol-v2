@@ -21,6 +21,11 @@ import "./tasks/clean";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
+// ENV: Config
+const CONTRACT_SIZER_STRICT = process.env.CONTRACT_SIZER_STRICT !== '0'
+
+
+// ENV: Secrets
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY;
 if (!ETHERSCAN_KEY) {
   throw new Error("Please set your ETHERSCAN_KEY in a .env file");
@@ -198,7 +203,7 @@ const config: HardhatUserConfig = {
     alphaSort: true,
     disambiguatePaths: false,
     runOnCompile: true,
-    strict: true,
+    strict: CONTRACT_SIZER_STRICT,
   },
   docgen: {
     path: "./docs/contracts/specs",
