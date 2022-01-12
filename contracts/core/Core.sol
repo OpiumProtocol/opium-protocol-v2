@@ -518,10 +518,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         emit LogRedeemed(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
-    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed positions being burned regardless of their profitability
+    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed position's amount being burned regardless of its profitability
     /// @param _positionOwner address Address of the owner of positions
-    /// @param _positionAddress address[] `positionAddresses` of positions that needs to be executed
-    /// @param _amount uint256 Amount of positions to execute for each `positionAddress`
+    /// @param _positionAddress address `_positionAddress` of the ERC20 OpiumPositionToken that needs to be executed
+    /// @param _amount uint256 Amount of position to execute for the provided `positionAddress`
     function _execute(
         address _positionOwner,
         address _positionAddress,
