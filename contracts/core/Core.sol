@@ -87,7 +87,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     function initialize(address _registry) external initializer {
         __RegistryManager__init(_registry);
         __ReentrancyGuard_init();
-        protocolParametersArgs = registry.getProtocolParameters();
+        protocolParametersArgs = _registry.getProtocolParameters();
     }
 
     // ****************** EXTERNAL FUNCTIONS ******************
