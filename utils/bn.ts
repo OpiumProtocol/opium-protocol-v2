@@ -28,3 +28,7 @@ export const pow = (x: number, y: number): BigNumber => {
 export const frac = (x: BigNumber, n: string, d: string): BigNumber => {
   return x.mul(toBN(n)).div(toBN(d));
 };
+
+export const mulWithPrecisionFactor = (x:  BigNumber, y: BigNumber): BigNumber => {
+  return x.mul(y).div(toBN('1'));
+};

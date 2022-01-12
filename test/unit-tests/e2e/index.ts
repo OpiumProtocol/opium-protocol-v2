@@ -2,7 +2,7 @@
 import { ethers } from "hardhat";
 // utils
 import { expect } from "../../chai-setup";
-import { toBN } from "../../../utils/bn";
+import { mulWithPrecisionFactor, toBN } from "../../../utils/bn";
 import { createValidDerivativeExpiry, derivativeFactory, getDerivativeHash } from "../../../utils/derivatives";
 import setup from "../../__fixtures__";
 // types and constants
@@ -53,8 +53,7 @@ describe("e2e", () => {
     await optionController.setDerivative(derivative);
     const testTokenBalanceBefore = await testToken.balanceOf(users.deployer.address);
     console.log(`testTokenBalanceBefore: ${testTokenBalanceBefore.toString()}`);
-
-    await testToken.approve(optionController.address, derivative.margin.mul(amount).div(toBN("1")));
+    await testToken.approve(optionController.address, mulWithPrecisionFactor(derivative.margin, amount));
     await optionController.create(amount);
     const shortOpiumPositionTokenAddress = await optionController.getPositionAddress(false);
     shortOpiumPositionToken = await (<OpiumPositionToken>(
