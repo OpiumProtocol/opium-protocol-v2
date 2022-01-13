@@ -13,6 +13,7 @@ import "solidity-coverage";
 
 import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
+import { HardhatNetworkUserConfig } from "hardhat/types/config";
 import { NetworkUserConfig } from "hardhat/types";
 
 import { resolve } from "path";
@@ -22,8 +23,7 @@ import "./tasks/clean";
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 // ENV: Config
-const CONTRACT_SIZER_STRICT = process.env.CONTRACT_SIZER_STRICT !== '0'
-
+const CONTRACT_SIZER_STRICT = process.env.CONTRACT_SIZER_STRICT !== "0";
 
 // ENV: Secrets
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY;
@@ -69,6 +69,12 @@ if (!infuraApiKey) {
   throw new Error("Please set your INFURA_API_KEY in a .env file");
 }
 
+// it can either be `fork` or `local`
+const hardhatNetworkEnvironment = process.env.HARDHAT_NETWORK_ENVIRONMENT;
+if (!hardhatNetworkEnvironment) {
+  throw new Error("Please set your HARDHAT_NETWORK_ENVIRONMENT in a .env file");
+}
+
 const createInfuraUrl = (network: keyof typeof chainIds): string => {
   return "https://" + network + ".infura.io/v3/" + infuraApiKey;
 };
@@ -86,6 +92,28 @@ const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): N
   };
 };
 
+const createHardhatNetworkConfig = (): HardhatNetworkUserConfig => {
+  if (hardhatNetworkEnvironment === "fork") {
+    return {
+      allowUnlimitedContractSize: false,
+      accounts: {
+        mnemonic,
+      },
+      forking: {
+        url: createInfuraUrl("mainnet"),
+      },
+      chainId: chainIds.mainnet,
+    };
+  }
+  return {
+    allowUnlimitedContractSize: false,
+    accounts: {
+      mnemonic,
+    },
+    chainId: chainIds.hardhat,
+  };
+};
+
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   gasReporter: {
@@ -95,13 +123,7 @@ const config: HardhatUserConfig = {
     src: "./contracts",
   },
   networks: {
-    hardhat: {
-      allowUnlimitedContractSize: false,
-      accounts: {
-        mnemonic,
-      },
-      chainId: chainIds.hardhat,
-    },
+    hardhat: createHardhatNetworkConfig(),
     goerli: createTestnetConfig("goerli", createInfuraUrl("goerli")),
     kovan: createTestnetConfig("kovan", createInfuraUrl("kovan")),
     rinkeby: createTestnetConfig("rinkeby", createInfuraUrl("rinkeby")),
