@@ -647,9 +647,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         IOracleAggregator _oracleAggregator
     ) private returns (uint256 payout) {
         /// if the derivativePayout tuple's items (buyer payout and seller payout) are 0, it assumes it's the first time the _getPayout function is being executed, hence it fetches the payouts from the syntheticId and caches them.
+        (uint256 buyerPayoutRatio, uint256 sellerPayoutRatio) = _getDerivativePayouts(_opiumPositionTokenParams.derivativeHash); // gas saving
         if (
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][0] == 0 &&
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][1] == 0
+            buyerPayoutRatio == 0 &&
+            sellerPayoutRatio == 0
         ) {
             /// fetches the derivative's data from the related oracleId
             /// opium allows the usage of "dummy" oracleIds - oracleIds whose address is null - in which case the data is set to 0
@@ -662,17 +663,11 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             // Get payout ratio from Derivative logic
             // payoutRatio[0] - buyerPayout
             // payoutRatio[1] - sellerPayout
-            (uint256 buyerPayout, uint256 sellerPayout) = IDerivativeLogic(
+            (buyerPayoutRatio, sellerPayoutRatio) = IDerivativeLogic(
                 _opiumPositionTokenParams.derivative.syntheticId
             ).getExecutionPayout(_opiumPositionTokenParams.derivative, data);
-            // Cache buyer payout
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][0] = buyerPayout;
-            // Cache seller payout
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][1] = sellerPayout;
+            derivativePayouts[_opiumPositionTokenParams.derivativeHash] = [buyerPayoutRatio, sellerPayoutRatio]; // gas saving
         }
-
-        uint256 buyerPayoutRatio = derivativePayouts[_opiumPositionTokenParams.derivativeHash][0];
-        uint256 sellerPayoutRatio = derivativePayouts[_opiumPositionTokenParams.derivativeHash][1];
 
         ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(_syntheticAggregator)
             .getSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
@@ -779,6 +774,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             address(protocolAddressesArgs.opiumProxyFactory)
         );
         require(_tokenAddress == predicted, "C14");
+    }
+
+    /// @notice private getter to destructure the derivativePayouts tuple. its only purpose is gas optimization
+    /// @param _derivativeHash bytes32 identifier of the derivative whose payout is being fetched
+    function _getDerivativePayouts(bytes32 _derivativeHash) private view returns(uint256, uint256) {
+        return (derivativePayouts[_derivativeHash][0], derivativePayouts[_derivativeHash][1]);
     }
 
     // Reserved storage space to allow for layout changes in the future.
