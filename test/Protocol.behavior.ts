@@ -21,6 +21,7 @@ export const shouldBehaveLikeProtocol = async (
   optionOrder: TDerivativeOrder,
 ): Promise<void> => {
   await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 10000, 100, 1, false);
+  await shouldBehaveLikeCore(core).toBeSyncWithRegistryState(registry);
   await shouldBehaveLikeCore(core).toCreateAndMintAndExecutePositions(
     registry,
     testToken,

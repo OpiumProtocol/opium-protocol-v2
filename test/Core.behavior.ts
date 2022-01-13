@@ -15,14 +15,7 @@ import {
   createValidDerivativeExpiry,
 } from "../utils/derivatives";
 // types
-import {
-  Core,
-  OpiumPositionToken,
-  OpiumProxyFactory,
-  Registry,
-  TestToken,
-  TokenSpender,
-} from "../typechain";
+import { Core, OpiumPositionToken, OpiumProxyFactory, Registry, TestToken, TokenSpender } from "../typechain";
 import { timeTravel } from "../utils/evm";
 import { TDerivative, TDerivativeOrder } from "../types";
 import { cast, toBN } from "../utils/bn";
@@ -42,6 +35,24 @@ export enum ECoreActions {
   REDEEM = "REDEEM",
   CLAIM_RESERVE = "CLAIM_RESERVE",
 }
+
+type TRegistryAddresses = {
+  core: string;
+  opiumProxyFactory: string;
+  oracleAggregator: string;
+  syntheticAggregator: string;
+  tokenSpender: string;
+  protocolExecutionReserveClaimer: string;
+  protocolRedemptionReserveClaimer: string;
+};
+
+type TRegistryProtocolParameters = {
+  noDataCancellationPeriod: number;
+  derivativeAuthorExecutionFeeCap: number;
+  derivativeAuthorRedemptionReservePart: number;
+  protocolExecutionReservePart: number;
+  protocolRedemptionReservePart: number;
+};
 
 export type TShouldBehaveLikeCore = {
   toCreateAndMintAndExecutePositions: (
@@ -63,6 +74,7 @@ export type TShouldBehaveLikeCore = {
     shortPositionAddress: string,
     account: SignerWithAddress,
   ) => Promise<void>;
+  toBeSyncWithRegistryState: (registry: Registry) => Promise<void>;
 };
 
 const assertFailureOrSuccess = async (
@@ -97,7 +109,13 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
 
     const marginBalanceBefore = await testToken.balanceOf(seller.address);
 
-    await testToken.connect(seller).approve(tokenSpender.address, derivative.margin.mul(amount).div(toBN("1")));
+    expect(
+      await core.getP2pDerivativeVaultFunds(expectedDerivativeHash),
+      "wrong initial value of derivative vault",
+    ).to.be.eq(0);
+
+    const totalDerivativeMargin = computeDerivativeMargin(derivative.margin, amount);
+    await testToken.connect(seller).approve(tokenSpender.address, totalDerivativeMargin);
     const tx =
       operationType === EPositionCreation.CREATE
         ? await core.connect(seller).create(derivative, amount, [buyer.address, seller.address])
@@ -109,10 +127,20 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
      * emits _buyer, _seller, _derivativeHash, _amount
      */
     const [coreCreateEvent] = decodeEvents<Core>(core, "LogCreated", receipt.events);
-    expect(coreCreateEvent[0]).to.equal(buyer.address);
-    expect(coreCreateEvent[1]).to.equal(seller.address);
-    expect(coreCreateEvent[2]).to.equal(expectedDerivativeHash);
-    expect(coreCreateEvent[3]).to.equal(amount);
+    expect(coreCreateEvent, "wrong LogCreated event parameters").to.deep.eq([
+      buyer.address,
+      seller.address,
+      expectedDerivativeHash,
+      amount,
+    ]);
+    expect(
+      await core.getDerivativePayouts(expectedDerivativeHash),
+      "wrong cached payouts' initial value",
+    ).to.be.deep.eq([cast(0), cast(0)]);
+    expect(
+      await core.getP2pDerivativeVaultFunds(expectedDerivativeHash),
+      "wrong value of derivative vault after core.create()/core.mint()",
+    ).to.be.eq(totalDerivativeMargin);
 
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", shortPositionAddress)
@@ -122,16 +150,12 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
     const marginBalanceAfter = await testToken.balanceOf(seller.address);
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
-
-    expect(marginBalanceAfter, "wrong margin balance after").to.equal(
-      marginBalanceBefore.sub(computeDerivativeMargin(derivative.margin, amount)),
-    );
-    expect(buyerPositionsLongBalance, "wrong buyer long balance").to.equal(amount);
-    expect(buyerPositionsShortBalance, "wrong buyer short balance").to.equal(0);
-
     const sellerPositionsLongBalance = await longPositionERC20.balanceOf(seller.address);
     const sellerPositionsShortBalance = await shortPositionERC20.balanceOf(seller.address);
 
+    expect(marginBalanceAfter, "wrong margin balance after").to.equal(marginBalanceBefore.sub(totalDerivativeMargin));
+    expect(buyerPositionsLongBalance, "wrong buyer long balance").to.equal(amount);
+    expect(buyerPositionsShortBalance, "wrong buyer short balance").to.equal(0);
     expect(sellerPositionsLongBalance, "wrong seller long balance").to.equal(0);
     expect(sellerPositionsShortBalance, "wrong seller short balance").to.equal(amount);
 
@@ -150,8 +174,6 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
 
     await core.connect(buyer)[executeOne](longPositionAddress, amount);
     await core.connect(seller)[executeOne](shortPositionAddress, amount);
-
-    const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
 
     const { buyerPayout: buyerPayoutRatio, sellerPayout: sellerPayoutRatio } =
       await syntheticContract.getExecutionPayout(optionOrder.derivative, optionOrder.price);
@@ -181,11 +203,6 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
       buyerFees.totalFee,
       EPayout.BUYER,
     );
-
-    expect(buyerBalanceAfter, "wrong buyer balance after execution").to.be.equal(
-      buyerBalanceBefore.add(buyerNetPayout),
-    );
-
     const sellerNetPayout = calculateTotalNetPayout(
       buyerMargin,
       sellerMargin,
@@ -195,11 +212,24 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
       sellerFees.totalFee,
       EPayout.SELLER,
     );
-
+    const buyerBalanceAfter = await testToken.balanceOf(buyer.address);
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
+
+    expect(
+      await core.getDerivativePayouts(expectedDerivativeHash),
+      "wrong settled derivative's cached payout values",
+    ).to.be.deep.eq([buyerPayoutRatio, sellerPayoutRatio]);
+    expect(buyerBalanceAfter, "wrong buyer balance after execution").to.be.equal(
+      buyerBalanceBefore.add(buyerNetPayout),
+    );
     expect(sellerBalanceAfter, "wrong seller balance after execution").to.be.equal(
       sellerBalanceBefore.add(sellerNetPayout),
     );
+    expect(await core.isDerivativeCancelled(expectedDerivativeHash), "wrong isDerivativeCancelled value").to.be.false;
+    expect(
+      await core.getP2pDerivativeVaultFunds(expectedDerivativeHash),
+      "wrong value of derivative vault after execution of all its positions",
+    ).to.be.eq(0);
 
     const opiumFeesAfter = await core.getReservesVaultBalance(
       protocolAddresses.protocolExecutionReserveClaimer,
@@ -268,8 +298,21 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
         pickError(semanticErrors.ERROR_CORE_PROTOCOL_POSITION_CANCELLATION_PAUSED),
       );
     } catch (error) {
-      //@ts-ignore
-      expect(error.message).to.include(pickError(semanticErrors.ERROR_CORE_CANT_CANCEL_DUMMY_ORACLE_ID));
+      expect((error as Error).message).to.include(pickError(semanticErrors.ERROR_CORE_CANT_CANCEL_DUMMY_ORACLE_ID));
     }
+  },
+  toBeSyncWithRegistryState: async (registry: Registry) => {
+    const registryAddresses = await registry.getProtocolAddresses();
+    const registryProtocolParameters = await registry.getProtocolParameters();
+
+    expect(await core.getRegistry(), "wrong Core.registry").to.be.eq(registry.address);
+    expect(
+      await core.getProtocolAddresses(),
+      `Opium.Core's protocol addresses out of sync with Opium.Registry`,
+    ).to.be.deep.eq(registryAddresses);
+    expect(
+      await core.getProtocolParametersArgs(),
+      `Opium.Core's protocol parameters out of sync with Opium.Registry`,
+    ).to.be.deep.eq(registryProtocolParameters);
   },
 });

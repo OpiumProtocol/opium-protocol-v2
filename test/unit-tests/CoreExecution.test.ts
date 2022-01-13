@@ -13,7 +13,7 @@ import {
   calculateTotalGrossPayout,
   EPayout,
 } from "../../utils/derivatives";
-import { toBN } from "../../utils/bn";
+import { cast, toBN } from "../../utils/bn";
 import setup from "../__fixtures__";
 import {
   Core,
@@ -348,6 +348,12 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
     const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
+
+    expect(
+      await core.getDerivativePayouts(getDerivativeHash(fullMarginOption.derivative)),
+      "wrong cached payouts",
+    ).to.be.deep.eq([cast(0), cast(0)]);
+
     const amount = fullMarginOption.amount.sub(toBN("1"));
     await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, amount);
     await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, amount);
@@ -392,6 +398,11 @@ describe("CoreExecution", () => {
       sellerFees.totalFee,
       EPayout.SELLER,
     );
+
+    expect(
+      await core.getDerivativePayouts(getDerivativeHash(fullMarginOption.derivative)),
+      "wrong cached payouts",
+    ).to.be.deep.eq([buyerPayoutRatio, sellerPayoutRatio]);
     expect(buyerBalanceAfter, "wrong buyer").to.be.equal(buyerBalanceBefore.add(buyerNetPayout));
 
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
@@ -612,9 +623,9 @@ describe("CoreExecution", () => {
     );
 
     const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    const sellerBalanceAfter = await testToken.balanceOf(seller.address);
 
     expect(buyerBalanceAfter, "wrong buyer balance").to.be.equal(buyerBalanceBefore.add(buyerNetPayout));
-    const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     expect(sellerBalanceAfter, "wrong seller balance").to.be.equal(sellerBalanceBefore.add(sellerNetPayout));
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
   });

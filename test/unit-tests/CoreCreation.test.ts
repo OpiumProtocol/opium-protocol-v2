@@ -16,8 +16,16 @@ import { pickError } from "../../utils/misc";
 import { semanticErrors } from "../../utils/constants";
 // types
 import { Core, OpiumPositionToken } from "../../typechain";
+import { shouldBehaveLikeCore } from "../Core.behavior";
 
 describe("CoreCreation", () => {
+  it("is in sync with Registry", async () => {
+    const {
+      contracts: { core, registry },
+    } = await setup();
+    await shouldBehaveLikeCore(core).toBeSyncWithRegistryState(registry);
+  });
+
   it(`should revert create OptionCall derivative with SYNTHETIC_AGGREGATOR:WRONG_MARGIN`, async () => {
     try {
       const {
