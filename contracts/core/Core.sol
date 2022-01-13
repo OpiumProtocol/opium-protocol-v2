@@ -600,25 +600,28 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             emit LogDerivativeHashCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
 
-        uint256[2] memory margins;
-        // Get cached margin required according to logic from Opium.SyntheticAggregator
-        // margins[0] - buyerMargin
-        // margins[1] - sellerMargin
-        (margins[0], margins[1]) = protocolAddressesArgs.syntheticAggregator.getMargin(
-            opiumPositionTokenParams.derivativeHash,
-            opiumPositionTokenParams.derivative
-        );
-
         uint256 payout;
         // Check if `_positionsAddresses` is a LONG position
         if (opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
+            // Get cached margin required according to logic from Opium.SyntheticAggregator
+            // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
+            (uint256 buyerMargin, ) = protocolAddressesArgs.syntheticAggregator.getMargin(
+                opiumPositionTokenParams.derivativeHash,
+                opiumPositionTokenParams.derivative
+            );
             // Set payout to buyerPayout
-            payout = margins[0].mulWithPrecisionFactor(_amount);
+            payout = buyerMargin.mulWithPrecisionFactor(_amount);
 
             // Check if `positionAddress` is a SHORT position
         } else {
+            // Get cached margin required according to logic from Opium.SyntheticAggregator
+            // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
+            (, uint256 sellerMargin) = protocolAddressesArgs.syntheticAggregator.getMargin(
+                opiumPositionTokenParams.derivativeHash,
+                opiumPositionTokenParams.derivative
+            );
             // Set payout to sellerPayout
-            payout = margins[1].mulWithPrecisionFactor(_amount);
+            payout = sellerMargin.mulWithPrecisionFactor(_amount);
         }
 
         // Burn cancelled position tokens
