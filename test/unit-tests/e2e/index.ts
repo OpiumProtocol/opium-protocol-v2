@@ -13,6 +13,7 @@ import {
   OptionController,
   Registry,
   TestToken,
+  ChainlinkOracleSubId,
 } from "../../../typechain";
 import { TDerivative } from "../../../types";
 import { timeTravel } from "../../../utils/evm";
@@ -25,6 +26,7 @@ describe("e2e", () => {
   let testToken: TestToken;
   let optionCallMock: OptionCallSyntheticIdMock;
   let optionController: OptionController;
+  let chainlinkOracleSubId: ChainlinkOracleSubId;
   let derivative: TDerivative;
 
   const amount = toBN("2");
@@ -37,6 +39,9 @@ describe("e2e", () => {
     const OptionController = await ethers.getContractFactory("OptionController");
     optionController = <OptionController>await OptionController.deploy(registry.address);
     optionController = <OptionController>await optionController.deployed();
+    const ChainlinkOracleSubId = await ethers.getContractFactory("ChainlinkOracleSubId");
+    chainlinkOracleSubId = <ChainlinkOracleSubId>await ChainlinkOracleSubId.deploy(registry.address);
+    chainlinkOracleSubId = <ChainlinkOracleSubId>await chainlinkOracleSubId.deployed();
 
     derivative = derivativeFactory({
       margin: toBN("30"),
@@ -44,6 +49,7 @@ describe("e2e", () => {
       params: [toBN("200")],
       syntheticId: optionCallMock.address,
       token: testToken.address,
+      oracleId: chainlinkOracleSubId.address,
     });
 
     await optionCallMock.allowThirdpartyExecution(true);
@@ -73,6 +79,8 @@ describe("e2e", () => {
 
   it("executes 1 SHORT and 2 LONG and returns the initially allocated collateral", async () => {
     await timeTravel(derivative.endTime + 100);
+    await chainlinkOracleSubId.triggerCallback(derivative.endTime);
+
     const testTokenBalanceBefore = await testToken.balanceOf(users.deployer.address);
 
     await optionController.executeShort(toBN("1"));
@@ -95,4 +103,3 @@ describe("e2e", () => {
     );
   });
 });
-

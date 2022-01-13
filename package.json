@@ -77,6 +77,7 @@
     "prettier:check": "prettier --check --config ./.prettierrc \"**/*.{js,json,md,sol,ts}\""
   },
   "dependencies": {
+    "@chainlink/contracts": "^0.3.1",
     "@openzeppelin/contracts-upgradeable": "^4.3.0",
     "@openzeppelin/hardhat-upgrades": "^1.10.0",
     "async": "^3.2.1",
