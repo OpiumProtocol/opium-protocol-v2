@@ -490,7 +490,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 totalMargin = (syntheticCache.buyerMargin + syntheticCache.sellerMargin).mulWithPrecisionFactor(
             _amount
         );
-        uint256 reserves = _getReserves(
+        uint256 reserves = _computeReserves(
             syntheticCache.authorAddress,
             shortOpiumPositionTokenParams.derivative.token,
             protocolAddressesArgs.protocolRedemptionReserveClaimer,
@@ -548,7 +548,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
 
         // Returns payout for all positions
-        uint256 payout = _getPayout(
+        uint256 payout = _computePayout(
             opiumPositionTokenParams,
             _amount,
             protocolAddressesArgs.syntheticAggregator,
@@ -641,13 +641,13 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _syntheticAggregator interface/address of `Opium SyntheticAggregator.sol`
     /// @param _oracleAggregator interface/address of `Opium OracleAggregator.sol`
     /// @return payout uint256 representing the net payout (gross payout - reserves) of the executed amount of positions
-    function _getPayout(
+    function _computePayout(
         IOpiumPositionToken.OpiumPositionTokenParams memory _opiumPositionTokenParams,
         uint256 _amount,
         ISyntheticAggregator _syntheticAggregator,
         IOracleAggregator _oracleAggregator
     ) private returns (uint256 payout) {
-        /// if the derivativePayout tuple's items (buyer payout and seller payout) are 0, it assumes it's the first time the _getPayout function is being executed, hence it fetches the payouts from the syntheticId and caches them.
+        /// if the derivativePayout tuple's items (buyer payout and seller payout) are 0, it assumes it's the first time the _computePayout function is being executed, hence it fetches the payouts from the syntheticId and caches them.
         (uint256 buyerPayoutRatio, uint256 sellerPayoutRatio) = _getDerivativePayouts(
             _opiumPositionTokenParams.derivativeHash
         ); // gas saving
@@ -697,7 +697,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (payout > positionMargin) {
             payout =
                 payout -
-                _getReserves(
+                _computeReserves(
                     syntheticCache.authorAddress,
                     _opiumPositionTokenParams.derivative.token,
                     protocolAddressesArgs.protocolExecutionReserveClaimer,
@@ -716,7 +716,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _protocolReservePercentage uint256 portion of the reserves that is being distributed to `_protocolReserveReceiver`
     /// @param _initialAmount uint256 the amount from which the reserves will be detracted
     /// @return totalReserve uint256 total reserves being calculated which corresponds to the sum of the reserves distributed to the derivative author and the designated recipient
-    function _getReserves(
+    function _computeReserves(
         address _derivativeAuthorAddress,
         address _tokenAddress,
         address _protocolReserveReceiver,
