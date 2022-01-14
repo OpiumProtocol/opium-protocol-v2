@@ -187,8 +187,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _amount,
         address[2] calldata _positionsOwners
     ) external nonReentrant {
-        bytes32 derivativeHash = _derivative.getDerivativeHash();
-        _create(_derivative, derivativeHash, _amount, _positionsOwners);
+        _create(_derivative, _derivative.getDerivativeHash(), _amount, _positionsOwners);
     }
 
     /// @notice It can either 1) deploy AND mint 2) only mint.
@@ -222,8 +221,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (!isLongDeployed) {
             _create(_derivative, derivativeHash, _amount, _positionsOwners);
         } else {
-            address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
-            _mint(_amount, _positionsAddress, _positionsOwners);
+            _mint(_amount, [longPositionTokenAddress, shortPositionTokenAddress], _positionsOwners);
         }
     }
 
