@@ -8,7 +8,7 @@ import "../../../interfaces/IOracleAggregator.sol";
 
 contract ChainlinkOracleSubId {
     event LogDataProvision(address _from, address _to, uint256 _timestamp, uint256 _data);
-    // AAVE/ETH price feed (8 decimals)
+    // AAVE/ETH price feed (18 decimals)
     AggregatorV3Interface private constant priceFeed =
         AggregatorV3Interface(0x6Df09E975c830ECae5bd4eD9d90f3A95a4f88012);
     // Opium Protocol Registry

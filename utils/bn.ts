@@ -9,7 +9,7 @@ export const fromBN = (value: BigNumber): string => {
   return ethers.utils.formatEther(value);
 };
 
-export const cast = (x: number | BigNumber): BigNumber => {
+export const cast = (x: number | BigNumber | string): BigNumber => {
   return BigNumber.from(x);
 };
 
