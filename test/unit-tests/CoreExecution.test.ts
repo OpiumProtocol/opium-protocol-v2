@@ -17,6 +17,7 @@ import { cast, toBN } from "../../utils/bn";
 import setup from "../__fixtures__";
 import {
   Core,
+  MaliciousTestToken,
   OpiumPositionToken,
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
@@ -40,7 +41,6 @@ import {
   executeMany,
   cancelOne,
   executeManyWithAddress,
-  cancelMany,
 } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { pickError } from "../../utils/misc";
@@ -54,6 +54,7 @@ describe("CoreExecution", () => {
     delayedDataOption: ICreatedDerivativeOrder;
 
   let testToken: TestToken,
+    maliciousTestToken: MaliciousTestToken,
     core: Core,
     optionCallMock: OptionCallSyntheticIdMock,
     oracleAggregator: OracleAggregator,
@@ -65,7 +66,16 @@ describe("CoreExecution", () => {
 
   before(async () => {
     ({
-      contracts: { core, testToken, tokenSpender, testToken, oracleAggregator, opiumProxyFactory, registry },
+      contracts: {
+        core,
+        testToken,
+        tokenSpender,
+        testToken,
+        maliciousTestToken,
+        oracleAggregator,
+        opiumProxyFactory,
+        registry,
+      },
       users,
     } = await setup());
     const { buyer, seller, oracle, author } = users;
@@ -459,19 +469,28 @@ describe("CoreExecution", () => {
     expect(authorFeesAfter, "wrong author fee").to.be.equal(authorFeesBefore.add(fees.authorFee));
   });
 
-  // it("should revert execution of invalid tokenId with Transaction reverted: function was called with incorrect parameters", async () => {
-  //   // TODO: error does not exist, needs to be changed
-  //   const { buyer } = users;
-  // USE UNKNOWN ADDRESS!
-  // CHECK THAT IT IS AN ADDRESS FROM OPIUM PROXY FACTORY !
-  //   try {
-  //     // wrong enum value
-  //     await core.connect(buyer)[executeOne](2, 1, fullMarginOption.derivative);
-  //   } catch (error) {
-  //     const { message } = error as Error;
-  //     expect(message).to.include("Transaction reverted: function was called with incorrect parameters");
-  //   }
-  // });
+  it("should revert execution if the provided position token does not implement the expected OpiumPositionToken ABI", async () => {
+    // TODO: error does not exist, needs to be changed
+    const { buyer } = users;
+    try {
+      await core.connect(buyer)[executeOne](testToken.address, toBN("1"));
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include(
+        "Transaction reverted: function selector was not recognized and there's no fallback function",
+      );
+    }
+  });
+
+  it("should revert execution if the provided position token was not deployed by the OpiumProxyFactory", async () => {
+    const { buyer } = users;
+    try {
+      await core.connect(buyer)[executeOne](maliciousTestToken.address, toBN("1"));
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include(pickError(semanticErrors.ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS));
+    }
+  });
 
   it("should execute over margin option", async () => {
     const { deployer, buyer, seller, author } = users;
@@ -663,17 +682,6 @@ describe("CoreExecution", () => {
 
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(fees.protocolFee));
   });
-
-  // it("should revert cancellation with CORE:CANCELLATION_IS_NOT_ALLOWED", async () => {
-  //   const { buyer } = users;
-
-  //   try {
-  //     await core.connect(buyer)[cancelOne](1, noDataOption.amount, noDataOption.derivative);
-  //   } catch (error) {
-  //     const { message } = error as Error;
-  //     expect(message).to.include("CORE:CANCELLATION_IS_NOT_ALLOWED");
-  //   }
-  // });
 
   it("should revert execution with ORACLE_AGGREGATOR:DATA_DOESNT_EXIST", async () => {
     const { buyer } = users;
