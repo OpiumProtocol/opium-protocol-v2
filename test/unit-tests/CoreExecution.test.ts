@@ -26,7 +26,7 @@ import {
   TestToken,
   TokenSpender,
 } from "../../typechain";
-import { timeTravel } from "../../utils/evm";
+import { resetNetwork, timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
 import {
   SECONDS_10_MINS,
@@ -41,9 +41,15 @@ import {
   executeMany,
   cancelOne,
   executeManyWithAddress,
+  customDerivativeName,
 } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { pickError } from "../../utils/misc";
+import {
+  generateExpectedOpiumPositionTokenName,
+  generateExpectedOpiumPositionTokenSymbol,
+  generateRandomDerivativeSetup,
+} from "../../utils/testCaseGenerator";
 
 describe("CoreExecution", () => {
   let fullMarginOption: ICreatedDerivativeOrder,
@@ -63,6 +69,10 @@ describe("CoreExecution", () => {
     registry: Registry;
 
   let users: TNamedSigners;
+
+  before(async () => {
+    await resetNetwork();
+  });
 
   before(async () => {
     ({
@@ -359,10 +369,15 @@ describe("CoreExecution", () => {
     const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
     const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
 
+    expect(await core.getDerivativePayouts(fullMarginOption.hash), "wrong cached payouts").to.be.deep.eq([
+      cast(0),
+      cast(0),
+    ]);
+
     expect(
-      await core.getDerivativePayouts(getDerivativeHash(fullMarginOption.derivative)),
-      "wrong cached payouts",
-    ).to.be.deep.eq([cast(0), cast(0)]);
+      await core.getP2pDerivativeVaultFunds(fullMarginOption.hash),
+      `wrong p2p derivative vault's value before execution`,
+    ).to.be.eq(fullMarginOption.derivative.margin.mul(fullMarginOption.amount).div(toBN("1")));
 
     const amount = fullMarginOption.amount.sub(toBN("1"));
     await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, amount);
@@ -421,8 +436,13 @@ describe("CoreExecution", () => {
     const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
     const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
-    //precision issues, fix it
-    // expect(authorFeesAfter, 'wrong author fee').to.be.equal(authorFeesBefore.add(fees.authorFee));
+    expect(authorFeesAfter, "wrong author fee").to.be.equal(
+      authorFeesBefore.add(buyerFees.authorFee).add(sellerFees.authorFee),
+    );
+    expect(
+      await core.getP2pDerivativeVaultFunds(fullMarginOption.hash),
+      `wrong p2p derivative vault's value after execution`,
+    ).to.be.eq(fullMarginOption.derivative.margin.mul(fullMarginOption.amount.sub(toBN("2")).div(toBN("1"))));
   });
 
   it("should revert execution before endTime with CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED", async () => {
@@ -499,12 +519,52 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
     const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    expect(
+      await core.getP2pDerivativeVaultFunds(overMarginOption.hash),
+      `wrong p2p derivative vault's value before execution`,
+    ).to.be.eq(overMarginOption.derivative.margin.mul(overMarginOption.amount).div(toBN("1")));
 
     const longPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", overMarginOption.longPositionAddress)
     );
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", overMarginOption.shortPositionAddress)
+    );
+
+    const shortPositionTokenData = await shortPositionERC20.getPositionTokenData();
+    const longPositionTokenData = await longPositionERC20.getPositionTokenData();
+
+    expect(await shortPositionERC20.name(), "wrong ERC20 SHORT name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        shortPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        false,
+      ),
+    );
+    expect(await shortPositionERC20.symbol(), "wrong ERC20 SHORT symbol ").to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        shortPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        false,
+      ),
+    );
+    expect(await longPositionERC20.name(), "wrong ERC20 LONG name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        longPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        true,
+      ),
+    );
+    expect(await longPositionERC20.symbol(), "wrong ERC20 LONG symbol").to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        longPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        true,
+      ),
     );
 
     await core.connect(buyer)[executeOne](overMarginOption.longPositionAddress, overMarginOption.amount);
@@ -572,8 +632,15 @@ describe("CoreExecution", () => {
 
     const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
+
     const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
-    // expect(authorFeesAfter, 'wrong author fee').to.be.equal(authorFeesBefore.add(fees.authorFee));
+    expect(authorFeesAfter, "wrong author fee").to.be.equal(
+      authorFeesBefore.add(buyerFees.authorFee).add(sellerFees.authorFee),
+    );
+    expect(
+      await core.getP2pDerivativeVaultFunds(fullMarginOption.hash),
+      `wrong p2p derivative vault's value after execution`,
+    ).to.be.eq(0);
   });
 
   it("should execute under margin option", async () => {

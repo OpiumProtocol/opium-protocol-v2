@@ -15,17 +15,29 @@ import {
   createValidDerivativeExpiry,
 } from "../utils/derivatives";
 // types
-import { Core, OpiumPositionToken, OpiumProxyFactory, Registry, TestToken, TokenSpender } from "../typechain";
+import {
+  Core,
+  IDerivativeLogic,
+  OpiumPositionToken,
+  OpiumProxyFactory,
+  OracleAggregator,
+  Registry,
+  TestToken,
+  TokenSpender,
+} from "../typechain";
 import { timeTravel } from "../utils/evm";
 import { TDerivative, TDerivativeOrder } from "../types";
 import { cast, toBN } from "../utils/bn";
-import { cancelOne, executeOne, redeemOne, semanticErrors } from "../utils/constants";
+import { cancelOne, customDerivativeName, executeOne, redeemOne, semanticErrors } from "../utils/constants";
 import { pickError } from "../utils/misc";
+import {
+  generateExpectedOpiumPositionTokenName,
+  generateExpectedOpiumPositionTokenSymbol,
+} from "../utils/testCaseGenerator";
 
 export enum EPositionCreation {
   CREATE = "CREATE",
   CREATE_AND_MINT = "CREATE_AND_MINT",
-  MINT = "MINT",
 }
 
 export enum ECoreActions {
@@ -36,22 +48,9 @@ export enum ECoreActions {
   CLAIM_RESERVE = "CLAIM_RESERVE",
 }
 
-type TRegistryAddresses = {
-  core: string;
-  opiumProxyFactory: string;
-  oracleAggregator: string;
-  syntheticAggregator: string;
-  tokenSpender: string;
-  protocolExecutionReserveClaimer: string;
-  protocolRedemptionReserveClaimer: string;
-};
-
-type TRegistryProtocolParameters = {
-  noDataCancellationPeriod: number;
-  derivativeAuthorExecutionFeeCap: number;
-  derivativeAuthorRedemptionReservePart: number;
-  protocolExecutionReservePart: number;
-  protocolRedemptionReservePart: number;
+type TCorePositionCreationSignatures = {
+  [EPositionCreation.CREATE]: "create";
+  [EPositionCreation.CREATE_AND_MINT]: "createAndMint";
 };
 
 export type TShouldBehaveLikeCore = {
@@ -60,7 +59,6 @@ export type TShouldBehaveLikeCore = {
     testToken: TestToken,
     tokenSpender: TokenSpender,
     opiumProxyFactory: OpiumProxyFactory,
-    syntheticContract: Contract,
     oracleCallback: () => Promise<void>,
     seller: SignerWithAddress,
     buyer: SignerWithAddress,
@@ -95,7 +93,6 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
     testToken: TestToken,
     tokenSpender: TokenSpender,
     opiumProxyFactory: OpiumProxyFactory,
-    syntheticContract: Contract,
     oracleCallback: () => Promise<void>,
     seller: SignerWithAddress,
     buyer: SignerWithAddress,
@@ -106,7 +103,6 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
     await testToken.mint(seller.address, derivative.margin.mul(2).mul(amount).div("1"));
 
     const expectedDerivativeHash = getDerivativeHash(derivative);
-
     const marginBalanceBefore = await testToken.balanceOf(seller.address);
 
     expect(
@@ -116,10 +112,14 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
 
     const totalDerivativeMargin = computeDerivativeMargin(derivative.margin, amount);
     await testToken.connect(seller).approve(tokenSpender.address, totalDerivativeMargin);
-    const tx =
-      operationType === EPositionCreation.CREATE
-        ? await core.connect(seller).create(derivative, amount, [buyer.address, seller.address])
-        : await core.connect(seller).createAndMint(derivative, amount, [buyer.address, seller.address]);
+
+    const operationSignature: TCorePositionCreationSignatures = {
+      [EPositionCreation.CREATE]: "create",
+      [EPositionCreation.CREATE_AND_MINT]: "createAndMint",
+    };
+    const tx = await core
+      .connect(seller)
+      [operationSignature[operationType]](derivative, amount, [buyer.address, seller.address]);
     const receipt = await tx.wait();
 
     const [longPositionAddress, shortPositionAddress] = retrievePositionTokensAddresses(opiumProxyFactory, receipt);
@@ -147,6 +147,44 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
     );
     const longPositionERC20 = <OpiumPositionToken>await ethers.getContractAt("OpiumPositionToken", longPositionAddress);
 
+    const shortPositionTokenData = await shortPositionERC20.getPositionTokenData();
+    const longPositionTokenData = await longPositionERC20.getPositionTokenData();
+
+    const syntheticContract = <IDerivativeLogic>await ethers.getContractAt("IDerivativeLogic", derivative.syntheticId);
+
+    expect(await shortPositionERC20.name(), "wrong ERC20 SHORT name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        shortPositionTokenData.derivative.endTime.toNumber(),
+        await syntheticContract.getSyntheticIdName(),
+        expectedDerivativeHash,
+        false,
+      ),
+    );
+    expect(await shortPositionERC20.symbol(), "wrong ERC20 SHORT symbol ").to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        shortPositionTokenData.derivative.endTime.toNumber(),
+        await syntheticContract.getSyntheticIdName(),
+        expectedDerivativeHash,
+        false,
+      ),
+    );
+    expect(await longPositionERC20.name(), "wrong ERC20 LONG name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        longPositionTokenData.derivative.endTime.toNumber(),
+        await syntheticContract.getSyntheticIdName(),
+        expectedDerivativeHash,
+        true,
+      ),
+    );
+    expect(await longPositionERC20.symbol(), "wrong ERC20 LONG symbol").to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        longPositionTokenData.derivative.endTime.toNumber(),
+        await syntheticContract.getSyntheticIdName(),
+        expectedDerivativeHash,
+        true,
+      ),
+    );
+
     const marginBalanceAfter = await testToken.balanceOf(seller.address);
     const buyerPositionsLongBalance = await longPositionERC20.balanceOf(buyer.address);
     const buyerPositionsShortBalance = await shortPositionERC20.balanceOf(buyer.address);
@@ -159,10 +197,25 @@ export const shouldBehaveLikeCore = (core: Core): TShouldBehaveLikeCore => ({
     expect(sellerPositionsLongBalance, "wrong seller long balance").to.equal(0);
     expect(sellerPositionsShortBalance, "wrong seller short balance").to.equal(amount);
 
-    await timeTravel(derivative.endTime + 10);
-    await oracleCallback();
     const protocolAddresses = await registry.getProtocolAddresses();
     const derivativeAuthorAddress = await syntheticContract.getAuthorAddress();
+    const oracleAggregator = <OracleAggregator>(
+      await ethers.getContractAt("OracleAggregator", protocolAddresses.oracleAggregator)
+    );
+    expect(
+      await oracleAggregator.hasData(derivative.oracleId, derivative.endTime),
+      "unexpected data in OracleAggregator",
+    ).to.be.false;
+    await timeTravel(derivative.endTime + 10);
+    await oracleCallback();
+    expect(
+      await oracleAggregator.hasData(derivative.oracleId, derivative.endTime),
+      "unexpected `OracleAggregator.hasData()`",
+    ).to.be.true;
+    expect(
+      await oracleAggregator.getData(derivative.oracleId, derivative.endTime),
+      "unexpected `OracleAggregator.hasData()`",
+    ).to.be.eq(optionOrder.price);
 
     const buyerBalanceBefore = await testToken.balanceOf(buyer.address);
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);

@@ -1,7 +1,9 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
-import { BigNumber, ContractTransaction } from "ethers";
-import { Core } from "../../typechain";
+import { BigNumber, Contract, ContractTransaction } from "ethers";
+import { ethers } from "hardhat";
+import { Core, IERC20 } from "../../typechain";
 import { TDerivative } from "../../types";
+import { computeDerivativeMargin } from "../derivatives";
 
 class CoreContract {
   private _core: Core;
@@ -14,8 +16,11 @@ class CoreContract {
     _derivative: TDerivative,
     _amount: BigNumber,
     _positionsOwners: [string, string],
+    _marginToken: IERC20,
     _caller?: SignerWithAddress,
   ): Promise<ContractTransaction> {
+    const tokenSpenderAddress = await this._core.getProtocolAddresses()
+    await _marginToken.connect(_caller || this._deployer).approve(tokenSpenderAddress.tokenSpender,computeDerivativeMargin(_derivative.margin, _amount));
     return this._core.connect(_caller || this._deployer).create(_derivative, _amount, _positionsOwners);
   }
   public async createAndMint(
