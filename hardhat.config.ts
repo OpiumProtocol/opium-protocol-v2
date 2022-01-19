@@ -59,6 +59,12 @@ const chainIds = {
   bscMainnet: 56,
 };
 
+// it can either be `fork` or `local`
+export const hardhatNetworkEnvironment = process.env.HARDHAT_NETWORK_ENVIRONMENT;
+if (!hardhatNetworkEnvironment) {
+  throw new Error("Please set your HARDHAT_NETWORK_ENVIRONMENT in a .env file");
+}
+
 const mnemonic = process.env.MNEMONIC;
 if (!mnemonic) {
   throw new Error("Please set your MNEMONIC in a .env file");
@@ -67,12 +73,6 @@ if (!mnemonic) {
 const infuraApiKey = process.env.INFURA_API_KEY;
 if (!infuraApiKey) {
   throw new Error("Please set your INFURA_API_KEY in a .env file");
-}
-
-// it can either be `fork` or `local`
-const hardhatNetworkEnvironment = process.env.HARDHAT_NETWORK_ENVIRONMENT;
-if (!hardhatNetworkEnvironment) {
-  throw new Error("Please set your HARDHAT_NETWORK_ENVIRONMENT in a .env file");
 }
 
 const createInfuraUrl = (network: keyof typeof chainIds): string => {
