@@ -27,6 +27,7 @@ jobs:
           envkey_POLYGON_MAINNET_ENDPOINT: "abc"
           envkey_INFURA_API_KEY: "abc"
           envkey_MNEMONIC: "test test test test test test test test test test test junk"
+          envkey_HARDHAT_NETWORK_ENVIRONMENT: "local"
           directory: .
           file_name: .env
 
