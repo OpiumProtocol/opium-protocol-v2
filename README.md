@@ -67,4 +67,4 @@ yarn test
 
 ## Contract docs
 
-See the [core contracts documentation here](https://github.com/OpiumProtocol/opium-protocol-v2/tree/feature/development/docs/contracts)
+See the [core contracts documentation here](https://github.com/OpiumProtocol/opium-protocol-v2/tree/main/docs/contracts)
