@@ -11,6 +11,7 @@ import {
   calculateTotalGrossPayout,
   EPayout,
   calculateTotalNetPayout,
+  createValidDerivativeExpiry,
 } from "../../utils/derivatives";
 import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";
@@ -24,13 +25,12 @@ import {
   TestToken,
   TokenSpender,
 } from "../../typechain";
-import { timeTravel } from "../../utils/evm";
+import { resetNetwork, timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
 import { executeOne, SECONDS_40_MINS } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 
 describe("Core with fractional quantities", () => {
-  const endTime = ~~(Date.now() / 1000) + SECONDS_40_MINS; // Now + 40 mins
   let fullMarginOption: ICreatedDerivativeOrder,
     testToken: TestToken,
     testTokenSixDecimals: TestToken,
@@ -42,6 +42,10 @@ describe("Core with fractional quantities", () => {
     registry: Registry;
 
   let users: TNamedSigners;
+
+  before(async () => {
+    await resetNetwork();
+  });
 
   before(async () => {
     ({
@@ -63,7 +67,7 @@ describe("Core with fractional quantities", () => {
     // Full margin option
     const fullMarginOptionDerivative = derivativeFactory({
       margin: ethers.utils.parseUnits("1.2", 18),
-      endTime: ~~(Date.now() / 1000) + SECONDS_40_MINS, // Now + 40 mins
+      endTime: await createValidDerivativeExpiry(2), // Now + 1 day
       params: [
         toBN("200"), // Strike Price 200.00$
       ],
@@ -106,7 +110,7 @@ describe("Core with fractional quantities", () => {
     const amount = toBN("0.2");
     const optionCall = derivativeFactory({
       margin: toBN("0.03"),
-      endTime,
+      endTime: await createValidDerivativeExpiry(2),
       params: [
         toBN("20000"), // Strike Price 200.00$
       ],
@@ -146,7 +150,7 @@ describe("Core with fractional quantities", () => {
   it("should execute full margin option", async () => {
     const { deployer, buyer, seller, author } = users;
 
-    await timeTravel(SECONDS_40_MINS);
+    await timeTravel(fullMarginOption.derivative.endTime + 100);
     const buyerBalanceBefore = await testTokenSixDecimals.balanceOf(buyer.address);
 
     const sellerBalanceBefore = await testTokenSixDecimals.balanceOf(seller.address);

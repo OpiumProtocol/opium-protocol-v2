@@ -13,10 +13,11 @@ import {
   calculateTotalGrossPayout,
   EPayout,
 } from "../../utils/derivatives";
-import { toBN } from "../../utils/bn";
+import { cast, toBN } from "../../utils/bn";
 import setup from "../__fixtures__";
 import {
   Core,
+  MaliciousTestToken,
   OpiumPositionToken,
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
@@ -25,7 +26,7 @@ import {
   TestToken,
   TokenSpender,
 } from "../../typechain";
-import { timeTravel } from "../../utils/evm";
+import { resetNetwork, timeTravel } from "../../utils/evm";
 import { TNamedSigners, ICreatedDerivativeOrder } from "../../types";
 import {
   SECONDS_10_MINS,
@@ -40,10 +41,15 @@ import {
   executeMany,
   cancelOne,
   executeManyWithAddress,
-  cancelMany,
+  customDerivativeName,
 } from "../../utils/constants";
 import { retrievePositionTokensAddresses } from "../../utils/events";
 import { pickError } from "../../utils/misc";
+import {
+  generateExpectedOpiumPositionTokenName,
+  generateExpectedOpiumPositionTokenSymbol,
+  generateRandomDerivativeSetup,
+} from "../../utils/testCaseGenerator";
 
 describe("CoreExecution", () => {
   let fullMarginOption: ICreatedDerivativeOrder,
@@ -54,6 +60,7 @@ describe("CoreExecution", () => {
     delayedDataOption: ICreatedDerivativeOrder;
 
   let testToken: TestToken,
+    maliciousTestToken: MaliciousTestToken,
     core: Core,
     optionCallMock: OptionCallSyntheticIdMock,
     oracleAggregator: OracleAggregator,
@@ -64,8 +71,21 @@ describe("CoreExecution", () => {
   let users: TNamedSigners;
 
   before(async () => {
+    await resetNetwork();
+  });
+
+  before(async () => {
     ({
-      contracts: { core, testToken, tokenSpender, testToken, oracleAggregator, opiumProxyFactory, registry },
+      contracts: {
+        core,
+        testToken,
+        tokenSpender,
+        testToken,
+        maliciousTestToken,
+        oracleAggregator,
+        opiumProxyFactory,
+        registry,
+      },
       users,
     } = await setup());
     const { buyer, seller, oracle, author } = users;
@@ -348,6 +368,17 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
     const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
+
+    expect(await core.getDerivativePayouts(fullMarginOption.hash), "wrong cached payouts").to.be.deep.eq([
+      cast(0),
+      cast(0),
+    ]);
+
+    expect(
+      await core.getP2pDerivativeVaultFunds(fullMarginOption.hash),
+      `wrong p2p derivative vault's value before execution`,
+    ).to.be.eq(fullMarginOption.derivative.margin.mul(fullMarginOption.amount).div(toBN("1")));
+
     const amount = fullMarginOption.amount.sub(toBN("1"));
     await core.connect(buyer)[executeOne](fullMarginOption.longPositionAddress, amount);
     await core.connect(seller)[executeOne](fullMarginOption.shortPositionAddress, amount);
@@ -392,6 +423,11 @@ describe("CoreExecution", () => {
       sellerFees.totalFee,
       EPayout.SELLER,
     );
+
+    expect(
+      await core.getDerivativePayouts(getDerivativeHash(fullMarginOption.derivative)),
+      "wrong cached payouts",
+    ).to.be.deep.eq([buyerPayoutRatio, sellerPayoutRatio]);
     expect(buyerBalanceAfter, "wrong buyer").to.be.equal(buyerBalanceBefore.add(buyerNetPayout));
 
     const sellerBalanceAfter = await testToken.balanceOf(seller.address);
@@ -400,8 +436,13 @@ describe("CoreExecution", () => {
     const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
     const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
-    //precision issues, fix it
-    // expect(authorFeesAfter, 'wrong author fee').to.be.equal(authorFeesBefore.add(fees.authorFee));
+    expect(authorFeesAfter, "wrong author fee").to.be.equal(
+      authorFeesBefore.add(buyerFees.authorFee).add(sellerFees.authorFee),
+    );
+    expect(
+      await core.getP2pDerivativeVaultFunds(fullMarginOption.hash),
+      `wrong p2p derivative vault's value after execution`,
+    ).to.be.eq(fullMarginOption.derivative.margin.mul(fullMarginOption.amount.sub(toBN("2")).div(toBN("1"))));
   });
 
   it("should revert execution before endTime with CORE:SYNTHETIC_EXECUTION_WAS_NOT_ALLOWED", async () => {
@@ -448,19 +489,28 @@ describe("CoreExecution", () => {
     expect(authorFeesAfter, "wrong author fee").to.be.equal(authorFeesBefore.add(fees.authorFee));
   });
 
-  // it("should revert execution of invalid tokenId with Transaction reverted: function was called with incorrect parameters", async () => {
-  //   // TODO: error does not exist, needs to be changed
-  //   const { buyer } = users;
-  // USE UNKNOWN ADDRESS!
-  // CHECK THAT IT IS AN ADDRESS FROM OPIUM PROXY FACTORY !
-  //   try {
-  //     // wrong enum value
-  //     await core.connect(buyer)[executeOne](2, 1, fullMarginOption.derivative);
-  //   } catch (error) {
-  //     const { message } = error as Error;
-  //     expect(message).to.include("Transaction reverted: function was called with incorrect parameters");
-  //   }
-  // });
+  it("should revert execution if the provided position token does not implement the expected OpiumPositionToken ABI", async () => {
+    // TODO: error does not exist, needs to be changed
+    const { buyer } = users;
+    try {
+      await core.connect(buyer)[executeOne](testToken.address, toBN("1"));
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include(
+        "Transaction reverted: function selector was not recognized and there's no fallback function",
+      );
+    }
+  });
+
+  it("should revert execution if the provided position token was not deployed by the OpiumProxyFactory", async () => {
+    const { buyer } = users;
+    try {
+      await core.connect(buyer)[executeOne](maliciousTestToken.address, toBN("1"));
+    } catch (error) {
+      const { message } = error as Error;
+      expect(message).to.include(pickError(semanticErrors.ERROR_CORE_NOT_OPIUM_FACTORY_POSITIONS));
+    }
+  });
 
   it("should execute over margin option", async () => {
     const { deployer, buyer, seller, author } = users;
@@ -469,12 +519,52 @@ describe("CoreExecution", () => {
     const sellerBalanceBefore = await testToken.balanceOf(seller.address);
     const authorFeesBefore = await core.getReservesVaultBalance(author.address, testToken.address);
     const opiumFeesBefore = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    expect(
+      await core.getP2pDerivativeVaultFunds(overMarginOption.hash),
+      `wrong p2p derivative vault's value before execution`,
+    ).to.be.eq(overMarginOption.derivative.margin.mul(overMarginOption.amount).div(toBN("1")));
 
     const longPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", overMarginOption.longPositionAddress)
     );
     const shortPositionERC20 = <OpiumPositionToken>(
       await ethers.getContractAt("OpiumPositionToken", overMarginOption.shortPositionAddress)
+    );
+
+    const shortPositionTokenData = await shortPositionERC20.getPositionTokenData();
+    const longPositionTokenData = await longPositionERC20.getPositionTokenData();
+
+    expect(await shortPositionERC20.name(), "wrong ERC20 SHORT name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        shortPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        false,
+      ),
+    );
+    expect(await shortPositionERC20.symbol(), "wrong ERC20 SHORT symbol ").to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        shortPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        false,
+      ),
+    );
+    expect(await longPositionERC20.name(), "wrong ERC20 LONG name").to.be.eq(
+      generateExpectedOpiumPositionTokenName(
+        longPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        true,
+      ),
+    );
+    expect(await longPositionERC20.symbol(), "wrong ERC20 LONG symbol").to.be.eq(
+      generateExpectedOpiumPositionTokenSymbol(
+        longPositionTokenData.derivative.endTime.toNumber(),
+        customDerivativeName,
+        overMarginOption.hash,
+        true,
+      ),
     );
 
     await core.connect(buyer)[executeOne](overMarginOption.longPositionAddress, overMarginOption.amount);
@@ -542,8 +632,15 @@ describe("CoreExecution", () => {
 
     const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
+
     const authorFeesAfter = await core.getReservesVaultBalance(author.address, testToken.address);
-    // expect(authorFeesAfter, 'wrong author fee').to.be.equal(authorFeesBefore.add(fees.authorFee));
+    expect(authorFeesAfter, "wrong author fee").to.be.equal(
+      authorFeesBefore.add(buyerFees.authorFee).add(sellerFees.authorFee),
+    );
+    expect(
+      await core.getP2pDerivativeVaultFunds(fullMarginOption.hash),
+      `wrong p2p derivative vault's value after execution`,
+    ).to.be.eq(0);
   });
 
   it("should execute under margin option", async () => {
@@ -612,9 +709,9 @@ describe("CoreExecution", () => {
     );
 
     const opiumFeesAfter = await core.getReservesVaultBalance(deployer.address, testToken.address);
+    const sellerBalanceAfter = await testToken.balanceOf(seller.address);
 
     expect(buyerBalanceAfter, "wrong buyer balance").to.be.equal(buyerBalanceBefore.add(buyerNetPayout));
-    const sellerBalanceAfter = await testToken.balanceOf(seller.address);
     expect(sellerBalanceAfter, "wrong seller balance").to.be.equal(sellerBalanceBefore.add(sellerNetPayout));
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(buyerFees.protocolFee));
   });
@@ -652,17 +749,6 @@ describe("CoreExecution", () => {
 
     expect(opiumFeesAfter, "wrong protocol fee").to.be.equal(opiumFeesBefore.add(fees.protocolFee));
   });
-
-  // it("should revert cancellation with CORE:CANCELLATION_IS_NOT_ALLOWED", async () => {
-  //   const { buyer } = users;
-
-  //   try {
-  //     await core.connect(buyer)[cancelOne](1, noDataOption.amount, noDataOption.derivative);
-  //   } catch (error) {
-  //     const { message } = error as Error;
-  //     expect(message).to.include("CORE:CANCELLATION_IS_NOT_ALLOWED");
-  //   }
-  // });
 
   it("should revert execution with ORACLE_AGGREGATOR:DATA_DOESNT_EXIST", async () => {
     const { buyer } = users;

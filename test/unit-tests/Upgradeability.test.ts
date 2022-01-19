@@ -290,7 +290,6 @@ describe("Upgradeability", () => {
       testToken,
       tokenSpender,
       opiumProxyFactory,
-      optionCallMock,
       oracleCallback,
       seller,
       buyer,

@@ -1,12 +1,12 @@
 // theirs
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { ethers } from "hardhat";
 // utils
+import setup from "../__fixtures__";
 import { expect } from "../chai-setup";
 import { toBN } from "../../utils/bn";
 import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
-import setup from "../__fixtures__";
 // types and constants
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signers";
 import { TNamedSigners } from "../../types";
 import { Core, OpiumPositionToken, OpiumProxyFactory, OptionCallSyntheticIdMock } from "../../typechain";
 import { TDerivative } from "../../types";

@@ -14,19 +14,18 @@ export const shouldBehaveLikeProtocol = async (
   testToken: TestToken,
   tokenSpender: TokenSpender,
   opiumProxyFactory: OpiumProxyFactory,
-  syntheticContract: Contract,
   oracleCallback: () => Promise<void>,
   seller: SignerWithAddress,
   buyer: SignerWithAddress,
   optionOrder: TDerivativeOrder,
 ): Promise<void> => {
   await shouldBehaveLikeRegistry(registry).toHaveCorrectProtocolParameters(SECONDS_2_WEEKS, 10000, 100, 1, false);
+  await shouldBehaveLikeCore(core).toBeSyncWithRegistryState(registry);
   await shouldBehaveLikeCore(core).toCreateAndMintAndExecutePositions(
     registry,
     testToken,
     tokenSpender,
     opiumProxyFactory,
-    syntheticContract,
     oracleCallback,
     seller,
     buyer,

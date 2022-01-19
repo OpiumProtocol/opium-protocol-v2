@@ -1,12 +1,8 @@
-// theirs
-import { ethers } from "hardhat";
 // utils
 import { expect } from "../chai-setup";
 import { derivativeFactory, getDerivativeHash } from "../../utils/derivatives";
 import setup from "../__fixtures__";
 import { toBN } from "../../utils/bn";
-// types and constants
-import { TNamedSigners } from "../../types";
 
 describe("SyntheticAggregator", () => {
   it("should successfully return getMargin", async () => {
@@ -50,4 +46,23 @@ describe("SyntheticAggregator", () => {
     expect(syntheticCache.sellerMargin).to.be.equal(derivative.margin);
     expect(syntheticCache.authorCommission).to.be.equal(25);
   });
+
+    it("should successfully return a synthetic's LONG and SHORT margins from the syntheticCache", async () => {
+      const {
+        contracts: { syntheticAggregator, optionCallMock },
+      } = await setup();
+
+      const derivative = derivativeFactory({
+        margin: toBN("70"),
+        endTime: ~~(Date.now() / 1000) + 3600, // now + 1 hour
+        params: [toBN("200")],
+        syntheticId: optionCallMock.address,
+      });
+      const hash = getDerivativeHash(derivative);
+
+      const syntheticMargin = await syntheticAggregator.callStatic.getMargin(hash, derivative);
+
+      expect(syntheticMargin.buyerMargin).to.be.equal(0);
+      expect(syntheticMargin.sellerMargin).to.be.equal(derivative.margin);
+    });
 });

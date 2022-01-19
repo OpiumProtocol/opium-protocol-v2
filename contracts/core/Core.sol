@@ -87,7 +87,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     function initialize(address _registry) external initializer {
         __RegistryManager__init(_registry);
         __ReentrancyGuard_init();
-        protocolParametersArgs = registry.getProtocolParameters();
+        protocolParametersArgs = IRegistry(_registry).getProtocolParameters();
     }
 
     // ****************** EXTERNAL FUNCTIONS ******************
@@ -187,8 +187,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 _amount,
         address[2] calldata _positionsOwners
     ) external nonReentrant {
-        bytes32 derivativeHash = _derivative.getDerivativeHash();
-        _create(_derivative, derivativeHash, _amount, _positionsOwners);
+        _create(_derivative, _derivative.getDerivativeHash(), _amount, _positionsOwners);
     }
 
     /// @notice It can either 1) deploy AND mint 2) only mint.
@@ -222,8 +221,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (!isLongDeployed) {
             _create(_derivative, derivativeHash, _amount, _positionsOwners);
         } else {
-            address[2] memory _positionsAddress = [longPositionTokenAddress, shortPositionTokenAddress];
-            _mint(_amount, _positionsAddress, _positionsOwners);
+            _mint(_amount, [longPositionTokenAddress, shortPositionTokenAddress], _positionsOwners);
         }
     }
 
@@ -492,7 +490,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         uint256 totalMargin = (syntheticCache.buyerMargin + syntheticCache.sellerMargin).mulWithPrecisionFactor(
             _amount
         );
-        uint256 reserves = _getReserves(
+        uint256 reserves = _computeReserves(
             syntheticCache.authorAddress,
             shortOpiumPositionTokenParams.derivative.token,
             protocolAddressesArgs.protocolRedemptionReserveClaimer,
@@ -518,10 +516,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         emit LogRedeemed(msg.sender, shortOpiumPositionTokenParams.derivativeHash, _amount);
     }
 
-    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed positions being burned regardless of their profitability
+    /// @notice It executes the provided amount of a derivative's position owned by a given position's owner - which results in the distribution of the position's payout and related reseves if the position is profitable and in the executed position's amount being burned regardless of its profitability
     /// @param _positionOwner address Address of the owner of positions
-    /// @param _positionAddress address[] `positionAddresses` of positions that needs to be executed
-    /// @param _amount uint256 Amount of positions to execute for each `positionAddress`
+    /// @param _positionAddress address `_positionAddress` of the ERC20 OpiumPositionToken that needs to be executed
+    /// @param _amount uint256 Amount of position to execute for the provided `positionAddress`
     function _execute(
         address _positionOwner,
         address _positionAddress,
@@ -550,7 +548,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
 
         // Returns payout for all positions
-        uint256 payout = _getPayout(
+        uint256 payout = _computePayout(
             opiumPositionTokenParams,
             _amount,
             protocolAddressesArgs.syntheticAggregator,
@@ -600,25 +598,28 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             emit LogDerivativeHashCancelled(msg.sender, opiumPositionTokenParams.derivativeHash);
         }
 
-        uint256[2] memory margins;
-        // Get cached margin required according to logic from Opium.SyntheticAggregator
-        // margins[0] - buyerMargin
-        // margins[1] - sellerMargin
-        (margins[0], margins[1]) = protocolAddressesArgs.syntheticAggregator.getMargin(
-            opiumPositionTokenParams.derivativeHash,
-            opiumPositionTokenParams.derivative
-        );
-
         uint256 payout;
         // Check if `_positionsAddresses` is a LONG position
         if (opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
+            // Get cached margin required according to logic from Opium.SyntheticAggregator
+            // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
+            (uint256 buyerMargin, ) = protocolAddressesArgs.syntheticAggregator.getMargin(
+                opiumPositionTokenParams.derivativeHash,
+                opiumPositionTokenParams.derivative
+            );
             // Set payout to buyerPayout
-            payout = margins[0].mulWithPrecisionFactor(_amount);
+            payout = buyerMargin.mulWithPrecisionFactor(_amount);
 
             // Check if `positionAddress` is a SHORT position
         } else {
+            // Get cached margin required according to logic from Opium.SyntheticAggregator
+            // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
+            (, uint256 sellerMargin) = protocolAddressesArgs.syntheticAggregator.getMargin(
+                opiumPositionTokenParams.derivativeHash,
+                opiumPositionTokenParams.derivative
+            );
             // Set payout to sellerPayout
-            payout = margins[1].mulWithPrecisionFactor(_amount);
+            payout = sellerMargin.mulWithPrecisionFactor(_amount);
         }
 
         // Burn cancelled position tokens
@@ -640,17 +641,17 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _syntheticAggregator interface/address of `Opium SyntheticAggregator.sol`
     /// @param _oracleAggregator interface/address of `Opium OracleAggregator.sol`
     /// @return payout uint256 representing the net payout (gross payout - reserves) of the executed amount of positions
-    function _getPayout(
+    function _computePayout(
         IOpiumPositionToken.OpiumPositionTokenParams memory _opiumPositionTokenParams,
         uint256 _amount,
         ISyntheticAggregator _syntheticAggregator,
         IOracleAggregator _oracleAggregator
     ) private returns (uint256 payout) {
-        /// if the derivativePayout tuple's items (buyer payout and seller payout) are 0, it assumes it's the first time the _getPayout function is being executed, hence it fetches the payouts from the syntheticId and caches them.
-        if (
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][0] == 0 &&
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][1] == 0
-        ) {
+        /// if the derivativePayout tuple's items (buyer payout and seller payout) are 0, it assumes it's the first time the _computePayout function is being executed, hence it fetches the payouts from the syntheticId and caches them.
+        (uint256 buyerPayoutRatio, uint256 sellerPayoutRatio) = _getDerivativePayouts(
+            _opiumPositionTokenParams.derivativeHash
+        ); // gas saving
+        if (buyerPayoutRatio == 0 && sellerPayoutRatio == 0) {
             /// fetches the derivative's data from the related oracleId
             /// opium allows the usage of "dummy" oracleIds - oracleIds whose address is null - in which case the data is set to 0
             uint256 data = _opiumPositionTokenParams.derivative.oracleId == address(0)
@@ -662,17 +663,10 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             // Get payout ratio from Derivative logic
             // payoutRatio[0] - buyerPayout
             // payoutRatio[1] - sellerPayout
-            (uint256 buyerPayout, uint256 sellerPayout) = IDerivativeLogic(
-                _opiumPositionTokenParams.derivative.syntheticId
-            ).getExecutionPayout(_opiumPositionTokenParams.derivative, data);
-            // Cache buyer payout
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][0] = buyerPayout;
-            // Cache seller payout
-            derivativePayouts[_opiumPositionTokenParams.derivativeHash][1] = sellerPayout;
+            (buyerPayoutRatio, sellerPayoutRatio) = IDerivativeLogic(_opiumPositionTokenParams.derivative.syntheticId)
+                .getExecutionPayout(_opiumPositionTokenParams.derivative, data);
+            derivativePayouts[_opiumPositionTokenParams.derivativeHash] = [buyerPayoutRatio, sellerPayoutRatio]; // gas saving
         }
-
-        uint256 buyerPayoutRatio = derivativePayouts[_opiumPositionTokenParams.derivativeHash][0];
-        uint256 sellerPayoutRatio = derivativePayouts[_opiumPositionTokenParams.derivativeHash][1];
 
         ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(_syntheticAggregator)
             .getSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
@@ -703,15 +697,13 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (payout > positionMargin) {
             payout =
                 payout -
-                (
-                    _getReserves(
-                        syntheticCache.authorAddress,
-                        _opiumPositionTokenParams.derivative.token,
-                        protocolAddressesArgs.protocolExecutionReserveClaimer,
-                        syntheticCache.authorCommission,
-                        protocolParametersArgs.protocolExecutionReservePart,
-                        payout - positionMargin
-                    )
+                _computeReserves(
+                    syntheticCache.authorAddress,
+                    _opiumPositionTokenParams.derivative.token,
+                    protocolAddressesArgs.protocolExecutionReserveClaimer,
+                    syntheticCache.authorCommission,
+                    protocolParametersArgs.protocolExecutionReservePart,
+                    payout - positionMargin
                 );
         }
     }
@@ -724,7 +716,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     /// @param _protocolReservePercentage uint256 portion of the reserves that is being distributed to `_protocolReserveReceiver`
     /// @param _initialAmount uint256 the amount from which the reserves will be detracted
     /// @return totalReserve uint256 total reserves being calculated which corresponds to the sum of the reserves distributed to the derivative author and the designated recipient
-    function _getReserves(
+    function _computeReserves(
         address _derivativeAuthorAddress,
         address _tokenAddress,
         address _protocolReserveReceiver,
@@ -779,6 +771,12 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             address(protocolAddressesArgs.opiumProxyFactory)
         );
         require(_tokenAddress == predicted, "C14");
+    }
+
+    /// @notice private getter to destructure the derivativePayouts tuple. its only purpose is gas optimization
+    /// @param _derivativeHash bytes32 identifier of the derivative whose payout is being fetched
+    function _getDerivativePayouts(bytes32 _derivativeHash) private view returns (uint256, uint256) {
+        return (derivativePayouts[_derivativeHash][0], derivativePayouts[_derivativeHash][1]);
     }
 
     // Reserved storage space to allow for layout changes in the future.

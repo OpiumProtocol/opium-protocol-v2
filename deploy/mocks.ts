@@ -34,6 +34,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     args: ["test", "test", 6],
   });
+
+  await deploy("MaliciousTestToken", {
+    from: deployer.address,
+    contract: "MaliciousTestToken",
+    log: true,
+    args: ["test", "test", 18],
+  });
 };
 
 export default func;
