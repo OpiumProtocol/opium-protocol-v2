@@ -15,6 +15,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
 
+  await deploy("OptionPutSyntheticIdMock", {
+    from: author.address,
+    log: true,
+  });
+
   await deploy("OracleIdMock", {
     from: deployer.address,
     log: true,

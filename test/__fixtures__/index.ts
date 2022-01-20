@@ -4,6 +4,7 @@ import {
   MaliciousTestToken,
   OpiumProxyFactory,
   OptionCallSyntheticIdMock,
+  OptionPutSyntheticIdMock,
   OracleAggregator,
   OracleIdMock,
   SyntheticAggregator,
@@ -25,6 +26,7 @@ export type TContracts = {
   oracleIdMock: OracleIdMock;
   testTokenSixDecimals: TestToken;
   maliciousTestToken: MaliciousTestToken;
+  optionPutSyntheticIdMock: OptionPutSyntheticIdMock;
 };
 
 export type TFixturesOutput = {
@@ -56,6 +58,7 @@ const setup = deployments.createFixture(async (): Promise<TFixturesOutput> => {
    ********************/
 
   const optionCallMock = <OptionCallSyntheticIdMock>await ethers.getContract("OptionCallSyntheticIdMock");
+  const optionPutSyntheticIdMock = <OptionPutSyntheticIdMock>await ethers.getContract("OptionPutSyntheticIdMock");
   const oracleIdMock = <OracleIdMock>await ethers.getContract("OracleIdMock");
 
   const testToken = <TestToken>await ethers.getContract("TestToken");
@@ -75,6 +78,7 @@ const setup = deployments.createFixture(async (): Promise<TFixturesOutput> => {
       oracleIdMock,
       testTokenSixDecimals,
       maliciousTestToken,
+      optionPutSyntheticIdMock,
     },
     users,
   };

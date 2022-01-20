@@ -16,17 +16,22 @@ import setup from "../../__fixtures__";
 import { TNamedSigners } from "../../../types";
 import {
   OpiumPositionToken,
-  OptionCallSyntheticIdMock,
   OptionController,
   Registry,
   TestToken,
   ChainlinkOracleSubId,
   OracleAggregator,
+  OptionPutSyntheticIdMock,
 } from "../../../typechain";
 import { TDerivative } from "../../../types";
 import { timeTravel } from "../../../utils/evm";
 import { decodeEvents } from "../../../utils/events";
 import { hardhatNetworkEnvironment } from "../../../hardhat.config";
+
+/**
+ * set the process.env.HARDHAT_NETWORK_ENVIRONMENT to `fork` to run the current tests using the Ethereum mainnet
+ * {see hardhat.config.ts}
+ */
 
 if (hardhatNetworkEnvironment === "fork") {
   describe("e2e", function () {
@@ -35,33 +40,41 @@ if (hardhatNetworkEnvironment === "fork") {
     let oracleAggregator: OracleAggregator;
     let shortOpiumPositionToken: OpiumPositionToken;
     let longOpiumPositionToken: OpiumPositionToken;
-    let collateralToken: TestToken;
-    let optionCallMock: OptionCallSyntheticIdMock;
+    let daiCollateralMock: TestToken;
     let optionController: OptionController;
     let chainlinkOracleSubId: ChainlinkOracleSubId;
+    let optionPutSyntheticIdMock: OptionPutSyntheticIdMock;
     let derivative: TDerivative;
 
     const amount = toBN("2");
 
     before(async () => {
       ({
-        contracts: { optionCallMock, registry, testToken: collateralToken, oracleAggregator },
+        contracts: {
+          optionPutSyntheticIdMock,
+          registry,
+          testToken: daiCollateralMock,
+          oracleAggregator,
+          optionPutSyntheticIdMock,
+        },
         users,
       } = await setup());
       const OptionController = await ethers.getContractFactory("OptionController");
       const ChainlinkOracleSubId = await ethers.getContractFactory("ChainlinkOracleSubId");
+      // deploys example contract to interact with `Opium.Core`
       optionController = <OptionController>await OptionController.deploy(registry.address);
       optionController = <OptionController>await optionController.deployed();
+      // deploys the oracleId
       chainlinkOracleSubId = <ChainlinkOracleSubId>await ChainlinkOracleSubId.deploy(registry.address);
       chainlinkOracleSubId = <ChainlinkOracleSubId>await chainlinkOracleSubId.deployed();
 
       // setup (ensures the traders are sufficiently funded)
-      await collateralToken.transfer(users.seller.address, mulWithPrecisionFactor(toBN("2"), amount));
-      await collateralToken.transfer(users.buyer.address, mulWithPrecisionFactor(toBN("2"), amount));
+      await daiCollateralMock.transfer(users.seller.address, mulWithPrecisionFactor(toBN("1000"), amount));
+      await daiCollateralMock.transfer(users.buyer.address, mulWithPrecisionFactor(toBN("1000"), amount));
 
       /**
        * ***********************************
-       *        AAVE/ETH call option
+       *        AAVE/ETH PUT option mock
        * ***********************************
        *
        * margin -> 2e18
@@ -71,11 +84,11 @@ if (hardhatNetworkEnvironment === "fork") {
        * oracleId -> AAVE/ETH Chainlink pricefeed
        */
       derivative = derivativeFactory({
-        margin: toBN("2"),
+        margin: toBN("14"),
         endTime: await createValidDerivativeExpiry(10),
-        params: [cast("72720000000000000")],
-        syntheticId: optionCallMock.address,
-        token: collateralToken.address,
+        params: [cast("68199560000000000")], // = 0.06819956 ETH
+        syntheticId: optionPutSyntheticIdMock.address,
+        token: daiCollateralMock.address,
         oracleId: chainlinkOracleSubId.address,
       });
       // saves the derivative recipe in the OptionController
@@ -85,23 +98,26 @@ if (hardhatNetworkEnvironment === "fork") {
        * synthetic author allows third-party accounts to execute the option on their behalf
        * i.e: it's necessary if the msg.sender calling `core.execute` is an intermediary contract rather than the synthetic author's account itself
        */
-      await optionCallMock.connect(users.seller).allowThirdpartyExecution(true);
-      await optionCallMock.connect(users.buyer).allowThirdpartyExecution(true);
+      await optionPutSyntheticIdMock.connect(users.seller).allowThirdpartyExecution(true);
+      await optionPutSyntheticIdMock.connect(users.buyer).allowThirdpartyExecution(true);
     });
 
     it("creates a derivative and mints a market neutral LONG/SHORT position amount", async () => {
-      const collateralTokenBalanceBefore = await collateralToken.balanceOf(users.seller.address);
-      console.log(`collateralTokenBalanceBefore: ${collateralTokenBalanceBefore.toString()}`);
-      //
-      await collateralToken
+      const daiCollateralMockBalanceBefore = await daiCollateralMock.balanceOf(users.seller.address);
+      console.log(`daiCollateralMockBalanceBefore: ${daiCollateralMockBalanceBefore.toString()}`);
+      // approves the derivative's margin amount required
+      await daiCollateralMock
         .connect(users.seller)
         .approve(optionController.address, mulWithPrecisionFactor(derivative.margin, amount));
       await optionController.connect(users.seller).create(amount);
 
+      // we calculate the SHORT erc20 position token address
       const shortOpiumPositionTokenAddress = await optionController.getPositionAddress(false);
       shortOpiumPositionToken = await (<OpiumPositionToken>(
         await ethers.getContractAt("OpiumPositionToken", shortOpiumPositionTokenAddress)
       ));
+
+      // we calculate the SHORT erc20 position token address
       const longOpiumPositionTokenAddress = await optionController.getPositionAddress(true);
       longOpiumPositionToken = await (<OpiumPositionToken>(
         await ethers.getContractAt("OpiumPositionToken", longOpiumPositionTokenAddress)
@@ -114,25 +130,25 @@ if (hardhatNetworkEnvironment === "fork") {
       expect(longBalance, "wrong SHORT and LONG balance").to.be.eq(shortBalance);
     });
 
-    it("allows the `seller` to sell OTC the LONG positions to a `buyer`", async () => {
-      const collateralTokenBalanceBeforeSeller = await collateralToken.balanceOf(users.seller.address);
+    it("mocks an OTC exchange: the `seller` exchanges their LONG position tokens with a `buyer` for an amount of `daiCollateralMocks`", async () => {
+      const daiCollateralMockBalanceBeforeSeller = await daiCollateralMock.balanceOf(users.seller.address);
 
-      // seller sends the full amount of LONG positions to the buyer
+      // seller sends the full amount of LONG position tokens to the buyer
       await longOpiumPositionToken.connect(users.seller).transfer(users.buyer.address, amount);
       // buyer sends collateral to seller
-      await collateralToken.connect(users.buyer).transfer(users.seller.address, amount);
+      await daiCollateralMock.connect(users.buyer).transfer(users.seller.address, amount);
 
       const shortBalance = await shortOpiumPositionToken.balanceOf(users.seller.address);
       const longBalanceSeller = await longOpiumPositionToken.balanceOf(users.seller.address);
       const longBalanceBuyer = await longOpiumPositionToken.balanceOf(users.buyer.address);
-      const collateralTokenBalanceAfterSeller = await collateralToken.balanceOf(users.seller.address);
+      const daiCollateralMockBalanceAfterSeller = await daiCollateralMock.balanceOf(users.seller.address);
 
       expect(shortBalance, "wrong SHORT balance").to.be.eq(amount);
       expect(longBalanceSeller, "wrong LONG balance").to.be.eq(0);
       expect(longBalanceBuyer, "wrong SHORT and LONG balance").to.be.eq(amount);
       expect(longBalanceBuyer, "wrong seller's collateral").to.be.eq(amount);
-      expect(collateralTokenBalanceAfterSeller, "wrong seller's collateralToken balance").to.be.eq(
-        collateralTokenBalanceBeforeSeller.add(amount),
+      expect(daiCollateralMockBalanceAfterSeller, "wrong seller's daiCollateralMock balance").to.be.eq(
+        daiCollateralMockBalanceBeforeSeller.add(amount),
       );
     });
 
@@ -154,22 +170,25 @@ if (hardhatNetworkEnvironment === "fork") {
     });
 
     it("calculates and distributes the payout according to the scenario: seller executes all their SHORT positions and buyer executes all their LONG positions", async () => {
-      const sellerCollateralTokenBalanceBefore = await collateralToken.balanceOf(users.seller.address);
-      const buyerCollateralTokenBalanceBefore = await collateralToken.balanceOf(users.buyer.address);
+      const sellerdaiCollateralMockBalanceBefore = await daiCollateralMock.balanceOf(users.seller.address);
+      const buyerdaiCollateralMockBalanceBefore = await daiCollateralMock.balanceOf(users.buyer.address);
 
-      // executes 1e18 SHORT positions (half of the SHORT positions owned)
+      // seller executes their SHORT positions
       await optionController.connect(users.seller).executeShort(amount);
+      // buyer executes their LONG positions
       await optionController.connect(users.buyer).executeLong(amount);
 
       const { buyerPayout: buyerPayoutRatio, sellerPayout: sellerPayoutRatio } =
-        await optionCallMock.getExecutionPayout(
+        await optionPutSyntheticIdMock.getExecutionPayout(
           derivative,
           await oracleAggregator.getData(chainlinkOracleSubId.address, derivative.endTime),
         );
-      const { buyerMargin, sellerMargin } = await optionCallMock.getMargin(derivative);
-      const authorFeeCommission = await optionCallMock.getAuthorCommission();
+
+      const { buyerMargin, sellerMargin } = await optionPutSyntheticIdMock.getMargin(derivative);
+      const authorFeeCommission = await optionPutSyntheticIdMock.getAuthorCommission();
       const { protocolExecutionReservePart } = await registry.getProtocolParameters();
 
+      // helper function to compute the fees deducted from the executed LONG positions, if any
       const buyerFees = computeFees(
         calculateTotalGrossPayout(
           buyerMargin,
@@ -182,6 +201,7 @@ if (hardhatNetworkEnvironment === "fork") {
         authorFeeCommission,
         protocolExecutionReservePart,
       );
+      // helper function to compute the fees deducted from the executed SHORT positions, if any
       const sellerFees = computeFees(
         calculateTotalGrossPayout(
           buyerMargin,
@@ -194,6 +214,7 @@ if (hardhatNetworkEnvironment === "fork") {
         authorFeeCommission,
         protocolExecutionReservePart,
       );
+      // helper function to compute the net payout of the LONG positions
       const buyerNetPayout = calculateTotalNetPayout(
         buyerMargin,
         sellerMargin,
@@ -203,6 +224,7 @@ if (hardhatNetworkEnvironment === "fork") {
         buyerFees.totalFee,
         EPayout.BUYER,
       );
+      // helper function to compute the net payout of the SHORT positions
       const sellerNetPayout = calculateTotalNetPayout(
         buyerMargin,
         sellerMargin,
@@ -213,18 +235,18 @@ if (hardhatNetworkEnvironment === "fork") {
         EPayout.SELLER,
       );
 
-      const sellerCollateralTokenBalanceAfter = await collateralToken.balanceOf(users.seller.address);
-      const buyerCollateralTokenBalanceAfter = await collateralToken.balanceOf(users.buyer.address);
-      const shortSellerBalance = await shortOpiumPositionToken.balanceOf(users.seller.address);
-      const longBuyerBalance = await longOpiumPositionToken.balanceOf(users.buyer.address);
+      const sellerdaiCollateralMockBalanceAfter = await daiCollateralMock.balanceOf(users.seller.address);
+      const buyerdaiCollateralMockBalanceAfter = await daiCollateralMock.balanceOf(users.buyer.address);
+      const sellerShortBalance = await shortOpiumPositionToken.balanceOf(users.seller.address);
+      const buyerLongbalance = await longOpiumPositionToken.balanceOf(users.buyer.address);
 
-      expect(shortSellerBalance, "wrong seller's SHORT balance").to.be.eq(0);
-      expect(sellerCollateralTokenBalanceAfter, "wrong seller's collateral balance").to.be.equal(
-        sellerCollateralTokenBalanceBefore.add(sellerNetPayout),
+      expect(sellerShortBalance, "wrong seller's SHORT balance").to.be.eq(0);
+      expect(sellerdaiCollateralMockBalanceAfter, "wrong seller's collateral balance").to.be.equal(
+        sellerdaiCollateralMockBalanceBefore.add(sellerNetPayout),
       );
-      expect(longBuyerBalance, "wrong buyer's LONG balance").to.be.eq(0);
-      expect(buyerCollateralTokenBalanceAfter, "wrong buyer's collateral balance").to.be.equal(
-        buyerCollateralTokenBalanceBefore.add(buyerNetPayout),
+      expect(buyerLongbalance, "wrong buyer's LONG balance").to.be.eq(0);
+      expect(buyerdaiCollateralMockBalanceAfter, "wrong buyer's collateral balance").to.be.equal(
+        buyerdaiCollateralMockBalanceBefore.add(buyerNetPayout),
       );
     });
   });

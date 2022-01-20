@@ -22,6 +22,13 @@ import "./tasks/clean";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
+// ENV: it can either be `fork` or `local`
+// set to `fork` to run the hardhat tests using an ethereum mainnet fork
+export const hardhatNetworkEnvironment = process.env.HARDHAT_NETWORK_ENVIRONMENT;
+if (!hardhatNetworkEnvironment) {
+  throw new Error("Please set your HARDHAT_NETWORK_ENVIRONMENT in a .env file");
+}
+
 // ENV: Config
 const CONTRACT_SIZER_STRICT = process.env.CONTRACT_SIZER_STRICT !== "0";
 
@@ -58,12 +65,6 @@ const chainIds = {
   bscTestnet: 97,
   bscMainnet: 56,
 };
-
-// it can either be `fork` or `local`
-export const hardhatNetworkEnvironment = process.env.HARDHAT_NETWORK_ENVIRONMENT;
-if (!hardhatNetworkEnvironment) {
-  throw new Error("Please set your HARDHAT_NETWORK_ENVIRONMENT in a .env file");
-}
 
 const mnemonic = process.env.MNEMONIC;
 if (!mnemonic) {

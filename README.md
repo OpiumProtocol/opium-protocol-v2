@@ -38,6 +38,12 @@ BSC_MAINNET_ENDPOINT: "abc"
 POLYGON_MAINNET_ENDPOINT: "abc"
 INFURA_API_KEY: "abc"
 MNEMONIC: "test test test test test test test test test test test junk"
+HARDHAT_NETWORK_ENVIRONMENT='local'
+```
+
+Note that to run the tests that require a mainnnet fork, it is required to change the HARDHAT_NETWORK_ENVIRONMENT variable as follows:
+```sh
+HARDHAT_NETWORK_ENVIRONMENT='fork'
 ```
 
 #### Deployment on a local hardhat network and initialization
