@@ -15,6 +15,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
 
+  await deploy("OptionPutPartSyntheticId", {
+    from: author.address,
+    log: true,
+    args: [author.address, toBN("1")],
+  });
+
   await deploy("OptionPutSyntheticIdMock", {
     from: author.address,
     log: true,

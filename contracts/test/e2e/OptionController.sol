@@ -2,6 +2,7 @@ pragma solidity 0.8.5;
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
+import "openzeppelin-solidity/contracts/access/Ownable.sol";
 import "../../core/registry/RegistryEntities.sol";
 import "../../interfaces/IRegistry.sol";
 import "../../interfaces/ICore.sol";
@@ -12,7 +13,7 @@ import "../../libs/LibDerivative.sol";
 import "../../libs/LibPosition.sol";
 import "../../libs/LibCalculator.sol";
 
-contract OptionController {
+contract OptionController is Ownable {
     using SafeERC20 for IERC20;
     using LibDerivative for LibDerivative.Derivative;
     using LibPosition for bytes32;
@@ -49,7 +50,7 @@ contract OptionController {
 
     /// @notice Helper to set this contract's underlying derivative recipe
     /// @param derivative_ LibDerivative.Derivative derivative schema of the underlying synthetics
-    function setDerivative(LibDerivative.Derivative calldata derivative_) external {
+    function setDerivative(LibDerivative.Derivative calldata derivative_) external onlyOwner {
         _derivative = derivative_;
     }
 
