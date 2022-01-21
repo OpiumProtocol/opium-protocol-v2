@@ -13,11 +13,11 @@ interface ISyntheticAggregator {
 
     function initialize(address _registry) external;
 
-    function getSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
+    function getOrCacheSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
         external
         returns (SyntheticCache memory);
 
-    function getMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
+    function getOrCacheMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
         external
         returns (uint256 buyerMargin, uint256 sellerMargin);
 }

@@ -348,7 +348,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Get cached margin required according to logic from Opium.SyntheticAggregator
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
-        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
+        (margins[0], margins[1]) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
             _derivativeHash,
             _derivative
         );
@@ -422,7 +422,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Get cached margin required according to logic from Opium.SyntheticAggregator
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
-        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getMargin(
+        (margins[0], margins[1]) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
             longOpiumPositionTokenParams.derivativeHash,
             longOpiumPositionTokenParams.derivative
         );
@@ -485,7 +485,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         ISyntheticAggregator.SyntheticCache memory syntheticCache = protocolAddressesArgs
             .syntheticAggregator
-            .getSyntheticCache(shortOpiumPositionTokenParams.derivativeHash, shortOpiumPositionTokenParams.derivative);
+            .getOrCacheSyntheticCache(shortOpiumPositionTokenParams.derivativeHash, shortOpiumPositionTokenParams.derivative);
 
         uint256 totalMargin = (syntheticCache.buyerMargin + syntheticCache.sellerMargin).mulWithPrecisionFactor(
             _amount
@@ -603,7 +603,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
             // Get cached margin required according to logic from Opium.SyntheticAggregator
             // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
-            (uint256 buyerMargin, ) = protocolAddressesArgs.syntheticAggregator.getMargin(
+            (uint256 buyerMargin, ) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
                 opiumPositionTokenParams.derivativeHash,
                 opiumPositionTokenParams.derivative
             );
@@ -614,7 +614,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         } else {
             // Get cached margin required according to logic from Opium.SyntheticAggregator
             // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
-            (, uint256 sellerMargin) = protocolAddressesArgs.syntheticAggregator.getMargin(
+            (, uint256 sellerMargin) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
                 opiumPositionTokenParams.derivativeHash,
                 opiumPositionTokenParams.derivative
             );
@@ -668,8 +668,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             derivativePayouts[_opiumPositionTokenParams.derivativeHash] = [buyerPayoutRatio, sellerPayoutRatio]; // gas saving
         }
 
-        ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(_syntheticAggregator)
-            .getSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
+        ISyntheticAggregator.SyntheticCache memory syntheticCache = _syntheticAggregator
+            .getOrCacheSyntheticCache(_opiumPositionTokenParams.derivativeHash, _opiumPositionTokenParams.derivative);
 
         uint256 positionMargin;
 

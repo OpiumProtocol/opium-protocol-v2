@@ -159,7 +159,7 @@ describe("Upgradeability", () => {
 
     const hash = getDerivativeHash(derivative);
 
-    const margin = await upgraded.callStatic.getMargin(hash, derivative);
+    const margin = await upgraded.callStatic.getOrCacheMargin(hash, derivative);
 
     expect(margin.buyerMargin).to.be.equal(0);
     expect(margin.sellerMargin).to.be.equal(derivative.margin);

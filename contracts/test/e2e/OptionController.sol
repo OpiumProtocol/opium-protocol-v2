@@ -57,7 +57,7 @@ contract OptionController is Ownable {
     /// @notice Wrapper around `Opium.Core.create` to mint a derivative position contract
     /// @param _amount uint256 Amount of derivative positions to be created
     function create(uint256 _amount) external {
-        (uint256 buyerMargin, uint256 sellerMargin) = _protocolAddressesArgs.syntheticAggregator.getMargin(
+        (uint256 buyerMargin, uint256 sellerMargin) = _protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
             _derivative.getDerivativeHash(),
             _derivative
         );
