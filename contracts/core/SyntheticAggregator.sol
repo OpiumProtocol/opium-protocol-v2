@@ -39,10 +39,10 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
 
     /// @notice Initializes ticker, if was not initialized and returns buyer and seller margin from cache
     /// @param _derivativeHash bytes32 hash of derivative
-    /// @param _derivative Derivative Derivative itself
+    /// @param _derivative LibDerivative.Derivative itself
     /// @return buyerMargin uint256 Margin of buyer
     /// @return sellerMargin uint256 Margin of seller
-    function getMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
+    function getOrCacheMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
         external
         returns (uint256 buyerMargin, uint256 sellerMargin)
     {
@@ -53,8 +53,10 @@ contract SyntheticAggregator is ReentrancyGuardUpgradeable, RegistryManager {
         return (syntheticCaches[_derivativeHash].buyerMargin, syntheticCaches[_derivativeHash].sellerMargin);
     }
 
-    /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author address from cache
-    function getSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
+    /// @notice Initializes ticker if not previously initialized and returns the cached `syntheticId` data
+    /// @param _derivativeHash bytes32 hash of derivative
+    /// @param _derivative LibDerivative.Derivative itself
+    function getOrCacheSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)
         external
         returns (SyntheticCache memory)
     {

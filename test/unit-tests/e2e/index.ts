@@ -34,7 +34,7 @@ import { hardhatNetworkEnvironment } from "../../../hardhat.config";
  */
 
 if (hardhatNetworkEnvironment === "fork") {
-  describe("e2e", function () {
+  describe.skip("e2e", function () {
     let users: TNamedSigners;
     let registry: Registry;
     let oracleAggregator: OracleAggregator;

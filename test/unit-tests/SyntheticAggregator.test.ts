@@ -19,7 +19,7 @@ describe("SyntheticAggregator", () => {
 
     const hash = getDerivativeHash(derivative);
 
-    const margin = await syntheticAggregator.callStatic.getMargin(hash, derivative);
+    const margin = await syntheticAggregator.callStatic.getOrCacheMargin(hash, derivative);
 
     expect(margin.buyerMargin).to.be.equal(0);
     expect(margin.sellerMargin).to.be.equal(derivative.margin);
@@ -39,7 +39,7 @@ describe("SyntheticAggregator", () => {
     });
     const hash = getDerivativeHash(derivative);
 
-    const syntheticCache = await syntheticAggregator.callStatic.getSyntheticCache(hash, derivative);
+    const syntheticCache = await syntheticAggregator.callStatic.getOrCacheSyntheticCache(hash, derivative);
 
     expect(syntheticCache.authorAddress).to.be.equal(author.address);
     expect(syntheticCache.buyerMargin).to.be.equal(0);
@@ -60,7 +60,7 @@ describe("SyntheticAggregator", () => {
       });
       const hash = getDerivativeHash(derivative);
 
-      const syntheticMargin = await syntheticAggregator.callStatic.getMargin(hash, derivative);
+      const syntheticMargin = await syntheticAggregator.callStatic.getOrCacheMargin(hash, derivative);
 
       expect(syntheticMargin.buyerMargin).to.be.equal(0);
       expect(syntheticMargin.sellerMargin).to.be.equal(derivative.margin);
