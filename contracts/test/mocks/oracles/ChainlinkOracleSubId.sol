@@ -23,7 +23,7 @@ contract ChainlinkOracleSubId {
         // fetches the data and the timestamp from the Chainlink pricefeed
         (uint256 price, uint256 timestamp) = getLatestPrice();
         // fetches the Opium.OracleAggregator from the Opium.Registry
-        IOracleAggregator oracleAggregator = registry.getProtocolAddresses().oracleAggregator;
+        IOracleAggregator oracleAggregator = IOracleAggregator(registry.getProtocolAddresses().oracleAggregator);
         // logs the relevant event
         emit LogDataProvision(address(priceFeed), address(oracleAggregator), timestamp, price);
         // pushes the data into the OracleAggregator
