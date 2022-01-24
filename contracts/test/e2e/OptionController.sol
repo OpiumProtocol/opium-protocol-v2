@@ -57,7 +57,7 @@ contract OptionController is Ownable {
     /// @notice Wrapper around `Opium.Core.create` to mint a derivative position contract
     /// @param _amount uint256 Amount of derivative positions to be created
     function create(uint256 _amount) external {
-        (uint256 buyerMargin, uint256 sellerMargin) = _protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
+        (uint256 buyerMargin, uint256 sellerMargin) = ISyntheticAggregator(_protocolAddressesArgs.syntheticAggregator).getOrCacheMargin(
             _derivative.getDerivativeHash(),
             _derivative
         );
@@ -67,21 +67,21 @@ contract OptionController is Ownable {
         IERC20(_derivative.token).approve(address(_protocolAddressesArgs.tokenSpender), 0);
         IERC20(_derivative.token).approve(address(_protocolAddressesArgs.tokenSpender), requiredMargin);
 
-        _protocolAddressesArgs.core.create(_derivative, _amount, [msg.sender, msg.sender]);
+        ICore(_protocolAddressesArgs.core).create(_derivative, _amount, [msg.sender, msg.sender]);
     }
 
     /// @notice Wrapper around `Opium.Core.execute` to execute a derivative LONG position
     /// @param _amount uint256 amount of SHORT positions to be executed
     function executeShort(uint256 _amount) external {
         address shortAddress = _getPositionAddress(false);
-        _protocolAddressesArgs.core.execute(msg.sender, shortAddress, _amount);
+        ICore(_protocolAddressesArgs.core).execute(msg.sender, shortAddress, _amount);
     }
 
     /// @notice Wrapper around `Opium.Core.execute` to execute a derivative LONG position
     /// @param _amount uint256 amount of LONG positions to be executed
     function executeLong(uint256 _amount) external {
         address longAddress = _getPositionAddress(true);
-        _protocolAddressesArgs.core.execute(msg.sender, longAddress, _amount);
+        ICore(_protocolAddressesArgs.core).execute(msg.sender, longAddress, _amount);
     }
 
     /// @notice Helper that wraps around `LibCalculator.mulWithPrecisionFactor` to compute the collateral require requirements to mint new LONG/SHORT positions of a derivative
@@ -102,7 +102,7 @@ contract OptionController is Ownable {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
         address positionAddress = derivativeHash.predictDeterministicAddress(
             _isLong,
-            _protocolAddressesArgs.opiumProxyFactory.getImplementationAddress(),
+            IOpiumProxyFactory(_protocolAddressesArgs.opiumProxyFactory).getImplementationAddress(),
             address(_protocolAddressesArgs.opiumProxyFactory)
         );
         return positionAddress;

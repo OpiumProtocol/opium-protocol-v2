@@ -259,11 +259,11 @@ contract Registry is AccessControlUpgradeable {
                 _tokenSpender != address(0),
             "R12"
         );
-        protocolAddressesArgs.opiumProxyFactory = IOpiumProxyFactory(_opiumProxyFactory);
-        protocolAddressesArgs.core = ICore(_core);
-        protocolAddressesArgs.oracleAggregator = IOracleAggregator(_oracleAggregator);
-        protocolAddressesArgs.syntheticAggregator = ISyntheticAggregator(_syntheticAggregator);
-        protocolAddressesArgs.tokenSpender = ITokenSpender(_tokenSpender);
+        protocolAddressesArgs.opiumProxyFactory = _opiumProxyFactory;
+        protocolAddressesArgs.core = _core;
+        protocolAddressesArgs.oracleAggregator = _oracleAggregator;
+        protocolAddressesArgs.syntheticAggregator = _syntheticAggregator;
+        protocolAddressesArgs.tokenSpender = _tokenSpender;
     }
 
     /// @notice It allows the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)

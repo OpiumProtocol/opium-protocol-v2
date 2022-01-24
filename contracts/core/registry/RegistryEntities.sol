@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity 0.8.5;
 
-import "../../interfaces/IOpiumProxyFactory.sol";
-import "../../interfaces/ISyntheticAggregator.sol";
-import "../../interfaces/IOracleAggregator.sol";
-import "../../interfaces/ITokenSpender.sol";
-import "../../interfaces/ICore.sol";
-
 library RegistryEntities {
     struct ProtocolParametersArgs {
         // Period of time after which ticker could be canceled if no data was provided to the `oracleId`
@@ -29,15 +23,15 @@ library RegistryEntities {
 
     struct ProtocolAddressesArgs {
         // Address of Opium.Core contract
-        ICore core;
+        address core;
         // Address of Opium.OpiumProxyFactory contract
-        IOpiumProxyFactory opiumProxyFactory;
+        address opiumProxyFactory;
         // Address of Opium.OracleAggregator contract
-        IOracleAggregator oracleAggregator;
+        address oracleAggregator;
         // Address of Opium.SyntheticAggregator contract
-        ISyntheticAggregator syntheticAggregator;
+        address syntheticAggregator;
         // Address of Opium.TokenSpender contract
-        ITokenSpender tokenSpender;
+        address tokenSpender;
         // Address of the recipient of execution protocol reserves
         address protocolExecutionReserveClaimer;
         // Address of the recipient of redemption protocol reserves

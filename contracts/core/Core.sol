@@ -4,18 +4,18 @@ pragma solidity 0.8.5;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-
 import "./registry/RegistryEntities.sol";
 import "./base/RegistryManager.sol";
-import "../interfaces/IOpiumProxyFactory.sol";
-import "../interfaces/IOpiumPositionToken.sol";
-import "../interfaces/ISyntheticAggregator.sol";
-import "../interfaces/IOracleAggregator.sol";
-import "../interfaces/IDerivativeLogic.sol";
-import "../interfaces/IRegistry.sol";
 import "../libs/LibDerivative.sol";
 import "../libs/LibPosition.sol";
 import "../libs/LibCalculator.sol";
+import "../interfaces/IOpiumProxyFactory.sol";
+import "../interfaces/ISyntheticAggregator.sol";
+import "../interfaces/IOracleAggregator.sol";
+import "../interfaces/ITokenSpender.sol";
+import "../interfaces/IRegistry.sol";
+import "../interfaces/IOpiumPositionToken.sol";
+import "../interfaces/IDerivativeLogic.sol";
 
 /**
     Error codes:
@@ -205,7 +205,8 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         address[2] calldata _positionsOwners
     ) external nonReentrant {
         bytes32 derivativeHash = _derivative.getDerivativeHash();
-        address implementationAddress = protocolAddressesArgs.opiumProxyFactory.getImplementationAddress();
+        address implementationAddress = IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory)
+            .getImplementationAddress();
         (address longPositionTokenAddress, bool isLongDeployed) = derivativeHash.predictAndCheckDeterministicAddress(
             true,
             implementationAddress,
@@ -214,7 +215,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         (address shortPositionTokenAddress, bool isShortDeployed) = derivativeHash.predictAndCheckDeterministicAddress(
             false,
             implementationAddress,
-            address(protocolAddressesArgs.opiumProxyFactory)
+            protocolAddressesArgs.opiumProxyFactory
         );
         // both erc20 positions have not been deployed
         require(isLongDeployed == isShortDeployed, "C23");
@@ -348,7 +349,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Get cached margin required according to logic from Opium.SyntheticAggregator
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
-        (margins[0], margins[1]) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
+        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getOrCacheMargin(
             _derivativeHash,
             _derivative
         );
@@ -360,7 +361,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Check ERC20 tokens allowance: (margins[0] + margins[1]) * amount
         // `msg.sender` must provide margin for position creation
         require(
-            IERC20Upgradeable(_derivative.token).allowance(msg.sender, address(protocolAddressesArgs.tokenSpender)) >=
+            IERC20Upgradeable(_derivative.token).allowance(msg.sender, protocolAddressesArgs.tokenSpender) >=
                 totalMarginToE18,
             "C12"
         );
@@ -369,7 +370,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _increaseP2PVault(_derivativeHash, totalMarginToE18);
 
         // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        protocolAddressesArgs.tokenSpender.claimTokens(
+        ITokenSpender(protocolAddressesArgs.tokenSpender).claimTokens(
             IERC20Upgradeable(_derivative.token),
             msg.sender,
             address(this),
@@ -377,7 +378,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
 
         // Mint LONG and SHORT positions tokens
-        protocolAddressesArgs.opiumProxyFactory.create(
+        IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory).create(
             _positionsOwners[0],
             _positionsOwners[1],
             _amount,
@@ -422,7 +423,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         // Get cached margin required according to logic from Opium.SyntheticAggregator
         // margins[0] - buyerMargin
         // margins[1] - sellerMargin
-        (margins[0], margins[1]) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
+        (margins[0], margins[1]) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getOrCacheMargin(
             longOpiumPositionTokenParams.derivativeHash,
             longOpiumPositionTokenParams.derivative
         );
@@ -436,7 +437,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         require(
             IERC20Upgradeable(longOpiumPositionTokenParams.derivative.token).allowance(
                 msg.sender,
-                address(protocolAddressesArgs.tokenSpender)
+                protocolAddressesArgs.tokenSpender
             ) >= totalMarginToE18,
             "C12"
         );
@@ -445,7 +446,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _increaseP2PVault(longOpiumPositionTokenParams.derivativeHash, totalMarginToE18);
 
         // Take ERC20 tokens from msg.sender, should never revert in correct ERC20 implementation
-        protocolAddressesArgs.tokenSpender.claimTokens(
+        ITokenSpender(protocolAddressesArgs.tokenSpender).claimTokens(
             IERC20Upgradeable(longOpiumPositionTokenParams.derivative.token),
             msg.sender,
             address(this),
@@ -453,7 +454,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
 
         // Mint LONG and SHORT positions tokens
-        protocolAddressesArgs.opiumProxyFactory.mintPair(
+        IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory).mintPair(
             _positionsOwners[0],
             _positionsOwners[1],
             _positionsAddresses[0],
@@ -548,14 +549,14 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         );
 
         // Burn executed position tokens
-        protocolAddressesArgs.opiumProxyFactory.burn(_positionOwner, _positionAddress, _amount);
+        IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory).burn(_positionOwner, _positionAddress, _amount);
 
         // Returns payout for all positions
         uint256 payout = _computePayout(
             opiumPositionTokenParams,
             _amount,
-            protocolAddressesArgs.syntheticAggregator,
-            protocolAddressesArgs.oracleAggregator
+            ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator),
+            IOracleAggregator(protocolAddressesArgs.oracleAggregator)
         );
 
         // Transfer payout
@@ -590,7 +591,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
             // Ensures that `Opium.OracleAggregator` has still not been provided with data after noDataCancellationperiod
             // The check needs to be performed only the first time a derivative is being canceled as to avoid preventing other parties from canceling their positions in case `Opium.OracleAggregator` receives data after the successful cancelation
             require(
-                !protocolAddressesArgs.oracleAggregator.hasData(
+                !IOracleAggregator(protocolAddressesArgs.oracleAggregator).hasData(
                     opiumPositionTokenParams.derivative.oracleId,
                     opiumPositionTokenParams.derivative.endTime
                 ),
@@ -606,7 +607,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         if (opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG) {
             // Get cached margin required according to logic from Opium.SyntheticAggregator
             // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
-            (uint256 buyerMargin, ) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
+            (uint256 buyerMargin, ) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getOrCacheMargin(
                 opiumPositionTokenParams.derivativeHash,
                 opiumPositionTokenParams.derivative
             );
@@ -617,7 +618,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         } else {
             // Get cached margin required according to logic from Opium.SyntheticAggregator
             // (buyerMargin, sellerMargin) = syntheticAggregator.getMargin
-            (, uint256 sellerMargin) = protocolAddressesArgs.syntheticAggregator.getOrCacheMargin(
+            (, uint256 sellerMargin) = ISyntheticAggregator(protocolAddressesArgs.syntheticAggregator).getOrCacheMargin(
                 opiumPositionTokenParams.derivativeHash,
                 opiumPositionTokenParams.derivative
             );
@@ -628,7 +629,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         _decreaseP2PVault(opiumPositionTokenParams.derivativeHash, payout);
 
         // Burn cancelled position tokens
-        protocolAddressesArgs.opiumProxyFactory.burn(msg.sender, _positionAddress, _amount);
+        IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory).burn(msg.sender, _positionAddress, _amount);
 
         // Transfer payout * _amounts[i]
         if (payout > 0) {
@@ -772,7 +773,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
     ) private view {
         address predicted = _opiumPositionTokenParams.derivativeHash.predictDeterministicAddress(
             _opiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG,
-            protocolAddressesArgs.opiumProxyFactory.getImplementationAddress(),
+            IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory).getImplementationAddress(),
             address(protocolAddressesArgs.opiumProxyFactory)
         );
         require(_tokenAddress == predicted, "C14");
