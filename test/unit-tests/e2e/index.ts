@@ -22,6 +22,7 @@ import {
   ChainlinkOracleSubId,
   OracleAggregator,
   OptionPutSyntheticIdMock,
+  OptionPutPartSyntheticId,
 } from "../../../typechain";
 import { TDerivative } from "../../../types";
 import { timeTravel } from "../../../utils/evm";
@@ -43,20 +44,14 @@ if (hardhatNetworkEnvironment === "fork") {
     let daiCollateralMock: TestToken;
     let optionController: OptionController;
     let chainlinkOracleSubId: ChainlinkOracleSubId;
-    let optionPutSyntheticIdMock: OptionPutSyntheticIdMock;
+    let optionPutPartSyntheticId: OptionPutPartSyntheticId;
     let derivative: TDerivative;
 
     const amount = toBN("2");
 
     before(async () => {
       ({
-        contracts: {
-          optionPutSyntheticIdMock,
-          registry,
-          testToken: daiCollateralMock,
-          oracleAggregator,
-          optionPutSyntheticIdMock,
-        },
+        contracts: { registry, testToken: daiCollateralMock, oracleAggregator, optionPutPartSyntheticId },
         users,
       } = await setup());
       const OptionController = await ethers.getContractFactory("OptionController");
@@ -86,8 +81,8 @@ if (hardhatNetworkEnvironment === "fork") {
       derivative = derivativeFactory({
         margin: toBN("14"),
         endTime: await createValidDerivativeExpiry(10),
-        params: [cast("68199560000000000")], // = 0.06819956 ETH
-        syntheticId: optionPutSyntheticIdMock.address,
+        params: [cast("68199560000000000"), toBN("1"), cast("0")], // params[0]= 0.06819956 ETH
+        syntheticId: optionPutPartSyntheticId.address,
         token: daiCollateralMock.address,
         oracleId: chainlinkOracleSubId.address,
       });
@@ -98,8 +93,8 @@ if (hardhatNetworkEnvironment === "fork") {
        * synthetic author allows third-party accounts to execute the option on their behalf
        * i.e: it's necessary if the msg.sender calling `core.execute` is an intermediary contract rather than the synthetic author's account itself
        */
-      await optionPutSyntheticIdMock.connect(users.seller).allowThirdpartyExecution(true);
-      await optionPutSyntheticIdMock.connect(users.buyer).allowThirdpartyExecution(true);
+      await optionPutPartSyntheticId.connect(users.seller).allowThirdpartyExecution(true);
+      await optionPutPartSyntheticId.connect(users.buyer).allowThirdpartyExecution(true);
     });
 
     it("creates a derivative and mints a market neutral LONG/SHORT position amount", async () => {
@@ -179,13 +174,13 @@ if (hardhatNetworkEnvironment === "fork") {
       await optionController.connect(users.buyer).executeLong(amount);
 
       const { buyerPayout: buyerPayoutRatio, sellerPayout: sellerPayoutRatio } =
-        await optionPutSyntheticIdMock.getExecutionPayout(
+        await optionPutPartSyntheticId.getExecutionPayout(
           derivative,
           await oracleAggregator.getData(chainlinkOracleSubId.address, derivative.endTime),
         );
 
-      const { buyerMargin, sellerMargin } = await optionPutSyntheticIdMock.getMargin(derivative);
-      const authorFeeCommission = await optionPutSyntheticIdMock.getAuthorCommission();
+      const { buyerMargin, sellerMargin } = await optionPutPartSyntheticId.getMargin(derivative);
+      const authorFeeCommission = await optionPutPartSyntheticId.getAuthorCommission();
       const { protocolExecutionReservePart } = await registry.getProtocolParameters();
 
       // helper function to compute the fees deducted from the executed LONG positions, if any
