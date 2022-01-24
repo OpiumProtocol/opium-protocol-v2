@@ -484,9 +484,9 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
         require(longOpiumPositionTokenParams.positionType == LibDerivative.PositionType.LONG, "C3");
         require(shortOpiumPositionTokenParams.positionType == LibDerivative.PositionType.SHORT, "C3");
 
-        ISyntheticAggregator.SyntheticCache memory syntheticCache = protocolAddressesArgs
-            .syntheticAggregator
-            .getOrCacheSyntheticCache(
+        ISyntheticAggregator.SyntheticCache memory syntheticCache = ISyntheticAggregator(
+            protocolAddressesArgs.syntheticAggregator
+        ).getOrCacheSyntheticCache(
                 shortOpiumPositionTokenParams.derivativeHash,
                 shortOpiumPositionTokenParams.derivative
             );
@@ -505,7 +505,7 @@ contract Core is ReentrancyGuardUpgradeable, RegistryManager {
 
         _decreaseP2PVault(shortOpiumPositionTokenParams.derivativeHash, totalMargin);
 
-        protocolAddressesArgs.opiumProxyFactory.burnPair(
+        IOpiumProxyFactory(protocolAddressesArgs.opiumProxyFactory).burnPair(
             msg.sender,
             _positionsAddresses[0],
             _positionsAddresses[1],
