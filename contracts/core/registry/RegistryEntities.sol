@@ -25,7 +25,6 @@ library RegistryEntities {
         uint32 __gapOne;
         uint32 __gapTwo;
         uint32 __gapThree;
-        uint32 __gapFour;
     }
 
     struct ProtocolAddressesArgs {
