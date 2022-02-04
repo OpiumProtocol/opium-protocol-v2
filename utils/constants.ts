@@ -23,7 +23,6 @@ export const redeemOne = "redeem(address[2],uint256)";
 export const redeemMany = "redeem(address[2][],uint256[])";
 export const create = "redeem(address[2][],uint256[])";
 
-
 export const governanceRoles = Object.freeze({
   defaultAdminRole: "0x0000000000000000000000000000000000000000000000000000000000000000",
   protocolAddressesSetterRole: ethers.utils.keccak256(ethers.utils.toUtf8Bytes("RL1")),

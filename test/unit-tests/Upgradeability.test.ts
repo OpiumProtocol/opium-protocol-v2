@@ -174,7 +174,7 @@ describe("Upgradeability", () => {
     const { deploy } = deployments;
     const { oracleAggregator: oracleAggregatorAddressBefore } = await registry.getProtocolAddresses();
 
-    await oracleAggregator.__callback(1, 10)
+    await oracleAggregator.__callback(1, 10);
 
     const oracleAggregatorImplementationAddressBefore = (
       await deployments.getDeploymentsFromAddress(oracleAggregator.address)
@@ -186,7 +186,7 @@ describe("Upgradeability", () => {
       log: true,
       proxy: {
         owner: deployer.address,
-        proxyContract: "OpenZeppelinTransparentProxy"
+        proxyContract: "OpenZeppelinTransparentProxy",
       },
     });
 
@@ -200,17 +200,20 @@ describe("Upgradeability", () => {
 
     const { oracleAggregator: oracleAggregatorAddressAfter } = await registry.getProtocolAddresses();
 
-    await upgraded.__callback(2, 20)
+    await upgraded.__callback(2, 20);
 
-    const oracleAggregatorTestData = await oracleAggregator.getData(deployer.address, 1)
+    const oracleAggregatorTestData = await oracleAggregator.getData(deployer.address, 1);
     const upgradedOracleAggregatorTestData = await upgraded.getData(deployer.address, 1);
     const oracleAggregatorTestDataAfterUpgrade = await oracleAggregator.getData(deployer.address, 2);
     const upgradedOracleAggregatorTestDataAfterUpgrade = await upgraded.getData(deployer.address, 2);
 
-    expect(await upgraded.placeholder(), "Unexpected value for placeholder function").to.be.eq('upgraded');
-    expect(Object.keys(upgraded.functions).indexOf("placeholder") > -1, "Upgraded has unexpected function signature")
-      .to.be.true;
-    expect(Object.keys(oracleAggregator.functions).indexOf("placeholder") > -1, 'OracleAggregator has unexpected function signature').to.be.false;
+    expect(await upgraded.placeholder(), "Unexpected value for placeholder function").to.be.eq("upgraded");
+    expect(Object.keys(upgraded.functions).indexOf("placeholder") > -1, "Upgraded has unexpected function signature").to
+      .be.true;
+    expect(
+      Object.keys(oracleAggregator.functions).indexOf("placeholder") > -1,
+      "OracleAggregator has unexpected function signature",
+    ).to.be.false;
     expect(oracleAggregatorTestData).to.be.eq(10);
     expect(upgradedOracleAggregatorTestData).to.be.eq(10);
     expect(upgradedOracleAggregatorTestDataAfterUpgrade).to.be.eq(20);
@@ -219,7 +222,6 @@ describe("Upgradeability", () => {
     expect(oracleAggregatorImplementationAddressBefore).to.not.be.eq(oracleAggregatorImplementationAddressAfter);
     expect(oracleAggregatorAddressBefore).to.be.eq(oracleAggregatorAddressAfter);
     expect(oracleAggregatorImplementationAddressAfter).to.be.eq(upgradedImplementationAddress);
-
   });
 
   it("should upgrade Core", async () => {

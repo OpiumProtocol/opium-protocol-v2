@@ -90,7 +90,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const registryInstance = <Registry>await ethers.getContract("Registry");
 
-  await registryInstance
+  const tx1 = await registryInstance
     .connect(governor)
     .setProtocolAddresses(
       opiumProxyFactory.address,
@@ -99,12 +99,23 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       syntheticAggregator.address,
       tokenSpender.address,
     );
-  await registryInstance.connect(governor).setProtocolExecutionReserveClaimer(deployer.address);
-  await registryInstance.connect(governor).setProtocolRedemptionReserveClaimer(redemptionReserveClaimer.address);
-  await registryInstance.connect(governor).addToWhitelist(core.address);
+  await tx1.wait();
+
+  const tx2 = await registryInstance.connect(governor).setProtocolExecutionReserveClaimer(deployer.address);
+  await tx2.wait();
+
+  const tx3 = await registryInstance
+    .connect(governor)
+    .setProtocolRedemptionReserveClaimer(redemptionReserveClaimer.address);
+  await tx3.wait();
+
+  const tx4 = await registryInstance.connect(governor).addToWhitelist(core.address);
+  await tx4.wait();
 
   const coreInstance = <Core>await ethers.getContract("Core");
-  await coreInstance.connect(governor).updateProtocolAddresses();
+
+  const tx5 = await coreInstance.connect(governor).updateProtocolAddresses();
+  await tx5.wait();
 };
 
 export default func;

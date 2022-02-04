@@ -21,20 +21,19 @@ import {
   TestToken,
   ChainlinkOracleSubId,
   OracleAggregator,
-  OptionPutSyntheticIdMock,
   OptionPutPartSyntheticId,
 } from "../../../typechain";
 import { TDerivative } from "../../../types";
 import { timeTravel } from "../../../utils/evm";
 import { decodeEvents } from "../../../utils/events";
-import { hardhatNetworkEnvironment } from "../../../hardhat.config";
+import config from "../../../hardhatHelpers/config";
 
 /**
  * set the process.env.HARDHAT_NETWORK_ENVIRONMENT to `fork` to run the current tests using the Ethereum mainnet
  * {see hardhat.config.ts}
  */
 
-if (hardhatNetworkEnvironment === "fork") {
+if (config.hardhatNetworkEnvironment === "fork") {
   describe.skip("e2e", function () {
     let users: TNamedSigners;
     let registry: Registry;

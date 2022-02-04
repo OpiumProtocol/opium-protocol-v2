@@ -11,18 +11,18 @@ describe("TokenSpender", () => {
   it("should revert spending by non whitelisted address", async () => {
     const {
       contracts: { tokenSpender, testToken },
-      users: { deployer, hacker },
+      users: { deployer, notAllowed },
     } = await setup();
 
     await expect(
-      tokenSpender.claimTokens(testToken.address, deployer.address, hacker.address, toBN("0.01")),
+      tokenSpender.claimTokens(testToken.address, deployer.address, notAllowed.address, toBN("0.01")),
     ).to.be.revertedWith(pickError(semanticErrors.ERROR_TOKEN_SPENDER_NOT_WHITELISTED));
   });
 
   it("should successfully spend by core", async () => {
     const {
       contracts: { tokenSpender, testToken, core },
-      users: { goodGuy, deployer },
+      users: { authorized, deployer },
     } = await setup();
 
     const coreImpersonator = await impersonateAccount(core.address);
@@ -35,8 +35,8 @@ describe("TokenSpender", () => {
 
     await tokenSpender
       .connect(coreImpersonator)
-      .claimTokens(testToken.address, coreImpersonator.address, goodGuy.address, toBN("0.01"));
+      .claimTokens(testToken.address, coreImpersonator.address, authorized.address, toBN("0.01"));
 
-    expect(await testToken.balanceOf(goodGuy.address)).to.equal(toBN("0.01"));
+    expect(await testToken.balanceOf(authorized.address)).to.equal(toBN("0.01"));
   });
 });
