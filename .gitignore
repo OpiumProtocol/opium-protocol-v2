@@ -13,7 +13,6 @@ dist/
 lib/
 node_modules/
 typechain/
-deployments/
 
 # files
 *.env

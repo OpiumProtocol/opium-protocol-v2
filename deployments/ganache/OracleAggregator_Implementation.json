@@ -1,0 +1,240 @@
+{
+  "address": "0x22551148fa6fe97701da8D17A9023eBF51AbF603",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_oracleId",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_timestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_data",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogDataProvided",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "data",
+          "type": "uint256"
+        }
+      ],
+      "name": "__callback",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "oracleId",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "getData",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "dataResult",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "oracleId",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "hasData",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "result",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xc86f6be9545ffab433df7ffef852ce622251723f94ac98747178e8246c2ebcc0",
+  "receipt": {
+    "to": null,
+    "from": "0xc188c5Aafaaf847d9D887f80590267F6dc1a1b2f",
+    "contractAddress": "0x22551148fa6fe97701da8D17A9023eBF51AbF603",
+    "transactionIndex": 0,
+    "gasUsed": "196489",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x884b6938548f18793060835cc695e8f01fc82de5437892cea31b0ff53580b0db",
+    "transactionHash": "0xc86f6be9545ffab433df7ffef852ce622251723f94ac98747178e8246c2ebcc0",
+    "logs": [],
+    "blockNumber": 10,
+    "cumulativeGasUsed": "196489",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "bb75287ab88909f5b293c59b7a90cef6",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_oracleId\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_data\",\"type\":\"uint256\"}],\"name\":\"LogDataProvided\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"data\",\"type\":\"uint256\"}],\"name\":\"__callback\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"getData\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"dataResult\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"hasData\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"result\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"__callback(uint256,uint256)\":{\"params\":{\"data\":\"uint256 Data itself\",\"timestamp\":\"uint256 Timestamp of data\"}},\"getData(address,uint256)\":{\"params\":{\"oracleId\":\"address Address of the `oracleId` smart contract\",\"timestamp\":\"uint256 Timestamp at which data were requested\"},\"returns\":{\"dataResult\":\"uint256 Cached data provided by `oracleId`\"}},\"hasData(address,uint256)\":{\"params\":{\"oracleId\":\"address Address of the `oracleId` smart contract\",\"result\":\"bool Returns whether data were provided already\",\"timestamp\":\"uint256 Timestamp at which data were requested\"}}},\"title\":\"Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"__callback(uint256,uint256)\":{\"notice\":\"Receives and caches data from `msg.sender`\"},\"getData(address,uint256)\":{\"notice\":\"Returns cached data if they exist, or reverts with an error\"},\"hasData(address,uint256)\":{\"notice\":\"Getter for dataExist mapping\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/core/OracleAggregator.sol\":\"OracleAggregator\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"contracts/core/OracleAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/**\\n    Error codes:\\n    - O1 = ERROR_ORACLE_AGGREGATOR_DATA_ALREADY_EXISTS\\n    - O2 = ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST\\n */\\n\\n/// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\\ncontract OracleAggregator {\\n    event LogDataProvided(address indexed _oracleId, uint256 indexed _timestamp, uint256 indexed _data);\\n    // Storage for the `oracleId` results\\n    // dataCache[oracleId][timestamp] => data\\n    mapping(address => mapping(uint256 => uint256)) private dataCache;\\n\\n    // Flags whether data were provided\\n    // dataExist[oracleId][timestamp] => bool\\n    mapping(address => mapping(uint256 => bool)) private dataExist;\\n\\n    // EXTERNAL FUNCTIONS\\n\\n    /// @notice Receives and caches data from `msg.sender`\\n    /// @param timestamp uint256 Timestamp of data\\n    /// @param data uint256 Data itself\\n    function __callback(uint256 timestamp, uint256 data) external {\\n        // Don't allow to push data twice\\n        require(!dataExist[msg.sender][timestamp], \\\"O1\\\");\\n\\n        // Saving data\\n        dataCache[msg.sender][timestamp] = data;\\n\\n        // Flagging that data were received\\n        dataExist[msg.sender][timestamp] = true;\\n\\n        emit LogDataProvided(msg.sender, timestamp, data);\\n    }\\n\\n    // VIEW FUNCTIONS\\n\\n    /// @notice Returns cached data if they exist, or reverts with an error\\n    /// @param oracleId address Address of the `oracleId` smart contract\\n    /// @param timestamp uint256 Timestamp at which data were requested\\n    /// @return dataResult uint256 Cached data provided by `oracleId`\\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult) {\\n        // Check if Opium.OracleAggregator has data\\n        require(hasData(oracleId, timestamp), \\\"O2\\\");\\n\\n        // Return cached data\\n        dataResult = dataCache[oracleId][timestamp];\\n    }\\n\\n    /// @notice Getter for dataExist mapping\\n    /// @param oracleId address Address of the `oracleId` smart contract\\n    /// @param timestamp uint256 Timestamp at which data were requested\\n    /// @param result bool Returns whether data were provided already\\n    function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {\\n        return dataExist[oracleId][timestamp];\\n    }\\n\\n    // Reserved storage space to allow for layout changes in the future.\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x48bfd300fde793561ce4c68b294f7c15a28f785ac89714797e86a7a2f9d418a2\",\"license\":\"agpl-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610297806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80632979d025146100465780633102e5ab1461006c578063c8384d2f14610081575b600080fd5b610059610054366004610207565b6100ca565b6040519081526020015b60405180910390f35b61007f61007a36600461023f565b61014d565b005b6100ba61008f366004610207565b6001600160a01b03919091166000908152600160209081526040808320938352929052205460ff1690565b6040519015158152602001610063565b6001600160a01b038216600090815260016020908152604080832084845290915281205460ff166101275760405162461bcd60e51b8152602060048201526002602482015261279960f11b60448201526064015b60405180910390fd5b506001600160a01b03909116600090815260208181526040808320938352929052205490565b33600090815260016020908152604080832085845290915290205460ff161561019d5760405162461bcd60e51b81526020600482015260026024820152614f3160f01b604482015260640161011e565b3360008181526020818152604080832086845282528083208590558383526001808352818420878552909252808320805460ff1916909217909155518392859290917fbafe09c91210ac772a509fe28b36bf6b3c82f1aa1db44d58721d57a9595417de9190a45050565b6000806040838503121561021a57600080fd5b82356001600160a01b038116811461023157600080fd5b946020939093013593505050565b6000806040838503121561025257600080fd5b5050803592602090910135915056fea2646970667358221220285c5e7f5702c9e18d23c3371355364ac0c60109d736d927c56bd1a49355bd7864736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80632979d025146100465780633102e5ab1461006c578063c8384d2f14610081575b600080fd5b610059610054366004610207565b6100ca565b6040519081526020015b60405180910390f35b61007f61007a36600461023f565b61014d565b005b6100ba61008f366004610207565b6001600160a01b03919091166000908152600160209081526040808320938352929052205460ff1690565b6040519015158152602001610063565b6001600160a01b038216600090815260016020908152604080832084845290915281205460ff166101275760405162461bcd60e51b8152602060048201526002602482015261279960f11b60448201526064015b60405180910390fd5b506001600160a01b03909116600090815260208181526040808320938352929052205490565b33600090815260016020908152604080832085845290915290205460ff161561019d5760405162461bcd60e51b81526020600482015260026024820152614f3160f01b604482015260640161011e565b3360008181526020818152604080832086845282528083208590558383526001808352818420878552909252808320805460ff1916909217909155518392859290917fbafe09c91210ac772a509fe28b36bf6b3c82f1aa1db44d58721d57a9595417de9190a45050565b6000806040838503121561021a57600080fd5b82356001600160a01b038116811461023157600080fd5b946020939093013593505050565b6000806040838503121561025257600080fd5b5050803592602090910135915056fea2646970667358221220285c5e7f5702c9e18d23c3371355364ac0c60109d736d927c56bd1a49355bd7864736f6c63430008050033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "__callback(uint256,uint256)": {
+        "params": {
+          "data": "uint256 Data itself",
+          "timestamp": "uint256 Timestamp of data"
+        }
+      },
+      "getData(address,uint256)": {
+        "params": {
+          "oracleId": "address Address of the `oracleId` smart contract",
+          "timestamp": "uint256 Timestamp at which data were requested"
+        },
+        "returns": {
+          "dataResult": "uint256 Cached data provided by `oracleId`"
+        }
+      },
+      "hasData(address,uint256)": {
+        "params": {
+          "oracleId": "address Address of the `oracleId` smart contract",
+          "result": "bool Returns whether data were provided already",
+          "timestamp": "uint256 Timestamp at which data were requested"
+        }
+      }
+    },
+    "title": "Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "__callback(uint256,uint256)": {
+        "notice": "Receives and caches data from `msg.sender`"
+      },
+      "getData(address,uint256)": {
+        "notice": "Returns cached data if they exist, or reverts with an error"
+      },
+      "hasData(address,uint256)": {
+        "notice": "Getter for dataExist mapping"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 16,
+        "contract": "contracts/core/OracleAggregator.sol:OracleAggregator",
+        "label": "dataCache",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))"
+      },
+      {
+        "astId": 22,
+        "contract": "contracts/core/OracleAggregator.sol:OracleAggregator",
+        "label": "dataExist",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))"
+      },
+      {
+        "astId": 115,
+        "contract": "contracts/core/OracleAggregator.sol:OracleAggregator",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_array(t_uint256)50_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_uint256)50_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[50]",
+        "numberOfBytes": "1600"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => mapping(uint256 => bool))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint256,t_bool)"
+      },
+      "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => mapping(uint256 => uint256))",
+        "numberOfBytes": "32",
+        "value": "t_mapping(t_uint256,t_uint256)"
+      },
+      "t_mapping(t_uint256,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_uint256,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

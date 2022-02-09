@@ -1,0 +1,402 @@
+{
+  "address": "0xdcb23fe246d25BaB794132f44AdBf483cc200394",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
+        }
+      ],
+      "name": "LogMetadataSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "allow",
+          "type": "bool"
+        }
+      ],
+      "name": "allowThirdpartyExecution",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAuthorAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAuthorCommission",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "_derivative",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_result",
+          "type": "uint256"
+        }
+      ],
+      "name": "getExecutionPayout",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "buyerPayout",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "sellerPayout",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "_derivative",
+          "type": "tuple"
+        }
+      ],
+      "name": "getMargin",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "buyerMargin",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "sellerMargin",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getSyntheticIdName",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "derivativeOwner",
+          "type": "address"
+        }
+      ],
+      "name": "thirdpartyExecutionAllowed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "_derivative",
+          "type": "tuple"
+        }
+      ],
+      "name": "validateInput",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x3c270c663ef50062fb9dd10e691ccac0d9e128fafbdf183757e9af82672c946b",
+  "receipt": {
+    "to": null,
+    "from": "0xc188c5Aafaaf847d9D887f80590267F6dc1a1b2f",
+    "contractAddress": "0xdcb23fe246d25BaB794132f44AdBf483cc200394",
+    "transactionIndex": 0,
+    "gasUsed": "403998",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000",
+    "blockHash": "0x4217f2648316046ec047d40e3f8eeb6f293a6245c714670866840d6041b57330",
+    "transactionHash": "0x3c270c663ef50062fb9dd10e691ccac0d9e128fafbdf183757e9af82672c946b",
+    "logs": [
+      {
+        "transactionIndex": 0,
+        "blockNumber": 19,
+        "transactionHash": "0x3c270c663ef50062fb9dd10e691ccac0d9e128fafbdf183757e9af82672c946b",
+        "address": "0xdcb23fe246d25BaB794132f44AdBf483cc200394",
+        "topics": ["0x0b11cbc9c1f60ccfdad79229add00f3dfa05137343e96ef525274af03c5d19d0"],
+        "data": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000607b22617574686f72223a224449422e4f4e45222c2274797065223a226f7074696f6e222c2273756274797065223a2263616c6c222c226465736372697074696f6e223a224f7074696f6e2043616c6c206c6f67696320636f6e7472616374227d",
+        "logIndex": 0,
+        "blockHash": "0x4217f2648316046ec047d40e3f8eeb6f293a6245c714670866840d6041b57330"
+      }
+    ],
+    "blockNumber": 19,
+    "cumulativeGasUsed": "403998",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "58dbb558cb816b5402f8301bbf18d319",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"metadata\",\"type\":\"string\"}],\"name\":\"LogMetadataSet\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"allow\",\"type\":\"bool\"}],\"name\":\"allowThirdpartyExecution\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAuthorAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAuthorCommission\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"_derivative\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"_result\",\"type\":\"uint256\"}],\"name\":\"getExecutionPayout\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"buyerPayout\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sellerPayout\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"_derivative\",\"type\":\"tuple\"}],\"name\":\"getMargin\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"buyerMargin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sellerMargin\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getSyntheticIdName\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"derivativeOwner\",\"type\":\"address\"}],\"name\":\"thirdpartyExecutionAllowed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"_derivative\",\"type\":\"tuple\"}],\"name\":\"validateInput\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getAuthorAddress()\":{\"returns\":{\"_0\":\"address syntheticId author address\"}},\"getAuthorCommission()\":{\"returns\":{\"_0\":\"uint26 syntheticId author commission\"}},\"getExecutionPayout((uint256,uint256,uint256[],address,address,address),uint256)\":{\"params\":{\"_derivative\":\"Derivative Instance of derivative\",\"_result\":\"uint256 Data retrieved from oracleId on the maturity\"},\"returns\":{\"buyerPayout\":\"uint256 Payout in ratio for buyer (LONG position holder)\",\"sellerPayout\":\"uint256 Payout in ratio for seller (SHORT position holder)\"}},\"getMargin((uint256,uint256,uint256[],address,address,address))\":{\"params\":{\"_derivative\":\"Derivative Instance of derivative\"},\"returns\":{\"buyerMargin\":\"uint256 Margin needed from buyer (LONG position)\",\"sellerMargin\":\"uint256 Margin needed from seller (SHORT position)\"}},\"getSyntheticIdName()\":{\"returns\":{\"_0\":\"Returns the custom name of a derivative ticker which will be used as part of the name of its positions\"}},\"validateInput((uint256,uint256,uint256[],address,address,address))\":{\"params\":{\"_derivative\":\"Derivative Instance of derivative to validate\"},\"returns\":{\"_0\":\"Returns boolean whether ticker is valid\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getAuthorAddress()\":{\"notice\":\"Getter for syntheticId author address\"},\"getAuthorCommission()\":{\"notice\":\"Getter for syntheticId author commission\"},\"getExecutionPayout((uint256,uint256,uint256[],address,address,address),uint256)\":{\"notice\":\"Calculates payout for derivative execution\"},\"getMargin((uint256,uint256,uint256[],address,address,address))\":{\"notice\":\"Calculates margin required for derivative creation\"},\"validateInput((uint256,uint256,uint256[],address,address,address))\":{\"notice\":\"Validates ticker\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/test/mocks/synthetics/OptionCallSyntheticIdMock.sol\":\"OptionCallSyntheticIdMock\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"contracts/helpers/ExecutableByThirdParty.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/// @title Opium.Helpers.ExecutableByThirdParty contract helps to syntheticId development and responsible for getting and setting thirdparty execution settings\\nabstract contract ExecutableByThirdParty {\\n    // Mapping holds whether position owner allows thirdparty execution\\n    mapping(address => bool) private thirdpartyExecutionAllowance;\\n\\n    /// @notice Getter for thirdparty execution allowance\\n    /// @param derivativeOwner Address of position holder that's going to be executed\\n    /// @return bool Returns whether thirdparty execution is allowed by derivativeOwner\\n    function thirdpartyExecutionAllowed(address derivativeOwner) public view virtual returns (bool) {\\n        return thirdpartyExecutionAllowance[derivativeOwner];\\n    }\\n\\n    /// @notice Sets third party execution settings for `msg.sender`\\n    /// @param allow Indicates whether thirdparty execution should be allowed or not\\n    function allowThirdpartyExecution(bool allow) public virtual {\\n        thirdpartyExecutionAllowance[msg.sender] = allow;\\n    }\\n}\\n\",\"keccak256\":\"0x3c968a22e381b6e1d5b08231dbee84a735dd70eda408fa26ee827ea34200b3cf\",\"license\":\"agpl-3.0\"},\"contracts/helpers/HasCommission.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/// @title Opium.Helpers.HasCommission contract helps to syntheticId development and responsible for commission and author address\\nabstract contract HasCommission {\\n    // Address of syntheticId author\\n    address private author;\\n    // Commission is in Opium.Lib.LibCommission.COMMISSION_BASE base\\n    uint256 private constant AUTHOR_COMMISSION = 25; // 0.25% of profit\\n\\n    /// @notice Sets `msg.sender` as syntheticId author\\n    constructor() {\\n        author = msg.sender;\\n    }\\n\\n    /// @notice Getter for syntheticId author address\\n    /// @return address syntheticId author address\\n    function getAuthorAddress() public view virtual returns (address) {\\n        return author;\\n    }\\n\\n    /// @notice Getter for syntheticId author commission\\n    /// @return uint26 syntheticId author commission\\n    function getAuthorCommission() public view virtual returns (uint256) {\\n        return AUTHOR_COMMISSION;\\n    }\\n}\\n\",\"keccak256\":\"0x698a67ac94c0a75f01d7382e4ed068cfa6fbebcfcf1f45a7c6398ec6c1854361\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/IDerivativeLogic.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"../libs/LibDerivative.sol\\\";\\n\\n/// @title Opium.Interface.IDerivativeLogic is an interface that every syntheticId should implement\\ninterface IDerivativeLogic {\\n    // Event with syntheticId metadata JSON string (for DIB.ONE derivative explorer)\\n    event LogMetadataSet(string metadata);\\n\\n    /// @notice Validates ticker\\n    /// @param _derivative Derivative Instance of derivative to validate\\n    /// @return Returns boolean whether ticker is valid\\n    function validateInput(LibDerivative.Derivative memory _derivative) external view returns (bool);\\n\\n    /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions\\n    function getSyntheticIdName() external view returns (string memory);\\n\\n    /// @notice Calculates margin required for derivative creation\\n    /// @param _derivative Derivative Instance of derivative\\n    /// @return buyerMargin uint256 Margin needed from buyer (LONG position)\\n    /// @return sellerMargin uint256 Margin needed from seller (SHORT position)\\n    function getMargin(LibDerivative.Derivative memory _derivative)\\n        external\\n        view\\n        returns (uint256 buyerMargin, uint256 sellerMargin);\\n\\n    /// @notice Calculates payout for derivative execution\\n    /// @param _derivative Derivative Instance of derivative\\n    /// @param _result uint256 Data retrieved from oracleId on the maturity\\n    /// @return buyerPayout uint256 Payout in ratio for buyer (LONG position holder)\\n    /// @return sellerPayout uint256 Payout in ratio for seller (SHORT position holder)\\n    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)\\n        external\\n        view\\n        returns (uint256 buyerPayout, uint256 sellerPayout);\\n\\n    /// @notice Returns syntheticId author address for Opium commissions\\n    /// @return authorAddress address The address of syntheticId address\\n    function getAuthorAddress() external view returns (address authorAddress);\\n\\n    /// @notice Returns syntheticId author commission in base of COMMISSION_BASE\\n    /// @return commission uint256 Author commission\\n    function getAuthorCommission() external view returns (uint256 commission);\\n\\n    /// @notice Returns whether thirdparty could execute on derivative's owner's behalf\\n    /// @param _derivativeOwner address Derivative owner address\\n    /// @return Returns boolean whether _derivativeOwner allowed third party execution\\n    function thirdpartyExecutionAllowed(address _derivativeOwner) external view returns (bool);\\n\\n    /// @notice Sets whether thirds parties are allowed or not to execute derivative's on msg.sender's behalf\\n    /// @param _allow bool Flag for execution allowance\\n    function allowThirdpartyExecution(bool _allow) external;\\n}\\n\",\"keccak256\":\"0x5e1d999a6634d35d25faf8a75072fda36c348bac716428d854fcdcee78c69346\",\"license\":\"agpl-3.0\"},\"contracts/libs/LibDerivative.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/// @title Opium.Lib.LibDerivative contract should be inherited by contracts that use Derivative structure and calculate derivativeHash\\nlibrary LibDerivative {\\n    enum PositionType {\\n        SHORT,\\n        LONG\\n    }\\n\\n    // Opium derivative structure (ticker) definition\\n    struct Derivative {\\n        // Margin parameter for syntheticId\\n        uint256 margin;\\n        // Maturity of derivative\\n        uint256 endTime;\\n        // Additional parameters for syntheticId\\n        uint256[] params;\\n        // oracleId of derivative\\n        address oracleId;\\n        // Margin token address of derivative\\n        address token;\\n        // syntheticId of derivative\\n        address syntheticId;\\n    }\\n\\n    /// @notice Calculates hash of provided Derivative\\n    /// @param _derivative Derivative Instance of derivative to hash\\n    /// @return derivativeHash bytes32 Derivative hash\\n    function getDerivativeHash(Derivative memory _derivative) internal pure returns (bytes32 derivativeHash) {\\n        derivativeHash = keccak256(\\n            abi.encodePacked(\\n                _derivative.margin,\\n                _derivative.endTime,\\n                _derivative.params,\\n                _derivative.oracleId,\\n                _derivative.token,\\n                _derivative.syntheticId\\n            )\\n        );\\n    }\\n}\\n\",\"keccak256\":\"0x8dc20b755b97c78a16d4c51b55efb29b9224e6117c1c8703e1716fd15539f12c\",\"license\":\"agpl-3.0\"},\"contracts/test/mocks/synthetics/OptionCallSyntheticIdMock.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"../../../interfaces/IDerivativeLogic.sol\\\";\\nimport \\\"../../../helpers/ExecutableByThirdParty.sol\\\";\\nimport \\\"../../../helpers/HasCommission.sol\\\";\\n\\ncontract OptionCallSyntheticIdMock is IDerivativeLogic, ExecutableByThirdParty, HasCommission {\\n    uint256 constant BASE_PPT = 1 ether;\\n\\n    constructor() {\\n        /*\\n        {\\n            \\\"author\\\": \\\"DIB.ONE\\\",\\n            \\\"type\\\": \\\"option\\\",\\n            \\\"subtype\\\": \\\"call\\\",\\n            \\\"description\\\": \\\"Option Call logic contract\\\"\\n        }\\n        */\\n        emit LogMetadataSet(\\n            '{\\\"author\\\":\\\"DIB.ONE\\\",\\\"type\\\":\\\"option\\\",\\\"subtype\\\":\\\"call\\\",\\\"description\\\":\\\"Option Call logic contract\\\"}'\\n        );\\n    }\\n\\n    /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions\\n    function getSyntheticIdName() external pure override returns (string memory) {\\n        return \\\"Riccardo's derivative shop\\\";\\n    }\\n\\n    /// @notice Getter for syntheticId author address\\n    /// @return address syntheticId author address\\n    function getAuthorAddress() public view virtual override(IDerivativeLogic, HasCommission) returns (address) {\\n        return HasCommission.getAuthorAddress();\\n    }\\n\\n    /// @notice Getter for syntheticId author commission\\n    /// @return uint26 syntheticId author commission\\n    function getAuthorCommission() public view override(IDerivativeLogic, HasCommission) returns (uint256) {\\n        return HasCommission.getAuthorCommission();\\n    }\\n\\n    function validateInput(LibDerivative.Derivative calldata _derivative) external view override returns (bool) {\\n        if (_derivative.params.length < 1) {\\n            return false;\\n        }\\n\\n        uint256 ppt;\\n\\n        if (_derivative.params.length == 2) {\\n            ppt = _derivative.params[1];\\n        } else {\\n            ppt = BASE_PPT;\\n        }\\n\\n        uint256 strikePrice = _derivative.params[0];\\n        return (_derivative.margin > 0 && _derivative.endTime > block.timestamp && strikePrice > 0 && ppt > 0);\\n    }\\n\\n    function getMargin(LibDerivative.Derivative calldata _derivative)\\n        external\\n        pure\\n        override\\n        returns (uint256 buyerMargin, uint256 sellerMargin)\\n    {\\n        buyerMargin = 0;\\n        sellerMargin = _derivative.margin;\\n    }\\n\\n    function getExecutionPayout(LibDerivative.Derivative calldata _derivative, uint256 _result)\\n        external\\n        pure\\n        override\\n        returns (uint256 buyerPayout, uint256 sellerPayout)\\n    {\\n        uint256 ppt;\\n\\n        uint256 strikePrice = _derivative.params[0];\\n\\n        if (_derivative.params.length == 2) {\\n            ppt = _derivative.params[1];\\n        } else {\\n            ppt = BASE_PPT;\\n        }\\n\\n        if (_result > strikePrice) {\\n            uint256 profit = _result - strikePrice;\\n            profit = (profit * ppt) / BASE_PPT;\\n\\n            if (profit < _derivative.margin) {\\n                buyerPayout = profit;\\n                sellerPayout = _derivative.margin - profit;\\n            } else {\\n                buyerPayout = _derivative.margin;\\n                sellerPayout = 0;\\n            }\\n        } else {\\n            buyerPayout = 0;\\n            sellerPayout = _derivative.margin;\\n        }\\n    }\\n\\n    function allowThirdpartyExecution(bool allow) public virtual override(IDerivativeLogic, ExecutableByThirdParty) {\\n        ExecutableByThirdParty.allowThirdpartyExecution(allow);\\n    }\\n\\n    function thirdpartyExecutionAllowed(address derivativeOwner)\\n        public\\n        view\\n        virtual\\n        override(IDerivativeLogic, ExecutableByThirdParty)\\n        returns (bool)\\n    {\\n        return ExecutableByThirdParty.thirdpartyExecutionAllowed(derivativeOwner);\\n    }\\n}\\n\",\"keccak256\":\"0x8f0b3c65c9ccdd0eed38de55d8240e7b69c453b2cebebb440b6260cad1e360cd\",\"license\":\"agpl-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50600180546001600160a01b031916331790556040517f0b11cbc9c1f60ccfdad79229add00f3dfa05137343e96ef525274af03c5d19d0906100d090602080825260609082018190527f7b22617574686f72223a224449422e4f4e45222c2274797065223a226f70746960408301527f6f6e222c2273756274797065223a2263616c6c222c226465736372697074696f908201527f6e223a224f7074696f6e2043616c6c206c6f67696320636f6e7472616374227d608082015260a00190565b60405180910390a16105db806100e76000396000f3fe608060405234801561001057600080fd5b50600436106100885760003560e01c80633d6490b81161005b5780633d6490b81461011d578063a4300ee51461015c578063dd0060fd1461017c578063f22430e81461018f57600080fd5b80630433fe451461008d5780630e49dee8146100bd5780633a6f60a9146100eb5780633a84543e1461010e575b600080fd5b6100a361009b366004610401565b600091903590565b604080519283526020830191909152015b60405180910390f35b6100e96100cb3660046103df565b336000908152602081905260409020805460ff191682151517905550565b005b6100fe6100f9366004610401565b6101bb565b60405190151581526020016100b4565b604051601981526020016100b4565b604080518082018252601a81527f526963636172646f277320646572697661746976652073686f70000000000000602082015290516100b4919061047b565b610164610291565b6040516001600160a01b0390911681526020016100b4565b6100a361018a366004610436565b6102a5565b6100fe61019d3660046103af565b6001600160a01b031660009081526020819052604090205460ff1690565b600060016101cc60408401846104d0565b905010156101dc57506000919050565b60006101eb60408401846104d0565b9050600214156102215761020260408401846104d0565b60018181106102135761021361058f565b90506020020135905061022c565b50670de0b6b3a76400005b600061023b60408501856104d0565b600081811061024c5761024c61058f565b9050602002013590506000846000013511801561026c5750428460200135115b80156102785750600081115b80156102845750600082115b949350505050565b905090565b600061028c6001546001600160a01b031690565b60008080806102b760408701876104d0565b60008181106102c8576102c861058f565b9050602002013590508580604001906102e191906104d0565b905060021415610317576102f860408701876104d0565b60018181106103095761030961058f565b905060200201359150610323565b670de0b6b3a764000091505b808511156103855760006103378287610562565b9050670de0b6b3a764000061034c8483610543565b6103569190610521565b905086358110156103765793508361036f818835610562565b935061037f565b86359450600093505b5061038e565b60009350853592505b50509250929050565b600060c082840312156103a957600080fd5b50919050565b6000602082840312156103c157600080fd5b81356001600160a01b03811681146103d857600080fd5b9392505050565b6000602082840312156103f157600080fd5b813580151581146103d857600080fd5b60006020828403121561041357600080fd5b813567ffffffffffffffff81111561042a57600080fd5b61028484828501610397565b6000806040838503121561044957600080fd5b823567ffffffffffffffff81111561046057600080fd5b61046c85828601610397565b95602094909401359450505050565b600060208083528351808285015260005b818110156104a85785810183015185820160400152820161048c565b818111156104ba576000604083870101525b50601f01601f1916929092016040019392505050565b6000808335601e198436030181126104e757600080fd5b83018035915067ffffffffffffffff82111561050257600080fd5b6020019150600581901b360382131561051a57600080fd5b9250929050565b60008261053e57634e487b7160e01b600052601260045260246000fd5b500490565b600081600019048311821515161561055d5761055d610579565b500290565b60008282101561057457610574610579565b500390565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fdfea264697066735822122097655f49462468ba023150853f7cd60e1290f578f1e78e0cc0be3678615138e764736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100885760003560e01c80633d6490b81161005b5780633d6490b81461011d578063a4300ee51461015c578063dd0060fd1461017c578063f22430e81461018f57600080fd5b80630433fe451461008d5780630e49dee8146100bd5780633a6f60a9146100eb5780633a84543e1461010e575b600080fd5b6100a361009b366004610401565b600091903590565b604080519283526020830191909152015b60405180910390f35b6100e96100cb3660046103df565b336000908152602081905260409020805460ff191682151517905550565b005b6100fe6100f9366004610401565b6101bb565b60405190151581526020016100b4565b604051601981526020016100b4565b604080518082018252601a81527f526963636172646f277320646572697661746976652073686f70000000000000602082015290516100b4919061047b565b610164610291565b6040516001600160a01b0390911681526020016100b4565b6100a361018a366004610436565b6102a5565b6100fe61019d3660046103af565b6001600160a01b031660009081526020819052604090205460ff1690565b600060016101cc60408401846104d0565b905010156101dc57506000919050565b60006101eb60408401846104d0565b9050600214156102215761020260408401846104d0565b60018181106102135761021361058f565b90506020020135905061022c565b50670de0b6b3a76400005b600061023b60408501856104d0565b600081811061024c5761024c61058f565b9050602002013590506000846000013511801561026c5750428460200135115b80156102785750600081115b80156102845750600082115b949350505050565b905090565b600061028c6001546001600160a01b031690565b60008080806102b760408701876104d0565b60008181106102c8576102c861058f565b9050602002013590508580604001906102e191906104d0565b905060021415610317576102f860408701876104d0565b60018181106103095761030961058f565b905060200201359150610323565b670de0b6b3a764000091505b808511156103855760006103378287610562565b9050670de0b6b3a764000061034c8483610543565b6103569190610521565b905086358110156103765793508361036f818835610562565b935061037f565b86359450600093505b5061038e565b60009350853592505b50509250929050565b600060c082840312156103a957600080fd5b50919050565b6000602082840312156103c157600080fd5b81356001600160a01b03811681146103d857600080fd5b9392505050565b6000602082840312156103f157600080fd5b813580151581146103d857600080fd5b60006020828403121561041357600080fd5b813567ffffffffffffffff81111561042a57600080fd5b61028484828501610397565b6000806040838503121561044957600080fd5b823567ffffffffffffffff81111561046057600080fd5b61046c85828601610397565b95602094909401359450505050565b600060208083528351808285015260005b818110156104a85785810183015185820160400152820161048c565b818111156104ba576000604083870101525b50601f01601f1916929092016040019392505050565b6000808335601e198436030181126104e757600080fd5b83018035915067ffffffffffffffff82111561050257600080fd5b6020019150600581901b360382131561051a57600080fd5b9250929050565b60008261053e57634e487b7160e01b600052601260045260246000fd5b500490565b600081600019048311821515161561055d5761055d610579565b500290565b60008282101561057457610574610579565b500390565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fdfea264697066735822122097655f49462468ba023150853f7cd60e1290f578f1e78e0cc0be3678615138e764736f6c63430008050033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getAuthorAddress()": {
+        "returns": {
+          "_0": "address syntheticId author address"
+        }
+      },
+      "getAuthorCommission()": {
+        "returns": {
+          "_0": "uint26 syntheticId author commission"
+        }
+      },
+      "getExecutionPayout((uint256,uint256,uint256[],address,address,address),uint256)": {
+        "params": {
+          "_derivative": "Derivative Instance of derivative",
+          "_result": "uint256 Data retrieved from oracleId on the maturity"
+        },
+        "returns": {
+          "buyerPayout": "uint256 Payout in ratio for buyer (LONG position holder)",
+          "sellerPayout": "uint256 Payout in ratio for seller (SHORT position holder)"
+        }
+      },
+      "getMargin((uint256,uint256,uint256[],address,address,address))": {
+        "params": {
+          "_derivative": "Derivative Instance of derivative"
+        },
+        "returns": {
+          "buyerMargin": "uint256 Margin needed from buyer (LONG position)",
+          "sellerMargin": "uint256 Margin needed from seller (SHORT position)"
+        }
+      },
+      "getSyntheticIdName()": {
+        "returns": {
+          "_0": "Returns the custom name of a derivative ticker which will be used as part of the name of its positions"
+        }
+      },
+      "validateInput((uint256,uint256,uint256[],address,address,address))": {
+        "params": {
+          "_derivative": "Derivative Instance of derivative to validate"
+        },
+        "returns": {
+          "_0": "Returns boolean whether ticker is valid"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getAuthorAddress()": {
+        "notice": "Getter for syntheticId author address"
+      },
+      "getAuthorCommission()": {
+        "notice": "Getter for syntheticId author commission"
+      },
+      "getExecutionPayout((uint256,uint256,uint256[],address,address,address),uint256)": {
+        "notice": "Calculates payout for derivative execution"
+      },
+      "getMargin((uint256,uint256,uint256[],address,address,address))": {
+        "notice": "Calculates margin required for derivative creation"
+      },
+      "validateInput((uint256,uint256,uint256[],address,address,address))": {
+        "notice": "Validates ticker"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 7164,
+        "contract": "contracts/test/mocks/synthetics/OptionCallSyntheticIdMock.sol:OptionCallSyntheticIdMock",
+        "label": "thirdpartyExecutionAllowance",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_bool)"
+      },
+      {
+        "astId": 7197,
+        "contract": "contracts/test/mocks/synthetics/OptionCallSyntheticIdMock.sol:OptionCallSyntheticIdMock",
+        "label": "author",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_address"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      }
+    }
+  }
+}

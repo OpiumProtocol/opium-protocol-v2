@@ -1,0 +1,396 @@
+{
+  "address": "0xCB472C049C54eca1E83dfa899bB071eC1eA60523",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "derivative",
+          "type": "tuple"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "derivativeHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LogSyntheticInit",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_derivativeHash",
+          "type": "bytes32"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "_derivative",
+          "type": "tuple"
+        }
+      ],
+      "name": "getMargin",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "buyerMargin",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "sellerMargin",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_derivativeHash",
+          "type": "bytes32"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "_derivative",
+          "type": "tuple"
+        }
+      ],
+      "name": "getSyntheticCache",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "buyerMargin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "sellerMargin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "commission",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "authorAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "init",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct SyntheticAggregator.SyntheticCache",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_registry",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xdce853803c797820a455b587365a392c88d01294e694d2b075379465184006b1",
+  "receipt": {
+    "to": null,
+    "from": "0x4497C837663970d9B9fC274342D15be1A2f96D1D",
+    "contractAddress": "0xCB472C049C54eca1E83dfa899bB071eC1eA60523",
+    "transactionIndex": 1,
+    "gasUsed": "709321",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000800000000000000000000100000000004000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000084000000000000000000200000000000000000000000000000000000000000000000000000000000004000000000000000000001000000000000000000000000000000100040000000000000000000000010000000000000040000000000000000000000000000100000",
+    "blockHash": "0x3ba2b34de1add759c934a64fa9d923a43e48fd521ca896181ff7b05e4daa729e",
+    "transactionHash": "0xdce853803c797820a455b587365a392c88d01294e694d2b075379465184006b1",
+    "logs": [
+      {
+        "transactionIndex": 1,
+        "blockNumber": 20497351,
+        "transactionHash": "0xdce853803c797820a455b587365a392c88d01294e694d2b075379465184006b1",
+        "address": "0x0000000000000000000000000000000000001010",
+        "topics": [
+          "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+          "0x0000000000000000000000000000000000000000000000000000000000001010",
+          "0x0000000000000000000000004497c837663970d9b9fc274342d15be1a2f96d1d",
+          "0x000000000000000000000000be188d6641e8b680743a4815dfa0f6208038960f"
+        ],
+        "data": "0x00000000000000000000000000000000000000000000000000078f5efeb5ce0000000000000000000000000000000000000000000000000044dc202cf9f9ee000000000000000000000000000000000000000000000000d78290a17da38f128100000000000000000000000000000000000000000000000044d490cdfb4420000000000000000000000000000000000000000000000000d7829830dca244e081",
+        "logIndex": 7,
+        "blockHash": "0x3ba2b34de1add759c934a64fa9d923a43e48fd521ca896181ff7b05e4daa729e"
+      }
+    ],
+    "blockNumber": 20497351,
+    "cumulativeGasUsed": "1374328",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "658042053585c715e56757d0a4fb45c0",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"indexed\":false,\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"derivative\",\"type\":\"tuple\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"derivativeHash\",\"type\":\"bytes32\"}],\"name\":\"LogSyntheticInit\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_derivativeHash\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"_derivative\",\"type\":\"tuple\"}],\"name\":\"getMargin\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"buyerMargin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sellerMargin\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_derivativeHash\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"_derivative\",\"type\":\"tuple\"}],\"name\":\"getSyntheticCache\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"buyerMargin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sellerMargin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commission\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"authorAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"init\",\"type\":\"bool\"}],\"internalType\":\"struct SyntheticAggregator.SyntheticCache\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_registry\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getMargin(bytes32,(uint256,uint256,uint256[],address,address,address))\":{\"params\":{\"_derivative\":\"Derivative Derivative itself\",\"_derivativeHash\":\"bytes32 Hash of derivative\"},\"returns\":{\"buyerMargin\":\"uint256 Margin of buyer\",\"sellerMargin\":\"uint256 Margin of seller\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getMargin(bytes32,(uint256,uint256,uint256[],address,address,address))\":{\"notice\":\"Initializes ticker, if was not initialized and returns buyer and seller margin from cache\"},\"getSyntheticCache(bytes32,(uint256,uint256,uint256[],address,address,address))\":{\"notice\":\"Initializes ticker, if was not initialized and returns `syntheticId` author address from cache\"}},\"notice\":\"Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/SyntheticAggregator.sol\":\"SyntheticAggregator\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed\\n * behind a proxy. Since a proxied contract can't have a constructor, it's common to move constructor logic to an\\n * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer\\n * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.\\n *\\n * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as\\n * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.\\n *\\n * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure\\n * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.\\n */\\nabstract contract Initializable {\\n    /**\\n     * @dev Indicates that the contract has been initialized.\\n     */\\n    bool private _initialized;\\n\\n    /**\\n     * @dev Indicates that the contract is in the process of being initialized.\\n     */\\n    bool private _initializing;\\n\\n    /**\\n     * @dev Modifier to protect an initializer function from being invoked twice.\\n     */\\n    modifier initializer() {\\n        require(_initializing || !_initialized, \\\"Initializable: contract is already initialized\\\");\\n\\n        bool isTopLevelCall = !_initializing;\\n        if (isTopLevelCall) {\\n            _initializing = true;\\n            _initialized = true;\\n        }\\n\\n        _;\\n\\n        if (isTopLevelCall) {\\n            _initializing = false;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x8b2abd85d0ece7e866e100e9d47ca9cbec93c87cf71a8d267b2b93eb81f7d5e9\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20Upgradeable {\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `recipient`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address recipient, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `sender` to `recipient` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address sender,\\n        address recipient,\\n        uint256 amount\\n    ) external returns (bool);\\n\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n}\\n\",\"keccak256\":\"0xf449ca0a763d4b1b4462cf8706857074492f324020a2b9d099181b5383055ad3\",\"license\":\"MIT\"},\"contracts/Interface/IDerivativeLogic.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\nimport \\\"../Lib/LibDerivative.sol\\\";\\n\\n/// @title Opium.Interface.IDerivativeLogic contract is an interface that every syntheticId should implement\\nabstract contract IDerivativeLogic {\\n    /// @notice Validates ticker\\n    /// @param _derivative Derivative Instance of derivative to validate\\n    /// @return Returns boolean whether ticker is valid\\n    function validateInput(LibDerivative.Derivative memory _derivative) public view virtual returns (bool);\\n\\n    /// @notice Calculates margin required for derivative creation\\n    /// @param _derivative Derivative Instance of derivative\\n    /// @return buyerMargin uint256 Margin needed from buyer (LONG position)\\n    /// @return sellerMargin uint256 Margin needed from seller (SHORT position)\\n    function getMargin(LibDerivative.Derivative memory _derivative)\\n        public\\n        view\\n        virtual\\n        returns (uint256 buyerMargin, uint256 sellerMargin);\\n\\n    /// @notice Calculates payout for derivative execution\\n    /// @param _derivative Derivative Instance of derivative\\n    /// @param _result uint256 Data retrieved from oracleId on the maturity\\n    /// @return buyerPayout uint256 Payout in ratio for buyer (LONG position holder)\\n    /// @return sellerPayout uint256 Payout in ratio for seller (SHORT position holder)\\n    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)\\n        public\\n        view\\n        virtual\\n        returns (uint256 buyerPayout, uint256 sellerPayout);\\n\\n    /// @notice Returns syntheticId author address for Opium commissions\\n    /// @return authorAddress address The address of syntheticId address\\n    function getAuthorAddress() public view virtual returns (address authorAddress);\\n\\n    /// @notice Returns syntheticId author commission in base of COMMISSION_BASE\\n    /// @return commission uint256 Author commission\\n    function getAuthorCommission() public view virtual returns (uint256 commission);\\n\\n    /// @notice Returns whether thirdparty could execute on derivative's owner's behalf\\n    /// @param _derivativeOwner address Derivative owner address\\n    /// @return Returns boolean whether _derivativeOwner allowed third party execution\\n    function thirdpartyExecutionAllowed(address _derivativeOwner) public view virtual returns (bool);\\n\\n    /// @notice Sets whether thirds parties are allowed or not to execute derivative's on msg.sender's behalf\\n    /// @param _allow bool Flag for execution allowance\\n    function allowThirdpartyExecution(bool _allow) public virtual;\\n\\n    // Event with syntheticId metadata JSON string (for DIB.ONE derivative explorer)\\n    event MetadataSet(string metadata);\\n}\\n\",\"keccak256\":\"0x1488c41956c63f69592eeccf9428f17b8380f66b8c12d7a4ca167ba93e479f37\"},\"contracts/Interface/IOpiumProxyFactory.sol\":{\"content\":\"pragma solidity 0.8.5;\\nimport \\\"../Lib/LibDerivative.sol\\\";\\n\\ninterface IOpiumProxyFactory {\\n    function getImplementationAddress() external view returns (address);\\n\\n    function create(\\n        address _buyer,\\n        address _seller,\\n        uint256 _amount,\\n        bytes32 _derivativeHash,\\n        LibDerivative.Derivative calldata _derivative\\n    ) external;\\n\\n    function mintPair(\\n        address _buyer,\\n        address _seller,\\n        address _longPositionAddress,\\n        address _shortPositionAddress,\\n        uint256 _amount\\n    ) external;\\n\\n    function burnPair(\\n        address _tokenOwner,\\n        address _longToken,\\n        address _shortToken,\\n        uint256 _amount\\n    ) external;\\n\\n    function burn(\\n        address _tokenOwner,\\n        address _token,\\n        uint256 _amount\\n    ) external;\\n}\\n\",\"keccak256\":\"0xcb5cd1d493bda48bb8974196c7dc77c1f67b334adee59020d252907808ddce74\"},\"contracts/Interface/IOracleAggregator.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\ninterface IOracleAggregator {\\n    function __callback(uint256 timestamp, uint256 data) external;\\n\\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult);\\n\\n    function hasData(address oracleId, uint256 timestamp) external view returns (bool);\\n}\\n\",\"keccak256\":\"0xf7c9726dd6474c8c52bebc84aee87e000514a26bd19d74786b86df981664cdd5\"},\"contracts/Interface/IRegistry.sol\":{\"content\":\"pragma solidity 0.8.5;\\nimport \\\"../Registry/RegistryEntities.sol\\\";\\n\\ninterface IRegistry {\\n    function getCore() external view returns (address);\\n\\n    function getOracleAggregator() external view returns (address);\\n\\n    function isWhitelisted(address _address) external view returns (bool);\\n\\n    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);\\n\\n    function getProtocolCommissionParams() external view returns (RegistryEntities.ProtocolCommissionArgs memory);\\n\\n    function isPaused() external view returns (bool);\\n}\\n\",\"keccak256\":\"0xa736815379121444933331bd9233c01194e1ce49b0aff1a401c606a0f1a0657d\"},\"contracts/Interface/ISyntheticAggregator.sol\":{\"content\":\"pragma solidity 0.8.5;\\nimport \\\"../Lib/LibDerivative.sol\\\";\\n\\ninterface ISyntheticAggregator {\\n    struct SyntheticCache {\\n        uint256 buyerMargin;\\n        uint256 sellerMargin;\\n        uint256 commission; // rename it to author commission for clarity\\n        address authorAddress;\\n        bool init;\\n        // SyntheticTypes typeByHash;\\n    }\\n\\n    function getSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)\\n        external\\n        returns (SyntheticCache memory);\\n\\n    function getMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)\\n        external\\n        returns (uint256 buyerMargin, uint256 sellerMargin);\\n}\\n\",\"keccak256\":\"0x0dc6de045cb931209ed9e629be93b919634b241b8785726788dfe1fdcfa9d114\"},\"contracts/Interface/ITokenSpender.sol\":{\"content\":\"pragma solidity 0.8.5;\\nimport \\\"@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol\\\";\\n\\ninterface ITokenSpender {\\n    function claimTokens(\\n        IERC20Upgradeable token,\\n        address from,\\n        address to,\\n        uint256 amount\\n    ) external;\\n}\\n\",\"keccak256\":\"0x28849197d4a2ac4ce19a2b9a01ba9cf3f9d83462e827b8588e96e104ce686298\"},\"contracts/Lib/LibDerivative.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\n/// @title Opium.Lib.LibDerivative contract should be inherited by contracts that use Derivative structure and calculate derivativeHash\\nlibrary LibDerivative {\\n    enum PositionType {\\n        SHORT,\\n        LONG\\n    }\\n    \\n    // Opium derivative structure (ticker) definition\\n    struct Derivative {\\n        // Margin parameter for syntheticId\\n        uint256 margin;\\n        // Maturity of derivative\\n        uint256 endTime;\\n        // Additional parameters for syntheticId\\n        uint256[] params;\\n        // oracleId of derivative\\n        address oracleId;\\n        // Margin token address of derivative\\n        address token;\\n        // syntheticId of derivative\\n        address syntheticId;\\n    }\\n\\n    /// @notice Calculates hash of provided Derivative\\n    /// @param _derivative Derivative Instance of derivative to hash\\n    /// @return derivativeHash bytes32 Derivative hash\\n    function getDerivativeHash(Derivative memory _derivative) internal pure returns (bytes32 derivativeHash) {\\n        derivativeHash = keccak256(abi.encodePacked(\\n            _derivative.margin,\\n            _derivative.endTime,\\n            _derivative.params,\\n            _derivative.oracleId,\\n            _derivative.token,\\n            _derivative.syntheticId\\n        ));\\n    }\\n}\\n\",\"keccak256\":\"0x9c8656fb850636580a40cebb4c7b564a76d09ee43ad5ee564b5e59235f5eccfa\"},\"contracts/Registry/RegistryEntities.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\nimport \\\"../Interface/IOpiumProxyFactory.sol\\\";\\nimport \\\"../Interface/ISyntheticAggregator.sol\\\";\\nimport \\\"../Interface/IOracleAggregator.sol\\\";\\nimport \\\"../Interface/ITokenSpender.sol\\\";\\n\\nlibrary RegistryEntities {\\n    struct ProtocolCommissionArgs {\\n        // Represents 100% base for commissions calculation\\n        uint32 derivativeAuthorCommissionBase;\\n        // Period of time after which ticker could be canceled if no data was provided to the `oracleId`\\n        uint32 noDataCancellationPeriod;\\n        // Represents 100% base for Opium commission\\n        uint8 protocolFeeCommissionBase;\\n        // Represents which part of `syntheticId` author commissions goes to opium\\n        uint8 protocolCommissionPart;\\n        // scaling factor\\n        uint8 precisionFactor;\\n        bool paused;\\n    }\\n\\n    struct ProtocolAddressesArgs {\\n        // Address of Opium.Core contract\\n        address core;\\n        // Address of Opium.OpiumProxyFactory contract\\n        IOpiumProxyFactory opiumProxyFactory;\\n        // Address of Opium.OracleAggregator contract\\n        IOracleAggregator oracleAggregator;\\n        // Address of Opium.SyntheticAggregator contract\\n        ISyntheticAggregator syntheticAggregator;\\n        // Address of Opium.TokenSpender contract\\n        ITokenSpender tokenSpender;\\n        // Address of protocol commission receiver\\n        address protocolFeeReceiver;\\n    }\\n}\\n\",\"keccak256\":\"0x5c842f2678e0ab1c8e19ff0e097572984bd56658de6bfeb9d387623bbe35c3ae\"},\"contracts/SyntheticAggregator.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\nimport \\\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\\\";\\n\\nimport \\\"./Interface/IDerivativeLogic.sol\\\";\\nimport \\\"./Interface/IRegistry.sol\\\";\\nimport \\\"./Lib/LibDerivative.sol\\\";\\n\\n/// @notice Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data\\ncontract SyntheticAggregator is Initializable {\\n    using LibDerivative for LibDerivative.Derivative;\\n    // Emitted when new ticker is initialized\\n    event LogSyntheticInit(LibDerivative.Derivative derivative, bytes32 derivativeHash);\\n\\n    IRegistry private registry;\\n\\n    struct SyntheticCache {\\n        uint256 buyerMargin;\\n        uint256 sellerMargin;\\n        uint256 commission;\\n        address authorAddress;\\n        bool init;\\n    }\\n    mapping(bytes32 => SyntheticCache) private syntheticCaches;\\n\\n    // EXTERNAL FUNCTIONS\\n\\n    function initialize(address _registry) external initializer {\\n        registry = IRegistry(_registry);\\n    }\\n\\n    /// @notice Initializes ticker, if was not initialized and returns buyer and seller margin from cache\\n    /// @param _derivativeHash bytes32 Hash of derivative\\n    /// @param _derivative Derivative Derivative itself\\n    /// @return buyerMargin uint256 Margin of buyer\\n    /// @return sellerMargin uint256 Margin of seller\\n    function getMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)\\n        external\\n        returns (uint256 buyerMargin, uint256 sellerMargin)\\n    {\\n        // Initialize derivative if wasn't initialized before\\n        _initDerivative(_derivativeHash, _derivative);\\n        SyntheticCache memory syntheticCache = syntheticCaches[_derivativeHash];\\n        return (syntheticCache.buyerMargin, syntheticCache.sellerMargin);\\n    }\\n\\n    /// @notice Initializes ticker, if was not initialized and returns `syntheticId` author address from cache\\n    function getSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)\\n        external\\n        returns (SyntheticCache memory)\\n    {\\n        _initDerivative(_derivativeHash, _derivative);\\n        return syntheticCaches[_derivativeHash];\\n    }\\n\\n    // PRIVATE FUNCTIONS\\n\\n    /// @notice Initializes ticker: caches syntheticId type, margin, author address and commission\\n    /// @param _derivativeHash bytes32 Hash of derivative\\n    /// @param _derivative Derivative Derivative itself\\n    function _initDerivative(bytes32 _derivativeHash, LibDerivative.Derivative memory _derivative) private {\\n        if (syntheticCaches[_derivativeHash].init == true) {\\n            return;\\n        }\\n        // For security reasons we calculate hash of provided _derivative\\n        bytes32 derivativeHash = _derivative.getDerivativeHash();\\n        require(derivativeHash == _derivativeHash, \\\"S1\\\"); //ERROR_SYNTHETIC_AGGREGATOR_DERIVATIVE_HASH_NOT_MATCH\\n\\n        // Get margin from SyntheticId\\n        (uint256 buyerMargin, uint256 sellerMargin) = IDerivativeLogic(_derivative.syntheticId).getMargin(_derivative);\\n        // We are not allowing both margins to be equal to 0\\n        require(buyerMargin != 0 || sellerMargin != 0, \\\"S2\\\"); //ERROR_SYNTHETIC_AGGREGATOR_WRONG_MARGIN\\n\\n        // AUTHOR COMMISSION\\n        // Get commission from syntheticId\\n        uint256 commission = IDerivativeLogic(_derivative.syntheticId).getAuthorCommission();\\n        // Check if commission is not set > 100%\\n        RegistryEntities.ProtocolCommissionArgs memory protocolCommissionArgs = registry.getProtocolCommissionParams();\\n        require(\\n            commission <= protocolCommissionArgs.derivativeAuthorCommissionBase,\\n            \\\"S3\\\" //ERROR_SYNTHETIC_AGGREGATOR_COMMISSION_TOO_BIG\\n        );\\n        // Cache values by derivative hash\\n        syntheticCaches[derivativeHash] = SyntheticCache({\\n            buyerMargin: buyerMargin,\\n            sellerMargin: sellerMargin,\\n            commission: commission,\\n            authorAddress: IDerivativeLogic(_derivative.syntheticId).getAuthorAddress(),\\n            init: true\\n        });\\n\\n        // If we are here, this basically means this ticker was not used before, so we emit an event for Dapps developers about new ticker (derivative) and it's hash\\n        emit LogSyntheticInit(_derivative, derivativeHash);\\n    }\\n}\\n\",\"keccak256\":\"0x86a7a9986f35b7526cf52f5a21070fc633442d88a3d1bb52c462316ab1a84eb6\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610be2806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806399f685ee14610046578063ae7a39d414610073578063c4d66de8146100d3575b600080fd5b61005961005436600461079b565b6100e8565b604080519283526020830191909152015b60405180910390f35b61008661008136600461079b565b610160565b60405161006a9190600060a0820190508251825260208301516020830152604083015160408301526001600160a01b03606084015116606083015260808301511515608083015292915050565b6100e66100e136600461075a565b61020a565b005b6000806100fd846100f885610a81565b61030a565b505050600090815260016020818152604092839020835160a081018552815480825293820154928101839052600282015494810194909452600301546001600160a01b0381166060850152600160a01b900460ff16151560809093019290925291565b61019d6040518060a0016040528060008152602001600081526020016000815260200160006001600160a01b031681526020016000151581525090565b6101aa836100f884610a81565b5050600090815260016020818152604092839020835160a0810185528154815292810154918301919091526002810154928201929092526003909101546001600160a01b0381166060830152600160a01b900460ff161515608082015290565b600054610100900460ff1680610223575060005460ff16155b61029a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201527f647920696e697469616c697a656400000000000000000000000000000000000060648201526084015b60405180910390fd5b600054610100900460ff161580156102bc576000805461ffff19166101011790555b600080547fffffffffffffffffffff0000000000000000000000000000000000000000ffff16620100006001600160a01b038516021790558015610306576000805461ff00191690555b5050565b600082815260016020819052604090912060030154600160a01b900460ff1615151415610335575050565b6000610340826106d8565b90508281146103765760405162461bcd60e51b8152602060048201526002602482015261533160f01b6044820152606401610291565b6000808360a001516001600160a01b0316630433fe45856040518263ffffffff1660e01b81526004016103a991906109f2565b604080518083038186803b1580156103c057600080fd5b505afa1580156103d4573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103f891906108a8565b9150915081600014158061040b57508015155b61043c5760405162461bcd60e51b8152602060048201526002602482015261299960f11b6044820152606401610291565b60008460a001516001600160a01b0316633a84543e6040518163ffffffff1660e01b815260040160206040518083038186803b15801561047b57600080fd5b505afa15801561048f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104b3919061088f565b905060008060029054906101000a90046001600160a01b03166001600160a01b0316633c2ff9e46040518163ffffffff1660e01b815260040160c06040518083038186803b15801561050457600080fd5b505afa158015610518573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061053c91906107e9565b805190915063ffffffff1682111561057b5760405162461bcd60e51b8152602060048201526002602482015261533360f01b6044820152606401610291565b6040518060a001604052808581526020018481526020018381526020018760a001516001600160a01b031663a4300ee56040518163ffffffff1660e01b815260040160206040518083038186803b1580156105d557600080fd5b505afa1580156105e9573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061060d919061077e565b6001600160a01b0390811682526001602092830181905260008981528184526040908190208551815593850151918401919091558381015160028401556060840151600390930180546080909501511515600160a01b027fffffffffffffffffffffff000000000000000000000000000000000000000000909516939092169290921792909217909155517f29aa7d92d69bcc6e17d252d7860e10e2a096dbb7d00b9017322852681fc86935906106c79088908890610a05565b60405180910390a150505050505050565b80516020808301516040808501516060860151608087015160a08801519351600097610708979096959101610981565b604051602081830303815290604052805190602001209050919050565b803561073081610b94565b919050565b805163ffffffff8116811461073057600080fd5b805160ff8116811461073057600080fd5b60006020828403121561076c57600080fd5b813561077781610b94565b9392505050565b60006020828403121561079057600080fd5b815161077781610b94565b600080604083850312156107ae57600080fd5b82359150602083013567ffffffffffffffff8111156107cc57600080fd5b830160c081860312156107de57600080fd5b809150509250929050565b600060c082840312156107fb57600080fd5b60405160c0810181811067ffffffffffffffff8211171561081e5761081e610b7e565b60405261082a83610735565b815261083860208401610735565b602082015261084960408401610749565b604082015261085a60608401610749565b606082015261086b60808401610749565b608082015260a0830151801515811461088357600080fd5b60a08201529392505050565b6000602082840312156108a157600080fd5b5051919050565b600080604083850312156108bb57600080fd5b505080516020909101519092909150565b600060c083018251845260208084015181860152604084015160c0604087015282815180855260e0880191508383019450600092505b808310156109225784518252938301936001929092019190830190610902565b506060860151935061093f60608801856001600160a01b03169052565b6080860151935061095b60808801856001600160a01b03169052565b60a0860151935061097760a08801856001600160a01b03169052565b9695505050505050565b86815260006020878184015260408301875182890160005b828110156109b557815184529284019290840190600101610999565b5050506bffffffffffffffffffffffff19606097881b8116825295871b861660148201529390951b909316602883015250603c0195945050505050565b60208152600061077760208301846108cc565b604081526000610a1860408301856108cc565b90508260208301529392505050565b60405160c0810167ffffffffffffffff81118282101715610a4a57610a4a610b7e565b60405290565b604051601f8201601f1916810167ffffffffffffffff81118282101715610a7957610a79610b7e565b604052919050565b600060c08236031215610a9357600080fd5b610a9b610a27565b8235815260208084013581830152604084013567ffffffffffffffff80821115610ac457600080fd5b9085019036601f830112610ad757600080fd5b813581811115610ae957610ae9610b7e565b8060051b9150610afa848301610a50565b818152848101908486013685870188011115610b1557600080fd5b600095505b83861015610b38578035835260019590950194918601918601610b1a565b50806040880152505050505050610b5160608401610725565b6060820152610b6260808401610725565b6080820152610b7360a08401610725565b60a082015292915050565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b0381168114610ba957600080fd5b5056fea2646970667358221220a32abf3ea8c62ecbebaa56d2ff9c662719c7afd120cc2c4693dd4d1ce9ca377164736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c806399f685ee14610046578063ae7a39d414610073578063c4d66de8146100d3575b600080fd5b61005961005436600461079b565b6100e8565b604080519283526020830191909152015b60405180910390f35b61008661008136600461079b565b610160565b60405161006a9190600060a0820190508251825260208301516020830152604083015160408301526001600160a01b03606084015116606083015260808301511515608083015292915050565b6100e66100e136600461075a565b61020a565b005b6000806100fd846100f885610a81565b61030a565b505050600090815260016020818152604092839020835160a081018552815480825293820154928101839052600282015494810194909452600301546001600160a01b0381166060850152600160a01b900460ff16151560809093019290925291565b61019d6040518060a0016040528060008152602001600081526020016000815260200160006001600160a01b031681526020016000151581525090565b6101aa836100f884610a81565b5050600090815260016020818152604092839020835160a0810185528154815292810154918301919091526002810154928201929092526003909101546001600160a01b0381166060830152600160a01b900460ff161515608082015290565b600054610100900460ff1680610223575060005460ff16155b61029a5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201527f647920696e697469616c697a656400000000000000000000000000000000000060648201526084015b60405180910390fd5b600054610100900460ff161580156102bc576000805461ffff19166101011790555b600080547fffffffffffffffffffff0000000000000000000000000000000000000000ffff16620100006001600160a01b038516021790558015610306576000805461ff00191690555b5050565b600082815260016020819052604090912060030154600160a01b900460ff1615151415610335575050565b6000610340826106d8565b90508281146103765760405162461bcd60e51b8152602060048201526002602482015261533160f01b6044820152606401610291565b6000808360a001516001600160a01b0316630433fe45856040518263ffffffff1660e01b81526004016103a991906109f2565b604080518083038186803b1580156103c057600080fd5b505afa1580156103d4573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103f891906108a8565b9150915081600014158061040b57508015155b61043c5760405162461bcd60e51b8152602060048201526002602482015261299960f11b6044820152606401610291565b60008460a001516001600160a01b0316633a84543e6040518163ffffffff1660e01b815260040160206040518083038186803b15801561047b57600080fd5b505afa15801561048f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104b3919061088f565b905060008060029054906101000a90046001600160a01b03166001600160a01b0316633c2ff9e46040518163ffffffff1660e01b815260040160c06040518083038186803b15801561050457600080fd5b505afa158015610518573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061053c91906107e9565b805190915063ffffffff1682111561057b5760405162461bcd60e51b8152602060048201526002602482015261533360f01b6044820152606401610291565b6040518060a001604052808581526020018481526020018381526020018760a001516001600160a01b031663a4300ee56040518163ffffffff1660e01b815260040160206040518083038186803b1580156105d557600080fd5b505afa1580156105e9573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061060d919061077e565b6001600160a01b0390811682526001602092830181905260008981528184526040908190208551815593850151918401919091558381015160028401556060840151600390930180546080909501511515600160a01b027fffffffffffffffffffffff000000000000000000000000000000000000000000909516939092169290921792909217909155517f29aa7d92d69bcc6e17d252d7860e10e2a096dbb7d00b9017322852681fc86935906106c79088908890610a05565b60405180910390a150505050505050565b80516020808301516040808501516060860151608087015160a08801519351600097610708979096959101610981565b604051602081830303815290604052805190602001209050919050565b803561073081610b94565b919050565b805163ffffffff8116811461073057600080fd5b805160ff8116811461073057600080fd5b60006020828403121561076c57600080fd5b813561077781610b94565b9392505050565b60006020828403121561079057600080fd5b815161077781610b94565b600080604083850312156107ae57600080fd5b82359150602083013567ffffffffffffffff8111156107cc57600080fd5b830160c081860312156107de57600080fd5b809150509250929050565b600060c082840312156107fb57600080fd5b60405160c0810181811067ffffffffffffffff8211171561081e5761081e610b7e565b60405261082a83610735565b815261083860208401610735565b602082015261084960408401610749565b604082015261085a60608401610749565b606082015261086b60808401610749565b608082015260a0830151801515811461088357600080fd5b60a08201529392505050565b6000602082840312156108a157600080fd5b5051919050565b600080604083850312156108bb57600080fd5b505080516020909101519092909150565b600060c083018251845260208084015181860152604084015160c0604087015282815180855260e0880191508383019450600092505b808310156109225784518252938301936001929092019190830190610902565b506060860151935061093f60608801856001600160a01b03169052565b6080860151935061095b60808801856001600160a01b03169052565b60a0860151935061097760a08801856001600160a01b03169052565b9695505050505050565b86815260006020878184015260408301875182890160005b828110156109b557815184529284019290840190600101610999565b5050506bffffffffffffffffffffffff19606097881b8116825295871b861660148201529390951b909316602883015250603c0195945050505050565b60208152600061077760208301846108cc565b604081526000610a1860408301856108cc565b90508260208301529392505050565b60405160c0810167ffffffffffffffff81118282101715610a4a57610a4a610b7e565b60405290565b604051601f8201601f1916810167ffffffffffffffff81118282101715610a7957610a79610b7e565b604052919050565b600060c08236031215610a9357600080fd5b610a9b610a27565b8235815260208084013581830152604084013567ffffffffffffffff80821115610ac457600080fd5b9085019036601f830112610ad757600080fd5b813581811115610ae957610ae9610b7e565b8060051b9150610afa848301610a50565b818152848101908486013685870188011115610b1557600080fd5b600095505b83861015610b38578035835260019590950194918601918601610b1a565b50806040880152505050505050610b5160608401610725565b6060820152610b6260808401610725565b6080820152610b7360a08401610725565b60a082015292915050565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b0381168114610ba957600080fd5b5056fea2646970667358221220a32abf3ea8c62ecbebaa56d2ff9c662719c7afd120cc2c4693dd4d1ce9ca377164736f6c63430008050033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getMargin(bytes32,(uint256,uint256,uint256[],address,address,address))": {
+        "params": {
+          "_derivative": "Derivative Derivative itself",
+          "_derivativeHash": "bytes32 Hash of derivative"
+        },
+        "returns": {
+          "buyerMargin": "uint256 Margin of buyer",
+          "sellerMargin": "uint256 Margin of seller"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getMargin(bytes32,(uint256,uint256,uint256[],address,address,address))": {
+        "notice": "Initializes ticker, if was not initialized and returns buyer and seller margin from cache"
+      },
+      "getSyntheticCache(bytes32,(uint256,uint256,uint256[],address,address,address))": {
+        "notice": "Initializes ticker, if was not initialized and returns `syntheticId` author address from cache"
+      }
+    },
+    "notice": "Opium.SyntheticAggregator contract initialized, identifies and caches syntheticId sensitive data",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 413,
+        "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+        "label": "_initialized",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 416,
+        "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+        "label": "_initializing",
+        "offset": 1,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 5685,
+        "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+        "label": "registry",
+        "offset": 2,
+        "slot": "0",
+        "type": "t_contract(IRegistry)4245"
+      },
+      {
+        "astId": 5701,
+        "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+        "label": "syntheticCaches",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_bytes32,t_struct(SyntheticCache)5696_storage)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_contract(IRegistry)4245": {
+        "encoding": "inplace",
+        "label": "contract IRegistry",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_bytes32,t_struct(SyntheticCache)5696_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct SyntheticAggregator.SyntheticCache)",
+        "numberOfBytes": "32",
+        "value": "t_struct(SyntheticCache)5696_storage"
+      },
+      "t_struct(SyntheticCache)5696_storage": {
+        "encoding": "inplace",
+        "label": "struct SyntheticAggregator.SyntheticCache",
+        "members": [
+          {
+            "astId": 5687,
+            "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+            "label": "buyerMargin",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 5689,
+            "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+            "label": "sellerMargin",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 5691,
+            "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+            "label": "commission",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 5693,
+            "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+            "label": "authorAddress",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address"
+          },
+          {
+            "astId": 5695,
+            "contract": "contracts/SyntheticAggregator.sol:SyntheticAggregator",
+            "label": "init",
+            "offset": 20,
+            "slot": "3",
+            "type": "t_bool"
+          }
+        ],
+        "numberOfBytes": "128"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

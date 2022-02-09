@@ -1,0 +1,1578 @@
+{
+  "address": "0x16b160C763544F7273e54Ea74f8b3Ced703a6622",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint32",
+          "name": "_derivativeAuthorExecutionFeeCap",
+          "type": "uint32"
+        }
+      ],
+      "name": "LogDerivativeAuthorExecutionFeeCapChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint32",
+          "name": "_derivativeAuthorRedemptionReservePart",
+          "type": "uint32"
+        }
+      ],
+      "name": "LogDerivativeAuthorRedemptionReservePartChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_noDataCancellationPeriod",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogNoDataCancellationPeriodChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_protocolExecutionReserveClaimer",
+          "type": "address"
+        }
+      ],
+      "name": "LogProtocolExecutionReserveClaimerChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint32",
+          "name": "_protocolExecutionReservePart",
+          "type": "uint32"
+        }
+      ],
+      "name": "LogProtocolExecutionReservePartChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "bool",
+          "name": "_state",
+          "type": "bool"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "_role",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LogProtocolPausableStateChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_protocolRedemptionReserveClaimer",
+          "type": "address"
+        }
+      ],
+      "name": "LogProtocolRedemptionReserveClaimerChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint32",
+          "name": "_protocolRedemptionReservePart",
+          "type": "uint32"
+        }
+      ],
+      "name": "LogProtocolRedemptionReservePartChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_whitelisted",
+          "type": "address"
+        }
+      ],
+      "name": "LogWhitelistAccountAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_setter",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_unlisted",
+          "type": "address"
+        }
+      ],
+      "name": "LogWhitelistAccountRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "previousAdminRole",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "newAdminRole",
+          "type": "bytes32"
+        }
+      ],
+      "name": "RoleAdminChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "RoleGranted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "RoleRevoked",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "DEFAULT_ADMIN_ROLE",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_whitelisted",
+          "type": "address"
+        }
+      ],
+      "name": "addToWhitelist",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCore",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getProtocolAddresses",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "core",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "opiumProxyFactory",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleAggregator",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticAggregator",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "tokenSpender",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "protocolExecutionReserveClaimer",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "protocolRedemptionReserveClaimer",
+              "type": "address"
+            },
+            {
+              "internalType": "uint32",
+              "name": "__gapOne",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "__gapTwo",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct RegistryEntities.ProtocolAddressesArgs",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getProtocolParameters",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "noDataCancellationPeriod",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "derivativeAuthorExecutionFeeCap",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "derivativeAuthorRedemptionReservePart",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "protocolExecutionReservePart",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "protocolRedemptionReservePart",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "__gapOne",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "__gapTwo",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "__gapThree",
+              "type": "uint32"
+            }
+          ],
+          "internalType": "struct RegistryEntities.ProtocolParametersArgs",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getRoleAdmin",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "grantRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "hasRole",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_governor",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isCoreConfigurationUpdater",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isCoreSpenderWhitelisted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolPositionCancellationPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolPositionCreationPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolPositionExecutionPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolPositionMintingPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolPositionRedemptionPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isProtocolReserveClaimPaused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isRegistryManager",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProtocolPositionCancellation",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProtocolPositionCreation",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProtocolPositionExecution",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProtocolPositionMinting",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProtocolPositionRedemption",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pauseProtocolReserveClaim",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_whitelisted",
+          "type": "address"
+        }
+      ],
+      "name": "removeFromWhitelist",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "renounceRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "role",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "revokeRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_derivativeAuthorExecutionFeeCap",
+          "type": "uint32"
+        }
+      ],
+      "name": "setDerivativeAuthorExecutionFeeCap",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_derivativeAuthorRedemptionReservePart",
+          "type": "uint32"
+        }
+      ],
+      "name": "setDerivativeAuthorRedemptionReservePart",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_noDataCancellationPeriod",
+          "type": "uint32"
+        }
+      ],
+      "name": "setNoDataCancellationPeriod",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_opiumProxyFactory",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_core",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_oracleAggregator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_syntheticAggregator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_tokenSpender",
+          "type": "address"
+        }
+      ],
+      "name": "setProtocolAddresses",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_protocolExecutionReserveClaimer",
+          "type": "address"
+        }
+      ],
+      "name": "setProtocolExecutionReserveClaimer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_protocolExecutionReservePart",
+          "type": "uint32"
+        }
+      ],
+      "name": "setProtocolExecutionReservePart",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_protocolRedemptionReserveClaimer",
+          "type": "address"
+        }
+      ],
+      "name": "setProtocolRedemptionReserveClaimer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_protocolRedemptionReservePart",
+          "type": "uint32"
+        }
+      ],
+      "name": "setProtocolRedemptionReservePart",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "interfaceId",
+          "type": "bytes4"
+        }
+      ],
+      "name": "supportsInterface",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xc807932b8a80a26d2f350cc7a16274778eff861caa0532025f79c77df6f8521c",
+  "receipt": {
+    "to": null,
+    "from": "0xc188c5Aafaaf847d9D887f80590267F6dc1a1b2f",
+    "contractAddress": "0x16b160C763544F7273e54Ea74f8b3Ced703a6622",
+    "transactionIndex": 0,
+    "gasUsed": "2217427",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xd80f364c82d9a0b288d34c4859c3aa239debe7195e167e272cb7d8d3e7cf73ac",
+    "transactionHash": "0xc807932b8a80a26d2f350cc7a16274778eff861caa0532025f79c77df6f8521c",
+    "logs": [],
+    "blockNumber": 2,
+    "cumulativeGasUsed": "2217427",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "58dbb558cb816b5402f8301bbf18d319",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint32\",\"name\":\"_derivativeAuthorExecutionFeeCap\",\"type\":\"uint32\"}],\"name\":\"LogDerivativeAuthorExecutionFeeCapChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint32\",\"name\":\"_derivativeAuthorRedemptionReservePart\",\"type\":\"uint32\"}],\"name\":\"LogDerivativeAuthorRedemptionReservePartChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_noDataCancellationPeriod\",\"type\":\"uint256\"}],\"name\":\"LogNoDataCancellationPeriodChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_protocolExecutionReserveClaimer\",\"type\":\"address\"}],\"name\":\"LogProtocolExecutionReserveClaimerChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint32\",\"name\":\"_protocolExecutionReservePart\",\"type\":\"uint32\"}],\"name\":\"LogProtocolExecutionReservePartChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"bool\",\"name\":\"_state\",\"type\":\"bool\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"_role\",\"type\":\"bytes32\"}],\"name\":\"LogProtocolPausableStateChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_protocolRedemptionReserveClaimer\",\"type\":\"address\"}],\"name\":\"LogProtocolRedemptionReserveClaimerChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint32\",\"name\":\"_protocolRedemptionReservePart\",\"type\":\"uint32\"}],\"name\":\"LogProtocolRedemptionReservePartChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_whitelisted\",\"type\":\"address\"}],\"name\":\"LogWhitelistAccountAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_setter\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_unlisted\",\"type\":\"address\"}],\"name\":\"LogWhitelistAccountRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_whitelisted\",\"type\":\"address\"}],\"name\":\"addToWhitelist\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCore\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getProtocolAddresses\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"core\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"opiumProxyFactory\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"oracleAggregator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticAggregator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenSpender\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"protocolExecutionReserveClaimer\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"protocolRedemptionReserveClaimer\",\"type\":\"address\"},{\"internalType\":\"uint32\",\"name\":\"__gapOne\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"__gapTwo\",\"type\":\"uint32\"}],\"internalType\":\"struct RegistryEntities.ProtocolAddressesArgs\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getProtocolParameters\",\"outputs\":[{\"components\":[{\"internalType\":\"uint32\",\"name\":\"noDataCancellationPeriod\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"derivativeAuthorExecutionFeeCap\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"derivativeAuthorRedemptionReservePart\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"protocolExecutionReservePart\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"protocolRedemptionReservePart\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"__gapOne\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"__gapTwo\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"__gapThree\",\"type\":\"uint32\"}],\"internalType\":\"struct RegistryEntities.ProtocolParametersArgs\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_governor\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"isCoreConfigurationUpdater\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"isCoreSpenderWhitelisted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolPositionCancellationPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolPositionCreationPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolPositionExecutionPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolPositionMintingPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolPositionRedemptionPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isProtocolReserveClaimPaused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"isRegistryManager\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProtocolPositionCancellation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProtocolPositionCreation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProtocolPositionExecution\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProtocolPositionMinting\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProtocolPositionRedemption\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pauseProtocolReserveClaim\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_whitelisted\",\"type\":\"address\"}],\"name\":\"removeFromWhitelist\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"_derivativeAuthorExecutionFeeCap\",\"type\":\"uint32\"}],\"name\":\"setDerivativeAuthorExecutionFeeCap\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"_derivativeAuthorRedemptionReservePart\",\"type\":\"uint32\"}],\"name\":\"setDerivativeAuthorRedemptionReservePart\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"_noDataCancellationPeriod\",\"type\":\"uint32\"}],\"name\":\"setNoDataCancellationPeriod\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_opiumProxyFactory\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_core\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_oracleAggregator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_syntheticAggregator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenSpender\",\"type\":\"address\"}],\"name\":\"setProtocolAddresses\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_protocolExecutionReserveClaimer\",\"type\":\"address\"}],\"name\":\"setProtocolExecutionReserveClaimer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"_protocolExecutionReservePart\",\"type\":\"uint32\"}],\"name\":\"setProtocolExecutionReservePart\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_protocolRedemptionReserveClaimer\",\"type\":\"address\"}],\"name\":\"setProtocolRedemptionReserveClaimer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"_protocolRedemptionReservePart\",\"type\":\"uint32\"}],\"name\":\"setProtocolRedemptionReservePart\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unpause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getCore()\":{\"returns\":{\"_0\":\"`Opium.Core`\"}},\"getProtocolAddresses()\":{\"returns\":{\"_0\":\"RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol\"}},\"getProtocolParameters()\":{\"returns\":{\"_0\":\"RegistryEntities.getProtocolParameters struct that packs the protocol lifecycle parameters {see RegistryEntities comments}\"}},\"getRoleAdmin(bytes32)\":{\"details\":\"Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}.\"},\"grantRole(bytes32,address)\":{\"details\":\"Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role.\"},\"hasRole(bytes32,address)\":{\"details\":\"Returns `true` if `account` has been granted `role`.\"},\"initialize(address)\":{\"details\":\"internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters\",\"params\":{\"_governor\":\"address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE\"}},\"isCoreConfigurationUpdater(address)\":{\"details\":\"it is meant to be consumed by the RegistryManager module\",\"params\":{\"_address\":\"address to be checked\"}},\"isProtocolPositionCancellationPaused()\":{\"returns\":{\"_0\":\"true if protocol is globally paused or if protocolPositionCancellation is paused\"}},\"isProtocolPositionCreationPaused()\":{\"returns\":{\"_0\":\"true if protocol is globally paused or if protocolPositionCreation is paused\"}},\"isProtocolPositionExecutionPaused()\":{\"returns\":{\"_0\":\"true if protocol is globally paused or if protocolPositionExecution is paused\"}},\"isProtocolPositionMintingPaused()\":{\"returns\":{\"_0\":\"true if protocol is globally paused or if protocolPositionMinting is paused\"}},\"isProtocolPositionRedemptionPaused()\":{\"returns\":{\"_0\":\"true if protocol is globally paused or if protocolPositionRedemption is paused\"}},\"isProtocolReserveClaimPaused()\":{\"returns\":{\"_0\":\"true if protocol is globally paused or if protocolReserveClaim is paused\"}},\"isRegistryManager(address)\":{\"details\":\"it is meant to be consumed by the RegistryManager module\",\"params\":{\"_address\":\"address to be checked\"}},\"pause()\":{\"details\":\"it fails if the entire protocol is already paused\"},\"pauseProtocolPositionCancellation()\":{\"details\":\"it fails if the cancellation of positions is paused\"},\"pauseProtocolPositionCreation()\":{\"details\":\"it fails if the creation of positions is paused\"},\"pauseProtocolPositionExecution()\":{\"details\":\"it fails if the execution of positions is paused\"},\"pauseProtocolPositionMinting()\":{\"details\":\"it fails if the minting of positions is paused\"},\"pauseProtocolPositionRedemption()\":{\"details\":\"it fails if the redemption of positions is paused\"},\"pauseProtocolReserveClaim()\":{\"details\":\"it fails if the reserves claims are paused\"},\"renounceRole(bytes32,address)\":{\"details\":\"Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`.\"},\"revokeRole(bytes32,address)\":{\"details\":\"Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role.\"},\"setDerivativeAuthorExecutionFeeCap(uint32)\":{\"params\":{\"_derivativeAuthorExecutionFeeCap\":\"must be less than 100%\"}},\"setDerivativeAuthorRedemptionReservePart(uint32)\":{\"params\":{\"_derivativeAuthorRedemptionReservePart\":\"must be less than 1%\"}},\"setProtocolAddresses(address,address,address,address,address)\":{\"details\":\"It must be called as part of the protocol's deployment setup after the core addresses have been deployedthe contracts' addresses are set using their respective interfaces\",\"params\":{\"_core\":\"address of Opium.Core\",\"_opiumProxyFactory\":\"address of Opium.OpiumProxyFactory\",\"_oracleAggregator\":\"address of Opium.OracleAggregator\",\"_syntheticAggregator\":\"address of Opium.SyntheticAggregator\",\"_tokenSpender\":\"address of Opium.TokenSpender\"}},\"setProtocolExecutionReserveClaimer(address)\":{\"details\":\"It must be called as part of the protocol's deployment setup after the core addresses have been deployedit must be a non-null address\",\"params\":{\"_protocolExecutionReserveClaimer\":\"address that will replace the current `protocolExecutionReserveClaimer`\"}},\"setProtocolExecutionReservePart(uint32)\":{\"params\":{\"_protocolExecutionReservePart\":\"must be less than 100%\"}},\"setProtocolRedemptionReserveClaimer(address)\":{\"details\":\"It must be called as part of the protocol's deployment setup after the core addresses have been deployedit must be a non-null address\",\"params\":{\"_protocolRedemptionReserveClaimer\":\"address that will replace the current `protocolAddressesArgs.protocolRedemptionReserveClaimer`\"}},\"setProtocolRedemptionReservePart(uint32)\":{\"params\":{\"_protocolRedemptionReservePart\":\"must be less than 100%\"}},\"supportsInterface(bytes4)\":{\"details\":\"See {IERC165-supportsInterface}.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"addToWhitelist(address)\":{\"notice\":\"It allows the WHITELISTER_ROLE to add an address to the whitelist\"},\"initialize(address)\":{\"notice\":\"it is called only once upon deployment of the contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address.it sets the default ProtocolParametersArgs protocol parameters\"},\"isCoreConfigurationUpdater(address)\":{\"notice\":\"Returns true if msg.sender has been assigned the CORE_CONFIGURATION_UPDATER_ROLE role\"},\"isCoreSpenderWhitelisted(address)\":{\"notice\":\"It returns whether a given address is allowed to manage Opium.Core ERC20 balances\"},\"isProtocolPaused()\":{\"notice\":\"It returns true if the protocol is globally paused\"},\"isProtocolPositionCancellationPaused()\":{\"notice\":\"It returns whether Core.cancel() is currently paused\"},\"isProtocolPositionCreationPaused()\":{\"notice\":\"It returns whether Core.create() is currently paused\"},\"isProtocolPositionExecutionPaused()\":{\"notice\":\"It returns whether Core.execute() is currently paused\"},\"isProtocolPositionMintingPaused()\":{\"notice\":\"It returns whether Core.mint() is currently paused\"},\"isProtocolPositionRedemptionPaused()\":{\"notice\":\"It returns whether Core.redeem() is currently paused\"},\"isProtocolReserveClaimPaused()\":{\"notice\":\"It returns whether Core.execute() is currently paused\"},\"isRegistryManager(address)\":{\"notice\":\"Returns true if msg.sender has been assigned the REGISTRY_MANAGER_ROLE role\"},\"pause()\":{\"notice\":\"It allows the GUARDIAN role to pause the entire Opium Protocol\"},\"pauseProtocolPositionCancellation()\":{\"notice\":\"It allows the PARTIAL_CANCEL_PAUSE_ROLE role to pause the cancellation of positions\"},\"pauseProtocolPositionCreation()\":{\"notice\":\"It allows the PARTIAL_CREATE_PAUSE_ROLE role to pause the creation of positions\"},\"pauseProtocolPositionExecution()\":{\"notice\":\"It allows the PARTIAL_EXECUTE_PAUSE_ROLE role to pause the execution of positions\"},\"pauseProtocolPositionMinting()\":{\"notice\":\"It allows the PARTIAL_MINT_PAUSE_ROLE role to pause the minting of positions\"},\"pauseProtocolPositionRedemption()\":{\"notice\":\"It allows the PARTIAL_REDEEM_PAUSE_ROLE role to pause the redemption of positions\"},\"pauseProtocolReserveClaim()\":{\"notice\":\"It allows the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE role to pause the reserves claims\"},\"removeFromWhitelist(address)\":{\"notice\":\"It allows the WHITELISTER_ROLE to remove an address from the whitelist\"},\"setDerivativeAuthorExecutionFeeCap(uint32)\":{\"notice\":\"It allows the DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE role to change max fee that derivative author can set\"},\"setDerivativeAuthorRedemptionReservePart(uint32)\":{\"notice\":\"It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change the fixed part (percentage) that the derivative author receives for each redemption of market neutral positions\"},\"setNoDataCancellationPeriod(uint32)\":{\"notice\":\"It allows the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)\"},\"setProtocolAddresses(address,address,address,address,address)\":{\"notice\":\"It allows the PROTOCOL_ADDRESSES_SETTER_ROLE role to set the addresses of Opium Protocol's contracts\"},\"setProtocolExecutionReserveClaimer(address)\":{\"notice\":\"It allows the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address of the recipient of execution protocol reserves\"},\"setProtocolExecutionReservePart(uint32)\":{\"notice\":\"It allows the EXECUTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from derivative executions go to the protocol reserves\"},\"setProtocolRedemptionReserveClaimer(address)\":{\"notice\":\"It allows the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address of the recipient of redemption protocol reserves\"},\"setProtocolRedemptionReservePart(uint32)\":{\"notice\":\"It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves\"},\"unpause()\":{\"notice\":\"It allows the PROTOCOL_UNPAUSER_ROLE to unpause the Opium Protocol\"}},\"notice\":\"Error codes: - R1 = ERROR_REGISTRY_ONLY_PROTOCOL_ADDRESSES_SETTER_ROLE - R2 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE - R3 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE - R4 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_PART_SETTER_ROLE - R5 = ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE - R6 = ERROR_REGISTRY_ONLY_GUARDIAN_ROLE - R7 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE - R8 = ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE - R9 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE - R10 = ERROR_REGISTRY_ALREADY_PAUSED - R11 = ERROR_REGISTRY_NOT_PAUSED - R12 = ERROR_REGISTRY_NULL_ADDRESS - R13 = ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE - R14 = ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE - R15 = ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE - R16 = ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE - R17 = ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE - R18 = ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE - R19 = ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE - R20 = ERROR_REGISTRY_INVALID_VALUE\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/core/registry/Registry.sol\":\"Registry\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./IAccessControlUpgradeable.sol\\\";\\nimport \\\"../utils/ContextUpgradeable.sol\\\";\\nimport \\\"../utils/StringsUpgradeable.sol\\\";\\nimport \\\"../utils/introspection/ERC165Upgradeable.sol\\\";\\nimport \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Contract module that allows children to implement role-based access\\n * control mechanisms. This is a lightweight version that doesn't allow enumerating role\\n * members except through off-chain means by accessing the contract event logs. Some\\n * applications may benefit from on-chain enumerability, for those cases see\\n * {AccessControlEnumerable}.\\n *\\n * Roles are referred to by their `bytes32` identifier. These should be exposed\\n * in the external API and be unique. The best way to achieve this is by\\n * using `public constant` hash digests:\\n *\\n * ```\\n * bytes32 public constant MY_ROLE = keccak256(\\\"MY_ROLE\\\");\\n * ```\\n *\\n * Roles can be used to represent a set of permissions. To restrict access to a\\n * function call, use {hasRole}:\\n *\\n * ```\\n * function foo() public {\\n *     require(hasRole(MY_ROLE, msg.sender));\\n *     ...\\n * }\\n * ```\\n *\\n * Roles can be granted and revoked dynamically via the {grantRole} and\\n * {revokeRole} functions. Each role has an associated admin role, and only\\n * accounts that have a role's admin role can call {grantRole} and {revokeRole}.\\n *\\n * By default, the admin role for all roles is `DEFAULT_ADMIN_ROLE`, which means\\n * that only accounts with this role will be able to grant or revoke other\\n * roles. More complex role relationships can be created by using\\n * {_setRoleAdmin}.\\n *\\n * WARNING: The `DEFAULT_ADMIN_ROLE` is also its own admin: it has permission to\\n * grant and revoke this role. Extra precautions should be taken to secure\\n * accounts that have been granted it.\\n */\\nabstract contract AccessControlUpgradeable is Initializable, ContextUpgradeable, IAccessControlUpgradeable, ERC165Upgradeable {\\n    function __AccessControl_init() internal initializer {\\n        __Context_init_unchained();\\n        __ERC165_init_unchained();\\n        __AccessControl_init_unchained();\\n    }\\n\\n    function __AccessControl_init_unchained() internal initializer {\\n    }\\n    struct RoleData {\\n        mapping(address => bool) members;\\n        bytes32 adminRole;\\n    }\\n\\n    mapping(bytes32 => RoleData) private _roles;\\n\\n    bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;\\n\\n    /**\\n     * @dev Modifier that checks that an account has a specific role. Reverts\\n     * with a standardized message including the required role.\\n     *\\n     * The format of the revert reason is given by the following regular expression:\\n     *\\n     *  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/\\n     *\\n     * _Available since v4.1._\\n     */\\n    modifier onlyRole(bytes32 role) {\\n        _checkRole(role, _msgSender());\\n        _;\\n    }\\n\\n    /**\\n     * @dev See {IERC165-supportsInterface}.\\n     */\\n    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {\\n        return interfaceId == type(IAccessControlUpgradeable).interfaceId || super.supportsInterface(interfaceId);\\n    }\\n\\n    /**\\n     * @dev Returns `true` if `account` has been granted `role`.\\n     */\\n    function hasRole(bytes32 role, address account) public view override returns (bool) {\\n        return _roles[role].members[account];\\n    }\\n\\n    /**\\n     * @dev Revert with a standard message if `account` is missing `role`.\\n     *\\n     * The format of the revert reason is given by the following regular expression:\\n     *\\n     *  /^AccessControl: account (0x[0-9a-f]{40}) is missing role (0x[0-9a-f]{64})$/\\n     */\\n    function _checkRole(bytes32 role, address account) internal view {\\n        if (!hasRole(role, account)) {\\n            revert(\\n                string(\\n                    abi.encodePacked(\\n                        \\\"AccessControl: account \\\",\\n                        StringsUpgradeable.toHexString(uint160(account), 20),\\n                        \\\" is missing role \\\",\\n                        StringsUpgradeable.toHexString(uint256(role), 32)\\n                    )\\n                )\\n            );\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the admin role that controls `role`. See {grantRole} and\\n     * {revokeRole}.\\n     *\\n     * To change a role's admin, use {_setRoleAdmin}.\\n     */\\n    function getRoleAdmin(bytes32 role) public view override returns (bytes32) {\\n        return _roles[role].adminRole;\\n    }\\n\\n    /**\\n     * @dev Grants `role` to `account`.\\n     *\\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function grantRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) {\\n        _grantRole(role, account);\\n    }\\n\\n    /**\\n     * @dev Revokes `role` from `account`.\\n     *\\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function revokeRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) {\\n        _revokeRole(role, account);\\n    }\\n\\n    /**\\n     * @dev Revokes `role` from the calling account.\\n     *\\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\\n     * purpose is to provide a mechanism for accounts to lose their privileges\\n     * if they are compromised (such as when a trusted device is misplaced).\\n     *\\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must be `account`.\\n     */\\n    function renounceRole(bytes32 role, address account) public virtual override {\\n        require(account == _msgSender(), \\\"AccessControl: can only renounce roles for self\\\");\\n\\n        _revokeRole(role, account);\\n    }\\n\\n    /**\\n     * @dev Grants `role` to `account`.\\n     *\\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\\n     * event. Note that unlike {grantRole}, this function doesn't perform any\\n     * checks on the calling account.\\n     *\\n     * [WARNING]\\n     * ====\\n     * This function should only be called from the constructor when setting\\n     * up the initial roles for the system.\\n     *\\n     * Using this function in any other way is effectively circumventing the admin\\n     * system imposed by {AccessControl}.\\n     * ====\\n     */\\n    function _setupRole(bytes32 role, address account) internal virtual {\\n        _grantRole(role, account);\\n    }\\n\\n    /**\\n     * @dev Sets `adminRole` as ``role``'s admin role.\\n     *\\n     * Emits a {RoleAdminChanged} event.\\n     */\\n    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {\\n        bytes32 previousAdminRole = getRoleAdmin(role);\\n        _roles[role].adminRole = adminRole;\\n        emit RoleAdminChanged(role, previousAdminRole, adminRole);\\n    }\\n\\n    function _grantRole(bytes32 role, address account) private {\\n        if (!hasRole(role, account)) {\\n            _roles[role].members[account] = true;\\n            emit RoleGranted(role, account, _msgSender());\\n        }\\n    }\\n\\n    function _revokeRole(bytes32 role, address account) private {\\n        if (hasRole(role, account)) {\\n            _roles[role].members[account] = false;\\n            emit RoleRevoked(role, account, _msgSender());\\n        }\\n    }\\n    uint256[49] private __gap;\\n}\\n\",\"keccak256\":\"0x29d96f28c0dfcd25ddffef02e56438bde20e1135df9745d7eeb196f08665da6d\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev External interface of AccessControl declared to support ERC165 detection.\\n */\\ninterface IAccessControlUpgradeable {\\n    /**\\n     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`\\n     *\\n     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite\\n     * {RoleAdminChanged} not being emitted signaling this.\\n     *\\n     * _Available since v3.1._\\n     */\\n    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);\\n\\n    /**\\n     * @dev Emitted when `account` is granted `role`.\\n     *\\n     * `sender` is the account that originated the contract call, an admin role\\n     * bearer except when using {AccessControl-_setupRole}.\\n     */\\n    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);\\n\\n    /**\\n     * @dev Emitted when `account` is revoked `role`.\\n     *\\n     * `sender` is the account that originated the contract call:\\n     *   - if using `revokeRole`, it is the admin role bearer\\n     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)\\n     */\\n    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);\\n\\n    /**\\n     * @dev Returns `true` if `account` has been granted `role`.\\n     */\\n    function hasRole(bytes32 role, address account) external view returns (bool);\\n\\n    /**\\n     * @dev Returns the admin role that controls `role`. See {grantRole} and\\n     * {revokeRole}.\\n     *\\n     * To change a role's admin, use {AccessControl-_setRoleAdmin}.\\n     */\\n    function getRoleAdmin(bytes32 role) external view returns (bytes32);\\n\\n    /**\\n     * @dev Grants `role` to `account`.\\n     *\\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function grantRole(bytes32 role, address account) external;\\n\\n    /**\\n     * @dev Revokes `role` from `account`.\\n     *\\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function revokeRole(bytes32 role, address account) external;\\n\\n    /**\\n     * @dev Revokes `role` from the calling account.\\n     *\\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\\n     * purpose is to provide a mechanism for accounts to lose their privileges\\n     * if they are compromised (such as when a trusted device is misplaced).\\n     *\\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must be `account`.\\n     */\\n    function renounceRole(bytes32 role, address account) external;\\n}\\n\",\"keccak256\":\"0xb138a22255a0c28ffa169cd269120bbfa27711cefe14b531462b22560cf374fc\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed\\n * behind a proxy. Since a proxied contract can't have a constructor, it's common to move constructor logic to an\\n * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer\\n * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.\\n *\\n * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as\\n * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.\\n *\\n * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure\\n * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.\\n */\\nabstract contract Initializable {\\n    /**\\n     * @dev Indicates that the contract has been initialized.\\n     */\\n    bool private _initialized;\\n\\n    /**\\n     * @dev Indicates that the contract is in the process of being initialized.\\n     */\\n    bool private _initializing;\\n\\n    /**\\n     * @dev Modifier to protect an initializer function from being invoked twice.\\n     */\\n    modifier initializer() {\\n        require(_initializing || !_initialized, \\\"Initializable: contract is already initialized\\\");\\n\\n        bool isTopLevelCall = !_initializing;\\n        if (isTopLevelCall) {\\n            _initializing = true;\\n            _initialized = true;\\n        }\\n\\n        _;\\n\\n        if (isTopLevelCall) {\\n            _initializing = false;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x8b2abd85d0ece7e866e100e9d47ca9cbec93c87cf71a8d267b2b93eb81f7d5e9\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20Upgradeable {\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `recipient`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address recipient, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `sender` to `recipient` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address sender,\\n        address recipient,\\n        uint256 amount\\n    ) external returns (bool);\\n\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n}\\n\",\"keccak256\":\"0xf449ca0a763d4b1b4462cf8706857074492f324020a2b9d099181b5383055ad3\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\nimport \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract ContextUpgradeable is Initializable {\\n    function __Context_init() internal initializer {\\n        __Context_init_unchained();\\n    }\\n\\n    function __Context_init_unchained() internal initializer {\\n    }\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x062b5a0f7cc6b0528fa350033759f3a15ba42afb57423d7c593753860f2c82e0\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev String operations.\\n */\\nlibrary StringsUpgradeable {\\n    bytes16 private constant _HEX_SYMBOLS = \\\"0123456789abcdef\\\";\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(uint256 value) internal pure returns (string memory) {\\n        // Inspired by OraclizeAPI's implementation - MIT licence\\n        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol\\n\\n        if (value == 0) {\\n            return \\\"0\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 digits;\\n        while (temp != 0) {\\n            digits++;\\n            temp /= 10;\\n        }\\n        bytes memory buffer = new bytes(digits);\\n        while (value != 0) {\\n            digits -= 1;\\n            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));\\n            value /= 10;\\n        }\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(uint256 value) internal pure returns (string memory) {\\n        if (value == 0) {\\n            return \\\"0x00\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 length = 0;\\n        while (temp != 0) {\\n            length++;\\n            temp >>= 8;\\n        }\\n        return toHexString(value, length);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.\\n     */\\n    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {\\n        bytes memory buffer = new bytes(2 * length + 2);\\n        buffer[0] = \\\"0\\\";\\n        buffer[1] = \\\"x\\\";\\n        for (uint256 i = 2 * length + 1; i > 1; --i) {\\n            buffer[i] = _HEX_SYMBOLS[value & 0xf];\\n            value >>= 4;\\n        }\\n        require(value == 0, \\\"Strings: hex length insufficient\\\");\\n        return string(buffer);\\n    }\\n}\\n\",\"keccak256\":\"0xc7af08df3d3e818ce36f95aa879c13245772fed21b553e6033292ea4edc2a9f3\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./IERC165Upgradeable.sol\\\";\\nimport \\\"../../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Implementation of the {IERC165} interface.\\n *\\n * Contracts that want to implement ERC165 should inherit from this contract and override {supportsInterface} to check\\n * for the additional interface id that will be supported. For example:\\n *\\n * ```solidity\\n * function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {\\n *     return interfaceId == type(MyInterface).interfaceId || super.supportsInterface(interfaceId);\\n * }\\n * ```\\n *\\n * Alternatively, {ERC165Storage} provides an easier to use but more expensive implementation.\\n */\\nabstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {\\n    function __ERC165_init() internal initializer {\\n        __ERC165_init_unchained();\\n    }\\n\\n    function __ERC165_init_unchained() internal initializer {\\n    }\\n    /**\\n     * @dev See {IERC165-supportsInterface}.\\n     */\\n    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {\\n        return interfaceId == type(IERC165Upgradeable).interfaceId;\\n    }\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x17c9c5d2d6b56527215ee7b3da6dde66b6f23f1b3d5c66cc436e753ef349a97a\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC165 standard, as defined in the\\n * https://eips.ethereum.org/EIPS/eip-165[EIP].\\n *\\n * Implementers can declare support of contract interfaces, which can then be\\n * queried by others ({ERC165Checker}).\\n *\\n * For an implementation, see {ERC165}.\\n */\\ninterface IERC165Upgradeable {\\n    /**\\n     * @dev Returns true if this contract implements the interface defined by\\n     * `interfaceId`. See the corresponding\\n     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]\\n     * to learn more about how these ids are created.\\n     *\\n     * This function call must use less than 30 000 gas.\\n     */\\n    function supportsInterface(bytes4 interfaceId) external view returns (bool);\\n}\\n\",\"keccak256\":\"0x1c4860acd323e34a67b3e97faab9aaa55fe8e92b1dcf08b5f47f3468d58ce75c\",\"license\":\"MIT\"},\"contracts/core/registry/Registry.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol\\\";\\nimport \\\"../../libs/LibRoles.sol\\\";\\nimport \\\"../../libs/LibCalculator.sol\\\";\\nimport \\\"../../interfaces/IOpiumProxyFactory.sol\\\";\\nimport \\\"../../interfaces/ISyntheticAggregator.sol\\\";\\nimport \\\"../../interfaces/IOracleAggregator.sol\\\";\\nimport \\\"../../interfaces/ITokenSpender.sol\\\";\\nimport \\\"../../interfaces/ICore.sol\\\";\\n\\n/**\\n    Error codes:\\n    - R1 = ERROR_REGISTRY_ONLY_PROTOCOL_ADDRESSES_SETTER_ROLE\\n    - R2 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE\\n    - R3 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE\\n    - R4 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_PART_SETTER_ROLE\\n    - R5 = ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE\\n    - R6 = ERROR_REGISTRY_ONLY_GUARDIAN_ROLE\\n    - R7 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE\\n    - R8 = ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE\\n    - R9 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE\\n    - R10 = ERROR_REGISTRY_ALREADY_PAUSED\\n    - R11 = ERROR_REGISTRY_NOT_PAUSED\\n    - R12 = ERROR_REGISTRY_NULL_ADDRESS\\n    - R13 = ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE\\n    - R14 = ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE\\n    - R15 = ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE\\n    - R16 = ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE\\n    - R17 = ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE\\n    - R18 = ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE\\n    - R19 = ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE\\n    - R20 = ERROR_REGISTRY_INVALID_VALUE\\n */\\n\\ncontract Registry is AccessControlUpgradeable {\\n    // Setup\\n    event LogNoDataCancellationPeriodChanged(address indexed _setter, uint256 indexed _noDataCancellationPeriod);\\n    event LogWhitelistAccountAdded(address indexed _setter, address indexed _whitelisted);\\n    event LogWhitelistAccountRemoved(address indexed _setter, address indexed _unlisted);\\n    // Reserve\\n    event LogProtocolExecutionReserveClaimerChanged(\\n        address indexed _setter,\\n        address indexed _protocolExecutionReserveClaimer\\n    );\\n    event LogProtocolRedemptionReserveClaimerChanged(\\n        address indexed _setter,\\n        address indexed _protocolRedemptionReserveClaimer\\n    );\\n    event LogProtocolExecutionReservePartChanged(address indexed _setter, uint32 indexed _protocolExecutionReservePart);\\n    event LogDerivativeAuthorExecutionFeeCapChanged(\\n        address indexed _setter,\\n        uint32 indexed _derivativeAuthorExecutionFeeCap\\n    );\\n    event LogProtocolRedemptionReservePartChanged(\\n        address indexed _setter,\\n        uint32 indexed _protocolRedemptionReservePart\\n    );\\n    event LogDerivativeAuthorRedemptionReservePartChanged(\\n        address indexed _setter,\\n        uint32 indexed _derivativeAuthorRedemptionReservePart\\n    );\\n    // Emergency\\n    // emits the role to signal what type of pause has been committed, if any\\n    event LogProtocolPausableStateChanged(address indexed _setter, bool indexed _state, bytes32 indexed _role);\\n\\n    RegistryEntities.ProtocolParametersArgs private protocolParametersArgs;\\n    RegistryEntities.ProtocolAddressesArgs private protocolAddressesArgs;\\n    RegistryEntities.ProtocolPausabilityArgs private protocolPausabilityArgs;\\n    mapping(address => bool) private coreSpenderWhitelist;\\n\\n    // ***** SETUP *****\\n\\n    /// @notice it ensures that the calling account has been granted the PROTOCOL_ADDRESSES_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyProtocolAdressesSetter() {\\n        require(hasRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, msg.sender), \\\"R1\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyNoDataCancellationPeriodSetter() {\\n        require(hasRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, msg.sender), \\\"R5\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the WHITELISTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyWhitelister() {\\n        require(hasRole(LibRoles.WHITELISTER_ROLE, msg.sender), \\\"R7\\\");\\n        _;\\n    }\\n\\n    // ***** RESERVE *****\\n\\n    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyProtocolExecutionReserveClaimerAddressSetter() {\\n        require(hasRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), \\\"R2\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyProtocolRedemptionReserveClaimerAddressSetter() {\\n        require(hasRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, msg.sender), \\\"R3\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the EXECUTION_RESERVE_PART_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyProtocolExecutionReservePartSetter() {\\n        require(hasRole(LibRoles.EXECUTION_RESERVE_PART_SETTER_ROLE, msg.sender), \\\"R4\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyDerivativeAuthorExecutionFeeCapSetter() {\\n        require(hasRole(LibRoles.DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE, msg.sender), \\\"R8\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the REDEMPTION_RESERVE_PART_SETTER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyProtocolRedemptionReservePartSetter() {\\n        require(hasRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, msg.sender), \\\"R9\\\");\\n        _;\\n    }\\n\\n    // ***** EMERGENCY *****\\n\\n    /// @notice it ensures that the calling account has been granted the GUARDIAN_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyGuardian() {\\n        require(hasRole(LibRoles.GUARDIAN_ROLE, msg.sender), \\\"R6\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PARTIAL_CREATE_PAUSE_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyPartialCreatePauseSetter() {\\n        require(hasRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, msg.sender), \\\"R13\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PARTIAL_MINT_PAUSE_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyPartialMintPauseSetter() {\\n        require(hasRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, msg.sender), \\\"R14\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PARTIAL_REDEEM_PAUSE_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyPartialRedeemPauseSetter() {\\n        require(hasRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, msg.sender), \\\"R15\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PARTIAL_EXECUTE_PAUSE_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyPartialExecutePauseSetter() {\\n        require(hasRole(LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE, msg.sender), \\\"R16\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PARTIAL_CANCEL_PAUSE_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyPartialCancelPauseSetter() {\\n        require(hasRole(LibRoles.PARTIAL_CANCEL_PAUSE_ROLE, msg.sender), \\\"R17\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyPartialClaimReservePauseSetter() {\\n        require(hasRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, msg.sender), \\\"R18\\\");\\n        _;\\n    }\\n\\n    /// @notice it ensures that the calling account has been granted the PROTOCOL_UNPAUSER_ROLE\\n    /// @dev by default, it is granted to the `governor` account\\n    modifier onlyProtocolUnpauserSetter() {\\n        require(hasRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, msg.sender), \\\"R19\\\");\\n        _;\\n    }\\n\\n    // ****************** EXTERNAL FUNCTIONS ******************\\n\\n    // ***** SETTERS *****\\n\\n    /// @notice it is called only once upon deployment of the contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address.\\n    /// @notice it sets the default ProtocolParametersArgs protocol parameters\\n    /// @dev internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters\\n    /// @param _governor address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE\\n    function initialize(address _governor) external initializer {\\n        __AccessControl_init();\\n\\n        // Setup\\n        _setupRole(DEFAULT_ADMIN_ROLE, _governor);\\n        _setupRole(LibRoles.PROTOCOL_ADDRESSES_SETTER_ROLE, _governor);\\n        _setupRole(LibRoles.NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE, _governor);\\n        _setupRole(LibRoles.WHITELISTER_ROLE, _governor);\\n        _setupRole(LibRoles.REGISTRY_MANAGER_ROLE, _governor);\\n        _setupRole(LibRoles.CORE_CONFIGURATION_UPDATER_ROLE, _governor);\\n\\n        // Reserve\\n        _setupRole(LibRoles.EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);\\n        _setupRole(LibRoles.REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE, _governor);\\n        _setupRole(LibRoles.EXECUTION_RESERVE_PART_SETTER_ROLE, _governor);\\n        _setupRole(LibRoles.DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE, _governor);\\n        _setupRole(LibRoles.REDEMPTION_RESERVE_PART_SETTER_ROLE, _governor);\\n\\n        // Emergency\\n        _setupRole(LibRoles.GUARDIAN_ROLE, _governor);\\n        _setupRole(LibRoles.PARTIAL_CREATE_PAUSE_ROLE, _governor);\\n        _setupRole(LibRoles.PARTIAL_MINT_PAUSE_ROLE, _governor);\\n        _setupRole(LibRoles.PARTIAL_REDEEM_PAUSE_ROLE, _governor);\\n        _setupRole(LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE, _governor);\\n        _setupRole(LibRoles.PARTIAL_CANCEL_PAUSE_ROLE, _governor);\\n        _setupRole(LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE, _governor);\\n        _setupRole(LibRoles.PROTOCOL_UNPAUSER_ROLE, _governor);\\n\\n        // Default protocol parameters\\n        protocolParametersArgs.noDataCancellationPeriod = 2 weeks;\\n        protocolParametersArgs.derivativeAuthorExecutionFeeCap = 1000; // 10%\\n        protocolParametersArgs.derivativeAuthorRedemptionReservePart = 10; // 0.1%\\n        protocolParametersArgs.protocolExecutionReservePart = 1000; // 10%\\n        protocolParametersArgs.protocolRedemptionReservePart = 1000; // 10%\\n    }\\n\\n    // ** ROLE-RESTRICTED FUNCTIONS **\\n\\n    // * Setup *\\n\\n    /// @notice It allows the PROTOCOL_ADDRESSES_SETTER_ROLE role to set the addresses of Opium Protocol's contracts\\n    /// @dev It must be called as part of the protocol's deployment setup after the core addresses have been deployed\\n    /// @dev the contracts' addresses are set using their respective interfaces\\n    /// @param _opiumProxyFactory address of Opium.OpiumProxyFactory\\n    /// @param _core address of Opium.Core\\n    /// @param _oracleAggregator address of Opium.OracleAggregator\\n    /// @param _syntheticAggregator address of Opium.SyntheticAggregator\\n    /// @param _tokenSpender address of Opium.TokenSpender\\n    function setProtocolAddresses(\\n        address _opiumProxyFactory,\\n        address _core,\\n        address _oracleAggregator,\\n        address _syntheticAggregator,\\n        address _tokenSpender\\n    ) external onlyProtocolAdressesSetter {\\n        require(\\n            _opiumProxyFactory != address(0) &&\\n                _core != address(0) &&\\n                _oracleAggregator != address(0) &&\\n                _syntheticAggregator != address(0) &&\\n                _tokenSpender != address(0),\\n            \\\"R12\\\"\\n        );\\n        protocolAddressesArgs.opiumProxyFactory = _opiumProxyFactory;\\n        protocolAddressesArgs.core = _core;\\n        protocolAddressesArgs.oracleAggregator = _oracleAggregator;\\n        protocolAddressesArgs.syntheticAggregator = _syntheticAggregator;\\n        protocolAddressesArgs.tokenSpender = _tokenSpender;\\n    }\\n\\n    /// @notice It allows the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)\\n    function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external onlyNoDataCancellationPeriodSetter {\\n        protocolParametersArgs.noDataCancellationPeriod = _noDataCancellationPeriod;\\n        emit LogNoDataCancellationPeriodChanged(msg.sender, _noDataCancellationPeriod);\\n    }\\n\\n    /// @notice It allows the WHITELISTER_ROLE to add an address to the whitelist\\n    function addToWhitelist(address _whitelisted) external onlyWhitelister {\\n        coreSpenderWhitelist[_whitelisted] = true;\\n        emit LogWhitelistAccountAdded(msg.sender, _whitelisted);\\n    }\\n\\n    /// @notice It allows the WHITELISTER_ROLE to remove an address from the whitelist\\n    function removeFromWhitelist(address _whitelisted) external onlyWhitelister {\\n        coreSpenderWhitelist[_whitelisted] = false;\\n        emit LogWhitelistAccountRemoved(msg.sender, _whitelisted);\\n    }\\n\\n    // * Reserve *\\n\\n    /// @notice It allows the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address of the recipient of execution protocol reserves\\n    /// @dev It must be called as part of the protocol's deployment setup after the core addresses have been deployed\\n    /// @dev it must be a non-null address\\n    /// @param _protocolExecutionReserveClaimer address that will replace the current `protocolExecutionReserveClaimer`\\n    function setProtocolExecutionReserveClaimer(address _protocolExecutionReserveClaimer)\\n        external\\n        onlyProtocolExecutionReserveClaimerAddressSetter\\n    {\\n        require(_protocolExecutionReserveClaimer != address(0), \\\"R12\\\");\\n        protocolAddressesArgs.protocolExecutionReserveClaimer = _protocolExecutionReserveClaimer;\\n        emit LogProtocolExecutionReserveClaimerChanged(msg.sender, _protocolExecutionReserveClaimer);\\n    }\\n\\n    /// @notice It allows the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address of the recipient of redemption protocol reserves\\n    /// @dev It must be called as part of the protocol's deployment setup after the core addresses have been deployed\\n    /// @dev it must be a non-null address\\n    /// @param _protocolRedemptionReserveClaimer address that will replace the current `protocolAddressesArgs.protocolRedemptionReserveClaimer`\\n    function setProtocolRedemptionReserveClaimer(address _protocolRedemptionReserveClaimer)\\n        external\\n        onlyProtocolRedemptionReserveClaimerAddressSetter\\n    {\\n        require(_protocolRedemptionReserveClaimer != address(0), \\\"R12\\\");\\n        protocolAddressesArgs.protocolRedemptionReserveClaimer = _protocolRedemptionReserveClaimer;\\n        emit LogProtocolRedemptionReserveClaimerChanged(msg.sender, _protocolRedemptionReserveClaimer);\\n    }\\n\\n    /// @notice It allows the EXECUTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from derivative executions go to the protocol reserves\\n    /// @param _protocolExecutionReservePart must be less than 100%\\n    function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart)\\n        external\\n        onlyProtocolExecutionReservePartSetter\\n    {\\n        require(_protocolExecutionReservePart < LibCalculator.PERCENTAGE_BASE, \\\"R20\\\");\\n        protocolParametersArgs.protocolExecutionReservePart = _protocolExecutionReservePart;\\n        emit LogProtocolExecutionReservePartChanged(msg.sender, _protocolExecutionReservePart);\\n    }\\n\\n    /// @notice It allows the DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE role to change max fee that derivative author can set\\n    /// @param _derivativeAuthorExecutionFeeCap must be less than 100%\\n    function setDerivativeAuthorExecutionFeeCap(uint32 _derivativeAuthorExecutionFeeCap)\\n        external\\n        onlyDerivativeAuthorExecutionFeeCapSetter\\n    {\\n        require(_derivativeAuthorExecutionFeeCap < LibCalculator.PERCENTAGE_BASE, \\\"R20\\\");\\n        protocolParametersArgs.derivativeAuthorExecutionFeeCap = _derivativeAuthorExecutionFeeCap;\\n        emit LogDerivativeAuthorExecutionFeeCapChanged(msg.sender, _derivativeAuthorExecutionFeeCap);\\n    }\\n\\n    /// @notice It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves\\n    /// @param _protocolRedemptionReservePart must be less than 100%\\n    function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart)\\n        external\\n        onlyProtocolRedemptionReservePartSetter\\n    {\\n        require(_protocolRedemptionReservePart < LibCalculator.PERCENTAGE_BASE, \\\"R20\\\");\\n        protocolParametersArgs.protocolRedemptionReservePart = _protocolRedemptionReservePart;\\n        emit LogProtocolRedemptionReservePartChanged(msg.sender, _protocolRedemptionReservePart);\\n    }\\n\\n    /// @notice It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change the fixed part (percentage) that the derivative author receives for each redemption of market neutral positions\\n    /// @param _derivativeAuthorRedemptionReservePart must be less than 1%\\n    function setDerivativeAuthorRedemptionReservePart(uint32 _derivativeAuthorRedemptionReservePart)\\n        external\\n        onlyProtocolRedemptionReservePartSetter\\n    {\\n        require(_derivativeAuthorRedemptionReservePart <= LibCalculator.MAX_REDEMPTION_PART, \\\"R20\\\");\\n        protocolParametersArgs.derivativeAuthorRedemptionReservePart = _derivativeAuthorRedemptionReservePart;\\n        emit LogDerivativeAuthorRedemptionReservePartChanged(msg.sender, _derivativeAuthorRedemptionReservePart);\\n    }\\n\\n    // * Emergency *\\n\\n    /// @notice It allows the GUARDIAN role to pause the entire Opium Protocol\\n    /// @dev it fails if the entire protocol is already paused\\n    function pause() external onlyGuardian {\\n        require(!protocolPausabilityArgs.protocolGlobal, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolGlobal = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.GUARDIAN_ROLE);\\n    }\\n\\n    /// @notice It allows the PARTIAL_CREATE_PAUSE_ROLE role to pause the creation of positions\\n    /// @dev it fails if the creation of positions is paused\\n    function pauseProtocolPositionCreation() external onlyPartialCreatePauseSetter {\\n        require(!protocolPausabilityArgs.protocolPositionCreation, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolPositionCreation = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.PARTIAL_CREATE_PAUSE_ROLE);\\n    }\\n\\n    /// @notice It allows the PARTIAL_MINT_PAUSE_ROLE role to pause the minting of positions\\n    /// @dev it fails if the minting of positions is paused\\n    function pauseProtocolPositionMinting() external onlyPartialMintPauseSetter {\\n        require(!protocolPausabilityArgs.protocolPositionMinting, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolPositionMinting = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.PARTIAL_MINT_PAUSE_ROLE);\\n    }\\n\\n    /// @notice It allows the PARTIAL_REDEEM_PAUSE_ROLE role to pause the redemption of positions\\n    /// @dev it fails if the redemption of positions is paused\\n    function pauseProtocolPositionRedemption() external onlyPartialRedeemPauseSetter {\\n        require(!protocolPausabilityArgs.protocolPositionRedemption, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolPositionRedemption = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.PARTIAL_REDEEM_PAUSE_ROLE);\\n    }\\n\\n    /// @notice It allows the PARTIAL_EXECUTE_PAUSE_ROLE role to pause the execution of positions\\n    /// @dev it fails if the execution of positions is paused\\n    function pauseProtocolPositionExecution() external onlyPartialExecutePauseSetter {\\n        require(!protocolPausabilityArgs.protocolPositionExecution, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolPositionExecution = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.PARTIAL_EXECUTE_PAUSE_ROLE);\\n    }\\n\\n    /// @notice It allows the PARTIAL_CANCEL_PAUSE_ROLE role to pause the cancellation of positions\\n    /// @dev it fails if the cancellation of positions is paused\\n    function pauseProtocolPositionCancellation() external onlyPartialCancelPauseSetter {\\n        require(!protocolPausabilityArgs.protocolPositionCancellation, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolPositionCancellation = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.PARTIAL_CANCEL_PAUSE_ROLE);\\n    }\\n\\n    /// @notice It allows the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE role to pause the reserves claims\\n    /// @dev it fails if the reserves claims are paused\\n    function pauseProtocolReserveClaim() external onlyPartialClaimReservePauseSetter {\\n        require(!protocolPausabilityArgs.protocolReserveClaim, \\\"R10\\\");\\n        protocolPausabilityArgs.protocolReserveClaim = true;\\n        emit LogProtocolPausableStateChanged(msg.sender, true, LibRoles.PARTIAL_CLAIM_RESERVE_PAUSE_ROLE);\\n    }\\n\\n    /// @notice It allows the PROTOCOL_UNPAUSER_ROLE to unpause the Opium Protocol\\n    function unpause() external onlyProtocolUnpauserSetter {\\n        delete protocolPausabilityArgs;\\n        emit LogProtocolPausableStateChanged(msg.sender, false, LibRoles.PROTOCOL_UNPAUSER_ROLE);\\n    }\\n\\n    // ***** GETTERS *****\\n\\n    ///@return RegistryEntities.getProtocolParameters struct that packs the protocol lifecycle parameters {see RegistryEntities comments}\\n    function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory) {\\n        return protocolParametersArgs;\\n    }\\n\\n    ///@return RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol\\n    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory) {\\n        return protocolAddressesArgs;\\n    }\\n\\n    /// @notice Returns true if msg.sender has been assigned the REGISTRY_MANAGER_ROLE role\\n    /// @dev it is meant to be consumed by the RegistryManager module\\n    /// @param _address address to be checked\\n    function isRegistryManager(address _address) external view returns (bool) {\\n        return hasRole(LibRoles.REGISTRY_MANAGER_ROLE, _address);\\n    }\\n\\n    /// @notice Returns true if msg.sender has been assigned the CORE_CONFIGURATION_UPDATER_ROLE role\\n    /// @dev it is meant to be consumed by the RegistryManager module\\n    /// @param _address address to be checked\\n    function isCoreConfigurationUpdater(address _address) external view returns (bool) {\\n        return hasRole(LibRoles.CORE_CONFIGURATION_UPDATER_ROLE, _address);\\n    }\\n\\n    /// @return `Opium.Core`\\n    function getCore() external view returns (address) {\\n        return address(protocolAddressesArgs.core);\\n    }\\n\\n    /// @notice It returns whether a given address is allowed to manage Opium.Core ERC20 balances\\n    function isCoreSpenderWhitelisted(address _address) external view returns (bool) {\\n        return coreSpenderWhitelist[_address];\\n    }\\n\\n    /// @notice It returns true if the protocol is globally paused\\n    function isProtocolPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal;\\n    }\\n\\n    /// @notice It returns whether Core.create() is currently paused\\n    /// @return true if protocol is globally paused or if protocolPositionCreation is paused\\n    function isProtocolPositionCreationPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionCreation;\\n    }\\n\\n    /// @notice It returns whether Core.mint() is currently paused\\n    /// @return true if protocol is globally paused or if protocolPositionMinting is paused\\n    function isProtocolPositionMintingPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionMinting;\\n    }\\n\\n    /// @notice It returns whether Core.redeem() is currently paused\\n    /// @return true if protocol is globally paused or if protocolPositionRedemption is paused\\n    function isProtocolPositionRedemptionPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionRedemption;\\n    }\\n\\n    /// @notice It returns whether Core.execute() is currently paused\\n    /// @return true if protocol is globally paused or if protocolPositionExecution is paused\\n    function isProtocolPositionExecutionPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionExecution;\\n    }\\n\\n    /// @notice It returns whether Core.cancel() is currently paused\\n    /// @return true if protocol is globally paused or if protocolPositionCancellation is paused\\n    function isProtocolPositionCancellationPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolPositionCancellation;\\n    }\\n\\n    /// @notice It returns whether Core.execute() is currently paused\\n    /// @return true if protocol is globally paused or if protocolReserveClaim is paused\\n    function isProtocolReserveClaimPaused() external view returns (bool) {\\n        return protocolPausabilityArgs.protocolGlobal || protocolPausabilityArgs.protocolReserveClaim;\\n    }\\n\\n    // Reserved storage space to allow for layout changes in the future.\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x3e0070f5228b603a2034fc0e65f9469f28734f3c0bb4608c2d96558f523d04e0\",\"license\":\"agpl-3.0\"},\"contracts/core/registry/RegistryEntities.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nlibrary RegistryEntities {\\n    struct ProtocolParametersArgs {\\n        // Period of time after which ticker could be canceled if no data was provided to the `oracleId`\\n        uint32 noDataCancellationPeriod;\\n        // Max fee that derivative author can set\\n        // it works as an upper bound for when the derivative authors set their synthetic's fee\\n        uint32 derivativeAuthorExecutionFeeCap;\\n        // Fixed part (percentage) that the derivative author receives for each redemption of market neutral positions\\n        // It is not set by the derivative authors themselves\\n        uint32 derivativeAuthorRedemptionReservePart;\\n        // Represents which part of derivative author reserves originated from derivative executions go to the protocol reserves\\n        uint32 protocolExecutionReservePart;\\n        // Represents which part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves\\n        uint32 protocolRedemptionReservePart;\\n        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability\\n        uint32 __gapOne;\\n        uint32 __gapTwo;\\n        uint32 __gapThree;\\n    }\\n\\n    struct ProtocolAddressesArgs {\\n        // Address of Opium.Core contract\\n        address core;\\n        // Address of Opium.OpiumProxyFactory contract\\n        address opiumProxyFactory;\\n        // Address of Opium.OracleAggregator contract\\n        address oracleAggregator;\\n        // Address of Opium.SyntheticAggregator contract\\n        address syntheticAggregator;\\n        // Address of Opium.TokenSpender contract\\n        address tokenSpender;\\n        // Address of the recipient of execution protocol reserves\\n        address protocolExecutionReserveClaimer;\\n        // Address of the recipient of redemption protocol reserves\\n        address protocolRedemptionReserveClaimer;\\n        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability\\n        uint32 __gapOne;\\n        uint32 __gapTwo;\\n    }\\n\\n    struct ProtocolPausabilityArgs {\\n        // if true, all the protocol's entry-points are paused\\n        bool protocolGlobal;\\n        // if true, no new positions can be created\\n        bool protocolPositionCreation;\\n        // if true, no new positions can be minted\\n        bool protocolPositionMinting;\\n        // if true, no new positions can be redeemed\\n        bool protocolPositionRedemption;\\n        // if true, no new positions can be executed\\n        bool protocolPositionExecution;\\n        // if true, no new positions can be cancelled\\n        bool protocolPositionCancellation;\\n        // if true, no reserves can be claimed\\n        bool protocolReserveClaim;\\n        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability\\n        bool __gapOne;\\n        bool __gapTwo;\\n        bool __gapThree;\\n        bool __gapFour;\\n    }\\n}\\n\",\"keccak256\":\"0x99e5b1a0e7a8911bc02947562556dc8476bb8c3c7061e66c2a24c8cf1d80b992\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/ICore.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"../core/registry/RegistryEntities.sol\\\";\\nimport \\\"../libs/LibDerivative.sol\\\";\\n\\ninterface ICore {\\n    function initialize(address _governor) external;\\n\\n    function getProtocolParametersArgs() external view returns (RegistryEntities.ProtocolParametersArgs memory);\\n\\n    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);\\n\\n    function getReservesVaultBalance(address _reseveRecipient, address _token) external view returns (uint256);\\n\\n    function getDerivativePayouts(bytes32 _derivativeHash) external view returns (uint256[2] memory);\\n\\n    function getP2pDerivativeVaultFunds(bytes32 _derivativeHash) external view returns (uint256);\\n\\n    function isDerivativeCancelled(bytes32 _derivativeHash) external view returns (bool);\\n\\n    function updateProtocolParametersArgs() external;\\n\\n    function updateProtocolAddresses() external;\\n\\n    function claimReserves(address _tokenAddress) external;\\n\\n    function claimReserves(address _tokenAddress, uint256 _amount) external;\\n\\n    function create(\\n        LibDerivative.Derivative calldata _derivative,\\n        uint256 _amount,\\n        address[2] calldata _positionsOwners\\n    ) external;\\n\\n    function createAndMint(\\n        LibDerivative.Derivative calldata _derivative,\\n        uint256 _amount,\\n        address[2] calldata _positionsOwners,\\n        string calldata _derivativeAuthorCustomName\\n    ) external;\\n\\n    function mint(\\n        uint256 _amount,\\n        address[2] calldata _positionsAddresses,\\n        address[2] calldata _positionsOwners\\n    ) external;\\n\\n    function execute(address _positionAddress, uint256 _amount) external;\\n\\n    function execute(\\n        address _positionOwner,\\n        address _positionAddress,\\n        uint256 _amount\\n    ) external;\\n\\n    function execute(address[] calldata _positionsAddresses, uint256[] calldata _amounts) external;\\n\\n    function execute(\\n        address _positionsOwner,\\n        address[] calldata _positionsAddresses,\\n        uint256[] calldata _amounts\\n    ) external;\\n\\n    function redeem(address[2] calldata _positionsAddresses, uint256 _amount) external;\\n\\n    function redeem(address[2][] calldata _positionsAddresses, uint256[] calldata _amounts) external;\\n\\n    function cancel(address _positionAddress, uint256 _amount) external;\\n\\n    function cancel(address[] calldata _positionsAddresses, uint256[] calldata _amounts) external;\\n}\\n\",\"keccak256\":\"0xcd1a2d848707b3e3796d13adc7bdb1d48fb7b97775d7629e556133f519dd1c99\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/IOpiumProxyFactory.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\nimport \\\"../libs/LibDerivative.sol\\\";\\n\\ninterface IOpiumProxyFactory {\\n    function getImplementationAddress() external view returns (address);\\n\\n    function initialize(address _registry) external;\\n\\n    function create(\\n        address _buyer,\\n        address _seller,\\n        uint256 _amount,\\n        bytes32 _derivativeHash,\\n        LibDerivative.Derivative calldata _derivative\\n    ) external;\\n\\n    function mintPair(\\n        address _buyer,\\n        address _seller,\\n        address _longPositionAddress,\\n        address _shortPositionAddress,\\n        uint256 _amount\\n    ) external;\\n\\n    function burn(\\n        address _positionOwner,\\n        address _positionAddress,\\n        uint256 _amount\\n    ) external;\\n\\n    function burnPair(\\n        address _positionOwner,\\n        address _longPositionAddress,\\n        address _shortPositionAddress,\\n        uint256 _amount\\n    ) external;\\n}\\n\",\"keccak256\":\"0x8ed7645d29129d554333c546c4ea01f1f15a12ba0d4800ca6c748936de4ad366\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/IOracleAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\ninterface IOracleAggregator {\\n    function __callback(uint256 timestamp, uint256 data) external;\\n\\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult);\\n\\n    function hasData(address oracleId, uint256 timestamp) external view returns (bool);\\n}\\n\",\"keccak256\":\"0xd7cf19f6f5cb6eed55fb87b5f5f04275f575f3dbc90435bb9cb97f1277406a79\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/ISyntheticAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\nimport \\\"../libs/LibDerivative.sol\\\";\\n\\ninterface ISyntheticAggregator {\\n    struct SyntheticCache {\\n        uint256 buyerMargin;\\n        uint256 sellerMargin;\\n        uint256 authorCommission;\\n        address authorAddress;\\n        bool init;\\n    }\\n\\n    function initialize(address _registry) external;\\n\\n    function getOrCacheSyntheticCache(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)\\n        external\\n        returns (SyntheticCache memory);\\n\\n    function getOrCacheMargin(bytes32 _derivativeHash, LibDerivative.Derivative calldata _derivative)\\n        external\\n        returns (uint256 buyerMargin, uint256 sellerMargin);\\n}\\n\",\"keccak256\":\"0x5c3c6f93980c54449b203594ffde12e7ab410642fc55748996c538ce8a644d02\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/ITokenSpender.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol\\\";\\n\\ninterface ITokenSpender {\\n    function claimTokens(\\n        IERC20Upgradeable _token,\\n        address _from,\\n        address _to,\\n        uint256 _amount\\n    ) external;\\n}\\n\",\"keccak256\":\"0x68136d9ec8312e8365684852786e3061535fd0142d65e732145388d01cadd2ac\",\"license\":\"agpl-3.0\"},\"contracts/libs/LibCalculator.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nlibrary LibCalculator {\\n    uint256 internal constant PERCENTAGE_BASE = 10000; // Represents 100%\\n    uint256 internal constant MAX_REDEMPTION_PART = 100; // Represents 1%\\n\\n    function mulWithPrecisionFactor(uint256 _x, uint256 _y) internal pure returns (uint256) {\\n        return (_x * _y) / 1e18;\\n    }\\n\\n    function modWithPrecisionFactor(uint256 _x) internal pure returns (uint256) {\\n        return _x % 1e18;\\n    }\\n}\\n\",\"keccak256\":\"0xea57e495efe54b9120acd3f1bfd59b5051741beb9c0322a7dc3fc1705e1f0181\",\"license\":\"agpl-3.0\"},\"contracts/libs/LibDerivative.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/// @title Opium.Lib.LibDerivative contract should be inherited by contracts that use Derivative structure and calculate derivativeHash\\nlibrary LibDerivative {\\n    enum PositionType {\\n        SHORT,\\n        LONG\\n    }\\n\\n    // Opium derivative structure (ticker) definition\\n    struct Derivative {\\n        // Margin parameter for syntheticId\\n        uint256 margin;\\n        // Maturity of derivative\\n        uint256 endTime;\\n        // Additional parameters for syntheticId\\n        uint256[] params;\\n        // oracleId of derivative\\n        address oracleId;\\n        // Margin token address of derivative\\n        address token;\\n        // syntheticId of derivative\\n        address syntheticId;\\n    }\\n\\n    /// @notice Calculates hash of provided Derivative\\n    /// @param _derivative Derivative Instance of derivative to hash\\n    /// @return derivativeHash bytes32 Derivative hash\\n    function getDerivativeHash(Derivative memory _derivative) internal pure returns (bytes32 derivativeHash) {\\n        derivativeHash = keccak256(\\n            abi.encodePacked(\\n                _derivative.margin,\\n                _derivative.endTime,\\n                _derivative.params,\\n                _derivative.oracleId,\\n                _derivative.token,\\n                _derivative.syntheticId\\n            )\\n        );\\n    }\\n}\\n\",\"keccak256\":\"0x8dc20b755b97c78a16d4c51b55efb29b9224e6117c1c8703e1716fd15539f12c\",\"license\":\"agpl-3.0\"},\"contracts/libs/LibRoles.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nlibrary LibRoles {\\n    // ***** SETUP *****\\n\\n    /// @notice Role responsible for updating the Opium Protocol core contracts' addresses encoded in the RegistryEntities.ProtocolAddressesArgs struct\\n    /// @dev { See RegistryEntities.sol for a detailed description of the struct }\\n    bytes32 internal constant PROTOCOL_ADDRESSES_SETTER_ROLE = keccak256(\\\"RL1\\\");\\n\\n    /// @notice Role responsible for updating the RegistryEntities.ProtocolParametersArgs.noDataCancellationPeriod\\n    /// @dev { See RegistryEntities.sol for a detailed description of the ProtocolParametersArgs parameters }\\n    bytes32 internal constant NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE = keccak256(\\\"RL5\\\");\\n\\n    /// @notice Role responsible for managing (adding and removing accounts) the whitelist\\n    bytes32 internal constant WHITELISTER_ROLE = keccak256(\\\"RL7\\\");\\n\\n    /// @notice Role responsible for updating the Registry address itself stored in the Opium Protocol core contracts that consume the Registry\\n    /// @dev It is the only role whose associated setter does not reside in the Registry itself but in a module inherited by its consumer contracts.\\n    /// @dev The registry's sole responsibility is to keep track of the accounts that have been assigned to the REGISTRY_MANAGER_ROLE role\\n    /// @dev { See RegistryManager.sol for further details }\\n    bytes32 internal constant REGISTRY_MANAGER_ROLE = keccak256(\\\"RL10\\\");\\n\\n    /// @notice Role responsible for updating (applying) new core configuration if it was changed in the registry\\n    bytes32 internal constant CORE_CONFIGURATION_UPDATER_ROLE = keccak256(\\\"RL18\\\");\\n\\n    // ***** RESERVE *****\\n\\n    /// @notice Role responsible for updating the reserve recipient's address of the profitable execution of derivatives positions\\n    bytes32 internal constant EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE = keccak256(\\\"RL2\\\");\\n\\n    /// @notice Role responsible for updating the reserve recipient's address of the redemption of market neutral positions\\n    bytes32 internal constant REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE = keccak256(\\\"RL3\\\");\\n\\n    /// @notice Role responsible for updating the fixed part (percentage) of the derivative author fees that goes to the protocol execution reserve\\n    bytes32 internal constant EXECUTION_RESERVE_PART_SETTER_ROLE = keccak256(\\\"RL4\\\");\\n\\n    /// @notice Role responsible for updating the maximum fee that a derivative author can set as a commission originated from the profitable execution of derivatives positions\\n    bytes32 internal constant DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE = keccak256(\\\"RL8\\\");\\n\\n    /// @notice Role responsible for updating the fixed part (percentage) of the initial margin that will be deducted to the reserves during redemption of market neutral positions\\n    /// @notice Also sets fixed part (percentage) of this redemption reserves that goes to the protocol redemption reserve\\n    bytes32 internal constant REDEMPTION_RESERVE_PART_SETTER_ROLE = keccak256(\\\"RL9\\\");\\n\\n    // ***** EMERGENCY *****\\n\\n    /// @notice Role responsible for globally pausing the protocol\\n    bytes32 internal constant GUARDIAN_ROLE = keccak256(\\\"RL6\\\");\\n\\n    /// @notice Role responsible for pausing Core.create\\n    bytes32 internal constant PARTIAL_CREATE_PAUSE_ROLE = keccak256(\\\"RL11\\\");\\n\\n    /// @notice Role responsible for pausing Core.mint\\n    bytes32 internal constant PARTIAL_MINT_PAUSE_ROLE = keccak256(\\\"RL12\\\");\\n\\n    /// @notice Role responsible for pausing Core.redeem\\n    bytes32 internal constant PARTIAL_REDEEM_PAUSE_ROLE = keccak256(\\\"RL13\\\");\\n\\n    /// @notice Role responsible for pausing Core.execute\\n    bytes32 internal constant PARTIAL_EXECUTE_PAUSE_ROLE = keccak256(\\\"RL14\\\");\\n\\n    /// @notice Role responsible for pausing Core.cancel\\n    bytes32 internal constant PARTIAL_CANCEL_PAUSE_ROLE = keccak256(\\\"RL15\\\");\\n\\n    /// @notice Role responsible for pausing Core.claimReserve\\n    bytes32 internal constant PARTIAL_CLAIM_RESERVE_PAUSE_ROLE = keccak256(\\\"RL16\\\");\\n\\n    /// @notice Role responsible for globally unpausing the protocol\\n    bytes32 internal constant PROTOCOL_UNPAUSER_ROLE = keccak256(\\\"RL17\\\");\\n}\\n\",\"keccak256\":\"0xcac492d137bffb52a82b8e7fc6dde9ee9021525d2302a19c792dd3aa2f2da969\",\"license\":\"agpl-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061272e806100206000396000f3fe608060405234801561001057600080fd5b50600436106102ac5760003560e01c8063a31923951161017b578063dac88561116100d8578063f10827e01161008c578063f6c228a811610071578063f6c228a8146106e3578063fbb5cfec146106eb578063fbc422f6146106f357600080fd5b8063f10827e0146106d3578063f5e0f847146106db57600080fd5b8063e26c6b7d116100bd578063e26c6b7d146106a5578063e43252d7146106b8578063e455d587146106cb57600080fd5b8063dac8856114610692578063dd1eb52c1461069d57600080fd5b8063c58aad871161012f578063cc0549e311610114578063cc0549e31461065c578063d547741f14610664578063da4fbe521461067757600080fd5b8063c58aad8714610573578063c823b5db1461065457600080fd5b8063b990690711610160578063b990690714610521578063bd6962d114610534578063c4d66de81461056057600080fd5b8063a319239514610506578063b2037c551461051957600080fd5b8063488f1cbe1161022957806391d14854116101dd5780639e30941b116101c25780639e30941b14610410578063a1774da014610423578063a217fddf146104fe57600080fd5b806391d14854146103cf5780639baacb871461040857600080fd5b8063698ef9931161020e578063698ef993146103a15780638456cb59146103b45780638ab1d681146103bc57600080fd5b8063488f1cbe146103865780634e562cbb1461039957600080fd5b80632f2ff15d1161028057806336568abe1161026557806336568abe146103585780633f4ba83a1461036b5780634048d9091461037357600080fd5b80632f2ff15d14610332578063315d0db41461034557600080fd5b8062c92e42146102b157806301ffc9a7146102c657806307d7ecb6146102ee578063248a9ca314610301575b600080fd5b6102c46102bf36600461244b565b6106fb565b005b6102d96102d4366004612421565b61080a565b60405190151581526020015b60405180910390f35b6102c46102fc366004612377565b610841565b61032461030f3660046123dc565b60009081526065602052604090206001015490565b6040519081526020016102e5565b6102c46103403660046123f5565b610991565b6102c461035336600461235c565b6109bc565b6102c46103663660046123f5565b610aa7565b6102c4610b33565b6102d961038136600461235c565b610bfc565b6102c461039436600461244b565b610c3c565b6102d9610d38565b6102d96103af36600461235c565b610d5c565b6102c4610d9c565b6102c46103ca36600461235c565b610e98565b6102d96103dd3660046123f5565b60009182526065602090815260408084206001600160a01b0393909316845291905290205460ff1690565b6102c4610f45565b6102c461041e36600461235c565b611048565b6104f16040805161012081018252600080825260208201819052918101829052606081018290526080810182905260a0810182905260c0810182905260e081018290526101008101919091525060408051610120810182526098546001600160a01b03908116825260995481166020830152609a54811692820192909252609b5482166060820152609c5482166080820152609d54821660a0820152609e5491821660c082015263ffffffff600160a01b8304811660e0830152600160c01b90920490911661010082015290565b6040516102e59190612525565b610324600081565b6102c461051436600461244b565b611133565b6102c46111dc565b6102c461052f36600461244b565b6112e5565b6102d961054236600461235c565b6001600160a01b0316600090815260a0602052604090205460ff1690565b6102c461056e36600461235c565b6113e9565b6106476040805161010081018252600080825260208201819052918101829052606081018290526080810182905260a0810182905260c0810182905260e081019190915250604080516101008101825260975463ffffffff80821683526401000000008204811660208401526801000000000000000082048116938301939093526c01000000000000000000000000810483166060830152600160801b810483166080830152600160a01b8104831660a0830152600160c01b8104831660c0830152600160e01b900490911660e082015290565b6040516102e591906125b1565b6102d96117c7565b6102c46117e8565b6102c46106723660046123f5565b6118fa565b6098546040516001600160a01b0390911681526020016102e5565b609f5460ff166102d9565b6102d9611920565b6102c46106b336600461244b565b61193f565b6102c46106c636600461235c565b611a33565b6102c4611ae3565b6102d9611bef565b6102d9611c0f565b6102c4611c32565b6102c4611d38565b6102d9611e47565b3360009081527f0faad572c43c9761ed61f423d6d106c39e1b0065a51556d39d05bcdec380d7f3602052604090205460ff166107635760405162461bcd60e51b8152602060048201526002602482015261523960f01b60448201526064015b60405180910390fd5b6127108163ffffffff16106107a05760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b609780547fffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff16600160801b63ffffffff84169081029190911790915560405133907f1a1468e93fd8855e6609e537f786724a4321061b8b716e3f37393c53f721a2a390600090a350565b60006001600160e01b03198216637965db0b60e01b148061083b57506301ffc9a760e01b6001600160e01b03198316145b92915050565b3360009081527ff860dc4d49b58b15761fa013a40ed9a8e5c703456c7681d309655e2140ffc53a602052604090205460ff166108a45760405162461bcd60e51b8152602060048201526002602482015261523160f01b604482015260640161075a565b6001600160a01b038516158015906108c457506001600160a01b03841615155b80156108d857506001600160a01b03831615155b80156108ec57506001600160a01b03821615155b801561090057506001600160a01b03811615155b6109325760405162461bcd60e51b815260206004820152600360248201526229189960e91b604482015260640161075a565b609980546001600160a01b03199081166001600160a01b039788161790915560988054821695871695909517909455609a8054851693861693909317909255609b80548416918516919091179055609c80549092169216919091179055565b6000828152606560205260409020600101546109ad8133611e65565b6109b78383611ee5565b505050565b3360009081527f0a7485b578decb844695fec73e47de9e3a0a0f61ade08dc3183b30f6ddac5f03602052604090205460ff16610a1f5760405162461bcd60e51b8152602060048201526002602482015261523360f01b604482015260640161075a565b6001600160a01b038116610a5b5760405162461bcd60e51b815260206004820152600360248201526229189960e91b604482015260640161075a565b609e80546001600160a01b0319166001600160a01b03831690811790915560405133907fe1b970507d04d56360abbd36d859d78cd6e65104574141796e49aa6c72da517190600090a350565b6001600160a01b0381163314610b255760405162461bcd60e51b815260206004820152602f60248201527f416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636560448201527f20726f6c657320666f722073656c660000000000000000000000000000000000606482015260840161075a565b610b2f8282611f87565b5050565b3360009081527f2d416a7e271f66853844bd9dc5cd274140b3d4ed65d3f4afcf1cfebd790dacaa602052604090205460ff16610b975760405162461bcd60e51b815260206004820152600360248201526252313960e81b604482015260640161075a565b609f80546affffffffffffffffffffff191690556040517f75d435b8ed45738e662759d0e2a87a699b5c6e9cdd9593f483f195bfc764e6909060009033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a62908390a4565b6001600160a01b03811660009081527f575d0b624afc72dea7d42668674270c86384c6196dd270cbc4fc1b5ed5cdbcff602052604081205460ff1661083b565b3360009081527f0faad572c43c9761ed61f423d6d106c39e1b0065a51556d39d05bcdec380d7f3602052604090205460ff16610c9f5760405162461bcd60e51b8152602060048201526002602482015261523960f01b604482015260640161075a565b60648163ffffffff161115610cdc5760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b609780546bffffffff000000000000000019166801000000000000000063ffffffff84169081029190911790915560405133907fd8cef7e691d07b1709503d29fa0717df64a78dbc8d86de1efabb15cf614b1ccd90600090a350565b609f5460009060ff1680610d575750609f5465010000000000900460ff165b905090565b6001600160a01b03811660009081527faaf2a71ee48636e8ae3a1955ae821e40d2cf5ab657d8933f1c1465e2a5bc4464602052604081205460ff1661083b565b3360009081527f1ce91ab5e0e81f316105d9217fc91329058104a15dc4476cf1844d77125686a5602052604090205460ff16610dff5760405162461bcd60e51b8152602060048201526002602482015261291b60f11b604482015260640161075a565b609f5460ff1615610e385760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805460ff191660019081179091556040517f2ca8e8dfde9481c8a047cde1353357bf2e606d7d1eca452231d961937a4c5aca919033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527f7a8dde43a7bc7e69e79f4e84c777c056b60ffe4a66e8627aaef837e50f847a24602052604090205460ff16610efb5760405162461bcd60e51b8152602060048201526002602482015261523760f01b604482015260640161075a565b6001600160a01b038116600081815260a06020526040808220805460ff191690555133917fd358711b94a3144deea84d17279846b11eac142209e2dbd93bc9eb9fb604db4c91a350565b3360009081527fb6b9868e4af9bfd0fc3575c1c867f9d0e77d5ed2905add1f763bcb8431db891e602052604090205460ff16610fa95760405162461bcd60e51b815260206004820152600360248201526252313360e81b604482015260640161075a565b609f54610100900460ff1615610fe75760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805461ff0019166101001790556040517ff3de4533ff00ef299a11d619e1a5d244e6ff5fa1f474c653ed54cbb6ef9394369060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527fa32a36b5c1804037ae493fce4127c36b5d0307d0508b7072f2ef402ea4851120602052604090205460ff166110ab5760405162461bcd60e51b8152602060048201526002602482015261291960f11b604482015260640161075a565b6001600160a01b0381166110e75760405162461bcd60e51b815260206004820152600360248201526229189960e91b604482015260640161075a565b609d80546001600160a01b0319166001600160a01b03831690811790915560405133907fd5c726c653300378b00ef01ee104e9b96adc0bc2442f71d420cd3a3d4bec188790600090a350565b3360009081527f84865fc2265c4ba049bd22aa05d3408f1b8cdf3f3e74978e5465ec4aa715cde8602052604090205460ff166111965760405162461bcd60e51b8152602060048201526002602482015261523560f01b604482015260640161075a565b6097805463ffffffff191663ffffffff831690811790915560405133907fec3d573c5a02aa38f73469c1fc6a491757b0a37dd6d2203b225fabedf2faaf3490600090a350565b3360009081527fd3425a59594079ca15994324f0b074f0d18f9670d322b79481b9220713780f70602052604090205460ff166112405760405162461bcd60e51b815260206004820152600360248201526252313560e81b604482015260640161075a565b609f546301000000900460ff16156112805760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805463ff000000191663010000001790556040517f1492d97ab6e4d8c7ca956834bc38263ad70284a7fdf818879444c466f060a8739060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527f3b51f19727f995496c81c5d4aad41d5c583bbd77a06ae445f5fb07d146f44861602052604090205460ff166113485760405162461bcd60e51b8152602060048201526002602482015261148d60f21b604482015260640161075a565b6127108163ffffffff16106113855760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b609780546fffffffff00000000000000000000000019166c0100000000000000000000000063ffffffff84169081029190911790915560405133907f26dfdabb870fe87855acdd50ba095834d3b321959344d33c4e4d1ced661dc02390600090a350565b600054610100900460ff1680611402575060005460ff16155b6114655760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b606482015260840161075a565b600054610100900460ff16158015611487576000805461ffff19166101011790555b61148f61200a565b61149a6000836120d5565b6114c47f8bed349beb182b4c10ffa09b24228eeab3af7dfd7ed1f15102a7dbe7a6f5d813836120d5565b6114ee7fea6cbf7d4e5f24055ba3677c8ea492419947fab4a7deeed8f4803fe415aad050836120d5565b6115187f88cc9cd9c54f9fbc935dfdf1daaa59ded01685c6fc56d4cb843e720a8d1c183d836120d5565b6115427f0f4989a44d2d609558af77c6ff340e14d02f94ee75ea4ad3948292d33e8ed7b1836120d5565b61156c7f390296b51502c03a83e20c8a2c4c75d5f9a6a9b012895550215a37783529363a836120d5565b6115967f6b7485dc29163dc8d5a5ba04f2e13702d6d8acaacfe7f15bfc9daeb62e0c1db6836120d5565b6115c07f1632efe3ce40cb1d1888fdab2f730ce74336e4153192c4fae3aa5d9fd8edcd03836120d5565b6115ea7fab2c7b53772c7d4909be14bd92182b417e0e3ccbc293e79bb476c884c5b9eacb836120d5565b6116147f70c561384e26c2d11e737b3121a1bf9f8952b626d42bcd32efa0c805e750f844836120d5565b61163e7fce5263906f3edf48ea37bf5a7fd9e307ecfb9a93febf8fbbd02951271e2a5935836120d5565b6116687f2ca8e8dfde9481c8a047cde1353357bf2e606d7d1eca452231d961937a4c5aca836120d5565b6116927ff3de4533ff00ef299a11d619e1a5d244e6ff5fa1f474c653ed54cbb6ef939436836120d5565b6116bc7f2455f7a8bbdd0bb4e98fefba1846d37b1c2aaefb411547a266276157e5c75d2d836120d5565b6116e67f1492d97ab6e4d8c7ca956834bc38263ad70284a7fdf818879444c466f060a873836120d5565b6117107f60a9770968af425ab1edbca869fda04c84d1c0fd21db260dfc186a3ef3e3e14f836120d5565b61173a7ff29bdb744edfeb41e2161a3a29b928fe654603a4e2b5577a7855149e9916a64b836120d5565b6117647f50a9ed8fc1c890456f829cbba972ff82bb1658c43895e7bee5d1fec9871e9b39836120d5565b61178e7f75d435b8ed45738e662759d0e2a87a699b5c6e9cdd9593f483f195bfc764e690836120d5565b609780546001600160a01b0319167103e8000003e80000000a000003e8001275001790558015610b2f576000805461ff00191690555050565b609f5460009060ff1680610d57575050609f54640100000000900460ff1690565b3360009081527f3da570987684dbd89cdc86e6f721d2e0b7865d41bbb84be8fd033708221cb9b6602052604090205460ff1661184c5760405162461bcd60e51b81526020600482015260036024820152620a462760eb1b604482015260640161075a565b609f546601000000000000900460ff161561188f5760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805466ff000000000000191666010000000000001790556040517f50a9ed8fc1c890456f829cbba972ff82bb1658c43895e7bee5d1fec9871e9b399060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b6000828152606560205260409020600101546119168133611e65565b6109b78383611f87565b609f5460009060ff1680610d57575050609f5462010000900460ff1690565b3360009081527fdac563a5eca333c5ee2ee69b76f4796bd8890408c930745ef9b47200c0b4a121602052604090205460ff166119a25760405162461bcd60e51b81526020600482015260026024820152610a4760f31b604482015260640161075a565b6127108163ffffffff16106119df5760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b6097805467ffffffff00000000191664010000000063ffffffff84169081029190911790915560405133907f456798d7429d6deef71c19b900fa05ce0bc150d970f312fac0396efe0ed89e2f90600090a350565b3360009081527f7a8dde43a7bc7e69e79f4e84c777c056b60ffe4a66e8627aaef837e50f847a24602052604090205460ff16611a965760405162461bcd60e51b8152602060048201526002602482015261523760f01b604482015260640161075a565b6001600160a01b038116600081815260a06020526040808220805460ff191660011790555133917f0beb05eda27aaa12c3879f90bf15e464bae38f391a8e75a12dc287ac2fdc29b591a350565b3360009081527f77f13b16c87b7f2f2e4e7e8fee3e2c404557d2df5b89ffd3e0e81d5b6a75af32602052604090205460ff16611b475760405162461bcd60e51b815260206004820152600360248201526229189b60e91b604482015260640161075a565b609f54640100000000900460ff1615611b885760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805464ff0000000019166401000000001790556040517f60a9770968af425ab1edbca869fda04c84d1c0fd21db260dfc186a3ef3e3e14f9060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b609f5460009060ff1680610d57575050609f546301000000900460ff1690565b609f5460009060ff1680610d57575050609f546601000000000000900460ff1690565b3360009081527f53ebb4d5020e385d4b47c75dab8fa68f4e9953c2ea2a824d50ad61d7fbe1e85e602052604090205460ff16611c965760405162461bcd60e51b8152602060048201526003602482015262148c4d60ea1b604482015260640161075a565b609f5462010000900460ff1615611cd55760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805462ff00001916620100001790556040517f2455f7a8bbdd0bb4e98fefba1846d37b1c2aaefb411547a266276157e5c75d2d9060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527fff6cba3daff300f2d51631d1bfa726734b8a02fb6bf1bfe8fabaa748202a8518602052604090205460ff16611d9c5760405162461bcd60e51b815260206004820152600360248201526252313760e81b604482015260640161075a565b609f5465010000000000900460ff1615611dde5760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805465ff00000000001916650100000000001790556040517ff29bdb744edfeb41e2161a3a29b928fe654603a4e2b5577a7855149e9916a64b9060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b609f5460009060ff1680610d57575050609f54610100900460ff1690565b60008281526065602090815260408083206001600160a01b038516845290915290205460ff16610b2f57611ea3816001600160a01b031660146120df565b611eae8360206120df565b604051602001611ebf929190612471565b60408051601f198184030181529082905262461bcd60e51b825261075a916004016124f2565b60008281526065602090815260408083206001600160a01b038516845290915290205460ff16610b2f5760008281526065602090815260408083206001600160a01b03851684529091529020805460ff19166001179055611f433390565b6001600160a01b0316816001600160a01b0316837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45050565b60008281526065602090815260408083206001600160a01b038516845290915290205460ff1615610b2f5760008281526065602090815260408083206001600160a01b0385168085529252808320805460ff1916905551339285917ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b9190a45050565b600054610100900460ff1680612023575060005460ff16155b6120865760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b606482015260840161075a565b600054610100900460ff161580156120a8576000805461ffff19166101011790555b6120b061228f565b6120b861228f565b6120c061228f565b80156120d2576000805461ff00191690555b50565b610b2f8282611ee5565b606060006120ee836002612650565b6120f9906002612638565b67ffffffffffffffff811115612111576121116126e2565b6040519080825280601f01601f19166020018201604052801561213b576020820181803683370190505b509050600360fc1b81600081518110612156576121566126cc565b60200101906001600160f81b031916908160001a905350600f60fb1b81600181518110612185576121856126cc565b60200101906001600160f81b031916908160001a90535060006121a9846002612650565b6121b4906001612638565b90505b6001811115612239577f303132333435363738396162636465660000000000000000000000000000000085600f16601081106121f5576121f56126cc565b1a60f81b82828151811061220b5761220b6126cc565b60200101906001600160f81b031916908160001a90535060049490941c936122328161269f565b90506121b7565b5083156122885760405162461bcd60e51b815260206004820181905260248201527f537472696e67733a20686578206c656e67746820696e73756666696369656e74604482015260640161075a565b9392505050565b600054610100900460ff16806122a8575060005460ff16155b61230b5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b606482015260840161075a565b600054610100900460ff161580156120c0576000805461ffff191661010117905580156120d2576000805461ff001916905550565b80356001600160a01b038116811461235757600080fd5b919050565b60006020828403121561236e57600080fd5b61228882612340565b600080600080600060a0868803121561238f57600080fd5b61239886612340565b94506123a660208701612340565b93506123b460408701612340565b92506123c260608701612340565b91506123d060808701612340565b90509295509295909350565b6000602082840312156123ee57600080fd5b5035919050565b6000806040838503121561240857600080fd5b8235915061241860208401612340565b90509250929050565b60006020828403121561243357600080fd5b81356001600160e01b03198116811461228857600080fd5b60006020828403121561245d57600080fd5b813563ffffffff8116811461228857600080fd5b7f416363657373436f6e74726f6c3a206163636f756e74200000000000000000008152600083516124a981601785016020880161266f565b7f206973206d697373696e6720726f6c652000000000000000000000000000000060179184019182015283516124e681602884016020880161266f565b01602801949350505050565b602081526000825180602084015261251181604085016020870161266f565b601f01601f19169190910160400192915050565b81516001600160a01b03908116825260208084015182169083015260408084015182169083015260608084015182169083015260808084015182169083015260a08084015182169083015260c080840151918216908301526101208201905060e083015161259b60e084018263ffffffff169052565b506101009283015163ffffffff16919092015290565b60006101008201905063ffffffff8084511683528060208501511660208401528060408501511660408401528060608501511660608401528060808501511660808401528060a08501511660a08401525060c083015161261960c084018263ffffffff169052565b5060e083015161263160e084018263ffffffff169052565b5092915050565b6000821982111561264b5761264b6126b6565b500190565b600081600019048311821515161561266a5761266a6126b6565b500290565b60005b8381101561268a578181015183820152602001612672565b83811115612699576000848401525b50505050565b6000816126ae576126ae6126b6565b506000190190565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea2646970667358221220fac5987cc8589d6112e6b08e71df64c3fdc9c67826a24278dbb01972677e930564736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106102ac5760003560e01c8063a31923951161017b578063dac88561116100d8578063f10827e01161008c578063f6c228a811610071578063f6c228a8146106e3578063fbb5cfec146106eb578063fbc422f6146106f357600080fd5b8063f10827e0146106d3578063f5e0f847146106db57600080fd5b8063e26c6b7d116100bd578063e26c6b7d146106a5578063e43252d7146106b8578063e455d587146106cb57600080fd5b8063dac8856114610692578063dd1eb52c1461069d57600080fd5b8063c58aad871161012f578063cc0549e311610114578063cc0549e31461065c578063d547741f14610664578063da4fbe521461067757600080fd5b8063c58aad8714610573578063c823b5db1461065457600080fd5b8063b990690711610160578063b990690714610521578063bd6962d114610534578063c4d66de81461056057600080fd5b8063a319239514610506578063b2037c551461051957600080fd5b8063488f1cbe1161022957806391d14854116101dd5780639e30941b116101c25780639e30941b14610410578063a1774da014610423578063a217fddf146104fe57600080fd5b806391d14854146103cf5780639baacb871461040857600080fd5b8063698ef9931161020e578063698ef993146103a15780638456cb59146103b45780638ab1d681146103bc57600080fd5b8063488f1cbe146103865780634e562cbb1461039957600080fd5b80632f2ff15d1161028057806336568abe1161026557806336568abe146103585780633f4ba83a1461036b5780634048d9091461037357600080fd5b80632f2ff15d14610332578063315d0db41461034557600080fd5b8062c92e42146102b157806301ffc9a7146102c657806307d7ecb6146102ee578063248a9ca314610301575b600080fd5b6102c46102bf36600461244b565b6106fb565b005b6102d96102d4366004612421565b61080a565b60405190151581526020015b60405180910390f35b6102c46102fc366004612377565b610841565b61032461030f3660046123dc565b60009081526065602052604090206001015490565b6040519081526020016102e5565b6102c46103403660046123f5565b610991565b6102c461035336600461235c565b6109bc565b6102c46103663660046123f5565b610aa7565b6102c4610b33565b6102d961038136600461235c565b610bfc565b6102c461039436600461244b565b610c3c565b6102d9610d38565b6102d96103af36600461235c565b610d5c565b6102c4610d9c565b6102c46103ca36600461235c565b610e98565b6102d96103dd3660046123f5565b60009182526065602090815260408084206001600160a01b0393909316845291905290205460ff1690565b6102c4610f45565b6102c461041e36600461235c565b611048565b6104f16040805161012081018252600080825260208201819052918101829052606081018290526080810182905260a0810182905260c0810182905260e081018290526101008101919091525060408051610120810182526098546001600160a01b03908116825260995481166020830152609a54811692820192909252609b5482166060820152609c5482166080820152609d54821660a0820152609e5491821660c082015263ffffffff600160a01b8304811660e0830152600160c01b90920490911661010082015290565b6040516102e59190612525565b610324600081565b6102c461051436600461244b565b611133565b6102c46111dc565b6102c461052f36600461244b565b6112e5565b6102d961054236600461235c565b6001600160a01b0316600090815260a0602052604090205460ff1690565b6102c461056e36600461235c565b6113e9565b6106476040805161010081018252600080825260208201819052918101829052606081018290526080810182905260a0810182905260c0810182905260e081019190915250604080516101008101825260975463ffffffff80821683526401000000008204811660208401526801000000000000000082048116938301939093526c01000000000000000000000000810483166060830152600160801b810483166080830152600160a01b8104831660a0830152600160c01b8104831660c0830152600160e01b900490911660e082015290565b6040516102e591906125b1565b6102d96117c7565b6102c46117e8565b6102c46106723660046123f5565b6118fa565b6098546040516001600160a01b0390911681526020016102e5565b609f5460ff166102d9565b6102d9611920565b6102c46106b336600461244b565b61193f565b6102c46106c636600461235c565b611a33565b6102c4611ae3565b6102d9611bef565b6102d9611c0f565b6102c4611c32565b6102c4611d38565b6102d9611e47565b3360009081527f0faad572c43c9761ed61f423d6d106c39e1b0065a51556d39d05bcdec380d7f3602052604090205460ff166107635760405162461bcd60e51b8152602060048201526002602482015261523960f01b60448201526064015b60405180910390fd5b6127108163ffffffff16106107a05760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b609780547fffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffff16600160801b63ffffffff84169081029190911790915560405133907f1a1468e93fd8855e6609e537f786724a4321061b8b716e3f37393c53f721a2a390600090a350565b60006001600160e01b03198216637965db0b60e01b148061083b57506301ffc9a760e01b6001600160e01b03198316145b92915050565b3360009081527ff860dc4d49b58b15761fa013a40ed9a8e5c703456c7681d309655e2140ffc53a602052604090205460ff166108a45760405162461bcd60e51b8152602060048201526002602482015261523160f01b604482015260640161075a565b6001600160a01b038516158015906108c457506001600160a01b03841615155b80156108d857506001600160a01b03831615155b80156108ec57506001600160a01b03821615155b801561090057506001600160a01b03811615155b6109325760405162461bcd60e51b815260206004820152600360248201526229189960e91b604482015260640161075a565b609980546001600160a01b03199081166001600160a01b039788161790915560988054821695871695909517909455609a8054851693861693909317909255609b80548416918516919091179055609c80549092169216919091179055565b6000828152606560205260409020600101546109ad8133611e65565b6109b78383611ee5565b505050565b3360009081527f0a7485b578decb844695fec73e47de9e3a0a0f61ade08dc3183b30f6ddac5f03602052604090205460ff16610a1f5760405162461bcd60e51b8152602060048201526002602482015261523360f01b604482015260640161075a565b6001600160a01b038116610a5b5760405162461bcd60e51b815260206004820152600360248201526229189960e91b604482015260640161075a565b609e80546001600160a01b0319166001600160a01b03831690811790915560405133907fe1b970507d04d56360abbd36d859d78cd6e65104574141796e49aa6c72da517190600090a350565b6001600160a01b0381163314610b255760405162461bcd60e51b815260206004820152602f60248201527f416363657373436f6e74726f6c3a2063616e206f6e6c792072656e6f756e636560448201527f20726f6c657320666f722073656c660000000000000000000000000000000000606482015260840161075a565b610b2f8282611f87565b5050565b3360009081527f2d416a7e271f66853844bd9dc5cd274140b3d4ed65d3f4afcf1cfebd790dacaa602052604090205460ff16610b975760405162461bcd60e51b815260206004820152600360248201526252313960e81b604482015260640161075a565b609f80546affffffffffffffffffffff191690556040517f75d435b8ed45738e662759d0e2a87a699b5c6e9cdd9593f483f195bfc764e6909060009033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a62908390a4565b6001600160a01b03811660009081527f575d0b624afc72dea7d42668674270c86384c6196dd270cbc4fc1b5ed5cdbcff602052604081205460ff1661083b565b3360009081527f0faad572c43c9761ed61f423d6d106c39e1b0065a51556d39d05bcdec380d7f3602052604090205460ff16610c9f5760405162461bcd60e51b8152602060048201526002602482015261523960f01b604482015260640161075a565b60648163ffffffff161115610cdc5760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b609780546bffffffff000000000000000019166801000000000000000063ffffffff84169081029190911790915560405133907fd8cef7e691d07b1709503d29fa0717df64a78dbc8d86de1efabb15cf614b1ccd90600090a350565b609f5460009060ff1680610d575750609f5465010000000000900460ff165b905090565b6001600160a01b03811660009081527faaf2a71ee48636e8ae3a1955ae821e40d2cf5ab657d8933f1c1465e2a5bc4464602052604081205460ff1661083b565b3360009081527f1ce91ab5e0e81f316105d9217fc91329058104a15dc4476cf1844d77125686a5602052604090205460ff16610dff5760405162461bcd60e51b8152602060048201526002602482015261291b60f11b604482015260640161075a565b609f5460ff1615610e385760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805460ff191660019081179091556040517f2ca8e8dfde9481c8a047cde1353357bf2e606d7d1eca452231d961937a4c5aca919033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527f7a8dde43a7bc7e69e79f4e84c777c056b60ffe4a66e8627aaef837e50f847a24602052604090205460ff16610efb5760405162461bcd60e51b8152602060048201526002602482015261523760f01b604482015260640161075a565b6001600160a01b038116600081815260a06020526040808220805460ff191690555133917fd358711b94a3144deea84d17279846b11eac142209e2dbd93bc9eb9fb604db4c91a350565b3360009081527fb6b9868e4af9bfd0fc3575c1c867f9d0e77d5ed2905add1f763bcb8431db891e602052604090205460ff16610fa95760405162461bcd60e51b815260206004820152600360248201526252313360e81b604482015260640161075a565b609f54610100900460ff1615610fe75760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805461ff0019166101001790556040517ff3de4533ff00ef299a11d619e1a5d244e6ff5fa1f474c653ed54cbb6ef9394369060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527fa32a36b5c1804037ae493fce4127c36b5d0307d0508b7072f2ef402ea4851120602052604090205460ff166110ab5760405162461bcd60e51b8152602060048201526002602482015261291960f11b604482015260640161075a565b6001600160a01b0381166110e75760405162461bcd60e51b815260206004820152600360248201526229189960e91b604482015260640161075a565b609d80546001600160a01b0319166001600160a01b03831690811790915560405133907fd5c726c653300378b00ef01ee104e9b96adc0bc2442f71d420cd3a3d4bec188790600090a350565b3360009081527f84865fc2265c4ba049bd22aa05d3408f1b8cdf3f3e74978e5465ec4aa715cde8602052604090205460ff166111965760405162461bcd60e51b8152602060048201526002602482015261523560f01b604482015260640161075a565b6097805463ffffffff191663ffffffff831690811790915560405133907fec3d573c5a02aa38f73469c1fc6a491757b0a37dd6d2203b225fabedf2faaf3490600090a350565b3360009081527fd3425a59594079ca15994324f0b074f0d18f9670d322b79481b9220713780f70602052604090205460ff166112405760405162461bcd60e51b815260206004820152600360248201526252313560e81b604482015260640161075a565b609f546301000000900460ff16156112805760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805463ff000000191663010000001790556040517f1492d97ab6e4d8c7ca956834bc38263ad70284a7fdf818879444c466f060a8739060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527f3b51f19727f995496c81c5d4aad41d5c583bbd77a06ae445f5fb07d146f44861602052604090205460ff166113485760405162461bcd60e51b8152602060048201526002602482015261148d60f21b604482015260640161075a565b6127108163ffffffff16106113855760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b609780546fffffffff00000000000000000000000019166c0100000000000000000000000063ffffffff84169081029190911790915560405133907f26dfdabb870fe87855acdd50ba095834d3b321959344d33c4e4d1ced661dc02390600090a350565b600054610100900460ff1680611402575060005460ff16155b6114655760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b606482015260840161075a565b600054610100900460ff16158015611487576000805461ffff19166101011790555b61148f61200a565b61149a6000836120d5565b6114c47f8bed349beb182b4c10ffa09b24228eeab3af7dfd7ed1f15102a7dbe7a6f5d813836120d5565b6114ee7fea6cbf7d4e5f24055ba3677c8ea492419947fab4a7deeed8f4803fe415aad050836120d5565b6115187f88cc9cd9c54f9fbc935dfdf1daaa59ded01685c6fc56d4cb843e720a8d1c183d836120d5565b6115427f0f4989a44d2d609558af77c6ff340e14d02f94ee75ea4ad3948292d33e8ed7b1836120d5565b61156c7f390296b51502c03a83e20c8a2c4c75d5f9a6a9b012895550215a37783529363a836120d5565b6115967f6b7485dc29163dc8d5a5ba04f2e13702d6d8acaacfe7f15bfc9daeb62e0c1db6836120d5565b6115c07f1632efe3ce40cb1d1888fdab2f730ce74336e4153192c4fae3aa5d9fd8edcd03836120d5565b6115ea7fab2c7b53772c7d4909be14bd92182b417e0e3ccbc293e79bb476c884c5b9eacb836120d5565b6116147f70c561384e26c2d11e737b3121a1bf9f8952b626d42bcd32efa0c805e750f844836120d5565b61163e7fce5263906f3edf48ea37bf5a7fd9e307ecfb9a93febf8fbbd02951271e2a5935836120d5565b6116687f2ca8e8dfde9481c8a047cde1353357bf2e606d7d1eca452231d961937a4c5aca836120d5565b6116927ff3de4533ff00ef299a11d619e1a5d244e6ff5fa1f474c653ed54cbb6ef939436836120d5565b6116bc7f2455f7a8bbdd0bb4e98fefba1846d37b1c2aaefb411547a266276157e5c75d2d836120d5565b6116e67f1492d97ab6e4d8c7ca956834bc38263ad70284a7fdf818879444c466f060a873836120d5565b6117107f60a9770968af425ab1edbca869fda04c84d1c0fd21db260dfc186a3ef3e3e14f836120d5565b61173a7ff29bdb744edfeb41e2161a3a29b928fe654603a4e2b5577a7855149e9916a64b836120d5565b6117647f50a9ed8fc1c890456f829cbba972ff82bb1658c43895e7bee5d1fec9871e9b39836120d5565b61178e7f75d435b8ed45738e662759d0e2a87a699b5c6e9cdd9593f483f195bfc764e690836120d5565b609780546001600160a01b0319167103e8000003e80000000a000003e8001275001790558015610b2f576000805461ff00191690555050565b609f5460009060ff1680610d57575050609f54640100000000900460ff1690565b3360009081527f3da570987684dbd89cdc86e6f721d2e0b7865d41bbb84be8fd033708221cb9b6602052604090205460ff1661184c5760405162461bcd60e51b81526020600482015260036024820152620a462760eb1b604482015260640161075a565b609f546601000000000000900460ff161561188f5760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805466ff000000000000191666010000000000001790556040517f50a9ed8fc1c890456f829cbba972ff82bb1658c43895e7bee5d1fec9871e9b399060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b6000828152606560205260409020600101546119168133611e65565b6109b78383611f87565b609f5460009060ff1680610d57575050609f5462010000900460ff1690565b3360009081527fdac563a5eca333c5ee2ee69b76f4796bd8890408c930745ef9b47200c0b4a121602052604090205460ff166119a25760405162461bcd60e51b81526020600482015260026024820152610a4760f31b604482015260640161075a565b6127108163ffffffff16106119df5760405162461bcd60e51b815260206004820152600360248201526205232360ec1b604482015260640161075a565b6097805467ffffffff00000000191664010000000063ffffffff84169081029190911790915560405133907f456798d7429d6deef71c19b900fa05ce0bc150d970f312fac0396efe0ed89e2f90600090a350565b3360009081527f7a8dde43a7bc7e69e79f4e84c777c056b60ffe4a66e8627aaef837e50f847a24602052604090205460ff16611a965760405162461bcd60e51b8152602060048201526002602482015261523760f01b604482015260640161075a565b6001600160a01b038116600081815260a06020526040808220805460ff191660011790555133917f0beb05eda27aaa12c3879f90bf15e464bae38f391a8e75a12dc287ac2fdc29b591a350565b3360009081527f77f13b16c87b7f2f2e4e7e8fee3e2c404557d2df5b89ffd3e0e81d5b6a75af32602052604090205460ff16611b475760405162461bcd60e51b815260206004820152600360248201526229189b60e91b604482015260640161075a565b609f54640100000000900460ff1615611b885760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805464ff0000000019166401000000001790556040517f60a9770968af425ab1edbca869fda04c84d1c0fd21db260dfc186a3ef3e3e14f9060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b609f5460009060ff1680610d57575050609f546301000000900460ff1690565b609f5460009060ff1680610d57575050609f546601000000000000900460ff1690565b3360009081527f53ebb4d5020e385d4b47c75dab8fa68f4e9953c2ea2a824d50ad61d7fbe1e85e602052604090205460ff16611c965760405162461bcd60e51b8152602060048201526003602482015262148c4d60ea1b604482015260640161075a565b609f5462010000900460ff1615611cd55760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805462ff00001916620100001790556040517f2455f7a8bbdd0bb4e98fefba1846d37b1c2aaefb411547a266276157e5c75d2d9060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b3360009081527fff6cba3daff300f2d51631d1bfa726734b8a02fb6bf1bfe8fabaa748202a8518602052604090205460ff16611d9c5760405162461bcd60e51b815260206004820152600360248201526252313760e81b604482015260640161075a565b609f5465010000000000900460ff1615611dde5760405162461bcd60e51b815260206004820152600360248201526205231360ec1b604482015260640161075a565b609f805465ff00000000001916650100000000001790556040517ff29bdb744edfeb41e2161a3a29b928fe654603a4e2b5577a7855149e9916a64b9060019033907f6033cdcd2199d6fdde99ce0b60a809d3f980ce9597551944dfd8af7f33ec0a6290600090a4565b609f5460009060ff1680610d57575050609f54610100900460ff1690565b60008281526065602090815260408083206001600160a01b038516845290915290205460ff16610b2f57611ea3816001600160a01b031660146120df565b611eae8360206120df565b604051602001611ebf929190612471565b60408051601f198184030181529082905262461bcd60e51b825261075a916004016124f2565b60008281526065602090815260408083206001600160a01b038516845290915290205460ff16610b2f5760008281526065602090815260408083206001600160a01b03851684529091529020805460ff19166001179055611f433390565b6001600160a01b0316816001600160a01b0316837f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a45050565b60008281526065602090815260408083206001600160a01b038516845290915290205460ff1615610b2f5760008281526065602090815260408083206001600160a01b0385168085529252808320805460ff1916905551339285917ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b9190a45050565b600054610100900460ff1680612023575060005460ff16155b6120865760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b606482015260840161075a565b600054610100900460ff161580156120a8576000805461ffff19166101011790555b6120b061228f565b6120b861228f565b6120c061228f565b80156120d2576000805461ff00191690555b50565b610b2f8282611ee5565b606060006120ee836002612650565b6120f9906002612638565b67ffffffffffffffff811115612111576121116126e2565b6040519080825280601f01601f19166020018201604052801561213b576020820181803683370190505b509050600360fc1b81600081518110612156576121566126cc565b60200101906001600160f81b031916908160001a905350600f60fb1b81600181518110612185576121856126cc565b60200101906001600160f81b031916908160001a90535060006121a9846002612650565b6121b4906001612638565b90505b6001811115612239577f303132333435363738396162636465660000000000000000000000000000000085600f16601081106121f5576121f56126cc565b1a60f81b82828151811061220b5761220b6126cc565b60200101906001600160f81b031916908160001a90535060049490941c936122328161269f565b90506121b7565b5083156122885760405162461bcd60e51b815260206004820181905260248201527f537472696e67733a20686578206c656e67746820696e73756666696369656e74604482015260640161075a565b9392505050565b600054610100900460ff16806122a8575060005460ff16155b61230b5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b606482015260840161075a565b600054610100900460ff161580156120c0576000805461ffff191661010117905580156120d2576000805461ff001916905550565b80356001600160a01b038116811461235757600080fd5b919050565b60006020828403121561236e57600080fd5b61228882612340565b600080600080600060a0868803121561238f57600080fd5b61239886612340565b94506123a660208701612340565b93506123b460408701612340565b92506123c260608701612340565b91506123d060808701612340565b90509295509295909350565b6000602082840312156123ee57600080fd5b5035919050565b6000806040838503121561240857600080fd5b8235915061241860208401612340565b90509250929050565b60006020828403121561243357600080fd5b81356001600160e01b03198116811461228857600080fd5b60006020828403121561245d57600080fd5b813563ffffffff8116811461228857600080fd5b7f416363657373436f6e74726f6c3a206163636f756e74200000000000000000008152600083516124a981601785016020880161266f565b7f206973206d697373696e6720726f6c652000000000000000000000000000000060179184019182015283516124e681602884016020880161266f565b01602801949350505050565b602081526000825180602084015261251181604085016020870161266f565b601f01601f19169190910160400192915050565b81516001600160a01b03908116825260208084015182169083015260408084015182169083015260608084015182169083015260808084015182169083015260a08084015182169083015260c080840151918216908301526101208201905060e083015161259b60e084018263ffffffff169052565b506101009283015163ffffffff16919092015290565b60006101008201905063ffffffff8084511683528060208501511660208401528060408501511660408401528060608501511660608401528060808501511660808401528060a08501511660a08401525060c083015161261960c084018263ffffffff169052565b5060e083015161263160e084018263ffffffff169052565b5092915050565b6000821982111561264b5761264b6126b6565b500190565b600081600019048311821515161561266a5761266a6126b6565b500290565b60005b8381101561268a578181015183820152602001612672565b83811115612699576000848401525b50505050565b6000816126ae576126ae6126b6565b506000190190565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea2646970667358221220fac5987cc8589d6112e6b08e71df64c3fdc9c67826a24278dbb01972677e930564736f6c63430008050033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getCore()": {
+        "returns": {
+          "_0": "`Opium.Core`"
+        }
+      },
+      "getProtocolAddresses()": {
+        "returns": {
+          "_0": "RegistryEntities.ProtocolAddressesArgs struct that packs all the interfaces of the Opium Protocol"
+        }
+      },
+      "getProtocolParameters()": {
+        "returns": {
+          "_0": "RegistryEntities.getProtocolParameters struct that packs the protocol lifecycle parameters {see RegistryEntities comments}"
+        }
+      },
+      "getRoleAdmin(bytes32)": {
+        "details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
+      },
+      "grantRole(bytes32,address)": {
+        "details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role."
+      },
+      "hasRole(bytes32,address)": {
+        "details": "Returns `true` if `account` has been granted `role`."
+      },
+      "initialize(address)": {
+        "details": "internally, it assigns all the setters roles to the DEFAULT_ADMIN_ROLE and it sets the initial protocol parameters",
+        "params": {
+          "_governor": "address of the governance account which will be assigned all the roles included in the LibRoles library and the OpenZeppelin AccessControl.DEFAULT_ADMIN_ROLE"
+        }
+      },
+      "isCoreConfigurationUpdater(address)": {
+        "details": "it is meant to be consumed by the RegistryManager module",
+        "params": {
+          "_address": "address to be checked"
+        }
+      },
+      "isProtocolPositionCancellationPaused()": {
+        "returns": {
+          "_0": "true if protocol is globally paused or if protocolPositionCancellation is paused"
+        }
+      },
+      "isProtocolPositionCreationPaused()": {
+        "returns": {
+          "_0": "true if protocol is globally paused or if protocolPositionCreation is paused"
+        }
+      },
+      "isProtocolPositionExecutionPaused()": {
+        "returns": {
+          "_0": "true if protocol is globally paused or if protocolPositionExecution is paused"
+        }
+      },
+      "isProtocolPositionMintingPaused()": {
+        "returns": {
+          "_0": "true if protocol is globally paused or if protocolPositionMinting is paused"
+        }
+      },
+      "isProtocolPositionRedemptionPaused()": {
+        "returns": {
+          "_0": "true if protocol is globally paused or if protocolPositionRedemption is paused"
+        }
+      },
+      "isProtocolReserveClaimPaused()": {
+        "returns": {
+          "_0": "true if protocol is globally paused or if protocolReserveClaim is paused"
+        }
+      },
+      "isRegistryManager(address)": {
+        "details": "it is meant to be consumed by the RegistryManager module",
+        "params": {
+          "_address": "address to be checked"
+        }
+      },
+      "pause()": {
+        "details": "it fails if the entire protocol is already paused"
+      },
+      "pauseProtocolPositionCancellation()": {
+        "details": "it fails if the cancellation of positions is paused"
+      },
+      "pauseProtocolPositionCreation()": {
+        "details": "it fails if the creation of positions is paused"
+      },
+      "pauseProtocolPositionExecution()": {
+        "details": "it fails if the execution of positions is paused"
+      },
+      "pauseProtocolPositionMinting()": {
+        "details": "it fails if the minting of positions is paused"
+      },
+      "pauseProtocolPositionRedemption()": {
+        "details": "it fails if the redemption of positions is paused"
+      },
+      "pauseProtocolReserveClaim()": {
+        "details": "it fails if the reserves claims are paused"
+      },
+      "renounceRole(bytes32,address)": {
+        "details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`."
+      },
+      "revokeRole(bytes32,address)": {
+        "details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role."
+      },
+      "setDerivativeAuthorExecutionFeeCap(uint32)": {
+        "params": {
+          "_derivativeAuthorExecutionFeeCap": "must be less than 100%"
+        }
+      },
+      "setDerivativeAuthorRedemptionReservePart(uint32)": {
+        "params": {
+          "_derivativeAuthorRedemptionReservePart": "must be less than 1%"
+        }
+      },
+      "setProtocolAddresses(address,address,address,address,address)": {
+        "details": "It must be called as part of the protocol's deployment setup after the core addresses have been deployedthe contracts' addresses are set using their respective interfaces",
+        "params": {
+          "_core": "address of Opium.Core",
+          "_opiumProxyFactory": "address of Opium.OpiumProxyFactory",
+          "_oracleAggregator": "address of Opium.OracleAggregator",
+          "_syntheticAggregator": "address of Opium.SyntheticAggregator",
+          "_tokenSpender": "address of Opium.TokenSpender"
+        }
+      },
+      "setProtocolExecutionReserveClaimer(address)": {
+        "details": "It must be called as part of the protocol's deployment setup after the core addresses have been deployedit must be a non-null address",
+        "params": {
+          "_protocolExecutionReserveClaimer": "address that will replace the current `protocolExecutionReserveClaimer`"
+        }
+      },
+      "setProtocolExecutionReservePart(uint32)": {
+        "params": {
+          "_protocolExecutionReservePart": "must be less than 100%"
+        }
+      },
+      "setProtocolRedemptionReserveClaimer(address)": {
+        "details": "It must be called as part of the protocol's deployment setup after the core addresses have been deployedit must be a non-null address",
+        "params": {
+          "_protocolRedemptionReserveClaimer": "address that will replace the current `protocolAddressesArgs.protocolRedemptionReserveClaimer`"
+        }
+      },
+      "setProtocolRedemptionReservePart(uint32)": {
+        "params": {
+          "_protocolRedemptionReservePart": "must be less than 100%"
+        }
+      },
+      "supportsInterface(bytes4)": {
+        "details": "See {IERC165-supportsInterface}."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "addToWhitelist(address)": {
+        "notice": "It allows the WHITELISTER_ROLE to add an address to the whitelist"
+      },
+      "initialize(address)": {
+        "notice": "it is called only once upon deployment of the contract. It initializes the DEFAULT_ADMIN_ROLE with the given governor address.it sets the default ProtocolParametersArgs protocol parameters"
+      },
+      "isCoreConfigurationUpdater(address)": {
+        "notice": "Returns true if msg.sender has been assigned the CORE_CONFIGURATION_UPDATER_ROLE role"
+      },
+      "isCoreSpenderWhitelisted(address)": {
+        "notice": "It returns whether a given address is allowed to manage Opium.Core ERC20 balances"
+      },
+      "isProtocolPaused()": {
+        "notice": "It returns true if the protocol is globally paused"
+      },
+      "isProtocolPositionCancellationPaused()": {
+        "notice": "It returns whether Core.cancel() is currently paused"
+      },
+      "isProtocolPositionCreationPaused()": {
+        "notice": "It returns whether Core.create() is currently paused"
+      },
+      "isProtocolPositionExecutionPaused()": {
+        "notice": "It returns whether Core.execute() is currently paused"
+      },
+      "isProtocolPositionMintingPaused()": {
+        "notice": "It returns whether Core.mint() is currently paused"
+      },
+      "isProtocolPositionRedemptionPaused()": {
+        "notice": "It returns whether Core.redeem() is currently paused"
+      },
+      "isProtocolReserveClaimPaused()": {
+        "notice": "It returns whether Core.execute() is currently paused"
+      },
+      "isRegistryManager(address)": {
+        "notice": "Returns true if msg.sender has been assigned the REGISTRY_MANAGER_ROLE role"
+      },
+      "pause()": {
+        "notice": "It allows the GUARDIAN role to pause the entire Opium Protocol"
+      },
+      "pauseProtocolPositionCancellation()": {
+        "notice": "It allows the PARTIAL_CANCEL_PAUSE_ROLE role to pause the cancellation of positions"
+      },
+      "pauseProtocolPositionCreation()": {
+        "notice": "It allows the PARTIAL_CREATE_PAUSE_ROLE role to pause the creation of positions"
+      },
+      "pauseProtocolPositionExecution()": {
+        "notice": "It allows the PARTIAL_EXECUTE_PAUSE_ROLE role to pause the execution of positions"
+      },
+      "pauseProtocolPositionMinting()": {
+        "notice": "It allows the PARTIAL_MINT_PAUSE_ROLE role to pause the minting of positions"
+      },
+      "pauseProtocolPositionRedemption()": {
+        "notice": "It allows the PARTIAL_REDEEM_PAUSE_ROLE role to pause the redemption of positions"
+      },
+      "pauseProtocolReserveClaim()": {
+        "notice": "It allows the PARTIAL_CLAIM_RESERVE_PAUSE_ROLE role to pause the reserves claims"
+      },
+      "removeFromWhitelist(address)": {
+        "notice": "It allows the WHITELISTER_ROLE to remove an address from the whitelist"
+      },
+      "setDerivativeAuthorExecutionFeeCap(uint32)": {
+        "notice": "It allows the DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE role to change max fee that derivative author can set"
+      },
+      "setDerivativeAuthorRedemptionReservePart(uint32)": {
+        "notice": "It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change the fixed part (percentage) that the derivative author receives for each redemption of market neutral positions"
+      },
+      "setNoDataCancellationPeriod(uint32)": {
+        "notice": "It allows the NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE role to change the noDataCancellationPeriod (the timeframe after which a derivative can be cancelled if the oracle has not provided any data)"
+      },
+      "setProtocolAddresses(address,address,address,address,address)": {
+        "notice": "It allows the PROTOCOL_ADDRESSES_SETTER_ROLE role to set the addresses of Opium Protocol's contracts"
+      },
+      "setProtocolExecutionReserveClaimer(address)": {
+        "notice": "It allows the EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address of the recipient of execution protocol reserves"
+      },
+      "setProtocolExecutionReservePart(uint32)": {
+        "notice": "It allows the EXECUTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from derivative executions go to the protocol reserves"
+      },
+      "setProtocolRedemptionReserveClaimer(address)": {
+        "notice": "It allows the REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE role to change the address of the recipient of redemption protocol reserves"
+      },
+      "setProtocolRedemptionReservePart(uint32)": {
+        "notice": "It allows the REDEMPTION_RESERVE_PART_SETTER_ROLE role to change part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves"
+      },
+      "unpause()": {
+        "notice": "It allows the PROTOCOL_UNPAUSER_ROLE to unpause the Opium Protocol"
+      }
+    },
+    "notice": "Error codes: - R1 = ERROR_REGISTRY_ONLY_PROTOCOL_ADDRESSES_SETTER_ROLE - R2 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE - R3 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_CLAIMER_ADDRESS_SETTER_ROLE - R4 = ERROR_REGISTRY_ONLY_EXECUTION_RESERVE_PART_SETTER_ROLE - R5 = ERROR_REGISTRY_ONLY_NO_DATA_CANCELLATION_PERIOD_SETTER_ROLE - R6 = ERROR_REGISTRY_ONLY_GUARDIAN_ROLE - R7 = ERROR_REGISTRY_ONLY_WHITELISTER_ROLE - R8 = ERROR_REGISTRY_ONLY_DERIVATIVE_AUTHOR_EXECUTION_FEE_CAP_SETTER_ROLE - R9 = ERROR_REGISTRY_ONLY_REDEMPTION_RESERVE_PART_SETTER_ROLE - R10 = ERROR_REGISTRY_ALREADY_PAUSED - R11 = ERROR_REGISTRY_NOT_PAUSED - R12 = ERROR_REGISTRY_NULL_ADDRESS - R13 = ERROR_REGISTRY_ONLY_PARTIAL_CREATE_PAUSE_ROLE - R14 = ERROR_REGISTRY_ONLY_PARTIAL_MINT_PAUSE_ROLE - R15 = ERROR_REGISTRY_ONLY_PARTIAL_REDEEM_PAUSE_ROLE - R16 = ERROR_REGISTRY_ONLY_PARTIAL_EXECUTE_PAUSE_ROLE - R17 = ERROR_REGISTRY_ONLY_PARTIAL_CANCEL_PAUSE_ROLE - R18 = ERROR_REGISTRY_ONLY_PARTIAL_CLAIM_RESERVE_PAUSE_ROLE - R19 = ERROR_REGISTRY_ONLY_PROTOCOL_UNPAUSER_ROLE - R20 = ERROR_REGISTRY_INVALID_VALUE",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 539,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "_initialized",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 542,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "_initializing",
+        "offset": 1,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 2058,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_array(t_uint256)50_storage"
+      },
+      {
+        "astId": 2897,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "51",
+        "type": "t_array(t_uint256)50_storage"
+      },
+      {
+        "astId": 94,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "_roles",
+        "offset": 0,
+        "slot": "101",
+        "type": "t_mapping(t_bytes32,t_struct(RoleData)89_storage)"
+      },
+      {
+        "astId": 379,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "102",
+        "type": "t_array(t_uint256)49_storage"
+      },
+      {
+        "astId": 5978,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "protocolParametersArgs",
+        "offset": 0,
+        "slot": "151",
+        "type": "t_struct(ProtocolParametersArgs)7112_storage"
+      },
+      {
+        "astId": 5981,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "protocolAddressesArgs",
+        "offset": 0,
+        "slot": "152",
+        "type": "t_struct(ProtocolAddressesArgs)7132_storage"
+      },
+      {
+        "astId": 5984,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "protocolPausabilityArgs",
+        "offset": 0,
+        "slot": "159",
+        "type": "t_struct(ProtocolPausabilityArgs)7156_storage"
+      },
+      {
+        "astId": 5988,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "coreSpenderWhitelist",
+        "offset": 0,
+        "slot": "160",
+        "type": "t_mapping(t_address,t_bool)"
+      },
+      {
+        "astId": 7091,
+        "contract": "contracts/core/registry/Registry.sol:Registry",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "161",
+        "type": "t_array(t_uint256)50_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_uint256)49_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[49]",
+        "numberOfBytes": "1568"
+      },
+      "t_array(t_uint256)50_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[50]",
+        "numberOfBytes": "1600"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_bytes32,t_struct(RoleData)89_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+        "numberOfBytes": "32",
+        "value": "t_struct(RoleData)89_storage"
+      },
+      "t_struct(ProtocolAddressesArgs)7132_storage": {
+        "encoding": "inplace",
+        "label": "struct RegistryEntities.ProtocolAddressesArgs",
+        "members": [
+          {
+            "astId": 7114,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "core",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address"
+          },
+          {
+            "astId": 7116,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "opiumProxyFactory",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address"
+          },
+          {
+            "astId": 7118,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "oracleAggregator",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address"
+          },
+          {
+            "astId": 7120,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "syntheticAggregator",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address"
+          },
+          {
+            "astId": 7122,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "tokenSpender",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_address"
+          },
+          {
+            "astId": 7124,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolExecutionReserveClaimer",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_address"
+          },
+          {
+            "astId": 7126,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolRedemptionReserveClaimer",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_address"
+          },
+          {
+            "astId": 7129,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapOne",
+            "offset": 20,
+            "slot": "6",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7131,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapTwo",
+            "offset": 24,
+            "slot": "6",
+            "type": "t_uint32"
+          }
+        ],
+        "numberOfBytes": "224"
+      },
+      "t_struct(ProtocolParametersArgs)7112_storage": {
+        "encoding": "inplace",
+        "label": "struct RegistryEntities.ProtocolParametersArgs",
+        "members": [
+          {
+            "astId": 7096,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "noDataCancellationPeriod",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7098,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "derivativeAuthorExecutionFeeCap",
+            "offset": 4,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7100,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "derivativeAuthorRedemptionReservePart",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7102,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolExecutionReservePart",
+            "offset": 12,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7104,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolRedemptionReservePart",
+            "offset": 16,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7107,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapOne",
+            "offset": 20,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7109,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapTwo",
+            "offset": 24,
+            "slot": "0",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 7111,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapThree",
+            "offset": 28,
+            "slot": "0",
+            "type": "t_uint32"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(ProtocolPausabilityArgs)7156_storage": {
+        "encoding": "inplace",
+        "label": "struct RegistryEntities.ProtocolPausabilityArgs",
+        "members": [
+          {
+            "astId": 7134,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolGlobal",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7136,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolPositionCreation",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7138,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolPositionMinting",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7140,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolPositionRedemption",
+            "offset": 3,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7142,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolPositionExecution",
+            "offset": 4,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7144,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolPositionCancellation",
+            "offset": 5,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7146,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "protocolReserveClaim",
+            "offset": 6,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7149,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapOne",
+            "offset": 7,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7151,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapTwo",
+            "offset": 8,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7153,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapThree",
+            "offset": 9,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 7155,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "__gapFour",
+            "offset": 10,
+            "slot": "0",
+            "type": "t_bool"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_struct(RoleData)89_storage": {
+        "encoding": "inplace",
+        "label": "struct AccessControlUpgradeable.RoleData",
+        "members": [
+          {
+            "astId": 86,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "members",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_address,t_bool)"
+          },
+          {
+            "astId": 88,
+            "contract": "contracts/core/registry/Registry.sol:Registry",
+            "label": "adminRole",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_bytes32"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "t_uint32": {
+        "encoding": "inplace",
+        "label": "uint32",
+        "numberOfBytes": "4"
+      }
+    }
+  }
+}

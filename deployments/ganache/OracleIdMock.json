@@ -1,0 +1,102 @@
+{
+  "address": "0xc48AFc71d9Bb4d819a9AC1BF21c7F3d6D86249DB",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_fetchPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_registry",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "returnData",
+          "type": "uint256"
+        }
+      ],
+      "name": "triggerCallback",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x6c52c069363cfdbdd041b7bc3323bd2f1ba574deb3d7f027639b4243658f2de2",
+  "receipt": {
+    "to": null,
+    "from": "0xc188c5Aafaaf847d9D887f80590267F6dc1a1b2f",
+    "contractAddress": "0xc48AFc71d9Bb4d819a9AC1BF21c7F3d6D86249DB",
+    "transactionIndex": 0,
+    "gasUsed": "248270",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xf7823442272d0530dee93e8ef23ecbeab5b1d3006e757464a243dc55aeb71b81",
+    "transactionHash": "0x6c52c069363cfdbdd041b7bc3323bd2f1ba574deb3d7f027639b4243658f2de2",
+    "logs": [],
+    "blockNumber": 22,
+    "cumulativeGasUsed": "248270",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": ["100000000000000000", "0xD212f6BA3A4121c397C5a8807fA123357CA6Afa3"],
+  "solcInputHash": "58dbb558cb816b5402f8301bbf18d319",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_fetchPrice\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_registry\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"returnData\",\"type\":\"uint256\"}],\"name\":\"triggerCallback\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/test/mocks/oracles/OracleIdMock.sol\":\"OracleIdMock\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"contracts/core/registry/RegistryEntities.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nlibrary RegistryEntities {\\n    struct ProtocolParametersArgs {\\n        // Period of time after which ticker could be canceled if no data was provided to the `oracleId`\\n        uint32 noDataCancellationPeriod;\\n        // Max fee that derivative author can set\\n        // it works as an upper bound for when the derivative authors set their synthetic's fee\\n        uint32 derivativeAuthorExecutionFeeCap;\\n        // Fixed part (percentage) that the derivative author receives for each redemption of market neutral positions\\n        // It is not set by the derivative authors themselves\\n        uint32 derivativeAuthorRedemptionReservePart;\\n        // Represents which part of derivative author reserves originated from derivative executions go to the protocol reserves\\n        uint32 protocolExecutionReservePart;\\n        // Represents which part of derivative author reserves originated from redemption of market neutral positions go to the protocol reserves\\n        uint32 protocolRedemptionReservePart;\\n        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability\\n        uint32 __gapOne;\\n        uint32 __gapTwo;\\n        uint32 __gapThree;\\n    }\\n\\n    struct ProtocolAddressesArgs {\\n        // Address of Opium.Core contract\\n        address core;\\n        // Address of Opium.OpiumProxyFactory contract\\n        address opiumProxyFactory;\\n        // Address of Opium.OracleAggregator contract\\n        address oracleAggregator;\\n        // Address of Opium.SyntheticAggregator contract\\n        address syntheticAggregator;\\n        // Address of Opium.TokenSpender contract\\n        address tokenSpender;\\n        // Address of the recipient of execution protocol reserves\\n        address protocolExecutionReserveClaimer;\\n        // Address of the recipient of redemption protocol reserves\\n        address protocolRedemptionReserveClaimer;\\n        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability\\n        uint32 __gapOne;\\n        uint32 __gapTwo;\\n    }\\n\\n    struct ProtocolPausabilityArgs {\\n        // if true, all the protocol's entry-points are paused\\n        bool protocolGlobal;\\n        // if true, no new positions can be created\\n        bool protocolPositionCreation;\\n        // if true, no new positions can be minted\\n        bool protocolPositionMinting;\\n        // if true, no new positions can be redeemed\\n        bool protocolPositionRedemption;\\n        // if true, no new positions can be executed\\n        bool protocolPositionExecution;\\n        // if true, no new positions can be cancelled\\n        bool protocolPositionCancellation;\\n        // if true, no reserves can be claimed\\n        bool protocolReserveClaim;\\n        /// Initially uninitialized variables to allow some flexibility in case of future changes and upgradeability\\n        bool __gapOne;\\n        bool __gapTwo;\\n        bool __gapThree;\\n        bool __gapFour;\\n    }\\n}\\n\",\"keccak256\":\"0x99e5b1a0e7a8911bc02947562556dc8476bb8c3c7061e66c2a24c8cf1d80b992\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/IOracleAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\ninterface IOracleAggregator {\\n    function __callback(uint256 timestamp, uint256 data) external;\\n\\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult);\\n\\n    function hasData(address oracleId, uint256 timestamp) external view returns (bool);\\n}\\n\",\"keccak256\":\"0xd7cf19f6f5cb6eed55fb87b5f5f04275f575f3dbc90435bb9cb97f1277406a79\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/IRegistry.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\nimport \\\"../core/registry/RegistryEntities.sol\\\";\\n\\ninterface IRegistry {\\n    function initialize(address _governor) external;\\n\\n    function setProtocolAddresses(\\n        address _opiumProxyFactory,\\n        address _core,\\n        address _oracleAggregator,\\n        address _syntheticAggregator,\\n        address _tokenSpender\\n    ) external;\\n\\n    function setNoDataCancellationPeriod(uint32 _noDataCancellationPeriod) external;\\n\\n    function addToWhitelist(address _whitelisted) external;\\n\\n    function removeFromWhitelist(address _whitelisted) external;\\n\\n    function setProtocolExecutionReserveClaimer(address _protocolExecutionReserveClaimer) external;\\n\\n    function setProtocolRedemptionReserveClaimer(address _protocolRedemptionReserveClaimer) external;\\n\\n    function setProtocolExecutionReservePart(uint32 _protocolExecutionReservePart) external;\\n\\n    function setDerivativeAuthorExecutionFeeCap(uint32 _derivativeAuthorExecutionFeeCap) external;\\n\\n    function setProtocolRedemptionReservePart(uint32 _protocolRedemptionReservePart) external;\\n\\n    function setDerivativeAuthorRedemptionReservePart(uint32 _derivativeAuthorRedemptionReservePart) external;\\n\\n    function pause() external;\\n\\n    function pauseProtocolPositionCreation() external;\\n\\n    function pauseProtocolPositionMinting() external;\\n\\n    function pauseProtocolPositionRedemption() external;\\n\\n    function pauseProtocolPositionExecution() external;\\n\\n    function pauseProtocolPositionCancellation() external;\\n\\n    function pauseProtocolReserveClaim() external;\\n\\n    function unpause() external;\\n\\n    function getProtocolParameters() external view returns (RegistryEntities.ProtocolParametersArgs memory);\\n\\n    function getProtocolAddresses() external view returns (RegistryEntities.ProtocolAddressesArgs memory);\\n\\n    function isRegistryManager(address _address) external view returns (bool);\\n\\n    function isCoreConfigurationUpdater(address _address) external view returns (bool);\\n\\n    function getCore() external view returns (address);\\n\\n    function isCoreSpenderWhitelisted(address _address) external view returns (bool);\\n\\n    function isProtocolPaused() external view returns (bool);\\n\\n    function isProtocolPositionCreationPaused() external view returns (bool);\\n\\n    function isProtocolPositionMintingPaused() external view returns (bool);\\n\\n    function isProtocolPositionRedemptionPaused() external view returns (bool);\\n\\n    function isProtocolPositionExecutionPaused() external view returns (bool);\\n\\n    function isProtocolPositionCancellationPaused() external view returns (bool);\\n\\n    function isProtocolReserveClaimPaused() external view returns (bool);\\n}\\n\",\"keccak256\":\"0x8281bf2dfcc32b5dde8c2dcfc225fdd422960c915563c4ba90280483b018a177\",\"license\":\"agpl-3.0\"},\"contracts/test/mocks/oracles/OracleIdMock.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"../../../interfaces/IRegistry.sol\\\";\\nimport \\\"../../../interfaces/IOracleAggregator.sol\\\";\\n\\ncontract OracleIdMock {\\n    uint256 fetchPrice;\\n    IRegistry registry;\\n\\n    constructor(uint256 _fetchPrice, address _registry) {\\n        fetchPrice = _fetchPrice;\\n        registry = IRegistry(_registry);\\n    }\\n\\n    function triggerCallback(uint256 timestamp, uint256 returnData) external {\\n        IOracleAggregator(registry.getProtocolAddresses().oracleAggregator).__callback(timestamp, returnData);\\n    }\\n}\\n\",\"keccak256\":\"0xa4782de12ba57ff20c7d1913b71623375f48bc332812685cd59613e311ffa3bc\",\"license\":\"agpl-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060405161035238038061035283398101604081905261002f91610059565b600091909155600180546001600160a01b0319166001600160a01b03909216919091179055610096565b6000806040838503121561006c57600080fd5b825160208401519092506001600160a01b038116811461008b57600080fd5b809150509250929050565b6102ad806100a56000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c806316f937b114610030575b600080fd5b61004361003e36600461021d565b610045565b005b600160009054906101000a90046001600160a01b03166001600160a01b031663a1774da06040518163ffffffff1660e01b81526004016101206040518083038186803b15801561009457600080fd5b505afa1580156100a8573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906100cc9190610167565b6040908101519051633102e5ab60e01b815260048101849052602481018390526001600160a01b0390911690633102e5ab90604401600060405180830381600087803b15801561011b57600080fd5b505af115801561012f573d6000803e3d6000fd5b505050505050565b80516001600160a01b038116811461014e57600080fd5b919050565b805163ffffffff8116811461014e57600080fd5b6000610120828403121561017a57600080fd5b61018261023f565b61018b83610137565b815261019960208401610137565b60208201526101aa60408401610137565b60408201526101bb60608401610137565b60608201526101cc60808401610137565b60808201526101dd60a08401610137565b60a08201526101ee60c08401610137565b60c08201526101ff60e08401610153565b60e0820152610100610212818501610153565b908201529392505050565b6000806040838503121561023057600080fd5b50508035926020909101359150565b604051610120810167ffffffffffffffff8111828210171561027157634e487b7160e01b600052604160045260246000fd5b6040529056fea2646970667358221220e31812333f92c91ff45107d7f91d8749abdb26c3b5f63b6f039cd64bb104e4b864736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c806316f937b114610030575b600080fd5b61004361003e36600461021d565b610045565b005b600160009054906101000a90046001600160a01b03166001600160a01b031663a1774da06040518163ffffffff1660e01b81526004016101206040518083038186803b15801561009457600080fd5b505afa1580156100a8573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906100cc9190610167565b6040908101519051633102e5ab60e01b815260048101849052602481018390526001600160a01b0390911690633102e5ab90604401600060405180830381600087803b15801561011b57600080fd5b505af115801561012f573d6000803e3d6000fd5b505050505050565b80516001600160a01b038116811461014e57600080fd5b919050565b805163ffffffff8116811461014e57600080fd5b6000610120828403121561017a57600080fd5b61018261023f565b61018b83610137565b815261019960208401610137565b60208201526101aa60408401610137565b60408201526101bb60608401610137565b60608201526101cc60808401610137565b60808201526101dd60a08401610137565b60a08201526101ee60c08401610137565b60c08201526101ff60e08401610153565b60e0820152610100610212818501610153565b908201529392505050565b6000806040838503121561023057600080fd5b50508035926020909101359150565b604051610120810167ffffffffffffffff8111828210171561027157634e487b7160e01b600052604160045260246000fd5b6040529056fea2646970667358221220e31812333f92c91ff45107d7f91d8749abdb26c3b5f63b6f039cd64bb104e4b864736f6c63430008050033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 9280,
+        "contract": "contracts/test/mocks/oracles/OracleIdMock.sol:OracleIdMock",
+        "label": "fetchPrice",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 9283,
+        "contract": "contracts/test/mocks/oracles/OracleIdMock.sol:OracleIdMock",
+        "label": "registry",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_contract(IRegistry)8116"
+      }
+    ],
+    "types": {
+      "t_contract(IRegistry)8116": {
+        "encoding": "inplace",
+        "label": "contract IRegistry",
+        "numberOfBytes": "20"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
