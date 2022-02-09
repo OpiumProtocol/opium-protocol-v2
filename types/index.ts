@@ -40,6 +40,12 @@ export type TDerivativeOrder = {
   hash: string;
 };
 
+export enum ENodeServices {
+  INFURA = "INFURA",
+  ALCHEMY = "ALCHEMY",
+  RPC = "RPC",
+}
+
 export interface ICreatedDerivativeOrder extends TDerivativeOrder {
   shortPositionAddress: string;
   longPositionAddress: string;

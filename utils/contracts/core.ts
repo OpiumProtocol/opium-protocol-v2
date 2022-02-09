@@ -19,8 +19,10 @@ class CoreContract {
     _marginToken: IERC20,
     _caller?: SignerWithAddress,
   ): Promise<ContractTransaction> {
-    const tokenSpenderAddress = await this._core.getProtocolAddresses()
-    await _marginToken.connect(_caller || this._deployer).approve(tokenSpenderAddress.tokenSpender,computeDerivativeMargin(_derivative.margin, _amount));
+    const tokenSpenderAddress = await this._core.getProtocolAddresses();
+    await _marginToken
+      .connect(_caller || this._deployer)
+      .approve(tokenSpenderAddress.tokenSpender, computeDerivativeMargin(_derivative.margin, _amount));
     return this._core.connect(_caller || this._deployer).create(_derivative, _amount, _positionsOwners);
   }
   public async createAndMint(

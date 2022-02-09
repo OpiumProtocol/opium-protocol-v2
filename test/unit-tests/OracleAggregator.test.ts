@@ -16,10 +16,14 @@ describe("OracleAggregator", () => {
     } = await setup();
 
     const tx = await oracleAggregator.connect(oracle).__callback(timestamp, mockDataOne);
-    const receipt = await tx.wait()
+    const receipt = await tx.wait();
     const [LogDataProvidedEvent] = decodeEvents(oracleAggregator, "LogDataProvided", receipt.events);
-    console.log("LogDataProvidedEvent ", LogDataProvidedEvent);
-    expect([LogDataProvidedEvent._oracleId, +LogDataProvidedEvent._timestamp.toString(), +LogDataProvidedEvent._data.toString()]).to.be.deep.eq([oracle.address, timestamp, mockDataOne]);
+
+    expect([
+      LogDataProvidedEvent._oracleId,
+      +LogDataProvidedEvent._timestamp.toString(),
+      +LogDataProvidedEvent._data.toString(),
+    ]).to.be.deep.eq([oracle.address, timestamp, mockDataOne]);
     const result = await oracleAggregator.getData(oracle.address, timestamp);
     expect(result).to.be.equal(mockDataOne);
   });

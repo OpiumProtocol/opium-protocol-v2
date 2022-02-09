@@ -10,110 +10,16 @@ import "@hardhat-docgen/core";
 import "@hardhat-docgen/markdown";
 import "@openzeppelin/hardhat-upgrades";
 import "solidity-coverage";
-
-import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
-import { HardhatNetworkUserConfig } from "hardhat/types/config";
-import { NetworkUserConfig } from "hardhat/types";
-
-import { resolve } from "path";
-
+import {
+  createHardhatNetworkConfig,
+  createTestnetConfig,
+  createInfuraUrl,
+  createTestnetWithL2Config,
+  createNetworkConfigWithPrivateKey,
+} from "./hardhatHelpers/helpers";
+import envConfig from "./hardhatHelpers/config";
 import "./tasks/clean";
-
-dotenvConfig({ path: resolve(__dirname, "./.env") });
-
-// ENV: it can either be `fork` or `local`
-// set to `fork` to run the hardhat tests using an ethereum mainnet fork
-export const hardhatNetworkEnvironment = process.env.HARDHAT_NETWORK_ENVIRONMENT;
-if (!hardhatNetworkEnvironment) {
-  throw new Error("Please set your HARDHAT_NETWORK_ENVIRONMENT in a .env file");
-}
-
-// ENV: Config
-const CONTRACT_SIZER_STRICT = process.env.CONTRACT_SIZER_STRICT !== "0";
-
-// ENV: Secrets
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY;
-if (!ETHERSCAN_KEY) {
-  throw new Error("Please set your ETHERSCAN_KEY in a .env file");
-}
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
-if (!BSCSCAN_API_KEY) {
-  throw new Error("Please set your BSCSCAN_API_KEY in a .env file");
-}
-const bscTestnetEndpoint = process.env.BSC_TESTNET_ENDPOINT || "https://data-seed-prebsc-1-s2.binance.org:8545/";
-const bscMainnetEndpoint = process.env.BSC_MAINNET_ENDPOINT;
-if (!bscMainnetEndpoint) {
-  throw new Error("Please set your BSC_MAINNET_ENDPOINT in a .env file");
-}
-const polygonMumbaiEndpoint = process.env.POLYGON_MUMBAI_ENDPOINT || "https://matic-mumbai.chainstacklabs.com";
-const polygonMainnetEndpoint = process.env.POLYGON_MAINNET_ENDPOINT;
-if (!polygonMainnetEndpoint) {
-  throw new Error("Please set your POLYGON_MAINNET_ENDPOINT in a .env file");
-}
-
-const chainIds = {
-  ganache: 1337,
-  goerli: 5,
-  hardhat: 31337,
-  kovan: 42,
-  mainnet: 1,
-  rinkeby: 4,
-  ropsten: 3,
-  polygonMumbai: 80001,
-  polygonMainnet: 137,
-  bscTestnet: 97,
-  bscMainnet: 56,
-};
-
-const mnemonic = process.env.MNEMONIC;
-if (!mnemonic) {
-  throw new Error("Please set your MNEMONIC in a .env file");
-}
-
-const infuraApiKey = process.env.INFURA_API_KEY;
-if (!infuraApiKey) {
-  throw new Error("Please set your INFURA_API_KEY in a .env file");
-}
-
-const createInfuraUrl = (network: keyof typeof chainIds): string => {
-  return "https://" + network + ".infura.io/v3/" + infuraApiKey;
-};
-
-const createTestnetConfig = (network: keyof typeof chainIds, nodeUrl: string): NetworkUserConfig => {
-  return {
-    accounts: {
-      count: 10,
-      initialIndex: 0,
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
-    chainId: chainIds[network],
-    url: nodeUrl,
-  };
-};
-
-const createHardhatNetworkConfig = (): HardhatNetworkUserConfig => {
-  if (hardhatNetworkEnvironment === "fork") {
-    return {
-      allowUnlimitedContractSize: false,
-      accounts: {
-        mnemonic,
-      },
-      forking: {
-        url: createInfuraUrl("mainnet"),
-      },
-      chainId: chainIds.mainnet,
-    };
-  }
-  return {
-    allowUnlimitedContractSize: false,
-    accounts: {
-      mnemonic,
-    },
-    chainId: chainIds.hardhat,
-  };
-};
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -125,14 +31,15 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: createHardhatNetworkConfig(),
-    goerli: createTestnetConfig("goerli", createInfuraUrl("goerli")),
+    arbitrumTestnet: createTestnetConfig("arbitrumTestnet", "https://rinkeby.arbitrum.io/rpc"),
+    rinkeby: createTestnetWithL2Config("rinkeby", createInfuraUrl("rinkeby")),
+    goerli: createNetworkConfigWithPrivateKey("goerli", createInfuraUrl("goerli"), true),
     kovan: createTestnetConfig("kovan", createInfuraUrl("kovan")),
-    rinkeby: createTestnetConfig("rinkeby", createInfuraUrl("rinkeby")),
     ropsten: createTestnetConfig("ropsten", createInfuraUrl("ropsten")),
-    bscTestnet: createTestnetConfig("bscTestnet", bscTestnetEndpoint),
-    bscMainnet: createTestnetConfig("bscMainnet", bscMainnetEndpoint),
-    polygonMumbai: createTestnetConfig("polygonMumbai", polygonMumbaiEndpoint),
-    polygonMainnet: createTestnetConfig("polygonMainnet", polygonMainnetEndpoint),
+    bscTestnet: createTestnetConfig("bscTestnet", envConfig.bscTestnetEndpoint),
+    bscMainnet: createTestnetConfig("bscMainnet", envConfig.bscMainnetEndpoint),
+    polygonMumbai: createTestnetConfig("polygonMumbai", envConfig.polygonMumbaiEndpoint),
+    polygonMainnet: createTestnetConfig("polygonMainnet", envConfig.polygonMainnetEndpoint),
     ganache: createTestnetConfig("ganache", "http://localhost:8545"),
   },
   paths: {
@@ -187,29 +94,23 @@ const config: HardhatUserConfig = {
     notAllowed: {
       default: 11,
     },
-    hacker: {
+    authorized: {
       default: 12,
     },
-    goodGuy: {
+    impersonator: {
       default: 13,
     },
-    authorized: {
+    thirdParty: {
       default: 14,
     },
-    impersonator: {
+    createPositionPauser: {
       default: 15,
     },
-    thirdParty: {
+    coreCancelPositionPauser: {
       default: 16,
     },
-    createPositionPauser: {
-      default: 17,
-    },
-    coreCancelPositionPauser: {
-      default: 18,
-    },
     redemptionReserveClaimer: {
-      default: 19,
+      default: 0,
     },
   },
   typechain: {
@@ -217,7 +118,11 @@ const config: HardhatUserConfig = {
     target: "ethers-v5",
   },
   etherscan: {
-    apiKey: ETHERSCAN_KEY,
+    apiKey: {
+      rinkeby: envConfig.etherscanKey,
+      goerli: envConfig.etherscanKey,
+      arbitrumTestnet: envConfig.arbiscanKey,
+    },
   },
   mocha: {
     timeout: 40000,
@@ -226,7 +131,7 @@ const config: HardhatUserConfig = {
     alphaSort: true,
     disambiguatePaths: false,
     runOnCompile: false,
-    strict: CONTRACT_SIZER_STRICT,
+    strict: envConfig.contractSizerStrict,
   },
   docgen: {
     path: "./docs/contracts/specs",

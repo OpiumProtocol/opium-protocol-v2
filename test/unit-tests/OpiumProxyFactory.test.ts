@@ -61,9 +61,9 @@ describe("OpiumProxyFactory", () => {
     const amount = 1;
 
     const hash = getDerivativeHash(derivative);
-    await expect(
-      opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative),
-    ).to.be.revertedWith(pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE));
+    await expect(opiumProxyFactory.create(buyer.address, seller.address, amount, hash, derivative)).to.be.revertedWith(
+      pickError(semanticErrors.ERROR_OPIUM_PROXY_FACTORY_NOT_CORE),
+    );
   });
 
   it("expects to mint the correct number of erc20 long/short positions", async () => {

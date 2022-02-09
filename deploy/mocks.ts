@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { toBN } from "../utils/bn";
 
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Promise<boolean> {
   const { deployments, ethers } = hre;
   const { deploy, get } = deployments;
 
@@ -52,8 +52,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     args: ["test", "test", 18],
   });
+
+  return true;
 };
 
 export default func;
+func.id = "02_test_mocks";
 func.tags = ["Mocks"];
 func.dependencies = ["Protocol"];

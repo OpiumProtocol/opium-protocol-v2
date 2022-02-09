@@ -42,6 +42,7 @@ HARDHAT_NETWORK_ENVIRONMENT='local'
 ```
 
 Note that to run the tests that require a mainnnet fork, it is required to change the HARDHAT_NETWORK_ENVIRONMENT variable as follows:
+
 ```sh
 HARDHAT_NETWORK_ENVIRONMENT='fork'
 ```
