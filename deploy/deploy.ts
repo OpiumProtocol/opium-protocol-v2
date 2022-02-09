@@ -2,7 +2,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { Core, Registry } from "../typechain";
 
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Promise<boolean> {
   const { deployments, ethers } = hre;
   const { deploy } = deployments;
 
@@ -116,7 +116,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const tx5 = await coreInstance.connect(governor).updateProtocolAddresses();
   await tx5.wait();
+
+  return true;
 };
 
 export default func;
+func.id = '01_protocol';
 func.tags = ["Protocol"];
