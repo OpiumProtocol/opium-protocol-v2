@@ -3,10 +3,15 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { toBN } from "../utils/bn";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Promise<boolean> {
-  const { deployments, ethers } = hre;
+  const { deployments, ethers, network } = hre;
   const { deploy, get } = deployments;
 
   const { deployer, author } = await ethers.getNamedSigners();
+
+  // Skip if network is not Arbitrum Testnet
+  if (network.name !== 'arbitrumTestnet') {
+    return false
+  }
 
   const registry = await get("Registry");
 
