@@ -123,6 +123,7 @@ const config: HardhatUserConfig = {
       rinkeby: envConfig.etherscanKey,
       goerli: envConfig.etherscanKey,
       arbitrumTestnet: envConfig.arbiscanKey,
+      arbitrumOne: envConfig.arbiscanKey,
     },
   },
   mocha: {

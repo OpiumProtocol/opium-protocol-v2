@@ -1,0 +1,58 @@
+#1 Run deployment script
+Run #1
+deploying "DefaultProxyAdmin" (tx: 0x9d6ad441a68a4f8266f9d76392e84319e787bad6e1ad7a30850ed65350a6cabf)...: deployed at 0x2Ba5feE02489c4c7D550b82044742084A652F01A with 5342901 gas
+deploying "Registry_Implementation" (tx: 0xd1b6b37657973a2c8e3be7644a3231654c7c2a9148a733ee79c1accd6e4d7f17)...: deployed at 0x845a7872d1cDe2B3285dE9f66B1D2EC70307cC6b with 33843715 gas
+deploying "Registry_Proxy" (tx: 0x3c764ffe8731709ecd100bd383d1bb9aac4a16d0dfac6c0c4e99f3f5b2d35877)...: deployed at 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a with 6532896 gas
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+deploying "Core_Implementation" (tx: 0x77d55bb119f2ae52dcf6d1349e025efa6f626884981d5f78b3d29de6a113436a)...: deployed at 0x5854694204828385ED3d5B9d0FF912794D78cdaE with 66797822 gas
+deploying "Core_Proxy" (tx: 0xe8c80f0130da8ee4603de86231b77883c1cf3a8bd4c6e6995dfcb2be338d391f)...: deployed at 0x1497A23a2abC0DAFFb8e333183cfC181b24bB570 with 5680814 gas
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+
+Run #2
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+reusing "Registry_Implementation" at 0x845a7872d1cDe2B3285dE9f66B1D2EC70307cC6b
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+reusing "Core_Implementation" at 0x5854694204828385ED3d5B9d0FF912794D78cdaE
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+deploying "TokenSpender_Implementation" (tx: 0xc3f909a3cb61dc5c69a85895609b95872df3385dbe21dbbc74e77157dc8384d8)...: deployed at 0x7C78bfaDb7F0EA6E84CC5196B6fAC48fb1cFA34E with 8002174 gas
+deploying "TokenSpender_Proxy" (tx: 0x59248aba90cfce0395938dfd1bbd479ff6aeb8eb61ff382094eb8fae861e3e87)...: deployed at 0x0A9A6CD7485Dd77c6cec28FB1bd64D5969B79132 with 5524568 gas
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+deploying "OpiumProxyFactory_Implementation" (tx: 0x5224217b76ce378fe9f6c0d4f6ab63c986d20cd3f01017e064a28aa3866cd309)...: deployed at 0x5a608F8dfD67504Eb1F07D0b32ACD8753160fCA3 with 49221150 gas
+deploying "OpiumProxyFactory_Proxy" (tx: 0xb1ad9ae35f5a95ecc60e9abcff786c65e45100415e9e2e37df9dde2f8ca584c3)...: deployed at 0x328bC74ccA6578349B262D21563d5581DAA43a16 with 5858299 gas
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+deploying "OracleAggregator_Implementation" (tx: 0xac5cf55414a376f801c9c77d871dfd775ef0ac8ef64e1875b170a3e7f0569553)...: deployed at 0xC3e733eaCCD9c3bc54450aCe8074F589760Ae079 with 2675801 gas
+deploying "OracleAggregator_Proxy" (tx: 0x2efbc586d4f62fd858fb7f8e3fe270b1d78768be26fcfaef58c584ef07266212)...: deployed at 0x85d9c3784B277Bc10e1504Aa8f647132ba17A674 with 5409247 gas
+reusing "DefaultProxyAdmin" at 0x2Ba5feE02489c4c7D550b82044742084A652F01A
+deploying "SyntheticAggregator_Implementation" (tx: 0x8fd4af6e8319f5485a89075671b00b5817efef576727610021e588694801321c)...: deployed at 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 with 14013178 gas
+deploying "SyntheticAggregator_Proxy" (tx: 0x24ab3b972bb0f741840f1c4821b023fe779d3f288e63c91d1d9f3040c1b430d5)...: deployed at 0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e with 5623757 gas
+Tx #1 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a setProtocolAddresses [
+  '0x328bC74ccA6578349B262D21563d5581DAA43a16',
+  '0x1497A23a2abC0DAFFb8e333183cfC181b24bB570',
+  '0x85d9c3784B277Bc10e1504Aa8f647132ba17A674',
+  '0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e',
+  '0x0A9A6CD7485Dd77c6cec28FB1bd64D5969B79132'
+]
+Tx #2 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a setProtocolExecutionReserveClaimer [ '0xc9162e9e8A6C47E7346a3fe6Dda9fab54Dfbe49B' ]
+Tx #3 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a setProtocolRedemptionReserveClaimer [ '0xc9162e9e8A6C47E7346a3fe6Dda9fab54Dfbe49B' ]
+Tx #4 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a setDerivativeAuthorRedemptionReservePart [ 0 ]
+Tx #5 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a setProtocolExecutionReservePart [ 0 ]
+Tx #6 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a setProtocolRedemptionReservePart [ 0 ]
+Tx #7 Registry @ 0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a addToWhitelist [ '0x1497A23a2abC0DAFFb8e333183cfC181b24bB570' ]
+Tx #8 Core @ 0x1497A23a2abC0DAFFb8e333183cfC181b24bB570 updateProtocolAddresses []
+Tx #9 Core @ 0x1497A23a2abC0DAFFb8e333183cfC181b24bB570 updateProtocolParametersArgs []
+----------------------
+#1 Transfer ownership of ProxyAdmin to DAO @ 0xc9162e9e8A6C47E7346a3fe6Dda9fab54Dfbe49B
+#2 call all initializers on implementation contracts [
+  'implementation of Registry',
+  'implementation of Core',
+  'implementation of TokenSpender',
+  'implementation of OpiumProxyFactory',
+  'implementation of OracleAggregator',
+  'implementation of SyntheticAggregator',
+  'OpiumProxyFactory.getImplementationAddress()'
+]
+
+#2 Verify contracts
+1) Verify sources of implementation contracts
+2) Point proxies to their implementations
+3) Verify source of Opium Position Token implementation
