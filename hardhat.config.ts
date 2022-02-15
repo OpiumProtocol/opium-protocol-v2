@@ -31,6 +31,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: createHardhatNetworkConfig(),
+    arbitrum: createNetworkConfigWithPrivateKey("arbitrum", "https://arb1.arbitrum.io/rpc", true),
     arbitrumTestnet: createTestnetConfig("arbitrumTestnet", "https://rinkeby.arbitrum.io/rpc"),
     rinkeby: createTestnetWithL2Config("rinkeby", createInfuraUrl("rinkeby")),
     goerli: createNetworkConfigWithPrivateKey("goerli", createInfuraUrl("goerli"), true),

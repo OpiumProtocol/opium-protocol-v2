@@ -1,15 +1,16 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { Core, Registry } from "../../typechain";
+
+const ECOSYSTEM = '0xc9162e9e8A6C47E7346a3fe6Dda9fab54Dfbe49B';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Promise<boolean> {
   const { deployments, ethers, network } = hre;
   const { deploy } = deployments;
 
-  const { deployer, governor, redemptionReserveClaimer } = await ethers.getNamedSigners();
+  const { deployer } = await ethers.getNamedSigners();
 
-  // Skip if network is not Arbitrum Testnet
-  if (network.name !== 'arbitrumTestnet') {
+  // Skip if network is not Arbitrum Mainnet
+  if (network.name !== 'arbitrum') {
     return false
   }
 
@@ -21,7 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Pr
       execute: {
         init: {
           methodName: "initialize",
-          args: [governor.address],
+          args: [ECOSYSTEM],
         },
       },
     },
@@ -93,34 +94,101 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Pr
     },
   });
 
-  const registryInstance = <Registry>await ethers.getContract("Registry");
+  // Ecosystem DAO Setup Instructions
 
-  const tx1 = await registryInstance
-    .connect(governor)
-    .setProtocolAddresses(
+  console.log(
+    'Tx #1',
+    `Registry @ ${registry.address}`,
+    'setProtocolAddresses',
+    [
       opiumProxyFactory.address,
       core.address,
       oracleAggregator.address,
       syntheticAggregator.address,
       tokenSpender.address,
-    );
-  await tx1.wait();
+    ]
+  )
 
-  const tx2 = await registryInstance.connect(governor).setProtocolExecutionReserveClaimer(deployer.address);
-  await tx2.wait();
+  console.log(
+    'Tx #2',
+    `Registry @ ${registry.address}`,
+    'setProtocolExecutionReserveClaimer',
+    [
+      ECOSYSTEM,
+    ]
+  )
 
-  const tx3 = await registryInstance
-    .connect(governor)
-    .setProtocolRedemptionReserveClaimer(redemptionReserveClaimer.address);
-  await tx3.wait();
+  console.log(
+    'Tx #3',
+    `Registry @ ${registry.address}`,
+    'setProtocolRedemptionReserveClaimer',
+    [
+      ECOSYSTEM,
+    ]
+  )
 
-  const tx4 = await registryInstance.connect(governor).addToWhitelist(core.address);
-  await tx4.wait();
+  console.log(
+    'Tx #4',
+    `Registry @ ${registry.address}`,
+    'setDerivativeAuthorRedemptionReservePart',
+    [
+      0,
+    ]
+  )
 
-  const coreInstance = <Core>await ethers.getContract("Core");
+  console.log(
+    'Tx #5',
+    `Registry @ ${registry.address}`,
+    'setProtocolExecutionReservePart',
+    [
+      0,
+    ]
+  )
 
-  const tx5 = await coreInstance.connect(governor).updateProtocolAddresses();
-  await tx5.wait();
+  console.log(
+    'Tx #6',
+    `Registry @ ${registry.address}`,
+    'setProtocolRedemptionReservePart',
+    [
+      0,
+    ]
+  )
+
+  console.log(
+    'Tx #7',
+    `Registry @ ${registry.address}`,
+    'addToWhitelist',
+    [
+      core.address,
+    ]
+  )
+
+  console.log(
+    'Tx #8',
+    `Core @ ${core.address}`,
+    'updateProtocolAddresses',
+    []
+  )
+
+  console.log(
+    'Tx #9',
+    `Core @ ${core.address}`,
+    'updateProtocolParametersArgs',
+    []
+  )
+
+  // Deployer Setup Instructions
+  console.log('----------------------')
+  console.log(`#1 Transfer ownership of ProxyAdmin to DAO @ ${ECOSYSTEM}`)
+  console.log('#2 call all initializers on implementation contracts', [
+    'implementation of Registry',
+    'implementation of Core',
+    'implementation of TokenSpender',
+    'implementation of OpiumProxyFactory',
+    'implementation of OracleAggregator',
+    'implementation of SyntheticAggregator',
+    'OpiumProxyFactory.getImplementationAddress()'
+  ])
 
   return true;
 };
