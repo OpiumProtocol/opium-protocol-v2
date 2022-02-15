@@ -43,13 +43,13 @@ Tx #9 Core @ 0x1497A23a2abC0DAFFb8e333183cfC181b24bB570 updateProtocolParameters
 ----------------------
 #1 Transfer ownership of ProxyAdmin to DAO @ 0xc9162e9e8A6C47E7346a3fe6Dda9fab54Dfbe49B
 #2 call all initializers on implementation contracts [
-  'implementation of Registry',
-  'implementation of Core',
-  'implementation of TokenSpender',
-  'implementation of OpiumProxyFactory',
-  'implementation of OracleAggregator',
-  'implementation of SyntheticAggregator',
-  'OpiumProxyFactory.getImplementationAddress()'
+  'implementation of Registry', // See special hardhat task
+  'implementation of Core', // Non-callable
+  'implementation of TokenSpender', // Non-callable
+  'implementation of OpiumProxyFactory', // Non-callable
+  'implementation of OracleAggregator', // No initializer
+  'implementation of SyntheticAggregator', // Non-callable
+  'OpiumProxyFactory.getImplementationAddress()' // See special hardhat task
 ]
 
 #2 Verify contracts

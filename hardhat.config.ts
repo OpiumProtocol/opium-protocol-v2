@@ -20,6 +20,8 @@ import {
 } from "./hardhatHelpers/helpers";
 import envConfig from "./hardhatHelpers/config";
 import "./tasks/clean";
+import "./tasks/checkDeployment";
+import "./tasks/initializers";
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
