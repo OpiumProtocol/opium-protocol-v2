@@ -21,6 +21,18 @@ Opium v2 is a permissionless financial smart escrow protocol that allows its use
 | ProxyAdmin          | -                                          | [0x2ba5fee02489c4c7d550b82044742084a652f01a](https://arbiscan.io/address/0x2ba5fee02489c4c7d550b82044742084a652f01a) |
 ### Testnet
 
+#### Arbitrum Testnet
+| Contract            | Proxy                                      | Implementation                             |
+|---------------------|--------------------------------------------|--------------------------------------------|
+| Registry            | [0x9285CAA6F92D9Ba197966E854174e9B27B2061e5](https://arbiscan.io/address/0x9285CAA6F92D9Ba197966E854174e9B27B2061e5) | [0x48ccef1ecc69e0b5e5fd3340c15f9a2e18563022](https://arbiscan.io/address/0x48ccef1ecc69e0b5e5fd3340c15f9a2e18563022) |
+| Core                | [0x416d29de99e346c59100680a14d44De08891dE30](https://arbiscan.io/address/0x416d29de99e346c59100680a14d44De08891dE30) | [0x384a5683155f035200cb16fbed0aedb2a6ffaf37](https://arbiscan.io/address/0x384a5683155f035200cb16fbed0aedb2a6ffaf37) |
+| TokenSpender        | [0xdFDe0C087DF52627673043a86E657B927ee10c4b](https://arbiscan.io/address/0xdFDe0C087DF52627673043a86E657B927ee10c4b) | [0xaC7C9f40F404Df8f5c0436087b7E9e7b0735f90b](https://arbiscan.io/address/0xaC7C9f40F404Df8f5c0436087b7E9e7b0735f90b) |
+| OpiumProxyFactory   | [0x3ea7753bE2d0ab682cd0f0B8803f3331BC5230fc](https://arbiscan.io/address/0x3ea7753bE2d0ab682cd0f0B8803f3331BC5230fc) | [0x5C97c97ea1015E4f2aE4274c022A06957Eddbb46](https://arbiscan.io/address/0x5C97c97ea1015E4f2aE4274c022A06957Eddbb46) |
+| OpiumPositionToken  | -                                          | [](https://arbiscan.io/address/) |
+| OracleAggregator    | [0xd030051cd8Cc0760fb0Fa857bbFDb8f9C3dAcaDE](https://arbiscan.io/address/0xd030051cd8Cc0760fb0Fa857bbFDb8f9C3dAcaDE) | [0x5f1670bdbafcbea39579083dfd56984bb4a34d25](https://arbiscan.io/address/0x5f1670bdbafcbea39579083dfd56984bb4a34d25) |
+| SyntheticAggregator | [0x3c1150e52d028DCD67a0bA986D332D54A8baC29A](https://arbiscan.io/address/0x3c1150e52d028DCD67a0bA986D332D54A8baC29A) | [0x01A44DbFE8a2b9568BEA0C0Db938E0dF93682910](https://arbiscan.io/address/0x01A44DbFE8a2b9568BEA0C0Db938E0dF93682910) |
+| ProxyAdmin          | -                                          | [0xFcEAF12d8A38E1135124E4251A462bA92F22b172](https://arbiscan.io/address/0xFcEAF12d8A38E1135124E4251A462bA92F22b172) |
+
 ## Local Development Setup and initialization
 
 #### Clone repo and install dependencies
