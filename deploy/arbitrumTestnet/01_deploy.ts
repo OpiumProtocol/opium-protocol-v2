@@ -1,12 +1,17 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { Core, Registry } from "../typechain";
+import { Core, Registry } from "../../typechain";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Promise<boolean> {
-  const { deployments, ethers } = hre;
+  const { deployments, ethers, network } = hre;
   const { deploy } = deployments;
 
   const { deployer, governor, redemptionReserveClaimer } = await ethers.getNamedSigners();
+
+  // Skip if network is not Arbitrum Testnet
+  if (network.name !== 'arbitrumTestnet') {
+    return false
+  }
 
   const registry = await deploy("Registry", {
     from: deployer.address,

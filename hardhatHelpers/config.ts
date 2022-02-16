@@ -15,6 +15,7 @@ const chainIds = {
   polygonMainnet: 137,
   bscTestnet: 97,
   bscMainnet: 56,
+  arbitrum: 42161,
   arbitrumTestnet: 421611,
 };
 

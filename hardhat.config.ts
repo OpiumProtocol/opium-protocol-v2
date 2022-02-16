@@ -20,6 +20,8 @@ import {
 } from "./hardhatHelpers/helpers";
 import envConfig from "./hardhatHelpers/config";
 import "./tasks/clean";
+import "./tasks/checkDeployment";
+import "./tasks/initializers";
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -31,6 +33,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: createHardhatNetworkConfig(),
+    arbitrum: createNetworkConfigWithPrivateKey("arbitrum", "https://arb1.arbitrum.io/rpc", true),
     arbitrumTestnet: createTestnetConfig("arbitrumTestnet", "https://rinkeby.arbitrum.io/rpc"),
     rinkeby: createTestnetWithL2Config("rinkeby", createInfuraUrl("rinkeby")),
     goerli: createNetworkConfigWithPrivateKey("goerli", createInfuraUrl("goerli"), true),
@@ -122,6 +125,7 @@ const config: HardhatUserConfig = {
       rinkeby: envConfig.etherscanKey,
       goerli: envConfig.etherscanKey,
       arbitrumTestnet: envConfig.arbiscanKey,
+      arbitrumOne: envConfig.arbiscanKey,
     },
   },
   mocha: {
