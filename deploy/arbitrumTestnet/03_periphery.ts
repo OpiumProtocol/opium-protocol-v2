@@ -14,7 +14,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment): Pr
 
   const registry = await get("Registry");
 
-  await deploy("OnChainDerivativeTracker", {
+  await deploy("OnChainPositionsLens", {
     from: deployer.address,
     log: true,
     args: [registry.address],
