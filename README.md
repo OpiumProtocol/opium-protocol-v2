@@ -19,6 +19,12 @@ Opium v2 is a permissionless financial smart escrow protocol that allows its use
 | OracleAggregator    | [0x85d9c3784B277Bc10e1504Aa8f647132ba17A674](https://arbiscan.io/address/0x85d9c3784B277Bc10e1504Aa8f647132ba17A674) | [0xC3e733eaCCD9c3bc54450aCe8074F589760Ae079](https://arbiscan.io/address/0xC3e733eaCCD9c3bc54450aCe8074F589760Ae079) |
 | SyntheticAggregator | [0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e](https://arbiscan.io/address/0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e) | [0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23](https://arbiscan.io/address/0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23) |
 | ProxyAdmin          | -                                          | [0x2ba5fee02489c4c7d550b82044742084a652f01a](https://arbiscan.io/address/0x2ba5fee02489c4c7d550b82044742084a652f01a) |
+
+##### Helpers
+| Contract            | Proxy                                      |
+|---------------------|--------------------------------------------|
+| BalanceHelper            | [0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d](https://arbiscan.io/address/0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d) |
+| PayoutHelper                | [0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd](https://arbiscan.io/address/0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd) |
 ### Testnet
 
 #### Arbitrum Testnet
@@ -32,6 +38,12 @@ Opium v2 is a permissionless financial smart escrow protocol that allows its use
 | OracleAggregator    | [0xd030051cd8Cc0760fb0Fa857bbFDb8f9C3dAcaDE](https://testnet.arbiscan.io/address/0xd030051cd8Cc0760fb0Fa857bbFDb8f9C3dAcaDE) | [0x5f1670bdbafcbea39579083dfd56984bb4a34d25](https://testnet.arbiscan.io/address/0x5f1670bdbafcbea39579083dfd56984bb4a34d25) |
 | SyntheticAggregator | [0x3c1150e52d028DCD67a0bA986D332D54A8baC29A](https://testnet.arbiscan.io/address/0x3c1150e52d028DCD67a0bA986D332D54A8baC29A) | [0x01A44DbFE8a2b9568BEA0C0Db938E0dF93682910](https://testnet.arbiscan.io/address/0x01A44DbFE8a2b9568BEA0C0Db938E0dF93682910) |
 | ProxyAdmin          | -                                          | [0xFcEAF12d8A38E1135124E4251A462bA92F22b172](https://testnet.arbiscan.io/address/0xFcEAF12d8A38E1135124E4251A462bA92F22b172) |
+
+##### Helpers
+| Contract            | Proxy                                      |
+|---------------------|--------------------------------------------|
+| BalanceHelper            | [0x60682B5B1C0AA76c0104AE77CCBFfbE95cE9Bc8a](https://testnet.arbiscan.io/address/0x60682B5B1C0AA76c0104AE77CCBFfbE95cE9Bc8a) |
+| PayoutHelper                | [0x42A02e1CC96974834Bd1eB2C02D34f68853Bb305](https://testnet.arbiscan.io/address/0x42A02e1CC96974834Bd1eB2C02D34f68853Bb305) |
 
 ## Local Development Setup and initialization
 
