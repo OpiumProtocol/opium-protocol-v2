@@ -75,6 +75,12 @@ if (!ARBISCAN_API_KEY) {
   throw new Error("Please set your ARBISCAN_API_KEY in a .env file");
 }
 
+// polygonscan key
+const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
+if (!POLYGONSCAN_API_KEY) {
+  throw new Error("Please set your POLYGONSCAN_API_KEY in a .env file");
+}
+
 // optional private key
 const privateKey = process.env.PRIVATE_KEY;
 
@@ -91,6 +97,7 @@ const config = {
   etherscanKey: ETHERSCAN_KEY,
   bscscanKey: BSCSCAN_API_KEY,
   arbiscanKey: ARBISCAN_API_KEY,
+  polygonscanKey: POLYGONSCAN_API_KEY,
   contractSizerStrict: CONTRACT_SIZER_STRICT,
 };
 

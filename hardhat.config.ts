@@ -126,6 +126,8 @@ const config: HardhatUserConfig = {
       goerli: envConfig.etherscanKey,
       arbitrumTestnet: envConfig.arbiscanKey,
       arbitrumOne: envConfig.arbiscanKey,
+      polygon: envConfig.polygonscanKey,
+      polygonMumbai: envConfig.polygonscanKey,
     },
   },
   mocha: {
