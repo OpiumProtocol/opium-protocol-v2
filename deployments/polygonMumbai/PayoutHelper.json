@@ -1,0 +1,124 @@
+{
+  "address": "0x0D4168f4e87C391D2A92264841106140bc12FE02",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "margin",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "endTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "params",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "address",
+              "name": "oracleId",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "syntheticId",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LibDerivative.Derivative",
+          "name": "_derivative",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_results",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "getExecutionPayouts",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "buyerPayout",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "sellerPayout",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct PayoutHelper.ExecutionPayout[]",
+          "name": "executionPayouts",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xf02cd57e2abff93e6fafd30277e993937f2b67b5b27d3e6fe2f848126e73f5eb",
+  "receipt": {
+    "to": null,
+    "from": "0x029afFD8Cf192Dae6384BcFEAe6a8D8C6877293F",
+    "contractAddress": "0x0D4168f4e87C391D2A92264841106140bc12FE02",
+    "transactionIndex": 26,
+    "gasUsed": "316971",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000800000000000000000000100000000004000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000080000000000000000000200000000000000000000000000000000010000000000000000000000000004000000000000000000001000000000100000000000000000080100040000000000000000000000000000000000000000000000000000000000000000000100000",
+    "blockHash": "0xfec13fab0a0aaaf2ac23b2564675c10271d683622cd54a2484c1f9832b4415fd",
+    "transactionHash": "0xf02cd57e2abff93e6fafd30277e993937f2b67b5b27d3e6fe2f848126e73f5eb",
+    "logs": [
+      {
+        "transactionIndex": 26,
+        "blockNumber": 25646374,
+        "transactionHash": "0xf02cd57e2abff93e6fafd30277e993937f2b67b5b27d3e6fe2f848126e73f5eb",
+        "address": "0x0000000000000000000000000000000000001010",
+        "topics": [
+          "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+          "0x0000000000000000000000000000000000000000000000000000000000001010",
+          "0x000000000000000000000000029affd8cf192dae6384bcfeae6a8d8c6877293f",
+          "0x000000000000000000000000be188d6641e8b680743a4815dfa0f6208038960f"
+        ],
+        "data": "0x00000000000000000000000000000000000000000000000000099268b1d4c88e0000000000000000000000000000000000000000000000000a75b4596e4313b0000000000000000000000000000000000000000000000c3e3ad86b80f51e0fa70000000000000000000000000000000000000000000000000a6c21f0bc6e4b22000000000000000000000000000000000000000000000c3e3ae1fde9a6f2d835",
+        "logIndex": 158,
+        "blockHash": "0xfec13fab0a0aaaf2ac23b2564675c10271d683622cd54a2484c1f9832b4415fd"
+      }
+    ],
+    "blockNumber": 25646374,
+    "cumulativeGasUsed": "4652563",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "7f3b3703bf8bc451e97d7ab184b21d6a",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"margin\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"endTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"params\",\"type\":\"uint256[]\"},{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"syntheticId\",\"type\":\"address\"}],\"internalType\":\"struct LibDerivative.Derivative\",\"name\":\"_derivative\",\"type\":\"tuple\"},{\"internalType\":\"uint256[]\",\"name\":\"_results\",\"type\":\"uint256[]\"}],\"name\":\"getExecutionPayouts\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"buyerPayout\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"sellerPayout\",\"type\":\"uint256\"}],\"internalType\":\"struct PayoutHelper.ExecutionPayout[]\",\"name\":\"executionPayouts\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/helpers/PayoutHelper.sol\":\"PayoutHelper\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"contracts/helpers/PayoutHelper.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"../interfaces/IDerivativeLogic.sol\\\";\\nimport \\\"../libs/LibDerivative.sol\\\";\\n\\ncontract PayoutHelper {\\n    struct ExecutionPayout {\\n        uint256 buyerPayout;\\n        uint256 sellerPayout;\\n    }\\n\\n    function getExecutionPayouts(LibDerivative.Derivative calldata _derivative, uint256[] calldata _results)\\n        external\\n        view\\n        returns (ExecutionPayout[] memory executionPayouts)\\n    {\\n        IDerivativeLogic logic = IDerivativeLogic(_derivative.syntheticId);\\n\\n        executionPayouts = new ExecutionPayout[](_results.length);\\n\\n        for (uint256 i = 0; i < _results.length; i++) {\\n            (uint256 buyerPayout, uint256 sellerPayout) = logic.getExecutionPayout(_derivative, _results[i]);\\n            executionPayouts[i] = ExecutionPayout(buyerPayout, sellerPayout);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x86f2c00922e9ab06be7bd855675af0e8eeff2b1adf903a7b3510d386e737d9bd\",\"license\":\"agpl-3.0\"},\"contracts/interfaces/IDerivativeLogic.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\nimport \\\"../libs/LibDerivative.sol\\\";\\n\\n/// @title Opium.Interface.IDerivativeLogic is an interface that every syntheticId should implement\\ninterface IDerivativeLogic {\\n    // Event with syntheticId metadata JSON string (for DIB.ONE derivative explorer)\\n    event LogMetadataSet(string metadata);\\n\\n    /// @notice Validates ticker\\n    /// @param _derivative Derivative Instance of derivative to validate\\n    /// @return Returns boolean whether ticker is valid\\n    function validateInput(LibDerivative.Derivative memory _derivative) external view returns (bool);\\n\\n    /// @return Returns the custom name of a derivative ticker which will be used as part of the name of its positions\\n    function getSyntheticIdName() external view returns (string memory);\\n\\n    /// @notice Calculates margin required for derivative creation\\n    /// @param _derivative Derivative Instance of derivative\\n    /// @return buyerMargin uint256 Margin needed from buyer (LONG position)\\n    /// @return sellerMargin uint256 Margin needed from seller (SHORT position)\\n    function getMargin(LibDerivative.Derivative memory _derivative)\\n        external\\n        view\\n        returns (uint256 buyerMargin, uint256 sellerMargin);\\n\\n    /// @notice Calculates payout for derivative execution\\n    /// @param _derivative Derivative Instance of derivative\\n    /// @param _result uint256 Data retrieved from oracleId on the maturity\\n    /// @return buyerPayout uint256 Payout in ratio for buyer (LONG position holder)\\n    /// @return sellerPayout uint256 Payout in ratio for seller (SHORT position holder)\\n    function getExecutionPayout(LibDerivative.Derivative memory _derivative, uint256 _result)\\n        external\\n        view\\n        returns (uint256 buyerPayout, uint256 sellerPayout);\\n\\n    /// @notice Returns syntheticId author address for Opium commissions\\n    /// @return authorAddress address The address of syntheticId address\\n    function getAuthorAddress() external view returns (address authorAddress);\\n\\n    /// @notice Returns syntheticId author commission in base of COMMISSION_BASE\\n    /// @return commission uint256 Author commission\\n    function getAuthorCommission() external view returns (uint256 commission);\\n\\n    /// @notice Returns whether thirdparty could execute on derivative's owner's behalf\\n    /// @param _derivativeOwner address Derivative owner address\\n    /// @return Returns boolean whether _derivativeOwner allowed third party execution\\n    function thirdpartyExecutionAllowed(address _derivativeOwner) external view returns (bool);\\n\\n    /// @notice Sets whether thirds parties are allowed or not to execute derivative's on msg.sender's behalf\\n    /// @param _allow bool Flag for execution allowance\\n    function allowThirdpartyExecution(bool _allow) external;\\n}\\n\",\"keccak256\":\"0x5e1d999a6634d35d25faf8a75072fda36c348bac716428d854fcdcee78c69346\",\"license\":\"agpl-3.0\"},\"contracts/libs/LibDerivative.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/// @title Opium.Lib.LibDerivative contract should be inherited by contracts that use Derivative structure and calculate derivativeHash\\nlibrary LibDerivative {\\n    enum PositionType {\\n        SHORT,\\n        LONG\\n    }\\n\\n    // Opium derivative structure (ticker) definition\\n    struct Derivative {\\n        // Margin parameter for syntheticId\\n        uint256 margin;\\n        // Maturity of derivative\\n        uint256 endTime;\\n        // Additional parameters for syntheticId\\n        uint256[] params;\\n        // oracleId of derivative\\n        address oracleId;\\n        // Margin token address of derivative\\n        address token;\\n        // syntheticId of derivative\\n        address syntheticId;\\n    }\\n\\n    /// @notice Calculates hash of provided Derivative\\n    /// @param _derivative Derivative Instance of derivative to hash\\n    /// @return derivativeHash bytes32 Derivative hash\\n    function getDerivativeHash(Derivative memory _derivative) internal pure returns (bytes32 derivativeHash) {\\n        derivativeHash = keccak256(\\n            abi.encodePacked(\\n                _derivative.margin,\\n                _derivative.endTime,\\n                _derivative.params,\\n                _derivative.oracleId,\\n                _derivative.token,\\n                _derivative.syntheticId\\n            )\\n        );\\n    }\\n}\\n\",\"keccak256\":\"0x8dc20b755b97c78a16d4c51b55efb29b9224e6117c1c8703e1716fd15539f12c\",\"license\":\"agpl-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506104c6806100206000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c80638800c3b514610030575b600080fd5b61004361003e366004610205565b610059565b604051610050919061031a565b60405180910390f35b6060600061006d60c0860160a087016101e3565b90508267ffffffffffffffff8111156100885761008861047a565b6040519080825280602002602001820160405280156100cd57816020015b60408051808201909152600080825260208201528152602001906001900390816100a65790505b50915060005b838110156101be57600080836001600160a01b031663dd0060fd8989898781811061010057610100610464565b905060200201356040518363ffffffff1660e01b8152600401610124929190610369565b604080518083038186803b15801561013b57600080fd5b505afa15801561014f573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061017391906102a7565b9150915060405180604001604052808381526020018281525085848151811061019e5761019e610464565b6020026020010181905250505080806101b69061043b565b9150506100d3565b50509392505050565b80356001600160a01b03811681146101de57600080fd5b919050565b6000602082840312156101f557600080fd5b6101fe826101c7565b9392505050565b60008060006040848603121561021a57600080fd5b833567ffffffffffffffff8082111561023257600080fd5b9085019060c0828803121561024657600080fd5b9093506020850135908082111561025c57600080fd5b818601915086601f83011261027057600080fd5b81358181111561027f57600080fd5b8760208260051b850101111561029457600080fd5b6020830194508093505050509250925092565b600080604083850312156102ba57600080fd5b505080516020909101519092909150565b81835260007f07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8311156102fd57600080fd5b8260051b8083602087013760009401602001938452509192915050565b602080825282518282018190526000919060409081850190868401855b8281101561035c57815180518552860151868501529284019290850190600101610337565b5091979650505050505050565b60408152823560408201526020830135606082015260006040840135601e1985360301811261039757600080fd5b8401803567ffffffffffffffff8111156103b057600080fd5b8060051b36038613156103c257600080fd5b60c060808501526103db610100850182602085016102cb565b9150506103ea606086016101c7565b6001600160a01b031660a0840152610404608086016101c7565b6001600160a01b031660c084015261041e60a086016101c7565b6001600160a01b031660e084015260209092019290925292915050565b600060001982141561045d57634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea26469706673582212203411f2636f9a3891a380a82be3ebc19ae0295d39cdc639e7321d2cc8e713117964736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c80638800c3b514610030575b600080fd5b61004361003e366004610205565b610059565b604051610050919061031a565b60405180910390f35b6060600061006d60c0860160a087016101e3565b90508267ffffffffffffffff8111156100885761008861047a565b6040519080825280602002602001820160405280156100cd57816020015b60408051808201909152600080825260208201528152602001906001900390816100a65790505b50915060005b838110156101be57600080836001600160a01b031663dd0060fd8989898781811061010057610100610464565b905060200201356040518363ffffffff1660e01b8152600401610124929190610369565b604080518083038186803b15801561013b57600080fd5b505afa15801561014f573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061017391906102a7565b9150915060405180604001604052808381526020018281525085848151811061019e5761019e610464565b6020026020010181905250505080806101b69061043b565b9150506100d3565b50509392505050565b80356001600160a01b03811681146101de57600080fd5b919050565b6000602082840312156101f557600080fd5b6101fe826101c7565b9392505050565b60008060006040848603121561021a57600080fd5b833567ffffffffffffffff8082111561023257600080fd5b9085019060c0828803121561024657600080fd5b9093506020850135908082111561025c57600080fd5b818601915086601f83011261027057600080fd5b81358181111561027f57600080fd5b8760208260051b850101111561029457600080fd5b6020830194508093505050509250925092565b600080604083850312156102ba57600080fd5b505080516020909101519092909150565b81835260007f07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8311156102fd57600080fd5b8260051b8083602087013760009401602001938452509192915050565b602080825282518282018190526000919060409081850190868401855b8281101561035c57815180518552860151868501529284019290850190600101610337565b5091979650505050505050565b60408152823560408201526020830135606082015260006040840135601e1985360301811261039757600080fd5b8401803567ffffffffffffffff8111156103b057600080fd5b8060051b36038613156103c257600080fd5b60c060808501526103db610100850182602085016102cb565b9150506103ea606086016101c7565b6001600160a01b031660a0840152610404608086016101c7565b6001600160a01b031660c084015261041e60a086016101c7565b6001600160a01b031660e084015260209092019290925292915050565b600060001982141561045d57634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea26469706673582212203411f2636f9a3891a380a82be3ebc19ae0295d39cdc639e7321d2cc8e713117964736f6c63430008050033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
