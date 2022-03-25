@@ -1,6 +1,31 @@
 {
-  "address": "0x59F9965e219d63a313B79F9f16F6bc7224FF3D9d",
+  "address": "0x5F1670bdbAfcbEA39579083Dfd56984bb4A34d25",
   "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_oracleId",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_timestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_data",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogDataProvided",
+      "type": "event"
+    },
     {
       "inputs": [
         {
@@ -68,43 +93,43 @@
       "type": "function"
     }
   ],
-  "transactionHash": "0xe2b39aaa4740019a2d418f3e3eafcce7c0675fc759628b518ff577f5bc21f898",
+  "transactionHash": "0x8f28b51c3a3b800fd97f0eb3b11c203fef28977139e7c8171657926652140e75",
   "receipt": {
     "to": null,
-    "from": "0x4497C837663970d9B9fC274342D15be1A2f96D1D",
-    "contractAddress": "0x59F9965e219d63a313B79F9f16F6bc7224FF3D9d",
-    "transactionIndex": 1,
-    "gasUsed": "186547",
-    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000800000000000000000000100000000004000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000084000000000000000000200000000000000000000000000000000000000000000000000000000000004000000000000000000001000000000000000000000000000000100040000000000000000000000010000000000000040000000000000000000000000000100000",
-    "blockHash": "0xfe5127299e137883597c8a1ac8d8dd73dba924e2b9b9d5bc417b737b9b796b92",
-    "transactionHash": "0xe2b39aaa4740019a2d418f3e3eafcce7c0675fc759628b518ff577f5bc21f898",
+    "from": "0x029afFD8Cf192Dae6384BcFEAe6a8D8C6877293F",
+    "contractAddress": "0x5F1670bdbAfcbEA39579083Dfd56984bb4A34d25",
+    "transactionIndex": 8,
+    "gasUsed": "196489",
+    "logsBloom": "0x00000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000800000000000000000000100000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000020000000000000000011000000000000000000000000004000000000000000000001000000000100000000000000000080100000000000000000000000000000000000000000000000000000000000000000000000100000",
+    "blockHash": "0x172d1ad8d6ac191d81b88f7310d774eb5e5634c03fed983a6ca6d90d5202eb6d",
+    "transactionHash": "0x8f28b51c3a3b800fd97f0eb3b11c203fef28977139e7c8171657926652140e75",
     "logs": [
       {
-        "transactionIndex": 1,
-        "blockNumber": 20497345,
-        "transactionHash": "0xe2b39aaa4740019a2d418f3e3eafcce7c0675fc759628b518ff577f5bc21f898",
+        "transactionIndex": 8,
+        "blockNumber": 25646290,
+        "transactionHash": "0x8f28b51c3a3b800fd97f0eb3b11c203fef28977139e7c8171657926652140e75",
         "address": "0x0000000000000000000000000000000000001010",
         "topics": [
           "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
           "0x0000000000000000000000000000000000000000000000000000000000001010",
-          "0x0000000000000000000000004497c837663970d9b9fc274342d15be1a2f96d1d",
-          "0x000000000000000000000000be188d6641e8b680743a4815dfa0f6208038960f"
+          "0x000000000000000000000000029affd8cf192dae6384bcfeae6a8d8c6877293f",
+          "0x000000000000000000000000c26880a0af2ea0c7e8130e6ec47af756465452e8"
         ],
-        "data": "0x0000000000000000000000000000000000000000000000000001fcfd9301ba0000000000000000000000000000000000000000000000000044e3ea6458cede000000000000000000000000000000000000000000000000d781133788e5ff7e8100000000000000000000000000000000000000000000000044e1ed66c5cd24000000000000000000000000000000000000000000000000d78115348679013881",
-        "logIndex": 4,
-        "blockHash": "0xfe5127299e137883597c8a1ac8d8dd73dba924e2b9b9d5bc417b737b9b796b92"
+        "data": "0x000000000000000000000000000000000000000000000000000df61d32d95b350000000000000000000000000000000000000000000000000bfb9fac002ae48c0000000000000000000000000000000000000000000008d70a04de84c95d24290000000000000000000000000000000000000000000000000beda98ecd5189570000000000000000000000000000000000000000000008d70a12d4a1fc367f5e",
+        "logIndex": 19,
+        "blockHash": "0x172d1ad8d6ac191d81b88f7310d774eb5e5634c03fed983a6ca6d90d5202eb6d"
       }
     ],
-    "blockNumber": 20497345,
-    "cumulativeGasUsed": "364524",
+    "blockNumber": 25646290,
+    "cumulativeGasUsed": "2427531",
     "status": 1,
     "byzantium": true
   },
   "args": [],
-  "solcInputHash": "658042053585c715e56757d0a4fb45c0",
-  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"data\",\"type\":\"uint256\"}],\"name\":\"__callback\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"getData\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"dataResult\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"hasData\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"result\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"__callback(uint256,uint256)\":{\"params\":{\"data\":\"uint256 Data itself\",\"timestamp\":\"uint256 Timestamp of data\"}},\"getData(address,uint256)\":{\"params\":{\"oracleId\":\"address Address of the `oracleId` smart contract\",\"timestamp\":\"uint256 Timestamp at which data were requested\"},\"returns\":{\"dataResult\":\"uint256 Cached data provided by `oracleId`\"}},\"hasData(address,uint256)\":{\"params\":{\"oracleId\":\"address Address of the `oracleId` smart contract\",\"result\":\"bool Returns whether data were provided already\",\"timestamp\":\"uint256 Timestamp at which data were requested\"}}},\"title\":\"Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"__callback(uint256,uint256)\":{\"notice\":\"Receives and caches data from `msg.sender`\"},\"getData(address,uint256)\":{\"notice\":\"Returns cached data if they exist, or reverts with an error\"},\"hasData(address,uint256)\":{\"notice\":\"Getter for dataExist mapping\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/OracleAggregator.sol\":\"OracleAggregator\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"contracts/Interface/IOracleId.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\n/// @title Opium.Interface.IOracleId contract is an interface that every oracleId should implement\\ninterface IOracleId {\\n    /// @notice Requests data from `oracleId` one time\\n    /// @param timestamp uint256 Timestamp at which data are needed\\n    function fetchData(uint256 timestamp) external payable;\\n\\n    /// @notice Requests data from `oracleId` multiple times\\n    /// @param timestamp uint256 Timestamp at which data are needed for the first time\\n    /// @param period uint256 Period in seconds between multiple timestamps\\n    /// @param times uint256 How many timestamps are requested\\n    function recursivelyFetchData(\\n        uint256 timestamp,\\n        uint256 period,\\n        uint256 times\\n    ) external payable;\\n\\n    /// @notice Requests and returns price in ETH for one request. This function could be called as `view` function. Oraclize API for price calculations restricts making this function as view.\\n    /// @return fetchPrice uint256 Price of one data request in ETH\\n    function calculateFetchPrice() external returns (uint256 fetchPrice);\\n\\n    // Event with oracleId metadata JSON string (for DIB.ONE derivative explorer)\\n    event MetadataSet(string metadata);\\n}\\n\",\"keccak256\":\"0xd0e3f91e1cf1687fe6eac8952ef751514aff15c15c301b308540a20ec74e02ed\"},\"contracts/OracleAggregator.sol\":{\"content\":\"pragma solidity 0.8.5;\\n\\nimport \\\"./Interface/IOracleId.sol\\\";\\n\\n/// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\\ncontract OracleAggregator {\\n    // Storage for the `oracleId` results\\n    // dataCache[oracleId][timestamp] => data\\n    mapping(address => mapping(uint256 => uint256)) private dataCache;\\n\\n    // Flags whether data were provided\\n    // dataExist[oracleId][timestamp] => bool\\n    mapping(address => mapping(uint256 => bool)) private dataExist;\\n\\n    // EXTERNAL FUNCTIONS\\n\\n    /// @notice Receives and caches data from `msg.sender`\\n    /// @param timestamp uint256 Timestamp of data\\n    /// @param data uint256 Data itself\\n    function __callback(uint256 timestamp, uint256 data) external {\\n        // Don't allow to push data twice\\n        require(!dataExist[msg.sender][timestamp], \\\"O1\\\"); //ERROR_ORACLE_AGGREGATOR_DATA_ALREADY_EXIST\\n\\n        // Saving data\\n        dataCache[msg.sender][timestamp] = data;\\n\\n        // Flagging that data were received\\n        dataExist[msg.sender][timestamp] = true;\\n    }\\n\\n    // VIEW FUNCTIONS\\n\\n    /// @notice Returns cached data if they exist, or reverts with an error\\n    /// @param oracleId address Address of the `oracleId` smart contract\\n    /// @param timestamp uint256 Timestamp at which data were requested\\n    /// @return dataResult uint256 Cached data provided by `oracleId`\\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult) {\\n        // Check if Opium.OracleAggregator has data\\n        require(hasData(oracleId, timestamp), \\\"O2\\\"); //ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST\\n\\n        // Return cached data\\n        dataResult = dataCache[oracleId][timestamp];\\n    }\\n\\n    /// @notice Getter for dataExist mapping\\n    /// @param oracleId address Address of the `oracleId` smart contract\\n    /// @param timestamp uint256 Timestamp at which data were requested\\n    /// @param result bool Returns whether data were provided already\\n    function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {\\n        return dataExist[oracleId][timestamp];\\n    }\\n}\\n\",\"keccak256\":\"0xf4688f1cc52d5f366efac581ca3a48e654ccf281b73c93f91f1a6de9a8d5bc4d\"}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50610269806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80632979d025146100465780633102e5ab1461006c578063c8384d2f14610081575b600080fd5b6100596100543660046101d9565b6100ca565b6040519081526020015b60405180910390f35b61007f61007a366004610211565b61014d565b005b6100ba61008f3660046101d9565b6001600160a01b03919091166000908152600160209081526040808320938352929052205460ff1690565b6040519015158152602001610063565b6001600160a01b038216600090815260016020908152604080832084845290915281205460ff166101275760405162461bcd60e51b8152602060048201526002602482015261279960f11b60448201526064015b60405180910390fd5b506001600160a01b03909116600090815260208181526040808320938352929052205490565b33600090815260016020908152604080832085845290915290205460ff161561019d5760405162461bcd60e51b81526020600482015260026024820152614f3160f01b604482015260640161011e565b3360008181526020818152604080832086845282528083209490945591815260018083528382209482529390915220805460ff19169091179055565b600080604083850312156101ec57600080fd5b82356001600160a01b038116811461020357600080fd5b946020939093013593505050565b6000806040838503121561022457600080fd5b5050803592602090910135915056fea264697066735822122092a364308c389d5e3888e376e5ffd3c48d0bf56de4425118a838f957cdbf10a164736f6c63430008050033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80632979d025146100465780633102e5ab1461006c578063c8384d2f14610081575b600080fd5b6100596100543660046101d9565b6100ca565b6040519081526020015b60405180910390f35b61007f61007a366004610211565b61014d565b005b6100ba61008f3660046101d9565b6001600160a01b03919091166000908152600160209081526040808320938352929052205460ff1690565b6040519015158152602001610063565b6001600160a01b038216600090815260016020908152604080832084845290915281205460ff166101275760405162461bcd60e51b8152602060048201526002602482015261279960f11b60448201526064015b60405180910390fd5b506001600160a01b03909116600090815260208181526040808320938352929052205490565b33600090815260016020908152604080832085845290915290205460ff161561019d5760405162461bcd60e51b81526020600482015260026024820152614f3160f01b604482015260640161011e565b3360008181526020818152604080832086845282528083209490945591815260018083528382209482529390915220805460ff19169091179055565b600080604083850312156101ec57600080fd5b82356001600160a01b038116811461020357600080fd5b946020939093013593505050565b6000806040838503121561022457600080fd5b5050803592602090910135915056fea264697066735822122092a364308c389d5e3888e376e5ffd3c48d0bf56de4425118a838f957cdbf10a164736f6c63430008050033",
+  "solcInputHash": "bb75287ab88909f5b293c59b7a90cef6",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_oracleId\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_data\",\"type\":\"uint256\"}],\"name\":\"LogDataProvided\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"data\",\"type\":\"uint256\"}],\"name\":\"__callback\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"getData\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"dataResult\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"oracleId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"hasData\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"result\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"__callback(uint256,uint256)\":{\"params\":{\"data\":\"uint256 Data itself\",\"timestamp\":\"uint256 Timestamp of data\"}},\"getData(address,uint256)\":{\"params\":{\"oracleId\":\"address Address of the `oracleId` smart contract\",\"timestamp\":\"uint256 Timestamp at which data were requested\"},\"returns\":{\"dataResult\":\"uint256 Cached data provided by `oracleId`\"}},\"hasData(address,uint256)\":{\"params\":{\"oracleId\":\"address Address of the `oracleId` smart contract\",\"result\":\"bool Returns whether data were provided already\",\"timestamp\":\"uint256 Timestamp at which data were requested\"}}},\"title\":\"Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"__callback(uint256,uint256)\":{\"notice\":\"Receives and caches data from `msg.sender`\"},\"getData(address,uint256)\":{\"notice\":\"Returns cached data if they exist, or reverts with an error\"},\"hasData(address,uint256)\":{\"notice\":\"Getter for dataExist mapping\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/core/OracleAggregator.sol\":\"OracleAggregator\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[]},\"sources\":{\"contracts/core/OracleAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: agpl-3.0\\npragma solidity 0.8.5;\\n\\n/**\\n    Error codes:\\n    - O1 = ERROR_ORACLE_AGGREGATOR_DATA_ALREADY_EXISTS\\n    - O2 = ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST\\n */\\n\\n/// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\\ncontract OracleAggregator {\\n    event LogDataProvided(address indexed _oracleId, uint256 indexed _timestamp, uint256 indexed _data);\\n    // Storage for the `oracleId` results\\n    // dataCache[oracleId][timestamp] => data\\n    mapping(address => mapping(uint256 => uint256)) private dataCache;\\n\\n    // Flags whether data were provided\\n    // dataExist[oracleId][timestamp] => bool\\n    mapping(address => mapping(uint256 => bool)) private dataExist;\\n\\n    // EXTERNAL FUNCTIONS\\n\\n    /// @notice Receives and caches data from `msg.sender`\\n    /// @param timestamp uint256 Timestamp of data\\n    /// @param data uint256 Data itself\\n    function __callback(uint256 timestamp, uint256 data) external {\\n        // Don't allow to push data twice\\n        require(!dataExist[msg.sender][timestamp], \\\"O1\\\");\\n\\n        // Saving data\\n        dataCache[msg.sender][timestamp] = data;\\n\\n        // Flagging that data were received\\n        dataExist[msg.sender][timestamp] = true;\\n\\n        emit LogDataProvided(msg.sender, timestamp, data);\\n    }\\n\\n    // VIEW FUNCTIONS\\n\\n    /// @notice Returns cached data if they exist, or reverts with an error\\n    /// @param oracleId address Address of the `oracleId` smart contract\\n    /// @param timestamp uint256 Timestamp at which data were requested\\n    /// @return dataResult uint256 Cached data provided by `oracleId`\\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult) {\\n        // Check if Opium.OracleAggregator has data\\n        require(hasData(oracleId, timestamp), \\\"O2\\\");\\n\\n        // Return cached data\\n        dataResult = dataCache[oracleId][timestamp];\\n    }\\n\\n    /// @notice Getter for dataExist mapping\\n    /// @param oracleId address Address of the `oracleId` smart contract\\n    /// @param timestamp uint256 Timestamp at which data were requested\\n    /// @param result bool Returns whether data were provided already\\n    function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {\\n        return dataExist[oracleId][timestamp];\\n    }\\n\\n    // Reserved storage space to allow for layout changes in the future.\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x48bfd300fde793561ce4c68b294f7c15a28f785ac89714797e86a7a2f9d418a2\",\"license\":\"agpl-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610297806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80632979d025146100465780633102e5ab1461006c578063c8384d2f14610081575b600080fd5b610059610054366004610207565b6100ca565b6040519081526020015b60405180910390f35b61007f61007a36600461023f565b61014d565b005b6100ba61008f366004610207565b6001600160a01b03919091166000908152600160209081526040808320938352929052205460ff1690565b6040519015158152602001610063565b6001600160a01b038216600090815260016020908152604080832084845290915281205460ff166101275760405162461bcd60e51b8152602060048201526002602482015261279960f11b60448201526064015b60405180910390fd5b506001600160a01b03909116600090815260208181526040808320938352929052205490565b33600090815260016020908152604080832085845290915290205460ff161561019d5760405162461bcd60e51b81526020600482015260026024820152614f3160f01b604482015260640161011e565b3360008181526020818152604080832086845282528083208590558383526001808352818420878552909252808320805460ff1916909217909155518392859290917fbafe09c91210ac772a509fe28b36bf6b3c82f1aa1db44d58721d57a9595417de9190a45050565b6000806040838503121561021a57600080fd5b82356001600160a01b038116811461023157600080fd5b946020939093013593505050565b6000806040838503121561025257600080fd5b5050803592602090910135915056fea2646970667358221220285c5e7f5702c9e18d23c3371355364ac0c60109d736d927c56bd1a49355bd7864736f6c63430008050033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80632979d025146100465780633102e5ab1461006c578063c8384d2f14610081575b600080fd5b610059610054366004610207565b6100ca565b6040519081526020015b60405180910390f35b61007f61007a36600461023f565b61014d565b005b6100ba61008f366004610207565b6001600160a01b03919091166000908152600160209081526040808320938352929052205460ff1690565b6040519015158152602001610063565b6001600160a01b038216600090815260016020908152604080832084845290915281205460ff166101275760405162461bcd60e51b8152602060048201526002602482015261279960f11b60448201526064015b60405180910390fd5b506001600160a01b03909116600090815260208181526040808320938352929052205490565b33600090815260016020908152604080832085845290915290205460ff161561019d5760405162461bcd60e51b81526020600482015260026024820152614f3160f01b604482015260640161011e565b3360008181526020818152604080832086845282528083208590558383526001808352818420878552909252808320805460ff1916909217909155518392859290917fbafe09c91210ac772a509fe28b36bf6b3c82f1aa1db44d58721d57a9595417de9190a45050565b6000806040838503121561021a57600080fd5b82356001600160a01b038116811461023157600080fd5b946020939093013593505050565b6000806040838503121561025257600080fd5b5050803592602090910135915056fea2646970667358221220285c5e7f5702c9e18d23c3371355364ac0c60109d736d927c56bd1a49355bd7864736f6c63430008050033",
   "devdoc": {
     "kind": "dev",
     "methods": {
@@ -152,20 +177,28 @@
   "storageLayout": {
     "storage": [
       {
-        "astId": 5100,
-        "contract": "contracts/OracleAggregator.sol:OracleAggregator",
+        "astId": 16,
+        "contract": "contracts/core/OracleAggregator.sol:OracleAggregator",
         "label": "dataCache",
         "offset": 0,
         "slot": "0",
         "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))"
       },
       {
-        "astId": 5106,
-        "contract": "contracts/OracleAggregator.sol:OracleAggregator",
+        "astId": 22,
+        "contract": "contracts/core/OracleAggregator.sol:OracleAggregator",
         "label": "dataExist",
         "offset": 0,
         "slot": "1",
         "type": "t_mapping(t_address,t_mapping(t_uint256,t_bool))"
+      },
+      {
+        "astId": 115,
+        "contract": "contracts/core/OracleAggregator.sol:OracleAggregator",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_array(t_uint256)50_storage"
       }
     ],
     "types": {
@@ -173,6 +206,12 @@
         "encoding": "inplace",
         "label": "address",
         "numberOfBytes": "20"
+      },
+      "t_array(t_uint256)50_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[50]",
+        "numberOfBytes": "1600"
       },
       "t_bool": {
         "encoding": "inplace",

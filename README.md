@@ -21,10 +21,11 @@ Opium v2 is a permissionless financial smart escrow protocol that allows its use
 | ProxyAdmin          | -                                          | [0x2ba5fee02489c4c7d550b82044742084a652f01a](https://arbiscan.io/address/0x2ba5fee02489c4c7d550b82044742084a652f01a) |
 
 ##### Helpers
-| Contract            | Proxy                                      |
-|---------------------|--------------------------------------------|
-| BalanceHelper            | [0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d](https://arbiscan.io/address/0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d) |
-| PayoutHelper                | [0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd](https://arbiscan.io/address/0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd) |
+| Contract             | Address                                      |
+|----------------------|--------------------------------------------|
+| BalanceHelper        | [0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d](https://arbiscan.io/address/0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d) |
+| PayoutHelper         | [0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd](https://arbiscan.io/address/0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd) |
+| OnChainPositionsLens | [0xfa01Fd6118445F811753D96178F2ef8AE77caa53](https://arbiscan.io/address/0xfa01Fd6118445F811753D96178F2ef8AE77caa53) |
 ### Testnet
 
 #### Arbitrum Testnet
@@ -40,10 +41,30 @@ Opium v2 is a permissionless financial smart escrow protocol that allows its use
 | ProxyAdmin          | -                                          | [0xFcEAF12d8A38E1135124E4251A462bA92F22b172](https://testnet.arbiscan.io/address/0xFcEAF12d8A38E1135124E4251A462bA92F22b172) |
 
 ##### Helpers
-| Contract            | Proxy                                      |
-|---------------------|--------------------------------------------|
-| BalanceHelper            | [0x60682B5B1C0AA76c0104AE77CCBFfbE95cE9Bc8a](https://testnet.arbiscan.io/address/0x60682B5B1C0AA76c0104AE77CCBFfbE95cE9Bc8a) |
-| PayoutHelper                | [0x42A02e1CC96974834Bd1eB2C02D34f68853Bb305](https://testnet.arbiscan.io/address/0x42A02e1CC96974834Bd1eB2C02D34f68853Bb305) |
+| Contract             | Address                                      |
+|----------------------|--------------------------------------------|
+| BalanceHelper        | [0x60682B5B1C0AA76c0104AE77CCBFfbE95cE9Bc8a](https://testnet.arbiscan.io/address/0x60682B5B1C0AA76c0104AE77CCBFfbE95cE9Bc8a) |
+| PayoutHelper         | [0x42A02e1CC96974834Bd1eB2C02D34f68853Bb305](https://testnet.arbiscan.io/address/0x42A02e1CC96974834Bd1eB2C02D34f68853Bb305) |
+| OnChainPositionsLens | [0x4b214B8AaFBdeB170b550Bb2dfed41AadD9aCf74](https://testnet.arbiscan.io/address/0x4b214B8AaFBdeB170b550Bb2dfed41AadD9aCf74) |
+
+#### Polygon (Mumbai) Testnet
+| Contract            | Proxy                                      | Implementation                             |
+|---------------------|--------------------------------------------|--------------------------------------------|
+| Registry            | [0x9285CAA6F92D9Ba197966E854174e9B27B2061e5](https://mumbai.polygonscan.com/address/0x9285CAA6F92D9Ba197966E854174e9B27B2061e5) | [0x7C40069bdC198925007786414343681bceCFd91D](https://mumbai.polygonscan.com/address/0x7C40069bdC198925007786414343681bceCFd91D) |
+| Core                | [0x416d29de99e346c59100680a14d44De08891dE30](https://mumbai.polygonscan.com/address/0x416d29de99e346c59100680a14d44De08891dE30) | [0x8d4129b538EEdaD7169ff53dd710E152eab9eB4B](https://mumbai.polygonscan.com/address/0x8d4129b538EEdaD7169ff53dd710E152eab9eB4B) |
+| TokenSpender        | [0xdFDe0C087DF52627673043a86E657B927ee10c4b](https://mumbai.polygonscan.com/address/0xdFDe0C087DF52627673043a86E657B927ee10c4b) | [0xa370CF1BB01e368FFdDB81A6511E6Ef072131A77](https://mumbai.polygonscan.com/address/0xa370CF1BB01e368FFdDB81A6511E6Ef072131A77) |
+| OpiumProxyFactory   | [0x3ea7753bE2d0ab682cd0f0B8803f3331BC5230fc](https://mumbai.polygonscan.com/address/0x3ea7753bE2d0ab682cd0f0B8803f3331BC5230fc) | [0x30654f4145A67345CF1B701eac259aA7a2e06FE7](https://mumbai.polygonscan.com/address/0x30654f4145A67345CF1B701eac259aA7a2e06FE7) |
+| OpiumPositionToken  | -                                          | [0x7b006dfca781aee11b4a4e9f42c3239ecd4dcf39](https://mumbai.polygonscan.com/address/0x7b006dfca781aee11b4a4e9f42c3239ecd4dcf39) |
+| OracleAggregator    | [0xd030051cd8Cc0760fb0Fa857bbFDb8f9C3dAcaDE](https://mumbai.polygonscan.com/address/0xd030051cd8Cc0760fb0Fa857bbFDb8f9C3dAcaDE) | [0x5F1670bdbAfcbEA39579083Dfd56984bb4A34d25](https://mumbai.polygonscan.com/address/0x5F1670bdbAfcbEA39579083Dfd56984bb4A34d25) |
+| SyntheticAggregator | [0x3c1150e52d028DCD67a0bA986D332D54A8baC29A](https://mumbai.polygonscan.com/address/0x3c1150e52d028DCD67a0bA986D332D54A8baC29A) | [0xF69821f7364FFc154E4a5003794EE2D9F40FD8Cc](https://mumbai.polygonscan.com/address/0xF69821f7364FFc154E4a5003794EE2D9F40FD8Cc) |
+| ProxyAdmin          | -                                          | [0xFcEAF12d8A38E1135124E4251A462bA92F22b172](https://mumbai.polygonscan.com/address/0xFcEAF12d8A38E1135124E4251A462bA92F22b172) |
+
+##### Helpers
+| Contract             | Address                                      |
+|----------------------|--------------------------------------------|
+| BalanceHelper        | [0xBd7C4B9aB1AC188E11CA046a996e378ecBB2a031](https://mumbai.polygonscan.com/address/0xBd7C4B9aB1AC188E11CA046a996e378ecBB2a031) |
+| PayoutHelper         | [0x0D4168f4e87C391D2A92264841106140bc12FE02](https://mumbai.polygonscan.com/address/0x0D4168f4e87C391D2A92264841106140bc12FE02) |
+| OnChainPositionsLens | [0x1e700c04c9F7c9d6c92F0B1a50dAf103b09E5821](https://mumbai.polygonscan.com/address/0x1e700c04c9F7c9d6c92F0B1a50dAf103b09E5821) |
 
 ## Local Development Setup and initialization
 
