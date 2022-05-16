@@ -1,0 +1,42 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/core/OracleAggregator.sol": {
+      "content": "// SPDX-License-Identifier: agpl-3.0\npragma solidity 0.8.5;\n\n/**\n    Error codes:\n    - O1 = ERROR_ORACLE_AGGREGATOR_DATA_ALREADY_EXISTS\n    - O2 = ERROR_ORACLE_AGGREGATOR_DATA_DOESNT_EXIST\n */\n\n/// @title Opium.OracleAggregator contract requests and caches the data from `oracleId`s and provides them to the Core for positions execution\ncontract OracleAggregator {\n    event LogDataProvided(address indexed _oracleId, uint256 indexed _timestamp, uint256 indexed _data);\n    // Storage for the `oracleId` results\n    // dataCache[oracleId][timestamp] => data\n    mapping(address => mapping(uint256 => uint256)) private dataCache;\n\n    // Flags whether data were provided\n    // dataExist[oracleId][timestamp] => bool\n    mapping(address => mapping(uint256 => bool)) private dataExist;\n\n    // EXTERNAL FUNCTIONS\n\n    /// @notice Receives and caches data from `msg.sender`\n    /// @param timestamp uint256 Timestamp of data\n    /// @param data uint256 Data itself\n    function __callback(uint256 timestamp, uint256 data) external {\n        // Don't allow to push data twice\n        require(!dataExist[msg.sender][timestamp], \"O1\");\n\n        // Saving data\n        dataCache[msg.sender][timestamp] = data;\n\n        // Flagging that data were received\n        dataExist[msg.sender][timestamp] = true;\n\n        emit LogDataProvided(msg.sender, timestamp, data);\n    }\n\n    // VIEW FUNCTIONS\n\n    /// @notice Returns cached data if they exist, or reverts with an error\n    /// @param oracleId address Address of the `oracleId` smart contract\n    /// @param timestamp uint256 Timestamp at which data were requested\n    /// @return dataResult uint256 Cached data provided by `oracleId`\n    function getData(address oracleId, uint256 timestamp) external view returns (uint256 dataResult) {\n        // Check if Opium.OracleAggregator has data\n        require(hasData(oracleId, timestamp), \"O2\");\n\n        // Return cached data\n        dataResult = dataCache[oracleId][timestamp];\n    }\n\n    /// @notice Getter for dataExist mapping\n    /// @param oracleId address Address of the `oracleId` smart contract\n    /// @param timestamp uint256 Timestamp at which data were requested\n    /// @param result bool Returns whether data were provided already\n    function hasData(address oracleId, uint256 timestamp) public view returns (bool result) {\n        return dataExist[oracleId][timestamp];\n    }\n\n    // Reserved storage space to allow for layout changes in the future.\n    uint256[50] private __gap;\n}\n"
+    },
+    "contracts/test/upgradeability/TestOracleAggregatorUpgrade.sol": {
+      "content": "pragma solidity 0.8.5;\nimport \"../../core/OracleAggregator.sol\";\n\ncontract TestOracleAggregatorUpgrade is OracleAggregator {\n    function placeholder() external pure returns (string memory) {\n        return \"upgraded\";\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 800
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates",
+          "devdoc",
+          "userdoc",
+          "devdoc",
+          "userdoc"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

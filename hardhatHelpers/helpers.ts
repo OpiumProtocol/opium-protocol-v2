@@ -56,6 +56,7 @@ export const createNetworkConfigWithPrivateKey = (
   network: keyof typeof chainIds,
   nodeUrl: string,
   withPrivateKey: boolean = false,
+  customGasPrice?: number
 ): NetworkUserConfig => {
   if (withPrivateKey) {
     if (!privateKey) {
@@ -66,6 +67,7 @@ export const createNetworkConfigWithPrivateKey = (
       accounts: privateKey.split(" "),
       chainId: chainIds[network],
       url: nodeUrl,
+      gasPrice: customGasPrice,
     };
   }
   return {
@@ -77,5 +79,6 @@ export const createNetworkConfigWithPrivateKey = (
     },
     chainId: chainIds[network],
     url: nodeUrl,
+    gasPrice: customGasPrice,
   };
 };
