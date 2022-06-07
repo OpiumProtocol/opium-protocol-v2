@@ -1,0 +1,49 @@
+Nothing to compile
+No need to generate any newer typings.
+transaction 0x2bbbf6cc9f15d7e2687e53ab7996204927de70f78ed99cff6fea4b52aa445fdb still pending... It used a gas price of 10000000000 wei, current gas price is 38282450474 wei
+✔ Choose what to do with the pending transaction: · skip (forget tx)
+reusing "DefaultProxyAdmin" at 0x17b6ffe276e8a4a299a5a87a656afc5b8fa3ee4a
+deploying "Registry_Implementation" (tx: 0x67a743a3980e69a9ecdea0a006b6bf48ce0f08adf0c36ab32e028d8abf1baaf8)...: deployed at 0x85d9c3784B277Bc10e1504Aa8f647132ba17A674 with 2191598 gas
+deploying "Registry_Proxy" (tx: 0xf0ff0853c57622a344a1fe21a41bf86f483b068a4cdb137c051cbaa031e14e07)...: deployed at 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 with 1058784 gas
+reusing "DefaultProxyAdmin" at 0x17b6ffe276e8a4a299a5a87a656afc5b8fa3ee4a
+deploying "Core_Implementation" (tx: 0xb77eee071c030db6353807ca22d026d6bef71acede749939dae8b59124497a12)...: deployed at 0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e with 4281974 gas
+deploying "Core_Proxy" (tx: 0x12569e01e7d6145ccf5c760a357b00c6942811500eca2b02a744c0e6e11a0674)...: deployed at 0x33afAaA35df82D56833B7EEacb2b65Eb805AC774 with 652153 gas
+reusing "DefaultProxyAdmin" at 0x17b6ffe276e8a4a299a5a87a656afc5b8fa3ee4a
+deploying "TokenSpender_Implementation" (tx: 0x4e77bf9f99a8be0a1b973f3b3281bcc2bf4737d33f181437f7f6578c5b04aabc)...: deployed at 0x33A18faF0E7f6c7ed971BF5eC289d516C370e76D with 539446 gas
+deploying "TokenSpender_Proxy" (tx: 0x3c56fe268d82c78ad40646c03e2e4c6a57287a4b479b4a4a1d7111320740d119)...: deployed at 0x2f79B00B04907C038f006f3d318380ECDFe81050 with 571064 gas
+reusing "DefaultProxyAdmin" at 0x17b6ffe276e8a4a299a5a87a656afc5b8fa3ee4a
+deploying "OpiumProxyFactory_Implementation" (tx: 0x521cc189ed2e27d7361ca50dd406c401af134590f6f13984d0ec3e8c9bca13bd)...: deployed at 0x61EFdF8c52b49A347E69dEe7A62e0921A3545cF7 with 3183421 gas
+deploying "OpiumProxyFactory_Proxy" (tx: 0xb508baa4d0c434f4aacf3c925a8980e1728d3727247ebd6da75fe2b44e1589eb)...: deployed at 0x6E797659154AD0D6f199feaFA2E2086Ce0239Fbf with 2659997 gas
+reusing "DefaultProxyAdmin" at 0x17b6ffe276e8a4a299a5a87a656afc5b8fa3ee4a
+deploying "OracleAggregator_Implementation" (tx: 0xe0abd85357802984d692f87799a1fac278bbe2aafac4986d542a12f043ebb564)...: deployed at 0xAF5F031b8D5F12AD80d5E5f13C99249d82AfFfe2 with 196489 gas
+deploying "OracleAggregator_Proxy" (tx: 0xa621e094422960e30a51f163f92731b21c0d285206e0c196a8a8874709b5e51c)...: deployed at 0xC135bE47acCEf605E72C5017e450aE0207C97Afb with 544341 gas
+reusing "DefaultProxyAdmin" at 0x17b6ffe276e8a4a299a5a87a656afc5b8fa3ee4a
+deploying "SyntheticAggregator_Implementation" (tx: 0x94507c792eef031a1abba5dba69347ad50b0762464a67f8c0014951a968fa9e8)...: deployed at 0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d with 917438 gas
+deploying "SyntheticAggregator_Proxy" (tx: 0xad1ef7d228dab0bb4c32b801234ae617be8f1c024a1f9b4a19cf989d8b2f9290)...: deployed at 0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd with 615369 gas
+Tx #1 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 setProtocolAddresses [
+  '0x6E797659154AD0D6f199feaFA2E2086Ce0239Fbf',
+  '0x33afAaA35df82D56833B7EEacb2b65Eb805AC774',
+  '0xC135bE47acCEf605E72C5017e450aE0207C97Afb',
+  '0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd',
+  '0x2f79B00B04907C038f006f3d318380ECDFe81050'
+]
+Tx #2 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 setProtocolExecutionReserveClaimer [ '0xdbc2f7f3bccccf54f1bda43c57e8ab526e379df1' ]
+Tx #3 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 setProtocolRedemptionReserveClaimer [ '0xdbc2f7f3bccccf54f1bda43c57e8ab526e379df1' ]
+Tx #4 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 setDerivativeAuthorRedemptionReservePart [ 0 ]
+Tx #5 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 setProtocolExecutionReservePart [ 0 ]
+Tx #6 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 setProtocolRedemptionReservePart [ 0 ]
+Tx #7 Registry @ 0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23 addToWhitelist [ '0x33afAaA35df82D56833B7EEacb2b65Eb805AC774' ]
+Tx #8 Core @ 0x33afAaA35df82D56833B7EEacb2b65Eb805AC774 updateProtocolAddresses []
+Tx #9 Core @ 0x33afAaA35df82D56833B7EEacb2b65Eb805AC774 updateProtocolParametersArgs []
+----------------------
+#1 Transfer ownership of ProxyAdmin to DAO @ 0xdbc2f7f3bccccf54f1bda43c57e8ab526e379df1
+#2 call all initializers on implementation contracts [
+  'implementation of Registry',
+  'implementation of Core',
+  'implementation of TokenSpender',
+  'implementation of OpiumProxyFactory',
+  'implementation of OracleAggregator',
+  'implementation of SyntheticAggregator',
+  'OpiumProxyFactory.getImplementationAddress()'
+]
+deploying "OnChainPositionsLens" (tx: 0xaebf6df1a38f7b69ea3d7a6246209c6b03583b30020f456ddbd511f0cd008e9e)...: deployed at 0xfa01Fd6118445F811753D96178F2ef8AE77caa53 with 1378785 gas
