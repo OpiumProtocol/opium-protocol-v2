@@ -123,6 +123,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
+      mainnet: envConfig.etherscanKey,
       rinkeby: envConfig.etherscanKey,
       goerli: envConfig.etherscanKey,
       arbitrumTestnet: envConfig.arbiscanKey,
