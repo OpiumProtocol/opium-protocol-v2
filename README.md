@@ -49,6 +49,27 @@ Opium v2 is a permissionless financial smart escrow protocol that allows its use
 | BalanceHelper        | [0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d](https://arbiscan.io/address/0x2f92AE7f568c1Fe3379eE47Daa7819E1362bf25d) |
 | PayoutHelper         | [0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd](https://arbiscan.io/address/0x06eb4bCc14b8C1664a2d4e2CdE8fA2F992332fCd) |
 | OnChainPositionsLens | [0xfa01Fd6118445F811753D96178F2ef8AE77caa53](https://arbiscan.io/address/0xfa01Fd6118445F811753D96178F2ef8AE77caa53) |
+
+#### Polygon
+
+| Contract            | Proxy                                      | Implementation                             |
+|---------------------|--------------------------------------------|--------------------------------------------|
+| Registry            | [0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a](https://polygonscan.com/address/0x17b6ffe276e8A4a299a5a87a656aFc5b8FA3ee4a) | [0x845a7872d1cDe2B3285dE9f66B1D2EC70307cC6b](https://polygonscan.com/address/0x845a7872d1cDe2B3285dE9f66B1D2EC70307cC6b) |
+| Core                | [0x1497A23a2abC0DAFFb8e333183cfC181b24bB570](https://polygonscan.com/address/0x1497A23a2abC0DAFFb8e333183cfC181b24bB570) | [0x5854694204828385ED3d5B9d0FF912794D78cdaE](https://polygonscan.com/address/0x5854694204828385ED3d5B9d0FF912794D78cdaE) |
+| TokenSpender        | [0x0A9A6CD7485Dd77c6cec28FB1bd64D5969B79132](https://polygonscan.com/address/0x0A9A6CD7485Dd77c6cec28FB1bd64D5969B79132) | [0x7C78bfaDb7F0EA6E84CC5196B6fAC48fb1cFA34E](https://polygonscan.com/address/0x7C78bfaDb7F0EA6E84CC5196B6fAC48fb1cFA34E) |
+| OpiumProxyFactory   | [0x328bC74ccA6578349B262D21563d5581DAA43a16](https://polygonscan.com/address/0x328bC74ccA6578349B262D21563d5581DAA43a16) | [0x5a608F8dfD67504Eb1F07D0b32ACD8753160fCA3](https://polygonscan.com/address/0x5a608F8dfD67504Eb1F07D0b32ACD8753160fCA3) |
+| OpiumPositionToken  | -                                          | [0x6384f8070fda183e2b8ce0d521c0a9e7606e30ea](https://polygonscan.com/address/0x6384f8070fda183e2b8ce0d521c0a9e7606e30ea) |
+| OracleAggregator    | [0x85d9c3784B277Bc10e1504Aa8f647132ba17A674](https://polygonscan.com/address/0x85d9c3784B277Bc10e1504Aa8f647132ba17A674) | [0xC3e733eaCCD9c3bc54450aCe8074F589760Ae079](https://polygonscan.com/address/0xC3e733eaCCD9c3bc54450aCe8074F589760Ae079) |
+| SyntheticAggregator | [0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e](https://polygonscan.com/address/0xE6AFB8b01CAF0214706116c7Dc3B978E6eb8ce7e) | [0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23](https://polygonscan.com/address/0xbd0e3097F47cEcA12407bAc42cDD574cf3072F23) |
+| ProxyAdmin          | -                                          | [0x2Ba5feE02489c4c7D550b82044742084A652F01A](https://polygonscan.com/address/0x2Ba5feE02489c4c7D550b82044742084A652F01A) |
+
+**Helpers**
+
+| Contract             | Address                                      |
+|----------------------|--------------------------------------------|
+| BalanceHelper        | [0x8baF1b40DC21877Bfa371f9ceEcfe4a140492DC9](https://polygonscan.com/address/0x8baF1b40DC21877Bfa371f9ceEcfe4a140492DC9) |
+| PayoutHelper         | [0xB7F7A1d9EA90227A33d682F1cD94A684E90B7339](https://polygonscan.com/address/0xB7F7A1d9EA90227A33d682F1cD94A684E90B7339) |
+| OnChainPositionsLens | [0x33afAaA35df82D56833B7EEacb2b65Eb805AC774](https://polygonscan.com/address/0x33afAaA35df82D56833B7EEacb2b65Eb805AC774) |
 ### Testnet
 
 #### Arbitrum Testnet
@@ -144,6 +165,18 @@ The steps performed are the following:
 - Deploys contracts defined in the Protocol fixtures (deploy/index.ts)
 - After successful deployment, all the Protocol addresses (OpiumProxyFactory, Core, OracleAggregator, SyntheticAggregator, TokenSpender) and the protocol’s reserves receivers (named protocolExecutionReserveClaimer and protocolRedemptonReserveClaimer) should be stored in the Registry contract
 - After successful registration, the core contract should be added to the whitelist of TokenSpenders
+
+## Deployment on a new chain
+
+1) Setup new chain in `hardhat.config.ts`: RPC w/ PK + Etherscan API key
+2) Copy deployment script to new chain folder: Change ecosystem address
+3) Deploy + Transfer `ProxyAdmin` ownership to ecosystem
+4) Copy deployment notes to new file
+5) Initialize `OpiumPositionToken` and `RegistryImplementation` via hardhat tasks
+6) Verify implementations + detect proxies in Etherscan
+7) Add new addresses to README and DOCS
+8) Finish deployment activation via ecosystem transactions according to instructions
+9) Check final deployment with hardhat task: `npx hardhat checkDeployment:<network> --network <network>`
 
 ## Compile all contracts:
 

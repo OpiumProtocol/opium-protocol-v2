@@ -1,13 +1,17 @@
 import { task } from "hardhat/config";
 import { OpiumPositionToken, Registry } from './../typechain';
 
+const OpiumPositionTokenAddress = "0x6384f8070fda183e2b8ce0d521c0a9e7606e30ea"
+const RegistryImplementationAddress = "0x845a7872d1cDe2B3285dE9f66B1D2EC70307cC6b"
+const ecosystem = "0x964C04B87D14dF4aa74169874C4B15A87EED360d";
+
 task('initialize:OpiumPositionToken', "Initialize OpiumPositionToken implementation", async function (_taskArgs, _hre) {
   const { ethers } = _hre;
   const { deployer } = await ethers.getNamedSigners();
 
   const opiumPositionTokenImplementation = <OpiumPositionToken>await ethers.getContractAt(
     "OpiumPositionToken",
-    "0x6384f8070fda183e2b8ce0d521c0a9e7606e30ea"
+    OpiumPositionTokenAddress
   );
 
   const hash = "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -40,10 +44,8 @@ task('initialize:Registry', "Initialize Registry implementation", async function
 
   const registryImplementation = <Registry>await ethers.getContractAt(
     "Registry",
-    "0x845a7872d1cDe2B3285dE9f66B1D2EC70307cC6b"
+    RegistryImplementationAddress
   );
-
-  const ecosystem = "0xc9162e9e8A6C47E7346a3fe6Dda9fab54Dfbe49B";
 
   const tx = await registryImplementation
     .connect(deployer)

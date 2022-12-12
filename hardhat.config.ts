@@ -35,7 +35,7 @@ const config: HardhatUserConfig = {
     hardhat: createHardhatNetworkConfig(),
     arbitrum: createNetworkConfigWithPrivateKey("arbitrum", "https://arb1.arbitrum.io/rpc", true),
     arbitrumTestnet: createTestnetConfig("arbitrumTestnet", "https://rinkeby.arbitrum.io/rpc"),
-    mainnet: createNetworkConfigWithPrivateKey("mainnet", "https://node.dib.one", true, 13e9),
+    mainnet: createNetworkConfigWithPrivateKey("mainnet", "https://cloudflare-eth.com", true, 13e9),
     rinkeby: createTestnetWithL2Config("rinkeby", createInfuraUrl("rinkeby")),
     goerli: createNetworkConfigWithPrivateKey("goerli", createInfuraUrl("goerli"), true),
     kovan: createTestnetConfig("kovan", createInfuraUrl("kovan")),
@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
     bscTestnet: createTestnetConfig("bscTestnet", envConfig.bscTestnetEndpoint),
     bscMainnet: createTestnetConfig("bscMainnet", envConfig.bscMainnetEndpoint),
     polygonMumbai: createTestnetConfig("polygonMumbai", envConfig.polygonMumbaiEndpoint),
-    polygonMainnet: createTestnetConfig("polygonMainnet", envConfig.polygonMainnetEndpoint),
+    polygonMainnet: createNetworkConfigWithPrivateKey("polygonMainnet", "https://polygon-rpc.com", true),
     ganache: createTestnetConfig("ganache", "http://localhost:8545"),
   },
   paths: {
